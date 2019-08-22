@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.supshop.suppingmall.mapper.UserMapper">
+    
+    <resultMap id="User" type="com.supshop.suppingmall.user.User" autoMapping="true">
+        <id property="id" column="UserId" />
+        <result property="email" column="UserEmail" />
+        <result property="password" column="UserPassword" />
+        <result property="name" column="Username" />
+        <result property="nickName" column="UserNickName" />
+        <result property="address" column="UserAddress" />
+        <result property="addressDetail" column="UserAddressDetail" />
+        <result property="postNo" column="UserPostNo" />
+        <result property="phoneNumber" column="UserPhoneNumber" />
+        <result property="createDate" column="UserCreateDate" />
+        <result property="updateDate" column="UserUpdateData" />
+        <result property="role" column="UserRole" typeHandler="" /> 
+        <result property="delYn" column="UserDelYn" />
+        <result property="shopName" column="ShopName" />
+        <result property="shopNumber" column="ShopNumber" />
+        <result property="shopAddress" column="ShopAddress" />
+        <result property="shopAddressDetail" column="ShopAddressDetail" />
+        <result property="shopPostNo" column="ShopPostNo" />
+    </resultMap>
+
+    <select id="selectUser" resultMap="User">
+        SELECT U.user_no AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword",
+               U.name AS "UserName", U.nickname AS "UserNickName", U.address AS "UserAddress",
+               U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
+               U.phone_number AS "UserPhoneNumber", U.create_date AS "UserCreateDate", U.update_date AS "UserUpdateData",
+               U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
+               U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
+               FROM User AS U
+               <include refid="conditionalSearch"></include>
+    </select>
+
+    <sql id="conditionalSearch">
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="id != null">
+                AND U.user_no = #{id}
+            </if>
+            <if test="role != null">
+                AND U.role = #{role}
+            </if>
+            <if test="name != null">
+                <bind name="name" value="'%'+name+'%'"/>
+                AND u.name LIKE #{name}
+            </if>
+        </trim>
+    </sql>
+
+    <select id="selectUser" resultMap="User">
+        SELECT U.user_no AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword",
+               U.name AS "UserName", U.nickname AS "UserNickName", U.address AS "UserAddress",
+               U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
+               U.phone_number AS "UserPhoneNumber", U.create_date AS "UserCreateDate", U.update_date AS "UserUpdateData",
+               U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
+               U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
+               FROM User AS U
+               WHERE U.user_no = #{id}
+    </select>
+
+</mapper>

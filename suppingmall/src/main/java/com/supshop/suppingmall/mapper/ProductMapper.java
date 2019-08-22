@@ -1,10 +1,12 @@
-package com.supshop.suppingmall.product;
+package com.supshop.suppingmall.mapper;
+
+import com.supshop.suppingmall.product.Product;
 
 public interface ProductMapper {
 
     Product selectPrdoduct(String id);
 
-    String createProduct(Product product);
+    String insertProduct(Product product);
 
     String updateProduct(String id, Product product);
 
