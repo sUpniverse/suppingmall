@@ -1,6 +1,5 @@
 package com.supshop.suppingmall.product;
 
-import com.supshop.suppingmall.user.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -13,15 +12,16 @@ import java.util.List;
 @ToString
 public class Product {
 
-    int prductId;
-    String name;
-    String price;
-    List<ProductOptions> optionsList;
-    LocalDateTime registerDate;
-    User seller;
-    String brandName;
-    String category;
-    String thumbnail;
-    String picture;
-    String asNumber;
+    private int productId;
+    private String name;
+    private String price;
+    private List<ProductOptions> optionsList;
+    private LocalDateTime registerDate;
+    private String sellerId;
+    private String brandName;
+    private String category;
+    private String delYn;
+    private String thumbnail;
+    private String picture;
+    private String asNumber;
 }

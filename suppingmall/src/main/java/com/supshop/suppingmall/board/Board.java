@@ -17,6 +17,7 @@ public class Board {
     private String contents;
     private User userInfo;
     private String category;
+    private String delYn;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 

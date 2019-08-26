@@ -11,7 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ProductOptions {
 
-    private int productId;
     private int id;
     private String optionName;
     private String price;

@@ -27,13 +27,13 @@
 
     <select id="selectUser" resultMap="User">
         SELECT U.user_no AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword",
-               U.name AS "UserName", U.nickname AS "UserNickName", U.address AS "UserAddress",
-               U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
-               U.phone_number AS "UserPhoneNumber", U.create_date AS "UserCreateDate", U.update_date AS "UserUpdateData",
-               U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
-               U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
-               FROM User AS U
-               <include refid="conditionalSearch"></include>
+        U.name AS "UserName", U.nickname AS "UserNickName", U.address AS "UserAddress",
+        U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
+        U.phone_number AS "UserPhoneNumber", U.create_date AS "UserCreateDate", U.update_date AS "UserUpdateData",
+        U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
+        U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
+        FROM User AS U
+        <include refid="conditionalSearch"></include>
     </select>
 
     <sql id="conditionalSearch">
@@ -46,7 +46,7 @@
             </if>
             <if test="name != null">
                 <bind name="name" value="'%'+name+'%'"/>
-                AND u.name LIKE #{name}
+                AND U.name LIKE #{name}
             </if>
         </trim>
     </sql>
@@ -62,4 +62,5 @@
                WHERE U.user_no = #{id}
     </select>
 
+    <insert id="insertUser" parameterType="com.supshop.suppingmall.user.User"
 </mapper>

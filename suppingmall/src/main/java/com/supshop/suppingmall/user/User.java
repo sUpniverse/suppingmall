@@ -13,24 +13,24 @@ import java.util.Arrays;
 @ToString
 public class User {
 
-    int userId;
-    String email;
-    String password;
-    String name;
-    String nikcName;
-    String address;
-    String addreDetail;
-    String postNo;
-    String phoneNumber;
-    LocalDateTime createDate;
-    LocalDateTime updateData;
-    String delYn;
-    Role role;
-    String shopName;
-    String shopNumber;
-    String shopAddress;
-    String shopAddressDetail;
-    String shopPostNo;
+    private int userId;
+    private String email;
+    private String password;
+    private String name;
+    private String nikcName;
+    private String address;
+    private String addreDetail;
+    private String postNo;
+    private String phoneNumber;
+    private LocalDateTime createDate;
+    private LocalDateTime updateData;
+    private String delYn;
+    private Role role;
+    private String shopName;
+    private String shopNumber;
+    private String shopAddress;
+    private String shopAddressDetail;
+    private String shopPostNo;
 
     @Getter
     @AllArgsConstructor
@@ -47,8 +47,5 @@ public class User {
                     .findAny()
                     .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + code + "]"));
         }
-
     }
-
-
 }
