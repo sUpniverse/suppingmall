@@ -3,20 +3,21 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.supshop.suppingmall.mapper.UserMapper">
-    
     <resultMap id="User" type="com.supshop.suppingmall.user.User" autoMapping="true">
-        <id property="id" column="UserId" />
+        <id property="userId" column="UserId" />
         <result property="email" column="UserEmail" />
         <result property="password" column="UserPassword" />
         <result property="name" column="Username" />
         <result property="nickName" column="UserNickName" />
+        <result property="city" column="UserCity" />
+        <result property="downtown" column="UserDowntown" />
         <result property="address" column="UserAddress" />
         <result property="addressDetail" column="UserAddressDetail" />
         <result property="postNo" column="UserPostNo" />
         <result property="phoneNumber" column="UserPhoneNumber" />
-        <result property="createDate" column="UserCreateDate" />
-        <result property="updateDate" column="UserUpdateData" />
-        <result property="role" column="UserRole" typeHandler="" /> 
+        <result property="createdDate" column="UserCreatedDate" />
+        <result property="updatedDate" column="UserUpdatedDate" />
+        <result property="role" column="UserRole" typeHandler="com.supshop.suppingmall.user.RoleTypeHandler" />
         <result property="delYn" column="UserDelYn" />
         <result property="shopName" column="ShopName" />
         <result property="shopNumber" column="ShopNumber" />
@@ -25,15 +26,15 @@
         <result property="shopPostNo" column="ShopPostNo" />
     </resultMap>
 
-    <select id="selectUser" resultMap="User">
+    <select id="selectAllUser" resultMap="User">
         SELECT U.user_no AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword",
-        U.name AS "UserName", U.nickname AS "UserNickName", U.address AS "UserAddress",
-        U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
-        U.phone_number AS "UserPhoneNumber", U.create_date AS "UserCreateDate", U.update_date AS "UserUpdateData",
+        U.name AS "UserName", U.nickname AS "UserNickName", U.city AS "UserCity", U.downtown AS "UserDowntown",
+        U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
+        U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
         U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
-        FROM User AS U
-        <include refid="conditionalSearch"></include>
+        FROM suppingmall.User AS U
+<!--        <include refid="conditionalSearch"></include>-->
     </select>
 
     <sql id="conditionalSearch">
@@ -53,14 +54,73 @@
 
     <select id="selectUser" resultMap="User">
         SELECT U.user_no AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword",
-               U.name AS "UserName", U.nickname AS "UserNickName", U.address AS "UserAddress",
-               U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
-               U.phone_number AS "UserPhoneNumber", U.create_date AS "UserCreateDate", U.update_date AS "UserUpdateData",
-               U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
-               U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
-               FROM User AS U
-               WHERE U.user_no = #{id}
+        U.name AS "UserName", U.nickname AS "UserNickName", U.city AS "UserCity", U.downtown AS "UserDowntown",
+        U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
+        U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
+        U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
+        U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
+        FROM suppingmall.User AS U
+        WHERE U.user_no = #{id}
     </select>
 
-    <insert id="insertUser" parameterType="com.supshop.suppingmall.user.User"
+    <select id="selectUserByEmail" resultMap="User">
+        SELECT U.user_no AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword",
+        U.name AS "UserName", U.nickname AS "UserNickName", U.city AS "UserCity", U.downtown AS "UserDowntown",
+        U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
+        U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
+        U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
+        U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
+        FROM suppingmall.User AS U
+        WHERE U.email = #{email}
+    </select>
+
+    <insert id="insertUser" parameterType="com.supshop.suppingmall.user.User" useGeneratedKeys="true" keyProperty="user_no">
+        INSERT INTO User(
+        email,
+        password,
+        name,
+        nickname,
+        city,
+        downtown,
+        address,
+        address_detail,
+        post_no,
+        phone_number,
+        created_date,
+        updated_date,
+        delYn,
+        role)
+        VALUES (
+        #{email},
+        #{password},
+        #{name},
+        #{nickName},
+        #{city},
+        #{downtown},
+        #{address},
+        #{addressDetail},
+        #{postNo},
+        #{phoneNumber},
+        now(),
+        now(),
+        'N',
+        'U001')
+    </insert>
+    
+    <update id="updateUser" parameterType="com.supshop.suppingmall.user.User">
+        UPDATE User
+        SET
+        password = #{user.password},
+        name = #{user.name},
+        nickname = #{user.nickName},
+        city = #{user.city},
+        downtown = #{user.downtown},
+        address = #{user.address},
+        address_detail = #{user.addressDetail},
+        post_no = #{user.postNo},
+        phone_number = #{user.phoneNumber},
+        updated_date = now()
+        WHERE user_no = #{id};
+    </update>
+    
 </mapper>

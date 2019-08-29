@@ -10,7 +10,7 @@
         <result property="registerDate" column="ProductRegisterDate" />
         <result property="sellerId" column="ProductSellerId" />
         <result property="brandName" column="ProductBrandName" />
-        <result property="category" column="ProductCategory" typeHandler="" />
+        <result property="category" column="ProductCategory"/>
         <result property="delYn" column="ProductDelYn"/>
         <result property="thumbnail" column="ProductThumbnail" />
         <result property="picture" column="ProductPicture" />
@@ -89,7 +89,7 @@
         U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
         U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
         LEFT OUTER JOIN Product_Option_Info AS O on (P.product_no = O.product_no)
-        LEFT OUTER JOIN User AS U on (P.seller_no = U.user_No)
+        LEFT OUTER JOIN User AS U on (P.seller_no = U.user_no)
         WHERE P.product_no = #{id} AND P.delYn = 'Y'
         ORDER BY P.product_no, O.product_option_no, user_no ASC
     </select>
@@ -160,7 +160,7 @@
 
 
 
-    <update id="deleteProduct" parameterType="com.supshop.suppingmall.product">
+    <update id="deleteProduct" parameterType="com.supshop.suppingmall.product.Product">
         UPDATE Product
         SET
         delYn = 'Y',

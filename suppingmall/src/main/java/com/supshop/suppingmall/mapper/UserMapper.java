@@ -2,13 +2,19 @@ package com.supshop.suppingmall.mapper;
 
 import com.supshop.suppingmall.user.User;
 
+import java.util.List;
+
 public interface UserMapper {
-    
-    User selectUser(String id);
 
-    String insertUser(User user);
+    List<User> selectAllUser();
 
-    String updateUser(String id, User user);
+    User selectUser(int id);
 
-    String deleteUSer(String id);
+    User selectUserByEmail(String email);
+
+    void insertUser(User user);
+
+    void updateUser(int id, User user);
+
+    void deleteUSer(int id);
 }

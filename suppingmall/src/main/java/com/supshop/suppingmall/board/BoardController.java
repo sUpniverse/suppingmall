@@ -1,18 +1,35 @@
 package com.supshop.suppingmall.board;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
+
 @RequestMapping("/boards")
-@RestController
+@Controller
 public class BoardController {
 
     @Autowired
     BoardService boardService;
 
+    @GetMapping("/form")
+    public String form(HttpSession session) {
+
+        return "/board/form";
+    }
+
     @GetMapping("")
-    public Board getBoard(@PathVariable String id) {
-        return boardService.getBoard(id);
+    public String getAllBoard(Model model) {
+        model.addAttribute(boardService.getAllBoard());
+        return "/board/list";
+    }
+
+    @GetMapping("/{id}")
+    public String getBoard(@PathVariable String id, Model model) {
+        model.addAttribute(boardService.getBoard(id));
+        return "/board/board";
     }
 
     @PostMapping("")

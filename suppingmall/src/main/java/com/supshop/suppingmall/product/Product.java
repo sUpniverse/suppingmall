@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.product;
 
+import com.supshop.suppingmall.user.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -15,7 +16,7 @@ public class Product {
     private int productId;
     private String name;
     private String price;
-    private List<ProductOptions> optionsList;
+    private List<ProductOptions> options;
     private LocalDateTime registerDate;
     private String sellerId;
     private String brandName;

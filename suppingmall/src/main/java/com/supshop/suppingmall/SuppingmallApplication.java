@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan(value = {"com.supshop.suppingmall.mappers"})
+@MapperScan(value = {"com.supshop.suppingmall.mapper"})
 public class SuppingmallApplication {
 
     public static void main(String[] args) {

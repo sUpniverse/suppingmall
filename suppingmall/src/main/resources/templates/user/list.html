@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:include="fragments/header :: header" />
+</head>
+<body>
+    <nav th:replace="fragments/navigation :: navigation" />
+    <div class="container">
+        <table class="table table-default">
+            <thead>
+                <tr>
+                    <th>아이디</th>
+                    <th>이메일</th>
+                    <th>이름</th>
+                    <th>닉네임</th>
+                    <th>주소</th>
+                    <th>주소 상세</th>
+                    <th>우편번호</th>
+                    <th>핸드폰번호</th>
+                    <th>생성일</th>
+                    <th>권한</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${userList}">
+                <td th:text="${user.userId}" />
+                <td th:text="${user.email}" />
+                <td th:text="${user.name}" />
+                <td th:text="${user.nickName}" />
+                <td th:text="${user.address}" />
+                <td th:text="${user.addressDetail}" />
+                <td th:text="${user.postNo}" />
+                <td th:text="${user.phoneNumber}" />
+                <td th:text="${user.createdDate}" />
+                <td th:text="${user.role}" />
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

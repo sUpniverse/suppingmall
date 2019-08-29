@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: header" >
+</head>
+<body>
+    <nav th:replace="fragments/navigation :: navigation" />
+    <div class="container">
+
+        <table class="table table-default">
+            <thead>
+                <tr>
+                    <th>글번호</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>생성일</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="board : ${boardList}">
+                    <td th:text="${board.boardId}"/>
+                    <td><a th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}}"></a></td>
+                    <td th:text="${board.creater}" />
+                    <td th:text="${board.category}" />
+                    <td th:text="${board.createDate}" />
+                </tr>
+            </tbody>
+        </table>
+        <a href="/boards/form" class="btn btn-primary">글쓰기</a>
+    </div>
+</body>
+</html>

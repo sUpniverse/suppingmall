@@ -1,9 +1,10 @@
 package com.supshop.suppingmall.product;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/products")
-@RestController
+@Controller
 public class ProductController {
 
     @GetMapping("")
