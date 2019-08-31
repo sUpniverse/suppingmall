@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: header" >
+<body>
+<nav th:replace="fragments/navigation :: navigation" />
+    <div class="container">
+        <form role="form" method="post" >
+            <input type="hidden" th:name="{id}(id=${board.boardId})">
+        </form>
+        <div class="table table-default">
+            <div class="form-group">
+                <label for="exampleInputEmail1">Title</label>
+                <input type="text" name="title" class="form-control" th:value="${board.title}">
+            </div>
+            <div class="form-group">
+                <label for="examplePassword1">Content</label>
+                <textarea rows="3" class="form-control" name="content" th:field="${board.contents}"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="exampleInputEmail1">Writer</label>
+                <input type="text" name="writer" class="form-control" th:value="${board.creater.nickName}">
+            </div>
+        </div>
+
+        <div class="box-footer">
+            <button type="submit" class="btn btn-warning">Complete</button>
+            <button type="submit" class="btn btn-danger">Cancle</button>
+        </div>
+    </div>
+</body>
+
+<script>
+    $(document).ready(function() {
+        var formObj = $("form[role='form']");
+
+        console.log(formObj);
+
+        $(".btn-warning").on("click", function() {
+            formObj.attr("action","/boards/");
+            formObj.submit();
+        });
+
+        $(".btn-danger").on("click",function() {
+            formObj.attr("action","/boards");
+            formObj.attr("method","delete");
+            formObj.submit();
+        });
+
+        $(".btn-primary").on("click",function() {
+            formObj.attr("action","/boards");
+            self.location ="/boards";
+        });
+    });
+</script>
+</html>

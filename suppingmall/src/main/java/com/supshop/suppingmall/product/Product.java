@@ -1,6 +1,5 @@
 package com.supshop.suppingmall.product;
 
-import com.supshop.suppingmall.user.User;
 import lombok.*;
 
 import java.time.LocalDateTime;

@@ -33,7 +33,7 @@
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
         U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
-        FROM suppingmall.User AS U
+        FROM User AS U
 <!--        <include refid="conditionalSearch"></include>-->
     </select>
 
@@ -59,7 +59,7 @@
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
         U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
-        FROM suppingmall.User AS U
+        FROM User AS U
         WHERE U.user_no = #{id}
     </select>
 
@@ -70,7 +70,7 @@
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
         U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
-        FROM suppingmall.User AS U
+        FROM User AS U
         WHERE U.email = #{email}
     </select>
 

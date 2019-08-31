@@ -7,25 +7,56 @@
         <id property="boardId" column="BoardId" />
         <result property="title" column="BoardTitle" />
         <result property="contents" column="BoardContents" />
-        <result property="creater" column="Boardcreater"  />
         <result property="category" column="BoardCategory"/>
         <result property="delYn" column="BoardDelYn" />
         <result property="createDate" column="BoardCreateDate" />
         <result property="updateDate" column="BoardUpdateDate" />
+        <association property="creater" javaType="com.supshop.suppingmall.user.User">
+            <id property="userId" column="UserId" />
+            <result property="email" column="UserEmail" />
+            <result property="nickName" column="UserNickName" />
+            <result property="createdDate" column="UserCreatedDate" />
+            <result property="role" column="UserRole" typeHandler="com.supshop.suppingmall.user.RoleTypeHandler" />
+        </association>
     </resultMap>
 
     <select id="selectAllBoard" resultMap="Board">
         SELECT B.board_no AS "BoardId", B.title AS "BoardTitle", B.creater AS "Boardcreater",
-        B.category AS "BoardCategory",B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate"
+        B.category AS "BoardCategory",B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate",
+        U.user_no AS "UserId", U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate",
+        U.role AS "UserRole"
         FROM Board AS B
+        LEFT OUTER JOIN User AS U on (B.creater = U.user_no)
     </select>
 
     <select id="selectBoard" resultMap="Board">
-        SELECT B.board_no AS "BoardId", B.title AS "BoardTitle", B.creater AS "Boardcreater",
-        B.category AS "BoardCategory",B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate"
+        SELECT B.board_no AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents",B.creater AS "Boardcreater",
+        B.category AS "BoardCategory",B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate",
+        U.user_no AS "UserId", U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate",
+        U.role AS "UserRole"
         FROM Board AS B
+        LEFT OUTER JOIN User AS U on (B.creater = U.user_no)
         WHERE B.board_no = #{id}
     </select>
+
+    <insert id="insertBoard" parameterType="com.supshop.suppingmall.board.Board" useGeneratedKeys="true" keyProperty="board_no">
+        INSERT INTO Board (
+        title,
+        contents,
+        creater,
+        category,
+        created_date,
+        updated_date
+        )
+        VALUES (
+        #{title},
+        #{contents},
+        #{creater.userId},
+        #{category},
+        now(),
+        now()
+        )
+    </insert>
 
 </mapper>
 

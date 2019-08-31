@@ -15,7 +15,7 @@ public class Board {
     private int boardId;
     private String title;
     private String contents;
-    private String creater;
+    private User creater;
     private String category;
     private String delYn;
     private LocalDateTime createDate;

@@ -37,9 +37,9 @@ public class User {
     @Getter
     @AllArgsConstructor
     public enum Role {
-        Admin("000"),
-        Seller("001"),
-        User("002");
+        Admin("U000"),
+        Seller("U001"),
+        User("U002");
 
         private String code;
 

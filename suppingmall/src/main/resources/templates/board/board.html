@@ -2,10 +2,10 @@
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: header" >
 <body>
-    <nav th:replace="fragments/navigation :: navigation" />
+<nav th:replace="fragments/navigation :: navigation" />
     <div class="container">
         <form role="form" method="post">
-            <input type="hidden" name="id" th:value="${board.boardId}">
+            <input th:type="hidden" th:value="  @{/{id}(id=${board.boardId})}">
         </form>
         <div class="table table-default">
             <div class="form-group">
@@ -18,7 +18,7 @@
             </div>
             <div class="form-group">
                 <label for="exampleInputEmail1">Writer</label>
-                <input type="text" name="writer" class="form-control" th:value="${board.creater}" readonly="readonly">
+                <input type="text" name="writer" class="form-control" th:value="${board.creater.nickName}" readonly="readonly">
             </div>
         </div>
 
@@ -33,23 +33,39 @@
 <script>
     $(document).ready(function() {
         var formObj = $("form[role='form']");
-
+        var boardId = $
         console.log(formObj);
 
         $(".btn-warning").on("click", function() {
-            formObj.attr("action","/boards");
-            formObj.attr("method","put");
-            formObj.submit();
+            
+            $.ajax({
+                type : 'get',
+                url : '/boards/' + boardId,
+                headers : {
+                    "Content-Type" : "application/json",
+                    "X-HTTP-Method-Override" : "get"                    
+                },
+                dataType : 'text',
+                success : function() {
+                    if(result == 'SUCCESS') {
+                        
+                    }
+            }
+            });
+            
+            function getBoard() {
+                
+            }
         });
 
         $(".btn-danger").on("click",function() {
-            formObj.attr("action","/boards");
+            formObj.attr("action","/boards/");
             formObj.attr("method","delete");
             formObj.submit();
         });
 
         $(".btn-primary").on("click",function() {
-            formObj.attr("action","/boards");
+            formObj.attr("action","/boards/");
             self.location ="/boards";
         });
     });

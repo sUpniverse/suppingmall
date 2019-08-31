@@ -10,9 +10,9 @@ public interface BoardMapper {
     
     Board selectBoard(String id);
 
-    String insertBoard(Board board);
+    void insertBoard(Board board);
 
-    String updateBoard(String id, Board board);
+    void updateBoard(String id, Board board);
 
-    String deleteBoard(String id);
+    void deleteBoard(String id);
 }

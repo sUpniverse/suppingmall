@@ -6,8 +6,8 @@
     <body>
         <nav th:replace="fragments/navigation :: navigation" />
         <div class="container">
-            <form action="/boards" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="authenticity_token" value="<%=form_authenticity_token%>">
+            <form th:action="@{/boards}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="category" th:value="${category}">
                 <table class="table">
                     <thead>
                     <tr>
@@ -17,12 +17,12 @@
                     <tbody>
                     <tr>
                         <td>
-                            <input class="form-control" type="text" name="" placeholder="제목">
+                            <input class="form-control" type="text" name="title" placeholder="제목">
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <input class="form-control" type="text" name="" size="1024px" placeholder="내용">
+                            <input class="form-control" type="text" name="contents" size="1024px" placeholder="내용">
                         </td>
                     </tr>
                     <tr>

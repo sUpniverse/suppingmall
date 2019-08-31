@@ -19,6 +19,6 @@ logging:
   level:
     org.hibernate.sql: debug
     org.type.descriptor.sql.BasicBinder: trace
-  com.supshop.suppingmall: debug
+
 
 

@@ -19,13 +19,13 @@
                 <tr th:each="board : ${boardList}">
                     <td th:text="${board.boardId}"/>
                     <td><a th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}}"></a></td>
-                    <td th:text="${board.creater}" />
+                    <td th:text="${board.creater.nickName}" />
                     <td th:text="${board.category}" />
                     <td th:text="${board.createDate}" />
                 </tr>
             </tbody>
         </table>
-        <a href="/boards/form" class="btn btn-primary">글쓰기</a>
+        <a href="/boards/form/B001" class="btn btn-primary">글쓰기</a>
     </div>
 </body>
 </html>
