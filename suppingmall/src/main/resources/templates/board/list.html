@@ -20,8 +20,7 @@
                     <td th:text="${board.boardId}"/>
                     <td><a th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}}"></a></td>
                     <td th:text="${board.creater.nickName}" />
-                    <td th:text="${board.category}" />
-                    <td th:text="${board.createDate}" />
+                    <td th:text="${board.createdDate}" />
                 </tr>
             </tbody>
         </table>

@@ -9,8 +9,8 @@
         <result property="contents" column="BoardContents" />
         <result property="category" column="BoardCategory"/>
         <result property="delYn" column="BoardDelYn" />
-        <result property="createDate" column="BoardCreateDate" />
-        <result property="updateDate" column="BoardUpdateDate" />
+        <result property="createdDate" column="BoardCreatedDate" />
+        <result property="updatedDate" column="BoardUpdatedDate" />
         <association property="creater" javaType="com.supshop.suppingmall.user.User">
             <id property="userId" column="UserId" />
             <result property="email" column="UserEmail" />
@@ -27,6 +27,7 @@
         U.role AS "UserRole"
         FROM Board AS B
         LEFT OUTER JOIN User AS U on (B.creater = U.user_no)
+        ORDER BY B.board_no, U.user_no ASC
     </select>
 
     <select id="selectBoard" resultMap="Board">
@@ -58,5 +59,18 @@
         )
     </insert>
 
+    <update id="updateBoard" parameterType="com.supshop.suppingmall.board.Board">
+        UPDATE Board
+        SET
+        title = #{board.title},
+        contents = #{board.contents},
+        updated_date = now()
+        WHERE board_no = #{id};
+    </update>
+
+    <delete id="deleteBoard" parameterType="com.supshop.suppingmall.board.Board">
+        DELETE FROM Board
+        WHERE board_no = #{id};
+    </delete>
 </mapper>
 

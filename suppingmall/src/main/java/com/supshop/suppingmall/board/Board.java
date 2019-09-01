@@ -18,7 +18,7 @@ public class Board {
     private User creater;
     private String category;
     private String delYn;
-    private LocalDateTime createDate;
-    private LocalDateTime updateDate;
+    private LocalDateTime createdDate;
+    private LocalDateTime updatedDate;
 
 }
