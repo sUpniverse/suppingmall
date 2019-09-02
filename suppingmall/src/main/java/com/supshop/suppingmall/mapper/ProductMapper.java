@@ -2,13 +2,17 @@ package com.supshop.suppingmall.mapper;
 
 import com.supshop.suppingmall.product.Product;
 
+import java.util.List;
+
 public interface ProductMapper {
+
+    List<Product> selectAllProduct();
 
     Product selectPrdoduct(String id);
 
-    String insertProduct(Product product);
+    void insertProduct(Product product);
 
-    String updateProduct(String id, Product product);
+    void updateProduct(String id, Product product);
 
-    String deleteProduct(String id);
+    void deleteProduct(String id);
 }

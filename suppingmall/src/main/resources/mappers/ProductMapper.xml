@@ -7,14 +7,27 @@
         <id property="productId" column="ProductNo" />
         <result property="name" column="ProductName" />
         <result property="price" column="ProductPrice" />
-        <result property="registerDate" column="ProductRegisterDate" />
-        <result property="sellerId" column="ProductSellerId" />
+        <result property="registeredDate" column="ProductRegisteredDate" />
         <result property="brandName" column="ProductBrandName" />
         <result property="category" column="ProductCategory"/>
         <result property="delYn" column="ProductDelYn"/>
         <result property="thumbnail" column="ProductThumbnail" />
         <result property="picture" column="ProductPicture" />
         <result property="asNumber" column="ProductAsNumber"/>
+        <association property="sellerId" javaType="com.supshop.suppingmall.user.User">
+            <id property="userId" column="UserId" />
+            <result property="email" column="UserEmail" />
+            <result property="nickName" column="UserNickName" />
+            <result property="createdDate" column="UserCreatedDate" />
+            <result property="role" column="UserRole" typeHandler="com.supshop.suppingmall.user.RoleTypeHandler" />
+            <result property="shop_name" column="UserShopName" />
+            <result property="shop_number" column="UserShopNumber" />
+            <result property="shop_city" column="UserShopCity" />
+            <result property="shop_downtown" column="UserShopDowntown" />
+            <result property="shop_address" column="UserShopAddress" />
+            <result property="shop_address_detail" column="UserShopAddressDetail" />
+            <result property="shop_post_no" column="UserShopAddressetail" />
+        </association>
         <collection property="options" column="ProductId" ofType="com.supshop.suppingmall.product.ProductOptions" >
             <id property="id" column="ProductOptionId" />
             <result property="optionName" column="ProductOptionName" />
@@ -31,11 +44,14 @@
             <result property="spec9" column="ProductOptionSpec9" />
             <result property="spec10" column="ProductOptionSpec10" />
         </collection>
+        <collection property="orders" column="ProductId" ofType="com.supshop.suppingmall.order.Order" >
+            <id property="id" column="OrderId" />
+        </collection>
     </resultMap>
 
     <select id="selectAllProduct" resultMap="Product" >
-        SELECT P.product_no AS "ProductNo", P.name AS "ProductName", P.price AS "ProductPrice",
-        P.register_date AS "ProductRegisterDate", P.seller_no AS "ProductSellerId",
+        SELECT P.product_no AS "ProductNo", P.product_name AS "ProductName", P.price AS "ProductPrice",
+        P.register_date AS "ProductRegisteredDate", P.seller_no AS "ProductSellerId",
         P.brand_name AS "ProductBrandName", P.category AS "ProductCategory",
         P.thumbnail AS "ProductThumbnail", P.picture AS "ProductPicture",
         P.as_number AS "ProductAsNumber",
@@ -46,13 +62,14 @@
         O.spec_8 AS "ProductOptionSpec8", O.spec_9 AS "ProductOptionSpec9", O.spec_10 AS "ProductOptionSpec10",
         U.name AS "UserName", U.nickname AS "UserNickName", U.address AS "UserAddress",
         U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
-        U.phone_number AS "UserPhoneNumber", U.create_date AS "UserCreateDate", U.update_date AS "UserUpdateData",
+        U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
+        U.shop_city AS "ShopCity", U.shop_downtown AS "ShopDowntown",
         U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
         FROM Product_Info AS P
         LEFT OUTER JOIN Product_Option_Info AS O on (P.product_no = O.product_no)
         LEFT OUTER JOIN User AS U on (P.seller_no = U.user_no)
-        <include refid="conditionalSearch"></include>
+<!--        <include refid="conditionalSearch"></include>-->
         ORDER BY P.product_no, O.product_option_no, user_no ASC
     </select>
 
@@ -73,8 +90,8 @@
     </sql>
 
     <select id="selectProduct" resultMap="Product" >
-        SELECT P.product_no AS "ProductNo", P.name AS "ProductName", P.price AS "ProductPrice",
-        P.register_date AS "ProductRegisterDate", P.seller_no AS "ProductSellerId",
+        SELECT P.product_no AS "ProductNo", P.product_name AS "ProductName", P.price AS "ProductPrice",
+        P.register_date AS "ProductRegisteredDate", P.seller_no AS "ProductSellerId",
         P.brand_name AS "ProductBrandName", P.category AS "ProductCategory",
         P.thumbnail AS "ProductThumbnail", P.picture AS "ProductPicture",
         P.as_number AS "ProductAsNumber",
@@ -85,12 +102,13 @@
         O.spec_8 AS "ProductOptionSpec8", O.spec_9 AS "ProductOptionSpec9", O.spec_10 AS "ProductOptionSpec10",
         U.name AS "UserName", U.nickname AS "UserNickName", U.address AS "UserAddress",
         U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
-        U.phone_number AS "UserPhoneNumber", U.create_date AS "UserCreateDate", U.update_date AS "UserUpdateData",
+        U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
+        U.shop_city AS "ShopCity", U.shop_downtown AS "ShopDowntown",
         U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
         LEFT OUTER JOIN Product_Option_Info AS O on (P.product_no = O.product_no)
         LEFT OUTER JOIN User AS U on (P.seller_no = U.user_no)
-        WHERE P.product_no = #{id} AND P.delYn = 'Y'
+        WHERE P.product_no = #{id} AND P.delYn = 'N'
         ORDER BY P.product_no, O.product_option_no, user_no ASC
     </select>
 
@@ -99,7 +117,7 @@
             <foreach collection="options" item="option" index="index" separator=";">
                 INSERT INTO Product_Option_Info(
                 product_option_no,
-                name,
+                product_name,
                 price,
                 total_count,
                 spec_1,
@@ -131,12 +149,12 @@
         </if>
     </sql>
 
-    <insert id="insertProduct" parameterType="com.supshop.suppingmall.product.Product" keyProperty="id">
+    <insert id="insertProduct" parameterType="com.supshop.suppingmall.product.Product" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO Product(
                 product_no,
                 product_name,
                 price,
-                register_date,
+                registered_date,
                 seller_no,
                 brand_name,
                 category,
@@ -147,18 +165,16 @@
                 VALUES (
                 #{id},
                 #{name},
-                #{registerDate},
+                #{registeredDate},
                 #{seller},
                 #{brandName},
                 #{category},
-                'Y',
+                'N',
                 #{thumbnail},
                 #{picture},
                 #{asNumber})
         <include refid="addProductOptions" />
     </insert>
-
-
 
     <update id="deleteProduct" parameterType="com.supshop.suppingmall.product.Product">
         UPDATE Product
