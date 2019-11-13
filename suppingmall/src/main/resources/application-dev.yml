@@ -21,4 +21,3 @@ logging:
     org.type.descriptor.sql.BasicBinder: trace
 
 
-

@@ -14,6 +14,11 @@ public class ProductController {
     @Autowired
     ProductService productService;
 
+    @GetMapping("/form")
+    public String form() {
+        return "/product/form";
+    }
+
     @GetMapping("")
     public String getAllProduct(Model model) {
         List<Product> products = productService.retrieveAllProduct();

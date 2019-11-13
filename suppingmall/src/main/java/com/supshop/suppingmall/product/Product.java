@@ -27,4 +27,9 @@ public class Product {
     private String thumbnail;
     private String picture;
     private String asNumber;
+    private String spec1;
+    private String spec2;
+    private String spec3;
+    private String spec4;
+    private String spec5;
 }

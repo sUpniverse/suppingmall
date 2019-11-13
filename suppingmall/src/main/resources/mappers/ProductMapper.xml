@@ -14,6 +14,11 @@
         <result property="thumbnail" column="ProductThumbnail" />
         <result property="picture" column="ProductPicture" />
         <result property="asNumber" column="ProductAsNumber"/>
+        <result property="spec1" column="ProductSpec1" />
+        <result property="spec2" column="ProductSpec2" />
+        <result property="spec3" column="ProductSpec3" />
+        <result property="spec4" column="ProductSpec4" />
+        <result property="spec5" column="ProductSpec5" />
         <association property="sellerId" javaType="com.supshop.suppingmall.user.User">
             <id property="userId" column="UserId" />
             <result property="email" column="UserEmail" />
@@ -33,16 +38,6 @@
             <result property="optionName" column="ProductOptionName" />
             <result property="price" column="ProductOptionPrice" />
             <result property="totalCount" column="ProductOptionTotalCount" />
-            <result property="spec1" column="ProductOptionSpec1" />
-            <result property="spec2" column="ProductOptionSpec2" />
-            <result property="spec3" column="ProductOptionSpec3" />
-            <result property="spec4" column="ProductOptionSpec4" />
-            <result property="spec5" column="ProductOptionSpec5" />
-            <result property="spec6" column="ProductOptionSpec6" />
-            <result property="spec7" column="ProductOptionSpec7" />
-            <result property="spec8" column="ProductOptionSpec8" />
-            <result property="spec9" column="ProductOptionSpec9" />
-            <result property="spec10" column="ProductOptionSpec10" />
         </collection>
         <collection property="orders" column="ProductId" ofType="com.supshop.suppingmall.order.Order" >
             <id property="id" column="OrderId" />
@@ -54,12 +49,10 @@
         P.register_date AS "ProductRegisteredDate", P.seller_no AS "ProductSellerId",
         P.brand_name AS "ProductBrandName", P.category AS "ProductCategory",
         P.thumbnail AS "ProductThumbnail", P.picture AS "ProductPicture",
-        P.as_number AS "ProductAsNumber",
+        P.as_number AS "ProductAsNumber", P.spec1 AS "ProductSpec1",P.spec2 AS "ProductSpec2",
+        P.spec3 AS "ProductSpec3", P.spec4 AS "ProductSpec4", P.spec5 AS "ProductSpec5",
         O.product_Option_No AS "ProductOptionId", O.name AS "ProductOptionName",
-        O.total_Count AS "ProductOptionTotalCount", O.spec_1 AS "ProductOptionSpec1",
-        O.spec_2 AS "ProductOptionSpec2", O.spec_3 AS "ProductOptionSpec3", O.spec_4 AS "ProductOptionSpec4",
-        O.spec_5 AS "ProductOptionSpec5", O.spec_6 AS "ProductOptionSpec6", O.spec_7 AS "ProductOptionSpec7",
-        O.spec_8 AS "ProductOptionSpec8", O.spec_9 AS "ProductOptionSpec9", O.spec_10 AS "ProductOptionSpec10",
+        O.total_Count AS "ProductOptionTotalCount",
         U.name AS "UserName", U.nickname AS "UserNickName", U.address AS "UserAddress",
         U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
@@ -94,12 +87,10 @@
         P.register_date AS "ProductRegisteredDate", P.seller_no AS "ProductSellerId",
         P.brand_name AS "ProductBrandName", P.category AS "ProductCategory",
         P.thumbnail AS "ProductThumbnail", P.picture AS "ProductPicture",
-        P.as_number AS "ProductAsNumber",
+        P.as_number AS "ProductAsNumber", P.spec1 AS "ProductSpec1",P.spec2 AS "ProductSpec2",
+        P.spec3 AS "ProductSpec3", P.spec4 AS "ProductSpec4", P.spec5 AS "ProductSpec5",
         O.product_Option_No AS "ProductOptionId", O.name AS "ProductOptionName",
-        O.total_Count AS "ProductOptionTotalCount", O.spec_1 AS "ProductOptionSpec1",
-        O.spec_2 AS "ProductOptionSpec2", O.spec_3 AS "ProductOptionSpec3", O.spec_4 AS "ProductOptionSpec4",
-        O.spec_5 AS "ProductOptionSpec5", O.spec_6 AS "ProductOptionSpec6", O.spec_7 AS "ProductOptionSpec7",
-        O.spec_8 AS "ProductOptionSpec8", O.spec_9 AS "ProductOptionSpec9", O.spec_10 AS "ProductOptionSpec10",
+        O.total_Count AS "ProductOptionTotalCount",
         U.name AS "UserName", U.nickname AS "UserNickName", U.address AS "UserAddress",
         U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",

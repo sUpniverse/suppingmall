@@ -2,36 +2,267 @@
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head>
         <div th:include="fragments/header :: header" />
+
+        <script src="https://cdn.ckeditor.com/ckeditor5/15.0.0/classic/ckeditor.js"></script>
     </head>
     <body>
         <nav th:replace="fragments/navigation :: navigation" />
         <div class="container">
-            <form th:action="@{/boards}" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="category" th:value="${category}">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th scope="col">게시판 작성</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>
-                            <input class="form-control" type="text" name="title" placeholder="제목">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input class="form-control" type="text" name="contents" size="1024px" placeholder="내용">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="file" name=""></td>
-                    </tr>
-                    </tbody>
-                </table>
-                <input class="btn btn-success" type="submit" value="등록하기">
-            </form>
+            <div class="py-1 mb-5 text-center">
+                <img class="d-block mx-auto mb-4" src="/docs/4.3/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
+                <h2>물품 등록</h2>
+            </div>
+
+            <div class="col-md order-md-1">
+                <h4 class="mb-3">물품 상세정보 입력</h4>
+                <form class="needs-validation" novalidate>
+                    <div class="row">
+                        <div class="form-group col-md-6 mb-3">
+                            <label for="product_category_top">카테고리 1차</label>
+                            <select class="form-control" id="product_category_top" th:name="product_category_top" required>
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Valid first name is required.
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 mb-3">
+                            <label for="product_category_bottom">카테고리 2차</label>
+                            <select class="form-control" id="product_category_bottom" th:name="product_category_bottom" required>
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Valid first name is required.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="product_name">상품명</label>
+                            <input type="text" class="form-control" id="product_name" th:name="product_name" required>
+                            <small class="text-muted">Full name as displayed on card</small>
+                            <div class="invalid-feedback">
+                                Name on card is required
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="price">가격 <span class="text-muted">(원)</span></label></label>
+                            <input type="text" class="form-control" id="price" th:name="price" required>
+                            <small class="text-muted">Full name as displayed on card</small>
+                            <div class="invalid-feedback">
+                                Name on card is required
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="spec1">스펙1 <span class="text-muted">(제품의 상세스펙)</span></label></label>
+                            <input type="text" class="form-control" id="spec1" th:name="price" required>
+                            <small class="text-muted">제품의 상세 스펙을 적으세요</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="spec2">스펙2 <span class="text-muted">(제품의 상세스펙)</span></label></label>
+                            <input type="text" class="form-control" id="spec2" th:name="price" required>
+                            <small class="text-muted">제품의 상세 스펙을 적으세요</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="spec3">스펙3 <span class="text-muted">(제품의 상세스펙)</span></label></label>
+                            <input type="text" class="form-control" id="spec3" th:name="price" required>
+                            <small class="text-muted">제품의 상세 스펙을 적으세요</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="spec4">스펙4 <span class="text-muted">(제품의 상세스펙)</span></label></label>
+                            <input type="text" class="form-control" id="spec4" th:name="price" required>
+                            <small class="text-muted">제품의 상세 스펙을 적으세요</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="spec5">스펙5 <span class="text-muted">(제품의 상세스펙)</span></label></label>
+                            <input type="text" class="form-control" id="spec5" th:name="price" required>
+                            <small class="text-muted">제품의 상세 스펙을 적으세요</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="spec6">스펙6 <span class="text-muted">(제품의 상세스펙)</span></label></label>
+                            <input type="text" class="form-control" id="spec6" th:name="price" required>
+                            <small class="text-muted">제품의 상세 스펙을 적으세요</small>
+                        </div>
+                    </div>
+
+                    <hr class="mb-4">
+                    <h4 class="mb-3">상품 이미지 첨부</h4>
+                    <div style="max-width: 650px; margin: auto;">
+                        <h1 class="page-header">Bootstrap Image Upload Form</h1>
+                        <p class="lead">Select a PNG or JPEG image, having maximum size <span id="max-size"></span> KB.</p>
+
+                        <form id="upload-image-form" action="" method="post" enctype="multipart/form-data">
+                            <div id="image-preview-div" style="display: none">
+                                <label for="exampleInputFile">Selected image:</label>
+                                <br>
+                                <img id="preview-img" src="noimage">
+                            </div>
+                            <div class="form-group">
+                                <input type="file" name="file" id="file" required>
+                            </div>
+                            <button class="btn btn-lg btn-primary" id="upload-button" type="submit" disabled>Upload image</button>
+                        </form>
+
+                        <br>
+                        <div class="alert alert-info" id="loading" style="display: none;" role="alert">
+                            Uploading image...
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                                </div>
+                            </div>
+                        </div>
+                        <div id="message"></div>
+                    </div>
+
+
+                    <hr class="mb-4">
+                    <h4 class="mb-3">상품 옵션</h4>
+                    <div class="mb-2">
+                        <button type="button" class="btn btn-light btn-sm">+옵션 추가</button>
+                        <button type="button" class="btn btn-danger btn-sm">옵션 저장</button>
+                    </div>
+                    <div class="container">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>NO</th>
+                                    <th>옵션명</th>
+                                    <th>판매가(원)</th>
+                                    <th>재고량</th>
+                                    <th>???</th>
+                                    <th>???</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td></td>
+                                    <th><input type="text" class="form-control" placeholder="옵션"></th>
+                                    <th><input type="text" class="form-control" placeholder="추가 가격(원)"></th>
+                                    <th><input type="text" class="form-control" placeholder="재고량"></th>
+                                    <th><input type="text" class="form-control" placeholder="???"></th>
+                                    <th><input type="text" class="form-control" placeholder="???"></th>
+                                    <th><button type="button" class="btn btn-danger btn-sm">x</button></th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr class="mb-4">
+                    <h4 class="mb-3">내용 입력</h4>
+                    <textarea name="content" id="editor"></textarea>
+
+                    <hr class="mb-4">
+
+                    <h4 class="mb-3">판매자 정보 입력</h4>
+
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="same-address">
+                        <label class="custom-control-label" for="same-address">기존의 등록지를 사용합니다.</label>
+                    </div>
+                    <div class="custom-control custom-checkbox mb-3">
+                        <input type="checkbox" class="custom-control-input" id="save-info">
+                        <label class="custom-control-label" for="save-info">새 등록지를 추가 합니다.</label>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-5 mb-3">
+                            <label for="country">Country</label>
+                            <select class="custom-select d-block w-100" id="country" required>
+                                <option value="">Choose...</option>
+                                <option>United States</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select a valid country.
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="state">State</label>
+                            <select class="custom-select d-block w-100" id="state" required>
+                                <option value="">Choose...</option>
+                                <option>California</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please provide a valid state.
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="zip">Zip</label>
+                            <input type="text" class="form-control" id="zip" placeholder="" required>
+                            <div class="invalid-feedback">
+                                Zip code required.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="cc-expiration">우편번호 앞자리</label>
+                            <input type="text" class="form-control" id="cc-expiration" placeholder="" required>
+                            <div class="invalid-feedback">
+                                Expiration date required
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="cc-cvv">우편번호 뒷자리</label>
+                            <input type="text" class="form-control" id="cc-cvv" placeholder="" required>
+                            <div class="invalid-feedback">
+                                Security code required
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="mb-4">
+                    <button class="btn btn-primary btn-lg btn-block" type="submit">상품 등록</button>
+                </form>
+            </div>
         </div>
+        <footer th:include="fragments/footer :: footer" />
     </body>
+    <script th:inline="javascript">
+        $(document).ready(function() {
+
+            $("#product_add_btn").on("click", function() {
+                var small = document.createElement('small')
+                var h6 = document.createElement('h6')
+                var div = document.createElement('div');
+                var li = document.createElement('li').appendChild(div.appendChild(h6.className("text-muted")));
+                li.className("list-group-item d-flex justify-content-between lh-condensed");
+                var span = document.createElement('span').className("text-muted");
+                ulObj.appendChild(li);
+                ulObj.appendChild(span);
+            });
+        });
+
+    </script>
+    <script>
+        var editor_id = '#editor';
+
+        ClassicEditor
+            .create( document.querySelector(editor_id), {
+                language:"ko",
+                height: 500
+            })
+            .then(function (editor) {
+                editoro = editor;
+                editor.plugins.get("FileRepository").createUploadAdapter = function (loader) {
+                    return new CustomUploadAdapter(loader, "/images/board/press", function (result) {
+                        var fileSeq = isEmpty(result[0]) ? "noimage" : result[0];
+                        var imageUrl = window.location.protocol + "//" + window.location.host + "/image/" + fileSeq;
+                        return {"default" : imageUrl};
+                    });
+                };
+            })
+            .catch(function (error) {
+                console.log( error );
+            } );
+    </script>
+    <footer th:include="fragments/footer :: footer" />
 </html>

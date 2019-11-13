@@ -53,6 +53,10 @@
             </a>
         </div>
 
+        <div class="container mt-5 mb-1">
+            <a class="btn btn-outline-danger" href="/products/form">물품등록</a>
+        </div>
+
         <div class="row mb-2 mt-5">
             <div class="col-md-6" th:each="product : ${products}">
                 <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
@@ -71,4 +75,5 @@
         </div>
     </div>
 </body>
+<footer th:include="fragments/footer :: footer" />
 </html>

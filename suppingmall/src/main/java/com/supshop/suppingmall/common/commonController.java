@@ -11,4 +11,9 @@ public class commonController {
     public String mainPage(){
         return "main.html";
     }
+
+    @RequestMapping("/test")
+    public String testPage(){
+        return "test.html";
+    }
 }
