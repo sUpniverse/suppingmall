@@ -1,10 +1,14 @@
 package com.supshop.suppingmall.product;
 
+import com.supshop.suppingmall.file.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpSession;
+import java.util.Arrays;
 import java.util.List;
 
 @RequestMapping("/products")
@@ -13,6 +17,9 @@ public class ProductController {
 
     @Autowired
     ProductService productService;
+
+    @Autowired
+    FileService fileService;
 
     @GetMapping("/form")
     public String form() {
@@ -31,9 +38,20 @@ public class ProductController {
         return "";
     }
 
+    // https://baekjungho.github.io/project-springboard15/ 참고 <-- commons libray
+    // https://gofnrk.tistory.com/36 <-- spring boot
+    // https://stackabuse.com/uploading-files-with-spring-boot/
     @PostMapping("")
-    public String createProduct(Product product) {
-        return "";
+    public String createProduct(Product product, HttpSession session, @RequestPart MultipartFile[] files) {
+
+        Arrays.asList(files)
+                .stream()
+                .forEach(file -> {
+                    fileService.uploadFile(file,"product",product.getProductId());
+                });
+
+        productService.createProduct(product);
+        return "forward:/products/}";
     }
 
     @PutMapping("/{id}")

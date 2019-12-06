@@ -4,6 +4,26 @@
         <div th:include="fragments/header :: header" />
 
         <script src="https://cdn.ckeditor.com/ckeditor5/15.0.0/classic/ckeditor.js"></script>
+        <style type="text/css">
+            input[type=file] {
+                display: none;
+            }
+
+            .images_wrap {
+
+                border: 2px solid #A8A8A8;
+                margin-top: 30px;
+                margin-bottom: 30px;
+                padding-top: 10px;
+                padding-bottom: 10px;
+
+            }
+            .images_wrap img {
+                max-width: 150px;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+        </style>
     </head>
     <body>
         <nav th:replace="fragments/navigation :: navigation" />
@@ -14,8 +34,8 @@
             </div>
 
             <div class="col-md order-md-1">
-                <h4 class="mb-3">물품 상세정보 입력</h4>
-                <form class="needs-validation" novalidate>
+                <h4 class="mb-3">물품 기본정보 입력</h4>
+                <form class="needs-validation" enctype="multipart/form-data" novalidate>
                     <div class="row">
                         <div class="form-group col-md-6 mb-3">
                             <label for="product_category_top">카테고리 1차</label>
@@ -62,75 +82,96 @@
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
+                            <label for="product_name">제조사</label>
+                            <input type="text" class="form-control" id="brand_name" th:name="brand_name" required>
+                            <small class="text-muted">Full name as displayed on card</small>
+                            <div class="invalid-feedback">
+                                Name on card is required
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="product_name">원산지</label>
+                            <input type="text" class="form-control" id="made_in" th:name="made_in" required>
+                            <small class="text-muted">Full name as displayed on card</small>
+                            <div class="invalid-feedback">
+                                Name on card is required
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="mb-4">
+                    <h4 class="mb-3">물품 상세정보 입력</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="product_name">등록 년월</label>
+                            <input type="text" class="form-control" id="register_date" th:name="register_date" required>
+                            <small class="text-muted">Full name as displayed on card</small>
+                            <div class="invalid-feedback">
+                                Name on card is required
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="product_name">a/s 안내</label>
+                            <input type="text" class="form-control" id="as_number" th:name="as_number" required>
+                            <small class="text-muted">Full name as displayed on card</small>
+                            <div class="invalid-feedback">
+                                Name on card is required
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label for="spec1">스펙1 <span class="text-muted">(제품의 상세스펙)</span></label></label>
-                            <input type="text" class="form-control" id="spec1" th:name="price" required>
+                            <input type="text" class="form-control" id="spec1" th:name="spec1" required>
                             <small class="text-muted">제품의 상세 스펙을 적으세요</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="spec2">스펙2 <span class="text-muted">(제품의 상세스펙)</span></label></label>
-                            <input type="text" class="form-control" id="spec2" th:name="price" required>
+                            <input type="text" class="form-control" id="spec2" th:name="spec2" required>
                             <small class="text-muted">제품의 상세 스펙을 적으세요</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="spec3">스펙3 <span class="text-muted">(제품의 상세스펙)</span></label></label>
-                            <input type="text" class="form-control" id="spec3" th:name="price" required>
+                            <input type="text" class="form-control" id="spec3" th:name="spec3" required>
                             <small class="text-muted">제품의 상세 스펙을 적으세요</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="spec4">스펙4 <span class="text-muted">(제품의 상세스펙)</span></label></label>
-                            <input type="text" class="form-control" id="spec4" th:name="price" required>
+                            <input type="text" class="form-control" id="spec4" th:name="spec4" required>
                             <small class="text-muted">제품의 상세 스펙을 적으세요</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="spec5">스펙5 <span class="text-muted">(제품의 상세스펙)</span></label></label>
-                            <input type="text" class="form-control" id="spec5" th:name="price" required>
+                            <input type="text" class="form-control" id="spec5" th:name="spec5" required>
                             <small class="text-muted">제품의 상세 스펙을 적으세요</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="spec6">스펙6 <span class="text-muted">(제품의 상세스펙)</span></label></label>
-                            <input type="text" class="form-control" id="spec6" th:name="price" required>
+                            <input type="text" class="form-control" id="spec6" th:name="spec6" required>
                             <small class="text-muted">제품의 상세 스펙을 적으세요</small>
                         </div>
                     </div>
 
                     <hr class="mb-4">
                     <h4 class="mb-3">상품 이미지 첨부</h4>
-                    <div style="max-width: 650px; margin: auto;">
-                        <h1 class="page-header">Bootstrap Image Upload Form</h1>
-                        <p class="lead">Select a PNG or JPEG image, having maximum size <span id="max-size"></span> KB.</p>
-
-                        <form id="upload-image-form" action="" method="post" enctype="multipart/form-data">
-                            <div id="image-preview-div" style="display: none">
-                                <label for="exampleInputFile">Selected image:</label>
-                                <br>
-                                <img id="preview-img" src="noimage">
-                            </div>
-                            <div class="form-group">
-                                <input type="file" name="file" id="file" required>
-                            </div>
-                            <button class="btn btn-lg btn-primary" id="upload-button" type="submit" disabled>Upload image</button>
-                        </form>
-
-                        <br>
-                        <div class="alert alert-info" id="loading" style="display: none;" role="alert">
-                            Uploading image...
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
-                                </div>
-                            </div>
+                    <div>
+                        <div class="input_wrap">
+                            <a href="javascript:" onclick="imageUploadAction();" class="btn btn-light">파일 업로드</a>
+                            <input type="file" id="input_images" multiple/>
                         </div>
-                        <div id="message"></div>
                     </div>
-
+                    <div>
+                        <div class="images_wrap">
+                            <img id="img" />
+                        </div>
+                    </div>
 
                     <hr class="mb-4">
                     <h4 class="mb-3">상품 옵션</h4>
                     <div class="mb-2">
-                        <button type="button" class="btn btn-light btn-sm">+옵션 추가</button>
+                        <button type="button" class="btn btn-light btn-sm" onclick="addOptionListener();">+옵션 추가</button>
                         <button type="button" class="btn btn-danger btn-sm">옵션 저장</button>
                     </div>
                     <div class="container">
-                        <table class="table table-bordered">
+                        <table class="table table-bordered" th:id="option_table">
                             <thead>
                                 <tr>
                                     <th>NO</th>
@@ -143,14 +184,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td></td>
-                                    <th><input type="text" class="form-control" placeholder="옵션"></th>
-                                    <th><input type="text" class="form-control" placeholder="추가 가격(원)"></th>
-                                    <th><input type="text" class="form-control" placeholder="재고량"></th>
-                                    <th><input type="text" class="form-control" placeholder="???"></th>
-                                    <th><input type="text" class="form-control" placeholder="???"></th>
-                                    <th><button type="button" class="btn btn-danger btn-sm">x</button></th>
+                                <tr id="optionRow">
+                                    <td><input type="text" class="form-control" th:value="1" disabled></td>
+                                    <td><input type="text" class="form-control" placeholder="옵션명"></td>
+                                    <td><input type="text" class="form-control" placeholder="추가 가격(원)"></td>
+                                    <td><input type="text" class="form-control" placeholder="재고량"></td>
+                                    <td><input type="text" class="form-control" placeholder="???"></td>
+                                    <td><button type="button" class="btn btn-danger btn-sm" onclick="deleteOptionListener(this);">x</button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -158,91 +198,117 @@
 
                     <hr class="mb-4">
                     <h4 class="mb-3">내용 입력</h4>
-                    <textarea name="content" id="editor"></textarea>
+                    <textarea th:name="content" id="editor"></textarea>
 
                     <hr class="mb-4">
+                    <h4 class="mb-3">판매자 정보</h4>
 
-                    <h4 class="mb-3">판매자 정보 입력</h4>
-
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="same-address">
-                        <label class="custom-control-label" for="same-address">기존의 등록지를 사용합니다.</label>
-                    </div>
-                    <div class="custom-control custom-checkbox mb-3">
-                        <input type="checkbox" class="custom-control-input" id="save-info">
-                        <label class="custom-control-label" for="save-info">새 등록지를 추가 합니다.</label>
-                    </div>
-
-
-                    <div class="row">
-                        <div class="col-md-5 mb-3">
-                            <label for="country">Country</label>
-                            <select class="custom-select d-block w-100" id="country" required>
-                                <option value="">Choose...</option>
-                                <option>United States</option>
-                            </select>
-                            <div class="invalid-feedback">
-                                Please select a valid country.
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="state">State</label>
-                            <select class="custom-select d-block w-100" id="state" required>
-                                <option value="">Choose...</option>
-                                <option>California</option>
-                            </select>
-                            <div class="invalid-feedback">
-                                Please provide a valid state.
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="zip">Zip</label>
-                            <input type="text" class="form-control" id="zip" placeholder="" required>
-                            <div class="invalid-feedback">
-                                Zip code required.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <label for="cc-expiration">우편번호 앞자리</label>
-                            <input type="text" class="form-control" id="cc-expiration" placeholder="" required>
-                            <div class="invalid-feedback">
-                                Expiration date required
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="cc-cvv">우편번호 뒷자리</label>
-                            <input type="text" class="form-control" id="cc-cvv" placeholder="" required>
-                            <div class="invalid-feedback">
-                                Security code required
-                            </div>
-                        </div>
-                    </div>
-                    <hr class="mb-4">
                     <button class="btn btn-primary btn-lg btn-block" type="submit">상품 등록</button>
                 </form>
             </div>
         </div>
         <footer th:include="fragments/footer :: footer" />
     </body>
-    <script th:inline="javascript">
-        $(document).ready(function() {
+    <script type="text/javascript">
+        // 이미지 업로드 관련
+        // https://greatps1215.tistory.com/5 참고
+        var sel_images = [];
 
-            $("#product_add_btn").on("click", function() {
-                var small = document.createElement('small')
-                var h6 = document.createElement('h6')
-                var div = document.createElement('div');
-                var li = document.createElement('li').appendChild(div.appendChild(h6.className("text-muted")));
-                li.className("list-group-item d-flex justify-content-between lh-condensed");
-                var span = document.createElement('span').className("text-muted");
-                ulObj.appendChild(li);
-                ulObj.appendChild(span);
-            });
+        $(document).ready( function() {
+            $("#input_images").on("change", handleImgFileSelect);
         });
 
+        function imageUploadAction() {
+            console.log("imageUploadAction");
+            $("#input_images").trigger('click');
+        }
+
+        function handleImgFileSelect(e) {
+
+            sel_images = [];
+            $(".images_wrap").empty();
+
+            var images = e.target.files;
+            var imagesArr = Array.prototype.slice.call(images);
+
+            var index = 0;
+
+            imagesArr.forEach(function (i) {
+                if(!i.type.match("image.*")) {
+                    alert("확장자는 이미지만 가능합니다.");
+                    return;
+                }
+
+                sel_images.push(i);
+                console.log(sel_images);
+
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var html = "<a href=\"javascript:void(0);\" onclick=\"deleteImageAction("+index+")\" id=\"img_id_"+index+"\"><img src=\"" + e.target.result + "\" data-file='"+i.name+"' class='selProductFile' title='Click to remove'></a>";
+                        
+                    $(".images_wrap").append(html);
+                    index++;
+                }
+
+                reader.readAsDataURL(i);
+            });
+        }
+
+
+        function deleteImageAction(index) {
+            console.log("index : ",index);
+            sel_images.splice(index,1);
+
+            var img_id = "#img_id_"+index;
+            $(img_id).remove();
+
+            console.log(sel_images);
+        }
+        
+        function submitAction() {
+            var data = new FormData();
+
+            for(var i = 0, len=sel_images.length; i < len; i++) {
+                var name = "images_"+i;
+                data.append(name,sel_images[i]);
+            }
+            data.append("image_count",sel_images.length);
+
+            var xhr = new XMLHttpRequest()
+            xhr.open("POST")
+        }
+
+
+    </script>
+    <script type="text/javascript">
+        // 옵션 추가 스크립트
+        function addOptionListener() {
+            var count = $("#option_table tbody tr").length +1;
+            console.log(count);
+            var option =
+                '<tr id="optionRow">\n' +
+                '<td><input type="text" class="form-control" id="option_number" value="'+count+'" disabled></td>\n' +
+                '<td><input type="text" class="form-control" id="option" placeholder="옵션명"></td>\n' +
+                '<td><input type="text" class="form-control" placeholder="추가 가격(원)"></td>\n' +
+                '<td><input type="text" class="form-control" placeholder="재고량"></td>\n' +
+                '<td><input type="text" class="form-control" placeholder="???"></td>\n' +
+                '<td><input type="text" class="form-control" placeholder="???"></td>\n' +
+                '<td><button type="button" class="btn btn-danger btn-sm" onclick="deleteOptionListener(this);" ">x</button></td>\n' +
+                '</tr>';
+
+            $("#option_table tbody tr:last").after(option);
+        }
+        
+        function deleteOptionListener(obj) {
+            var tr = $(obj).parent().parent();
+            console.log(tr);
+            tr.remove();
+        }
+        
     </script>
     <script>
+
+        // smart editor 관련 설정
         var editor_id = '#editor';
 
         ClassicEditor
