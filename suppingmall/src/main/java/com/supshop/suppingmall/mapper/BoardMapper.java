@@ -8,11 +8,11 @@ public interface BoardMapper {
 
     List<Board> selectAllBoard();
     
-    Board selectBoard(String id);
+    Board selectBoard(Long id);
 
     void insertBoard(Board board);
 
-    void updateBoard(String id, Board board);
+    void updateBoard(Long id, Board board);
 
-    void deleteBoard(String id);
+    void deleteBoard(Long id);
 }

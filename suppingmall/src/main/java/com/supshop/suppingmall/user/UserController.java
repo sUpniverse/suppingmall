@@ -11,8 +11,11 @@ import javax.servlet.http.HttpSession;
 @Controller
 public class UserController {
 
-    @Autowired
-    UserService userService;
+    private UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/signup")
     public String signupform() {
@@ -32,7 +35,7 @@ public class UserController {
 
     /* 나중에 MSA 전환 시 사용 */
     @GetMapping("/{id}")
-    public User getUser(@PathVariable int id) {
+    public User getUser(@PathVariable Long id) {
         return userService.getUser(id);
     }
 
@@ -65,7 +68,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/form")
-    public String update_form(@PathVariable int id, Model model, HttpSession session) {
+    public String update_form(@PathVariable Long id, Model model, HttpSession session) {
         User sessionedUser = (User) session.getAttribute("user");
         if(!(sessionedUser.getUserId() == id)) {
             return "redirect:/users/login";
@@ -75,14 +78,14 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public String updateUser(@PathVariable int id, User user, HttpSession session) {
+    public String updateUser(@PathVariable Long id, User user, HttpSession session) {
         System.out.println(user.toString());
         userService.updateUser(id, user);
         return "redirect:/";
     }
 
     @DeleteMapping("")
-    public String deleteUser(@PathVariable int id) {
+    public String deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return "redirect:/";
     }

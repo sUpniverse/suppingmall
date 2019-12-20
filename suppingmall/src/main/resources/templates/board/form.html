@@ -2,12 +2,19 @@
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head>
         <div th:include="fragments/header :: header" />
+        <script src="https://cdn.ckeditor.com/ckeditor5/15.0.0/classic/ckeditor.js"></script>
+        <style>
+            .ck.ck-editor__editable {
+                min-height: 300px;
+            }
+
+        </style>
     </head>
     <body>
         <nav th:replace="fragments/navigation :: navigation" />
         <div class="container">
             <form th:action="@{/boards}" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="category" th:value="${category}">
+                <input type="hidden" name="category.id" th:value="1">
                 <table class="table">
                     <thead>
                     <tr>
@@ -22,7 +29,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <input class="form-control" type="text" name="contents" size="1024px" placeholder="내용">
+                            <textarea th:name="contents" id="editor"></textarea>
                         </td>
                     </tr>
                     <tr>
@@ -34,4 +41,80 @@
             </form>
         </div>
     </body>
+    <script type="text/javascript">
+
+
+        ClassicEditor
+            .create( document.querySelector('#editor'), {
+                language:'ko'
+            })
+            .then( editor => {
+                editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+                    return new MyUploadAdapter(loader);
+                };
+                $('style').append('.ck-editor__editable { min-height: ' + $('textarea[name="editor"]').height() + 'px !important; }');
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+
+
+        class MyUploadAdapter {
+            constructor(loader) {
+                this.loader = loader;
+            }
+            upload() {
+                return this.loader.file
+                    .then(file => new Promise((resolve, reject) => {
+                        this._initRequest();
+                        this._initListeners(resolve, reject, file);
+                        this._sendRequest(file);
+                    }));
+            }
+
+            abort() {
+                if (this.xhr) { this.xhr.abort(); }
+
+            }
+
+            _initRequest() {
+                const xhr = this.xhr = new XMLHttpRequest();
+                xhr.open('POST', '/board/images', true);
+                xhr.responseType = 'json';
+            }
+
+            _initListeners(resolve, reject, file) {
+                const xhr = this.xhr;
+                const loader = this.loader;
+                const genericErrorText = `Couldn't upload file: ${ file.name }.`;
+                xhr.addEventListener('error', () => reject(genericErrorText));
+                xhr.addEventListener('abort', () => reject());
+                xhr.addEventListener('load', () => {
+                    const response = xhr.response;
+                    if (!response || response.error) {
+                        return reject(response && response.error ? response.error.message : genericErrorText);
+                    }
+                    resolve({
+                        default: response.url
+                    });
+                });
+
+                if (xhr.upload) {
+                    xhr.upload.addEventListener('progress', evt => {
+                        if (evt.lengthComputable) {
+                            loader.uploadTotal = evt.total;
+                            loader.uploaded = evt.loaded;
+                        }
+                    });
+                }
+            }
+
+            _sendRequest(file) {
+                const data = new FormData();
+                data.append('upload', file);
+                this.xhr.send(data);
+            }
+        }
+
+    </script>
 </html>

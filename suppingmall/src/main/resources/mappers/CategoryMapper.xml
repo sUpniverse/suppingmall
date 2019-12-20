@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.supshop.suppingmall.mapper.CategoryMapper">
+    <resultMap id="Category" type="com.supshop.suppingmall.category.Category" autoMapping="true">
+        <id property="id" column="CategoryId" />
+        <result property="name" column="CategoryName" />
+        <collection property="child" ofType="com.supshop.suppingmall.category.Category">
+            <id property="id" column="ChildCategoryId" />
+            <result property="name" column="ChildCategoryName" />
+        </collection>
+    </resultMap>
+
+    <select id="findAll" resultMap="Category">
+        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName",
+        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName"
+        FROM category AS C
+        LEFT OUTER JOIN category AS CH on (C.category_id = CH.parent_id)
+        ORDER BY C.category_id ASC
+    </select>
+
+    <select id="findOne" resultMap="Category">
+        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName",
+        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName"
+        FROM category AS C
+        LEFT OUTER JOIN category AS CH on (C.category_id = CH.parent_id)
+        WHERE C.category_id = #{id}
+    </select>
+
+</mapper>
+

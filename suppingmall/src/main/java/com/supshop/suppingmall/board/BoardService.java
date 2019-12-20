@@ -9,12 +9,15 @@ import java.util.List;
 @Service
 public class BoardService {
 
-    @Autowired
-    BoardMapper mapper;
+    private BoardMapper mapper;
+
+    public BoardService(BoardMapper mapper) {
+        this.mapper = mapper;
+    }
 
     public List<Board> getAllBoard() { return mapper.selectAllBoard(); }
 
-    public Board getBoard(String id) {
+    public Board getBoard(Long id) {
         return mapper.selectBoard(id);
     }
 
@@ -22,11 +25,11 @@ public class BoardService {
         mapper.insertBoard(board);
     }
 
-    public void updateBoard(String id, Board board) {
+    public void updateBoard(Long id, Board board) {
         mapper.updateBoard(id, board);
     }
 
-    public void deleteBoard(String id) {
+    public void deleteBoard(Long id) {
         mapper.deleteBoard(id);
     }
 }

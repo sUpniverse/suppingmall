@@ -8,13 +8,13 @@ public interface UserMapper {
 
     List<User> selectAllUser();
 
-    User selectUser(int id);
+    User selectUser(Long id);
 
     User selectUserByEmail(String email);
 
     void insertUser(User user);
 
-    void updateUser(int id, User user);
+    void updateUser(Long id, User user);
 
-    void deleteUSer(int id);
+    void deleteUSer(Long id);
 }

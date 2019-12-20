@@ -5,24 +5,18 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
-
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter @Setter
 @ToString
 public class User {
 
-    private int userId;
+    private Long userId;
     private String email;
     private String password;
     private String name;
     private String nickName;
     private String city;
-    private String downtown;
-    private String address;
-    private String addressDetail;
-    private String postNo;
+    private String cityDetail;
+    private String zipCode;
     private String phoneNumber;
     private LocalDateTime createdDate;
     private LocalDateTime updateDate;
@@ -34,12 +28,16 @@ public class User {
     private String shopAddressDetail;
     private String shopPostNo;
 
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = "010" + phoneNumber;
+    }
+
     @Getter
     @AllArgsConstructor
     public enum Role {
-        Admin("U000"),
-        Seller("U001"),
-        User("U002");
+        ADMIN("U000"),
+        SELLER("U001"),
+        USER("U002");
 
         private String code;
 

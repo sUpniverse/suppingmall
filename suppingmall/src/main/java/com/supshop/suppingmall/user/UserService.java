@@ -9,14 +9,17 @@ import java.util.List;
 @Service
 public class UserService {
 
-    @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
+
+    public UserService(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
 
     public List<User> getAllUser() {
         return userMapper.selectAllUser();
     }
 
-    public User getUser(int id) {
+    public User getUser(Long id) {
         return userMapper.selectUser(id);
     }
 
@@ -28,11 +31,11 @@ public class UserService {
         userMapper.insertUser(user);
     }
 
-    public void updateUser(int id, User user) {
+    public void updateUser(Long id, User user) {
         userMapper.updateUser(id, user);
     }
 
-    public void deleteUser(int id) {
+    public void deleteUser(Long id) {
         userMapper.deleteUSer(id);
     }
 }

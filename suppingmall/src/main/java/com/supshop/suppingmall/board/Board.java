@@ -1,22 +1,20 @@
 package com.supshop.suppingmall.board;
 
+import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.user.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter @Setter
 @ToString
 public class Board {
 
-    private int boardId;
+    private Long boardId;
     private String title;
     private String contents;
-    private User creater;
-    private String category;
+    private User creator;
+    private Category category;
     private String delYn;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;

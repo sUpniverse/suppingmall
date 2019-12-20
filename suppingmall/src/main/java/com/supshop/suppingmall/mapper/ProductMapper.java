@@ -8,11 +8,11 @@ public interface ProductMapper {
 
     List<Product> selectAllProduct();
 
-    Product selectPrdoduct(String id);
+    Product selectProduct(Long id);
 
     void insertProduct(Product product);
 
-    void updateProduct(String id, Product product);
+    void updateProduct(Long id, Product product);
 
-    void deleteProduct(String id);
+    void deleteProduct(Long id);
 }

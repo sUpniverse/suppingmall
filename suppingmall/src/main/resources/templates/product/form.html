@@ -35,39 +35,26 @@
 
             <div class="col-md order-md-1">
                 <h4 class="mb-3">물품 기본정보 입력</h4>
-                <form class="needs-validation" enctype="multipart/form-data" novalidate>
-                    <div class="row">
+                <form class="needs-validation" th:action="@{/products}" th:method="post" enctype="multipart/form-data">
+                    <input th:type="hidden" th:name="seller.userId" th:value="${session.user.userId}" >
+                    <div class="row" >
                         <div class="form-group col-md-6 mb-3">
-                            <label for="product_category_top">카테고리 1차</label>
-                            <select class="form-control" id="product_category_top" th:name="product_category_top" required>
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                                <option>5</option>
+                            <label for="product_category_top">카테고리 분류 1차</label>
+                            <select class="form-control" id="product_category_top" required>
+                                <option disabled selected value> -- select an option -- </option>
+                                <option th:each="category : ${categories}" th:id="category_parent" th:value="${category.id}" th:text="${category.name}"></option>
                             </select>
-                            <div class="invalid-feedback">
-                                Valid first name is required.
-                            </div>
                         </div>
                         <div class="form-group col-md-6 mb-3">
-                            <label for="product_category_bottom">카테고리 2차</label>
-                            <select class="form-control" id="product_category_bottom" th:name="product_category_bottom" required>
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                                <option>5</option>
+                            <label for="product_category_bottom">카테고리 분류 2차</label>
+                            <select class="form-control" id="product_category_bottom" th:name="category.id" >
                             </select>
-                            <div class="invalid-feedback">
-                                Valid first name is required.
-                            </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="product_name">상품명</label>
-                            <input type="text" class="form-control" id="product_name" th:name="product_name" required>
+                            <input type="text" class="form-control" id="product_name" th:name="name" required>
                             <small class="text-muted">Full name as displayed on card</small>
                             <div class="invalid-feedback">
                                 Name on card is required
@@ -81,9 +68,14 @@
                                 Name on card is required
                             </div>
                         </div>
+                    </div>
+
+                    <hr class="mb-4">
+                    <h4 class="mb-3">물품 상세정보 입력</h4>
+                    <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="product_name">제조사</label>
-                            <input type="text" class="form-control" id="brand_name" th:name="brand_name" required>
+                            <input type="text" class="form-control" id="brand_name" th:name="detail.manufacturer" required>
                             <small class="text-muted">Full name as displayed on card</small>
                             <div class="invalid-feedback">
                                 Name on card is required
@@ -91,20 +83,15 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="product_name">원산지</label>
-                            <input type="text" class="form-control" id="made_in" th:name="made_in" required>
+                            <input type="text" class="form-control" id="made_in" th:name="detail.origin" required>
                             <small class="text-muted">Full name as displayed on card</small>
                             <div class="invalid-feedback">
                                 Name on card is required
                             </div>
                         </div>
-                    </div>
-
-                    <hr class="mb-4">
-                    <h4 class="mb-3">물품 상세정보 입력</h4>
-                    <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="product_name">등록 년월</label>
-                            <input type="text" class="form-control" id="register_date" th:name="register_date" required>
+                            <label for="product_name">제조년월</label>
+                            <input type="date" class="form-control" id="register_date" th:name="detail.manuplatedDate" required>
                             <small class="text-muted">Full name as displayed on card</small>
                             <div class="invalid-feedback">
                                 Name on card is required
@@ -112,7 +99,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="product_name">a/s 안내</label>
-                            <input type="text" class="form-control" id="as_number" th:name="as_number" required>
+                            <input type="text" class="form-control" id="as_number" th:name="detail.asNumber" required>
                             <small class="text-muted">Full name as displayed on card</small>
                             <div class="invalid-feedback">
                                 Name on card is required
@@ -120,32 +107,32 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="spec1">스펙1 <span class="text-muted">(제품의 상세스펙)</span></label></label>
-                            <input type="text" class="form-control" id="spec1" th:name="spec1" required>
+                            <input type="text" class="form-control" id="spec1" th:name="detail.spec1">
                             <small class="text-muted">제품의 상세 스펙을 적으세요</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="spec2">스펙2 <span class="text-muted">(제품의 상세스펙)</span></label></label>
-                            <input type="text" class="form-control" id="spec2" th:name="spec2" required>
+                            <input type="text" class="form-control" id="spec2" th:name="detail.spec2">
                             <small class="text-muted">제품의 상세 스펙을 적으세요</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="spec3">스펙3 <span class="text-muted">(제품의 상세스펙)</span></label></label>
-                            <input type="text" class="form-control" id="spec3" th:name="spec3" required>
+                            <input type="text" class="form-control" id="spec3" th:name="detail.spec3">
                             <small class="text-muted">제품의 상세 스펙을 적으세요</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="spec4">스펙4 <span class="text-muted">(제품의 상세스펙)</span></label></label>
-                            <input type="text" class="form-control" id="spec4" th:name="spec4" required>
+                            <input type="text" class="form-control" id="spec4" th:name="detail.spec4">
                             <small class="text-muted">제품의 상세 스펙을 적으세요</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="spec5">스펙5 <span class="text-muted">(제품의 상세스펙)</span></label></label>
-                            <input type="text" class="form-control" id="spec5" th:name="spec5" required>
+                            <input type="text" class="form-control" id="spec5" th:name="detail.spec5">
                             <small class="text-muted">제품의 상세 스펙을 적으세요</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="spec6">스펙6 <span class="text-muted">(제품의 상세스펙)</span></label></label>
-                            <input type="text" class="form-control" id="spec6" th:name="spec6" required>
+                            <input type="text" class="form-control" id="spec6" th:name="detail.spec6">
                             <small class="text-muted">제품의 상세 스펙을 적으세요</small>
                         </div>
                     </div>
@@ -153,15 +140,7 @@
                     <hr class="mb-4">
                     <h4 class="mb-3">상품 이미지 첨부</h4>
                     <div>
-                        <div class="input_wrap">
-                            <a href="javascript:" onclick="imageUploadAction();" class="btn btn-light">파일 업로드</a>
-                            <input type="file" id="input_images" multiple/>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="images_wrap">
-                            <img id="img" />
-                        </div>
+                        <input type="file" value="" name="upload[]" multiple>
                     </div>
 
                     <hr class="mb-4">
@@ -178,18 +157,15 @@
                                     <th>옵션명</th>
                                     <th>판매가(원)</th>
                                     <th>재고량</th>
-                                    <th>???</th>
-                                    <th>???</th>
                                     <th>관리</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr id="optionRow">
-                                    <td><input type="text" class="form-control" th:value="1" disabled></td>
-                                    <td><input type="text" class="form-control" placeholder="옵션명"></td>
-                                    <td><input type="text" class="form-control" placeholder="추가 가격(원)"></td>
-                                    <td><input type="text" class="form-control" placeholder="재고량"></td>
-                                    <td><input type="text" class="form-control" placeholder="???"></td>
+                                    <td><input type="text" class="form-control" th:name="options[0].id" th:value="1" disabled></td>
+                                    <td><input type="text" class="form-control" th:name="options[0].id" placeholder="옵션명"></td>
+                                    <td><input type="text" class="form-control" th:name="options[0].id" placeholder="추가 가격(원)"></td>
+                                    <td><input type="text" class="form-control" th:name="options[0].id" placeholder="재고량"></td>
                                     <td><button type="button" class="btn btn-danger btn-sm" onclick="deleteOptionListener(this);">x</button></td>
                                 </tr>
                             </tbody>
@@ -209,90 +185,18 @@
         </div>
         <footer th:include="fragments/footer :: footer" />
     </body>
-    <script type="text/javascript">
-        // 이미지 업로드 관련
-        // https://greatps1215.tistory.com/5 참고
-        var sel_images = [];
 
-        $(document).ready( function() {
-            $("#input_images").on("change", handleImgFileSelect);
-        });
-
-        function imageUploadAction() {
-            console.log("imageUploadAction");
-            $("#input_images").trigger('click');
-        }
-
-        function handleImgFileSelect(e) {
-
-            sel_images = [];
-            $(".images_wrap").empty();
-
-            var images = e.target.files;
-            var imagesArr = Array.prototype.slice.call(images);
-
-            var index = 0;
-
-            imagesArr.forEach(function (i) {
-                if(!i.type.match("image.*")) {
-                    alert("확장자는 이미지만 가능합니다.");
-                    return;
-                }
-
-                sel_images.push(i);
-                console.log(sel_images);
-
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    var html = "<a href=\"javascript:void(0);\" onclick=\"deleteImageAction("+index+")\" id=\"img_id_"+index+"\"><img src=\"" + e.target.result + "\" data-file='"+i.name+"' class='selProductFile' title='Click to remove'></a>";
-                        
-                    $(".images_wrap").append(html);
-                    index++;
-                }
-
-                reader.readAsDataURL(i);
-            });
-        }
-
-
-        function deleteImageAction(index) {
-            console.log("index : ",index);
-            sel_images.splice(index,1);
-
-            var img_id = "#img_id_"+index;
-            $(img_id).remove();
-
-            console.log(sel_images);
-        }
-        
-        function submitAction() {
-            var data = new FormData();
-
-            for(var i = 0, len=sel_images.length; i < len; i++) {
-                var name = "images_"+i;
-                data.append(name,sel_images[i]);
-            }
-            data.append("image_count",sel_images.length);
-
-            var xhr = new XMLHttpRequest()
-            xhr.open("POST")
-        }
-
-
-    </script>
     <script type="text/javascript">
         // 옵션 추가 스크립트
         function addOptionListener() {
-            var count = $("#option_table tbody tr").length +1;
-            console.log(count);
+            var count = $("#option_table tbody tr").length
+            var order = count + 1;
             var option =
                 '<tr id="optionRow">\n' +
-                '<td><input type="text" class="form-control" id="option_number" value="'+count+'" disabled></td>\n' +
-                '<td><input type="text" class="form-control" id="option" placeholder="옵션명"></td>\n' +
-                '<td><input type="text" class="form-control" placeholder="추가 가격(원)"></td>\n' +
-                '<td><input type="text" class="form-control" placeholder="재고량"></td>\n' +
-                '<td><input type="text" class="form-control" placeholder="???"></td>\n' +
-                '<td><input type="text" class="form-control" placeholder="???"></td>\n' +
+                '<td><input type="text" class="form-control" id="option_number" name ="options['+count+'].id" value="'+order+'" disabled></td>\n' +
+                '<td><input type="text" class="form-control" id="option" name="options['+count+'].optionName" placeholder="옵션명"></td>\n' +
+                '<td><input type="text" class="form-control" name="options['+count+'].price" placeholder="추가 가격(원)"></td>\n' +
+                '<td><input type="text" class="form-control" name="options['+count+'].quantity" placeholder="수량"></td>\n' +
                 '<td><button type="button" class="btn btn-danger btn-sm" onclick="deleteOptionListener(this);" ">x</button></td>\n' +
                 '</tr>';
 
@@ -329,6 +233,27 @@
             .catch(function (error) {
                 console.log( error );
             } );
+    </script>
+
+    <script type="text/javascript">
+        var category_bottom;
+        $('#product_category_top').on('change',(e) => {
+            var category_id = $("#product_category_top option:selected").val();
+            $.ajax({
+                type:"GET",
+                url:"/categories/"+ category_id,
+                contentType: 'application/json',
+                success: (data) => {
+                    $("#product_category_bottom option").remove();
+                    var category_bottom = data;
+                    console.log(data);
+                    for(var i = 0; i < data.length; i++) {
+                        var option = "<option value="+data[i].id+">"+data[i].name+"</option>";
+                        $("#product_category_bottom").append(option);
+                    }
+                }
+            });
+        });
     </script>
     <footer th:include="fragments/footer :: footer" />
 </html>

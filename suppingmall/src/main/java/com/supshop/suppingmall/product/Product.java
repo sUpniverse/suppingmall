@@ -1,35 +1,31 @@
 package com.supshop.suppingmall.product;
 
-import com.supshop.suppingmall.order.Order;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.user.User;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter @Setter
 @ToString
 public class Product {
 
-    private int productId;
+    private Long productId;
     private String name;
     private String price;
-    private List<ProductOptions> options;
-    private List<Order> orders;
+    private ProductDetail detail;
+    private List<ProductOption> options;
+    private String contents;
+
     private LocalDateTime registeredDate;
-    private User sellerId;
-    private String brandName;
-    private String category;
+
+    private User seller;
+    private Category category;
     private String delYn;
     private String thumbnail;
     private String picture;
-    private String asNumber;
-    private String spec1;
-    private String spec2;
-    private String spec3;
-    private String spec4;
-    private String spec5;
+
 }

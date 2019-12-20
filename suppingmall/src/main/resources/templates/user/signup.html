@@ -69,46 +69,46 @@
 
                         <div class="row">
                             <div class="input-group mb-3">
-                                <label for="phone">핸드폰 번호</label>
+                                <label for="phone-detail">핸드폰 번호</label>
                                 <div class="input-group-prepend">
-                                    <select class="custom-select" id="phone" name="phoneNumber" required="">
+                                    <select class="custom-select" id="phone" name="" required="">
                                         <option selected>010</option>
                                         <option value="1">011</option>
                                         <option value="2">018</option>
                                         <option value="3">019</option>
                                     </select>
-                                    <input type="text" class="form-control" aria-label="Text input with segmented dropdown button">
+                                    <input type="text" id="phone-detail" class="form-control" name="phoneNumber" aria-label="Text input with segmented dropdown button">
                                 </div>
                             </div>
                         </div>
 
 
                         <div class="row">
-                            <div class="col-md-5 mb-3">
-                                <label for="country">시/도</label>
-                                <select class="custom-select d-block w-100 is-valid" id="country" name="city"  required="">
-                                    <option value="">Choose...</option>
-                                    <option>서울시</option>
-                                </select>
-                                <div class="invalid-feedback">
-                                    Please select a valid country.
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="state">구/군</label>
-                                <select class="custom-select d-block w-100 is-valid" id="state" name="downtown" required="">
-                                    <option value="">Choose...</option>
-                                    <option value="">중구</option>
-                                    <option>성북구</option>
-                                    <option>강남구</option>
-                                </select>
-                                <div class="invalid-feedback">
-                                    Please provide a valid state.
-                                </div>
-                            </div>
+<!--                            <div class="col-md-5 mb-3">-->
+<!--                                <label for="country">시/도</label>-->
+<!--                                <select class="custom-select d-block w-100 is-valid" id="country" name="city"  required="">-->
+<!--                                    <option value="">Choose...</option>-->
+<!--                                    <option>서울시</option>-->
+<!--                                </select>-->
+<!--                                <div class="invalid-feedback">-->
+<!--                                    Please select a valid country.-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-md-4 mb-3">-->
+<!--                                <label for="state">구/군</label>-->
+<!--                                <select class="custom-select d-block w-100 is-valid" id="state" name="downtown" required="">-->
+<!--                                    <option value="">Choose...</option>-->
+<!--                                    <option value="">중구</option>-->
+<!--                                    <option>성북구</option>-->
+<!--                                    <option>강남구</option>-->
+<!--                                </select>-->
+<!--                                <div class="invalid-feedback">-->
+<!--                                    Please provide a valid state.-->
+<!--                                </div>-->
+<!--                            </div>-->
                             <div class="col-md-3 mb-3">
                                 <label for="zip">Zip</label>
-                                <input type="text" class="form-control" id="zip" placeholder="" name="postNo" required="">
+                                <input type="text" class="form-control" id="zip" placeholder="" name="zipCode" required="">
                                 <div class="invalid-feedback">
                                     Zip code required.
                                 </div>
@@ -118,7 +118,7 @@
 
                         <div class="mb-3">
                             <label for="address">주소</label>
-                            <input type="text" class="form-control is-valid" id="address" placeholder="1234 Main St" name="address">
+                            <input type="text" class="form-control is-valid" id="address" placeholder="1234 Main St" name="city">
                             <div class="invalid-feedback">
                                 Please enter your shipping address.
                             </div>
@@ -126,19 +126,19 @@
 
                         <div class="mb-3">
                             <label for="address2">상세주소 <span class="text-muted">(Optional)</span></label>
-                            <input type="text" class="form-control is-valid" id="address2" placeholder="Apartment or suite" name="addressDetail">
+                            <input type="text" class="form-control is-valid" id="address2" placeholder="Apartment or suite" name="cityDetail">
                         </div>
 
 
-                        <hr class="mb-4">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="same-address">
-                            <label class="custom-control-label" for="same-address">Shipping address is the same as my billing address</label>
-                        </div>
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="save-info">
-                            <label class="custom-control-label" for="save-info">Save this information for next time</label>
-                        </div>
+<!--                        <hr class="mb-4">-->
+<!--                        <div class="custom-control custom-checkbox">-->
+<!--                            <input type="checkbox" class="custom-control-input" id="same-address">-->
+<!--                            <label class="custom-control-label" for="same-address">Shipping address is the same as my billing address</label>-->
+<!--                        </div>-->
+<!--                        <div class="custom-control custom-checkbox">-->
+<!--                            <input type="checkbox" class="custom-control-input" id="save-info">-->
+<!--                            <label class="custom-control-label" for="save-info">Save this information for next time</label>-->
+<!--                        </div>-->
 
                         <hr class="mb-4">
                         <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout</button>

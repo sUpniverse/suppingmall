@@ -2,7 +2,6 @@ package com.supshop.suppingmall.board;
 
 import com.supshop.suppingmall.user.User;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,17 +13,19 @@ import javax.servlet.http.HttpSession;
 @Slf4j
 public class BoardController {
 
-    @Autowired
-    BoardService boardService;
+    private BoardService boardService;
 
-    @GetMapping("/form/{category}")
-    public String form(HttpSession session, Model model,@PathVariable String category) {
+    public BoardController(BoardService boardService) {
+        this.boardService = boardService;
+    }
+
+    @GetMapping("/form")
+    public String form(HttpSession session) {
         log.debug("'form'가 실행됨");
         User user = (User) session.getAttribute("user");
         if(user == null) {
             return "redirect:/users/loginform";
         }
-        model.addAttribute("category",category);
         return "/board/form";
     }
 
@@ -36,7 +37,7 @@ public class BoardController {
     }
 
     @GetMapping("/{id}")
-    public String getBoard(@PathVariable String id, Model model) {
+    public String getBoard(@PathVariable Long id, Model model) {
         log.debug("'getBoard'가 실행됨");
         model.addAttribute("board",boardService.getBoard(id));
         return "/board/board";
@@ -46,17 +47,17 @@ public class BoardController {
     public String createBoard(Board board, HttpSession session) {
         log.debug("'createBoard'가 실행됨");
         User user = (User)session.getAttribute("user");
-        board.setCreater(user);
+        board.setCreator(user);
         boardService.createBoard(board);
         return "redirect:/boards";
     }
 
     @GetMapping("/{id}/form")
-    public String modifyBoard(@PathVariable String id, Model model, HttpSession session) {
+    public String modifyBoard(@PathVariable Long id, Model model, HttpSession session) {
         log.debug("'getBoard'가 실행됨");
         Board board = boardService.getBoard(id);
         User user = (User)session.getAttribute("user");
-        if(user == null || (user.getUserId() != board.getCreater().getUserId())) {
+        if(user == null || (user.getUserId() != board.getCreator().getUserId())) {
             return "redirect:/boards";
         }
         model.addAttribute("board",board);
@@ -64,16 +65,16 @@ public class BoardController {
     }
 
     @PutMapping("/{id}")
-    public String updateBoard(@PathVariable String id, Board board, HttpSession session) {
+    public String updateBoard(@PathVariable Long id, Board board, HttpSession session) {
         log.debug("'updateBoard'가 실행됨");
         User user = (User)session.getAttribute("user");
-        board.setCreater(user);
+        board.setCreator(user);
         boardService.updateBoard(id, board);
         return "redirect:/boards/"+id;
     }
 
     @DeleteMapping("/{id}")
-    public String deleteBoard(@PathVariable String id, HttpSession session) {
+    public String deleteBoard(@PathVariable Long id, HttpSession session) {
         log.debug("'deleteBoard'가 실행됨");
         User user = (User)session.getAttribute("user");
 //        if(user.getUserId() != userId) {

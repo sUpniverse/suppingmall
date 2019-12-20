@@ -10,10 +10,8 @@
         <result property="name" column="Username" />
         <result property="nickName" column="UserNickName" />
         <result property="city" column="UserCity" />
-        <result property="downtown" column="UserDowntown" />
-        <result property="address" column="UserAddress" />
-        <result property="addressDetail" column="UserAddressDetail" />
-        <result property="postNo" column="UserPostNo" />
+        <result property="cityDetail" column="UserCityDetail" />
+        <result property="zipCode" column="UserZipCode" />
         <result property="phoneNumber" column="UserPhoneNumber" />
         <result property="createdDate" column="UserCreatedDate" />
         <result property="updatedDate" column="UserUpdatedDate" />
@@ -27,12 +25,11 @@
     </resultMap>
 
     <select id="selectAllUser" resultMap="User">
-        SELECT U.user_no AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword",
-        U.name AS "UserName", U.nickname AS "UserNickName", U.city AS "UserCity", U.downtown AS "UserDowntown",
-        U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
+        SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword",
+        U.name AS "UserName", U.nickname AS "UserNickName",U.city AS "UserCity",U.city_detail AS "UserCityDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
-        U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
-        U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
+        U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
+        U.shop_city AS "ShopAddress", U.shop_city_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
         FROM User AS U
 <!--        <include refid="conditionalSearch"></include>-->
     </select>
@@ -40,7 +37,7 @@
     <sql id="conditionalSearch">
         <trim prefix="WHERE" prefixOverrides="AND|OR">
             <if test="id != null">
-                AND U.user_no = #{id}
+                AND U.user_id = #{id}
             </if>
             <if test="role != null">
                 AND U.role = #{role}
@@ -53,42 +50,38 @@
     </sql>
 
     <select id="selectUser" resultMap="User">
-        SELECT U.user_no AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword",
-        U.name AS "UserName", U.nickname AS "UserNickName", U.city AS "UserCity", U.downtown AS "UserDowntown",
-        U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
+        SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword",
+        U.name AS "UserName", U.nickname AS "UserNickName",U.city AS "UserCity",U.city_detail AS "UserCityDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
-        U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
-        U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
+        U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
+        U.shop_city AS "ShopAddress", U.shop_city_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
         FROM User AS U
-        WHERE U.user_no = #{id}
+        WHERE U.user_id = #{id}
     </select>
 
     <select id="selectUserByEmail" resultMap="User">
-        SELECT U.user_no AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword",
-        U.name AS "UserName", U.nickname AS "UserNickName", U.city AS "UserCity", U.downtown AS "UserDowntown",
-        U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.post_no AS "UserPostNo",
+        SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword",
+        U.name AS "UserName", U.nickname AS "UserNickName",U.city AS "UserCity",U.city_detail AS "UserCityDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
-        U.role AS "UserRole", U.delYn AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
-        U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_post_no AS "ShopPostNo"
+        U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
+        U.shop_city AS "ShopAddress", U.shop_city_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
         FROM User AS U
         WHERE U.email = #{email}
     </select>
 
-    <insert id="insertUser" parameterType="com.supshop.suppingmall.user.User" useGeneratedKeys="true" keyProperty="user_no">
+    <insert id="insertUser" parameterType="com.supshop.suppingmall.user.User" useGeneratedKeys="true" keyProperty="user_id">
         INSERT INTO User(
         email,
         password,
         name,
         nickname,
         city,
-        downtown,
-        address,
-        address_detail,
-        post_no,
+        city_detail,
+        zipcode,
         phone_number,
         created_date,
         updated_date,
-        delYn,
+        delete_yes_or_no,
         role)
         VALUES (
         #{email},
@@ -96,10 +89,8 @@
         #{name},
         #{nickName},
         #{city},
-        #{downtown},
-        #{address},
-        #{addressDetail},
-        #{postNo},
+        #{cityDetail},
+        #{zipCode},
         #{phoneNumber},
         now(),
         now(),
@@ -120,7 +111,7 @@
         post_no = #{user.postNo},
         phone_number = #{user.phoneNumber},
         updated_date = now()
-        WHERE user_no = #{id};
+        WHERE user_id = #{id};
     </update>
     
 </mapper>
