@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.supshop.suppingmall.mapper.CommentMapper">
+    <resultMap id="Comment" type="com.supshop.suppingmall.comment.Comment" autoMapping="true">
+        <id property="commentId" column="CommentId" />
+        <result property="level" column="CommentLevel" />
+        <result property="title" column="CommentTitle" />
+        <result property="contents" column="CommentContents" />
+        <result property="delYn" column="CommentDelYn" />
+        <result property="createdDate" column="CommentCreatedDate" />
+        <result property="updatedDate" column="CommentUpdatedDate" />
+        <association property="creator" javaType="com.supshop.suppingmall.user.User">
+            <id property="userId" column="UserId" />
+            <result property="email" column="UserEmail" />
+            <result property="nickName" column="UserNickName" />
+            <result property="createdDate" column="UserCreatedDate" />
+            <result property="role" column="UserRole" typeHandler="com.supshop.suppingmall.user.RoleTypeHandler" />
+        </association>
+    </resultMap>
+
+    <select id="selectAllComments" resultMap="Comment">
+        SELECT C.comment_id AS "CommentId", C.title AS "CommentTitle", C.contents AS "CommentContents", C.level AS "CommentLevel",
+        C.created_date AS "CommentCreatedDate", C.updated_date AS "CommentUpdatedDate", U.user_id AS "UserId",
+        U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole"
+        FROM Comment AS C
+        LEFT OUTER JOIN User AS U on (C.user_id = U.user_id)
+        where C.board_id = #{boardId}
+        ORDER BY C.comment_id asc;
+    </select>
+
+    <select id="selectComment" resultMap="Comment">
+        SELECT C.comment_id AS "CommentId", B.title AS "CommentTitle", B.contents AS "CommentContents",
+        B.created_date AS "CommentCreatedDate", B.updated_date AS "CommentUpdatedDate", U.user_id AS "UserId",
+        U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",
+        C.category_id AS "CategoryId", C.name AS "CategoryName"
+        FROM Comment AS B
+        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
+        LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
+        WHERE C.comment_id = #{id};
+    </select>
+
+    <insert id="insertComment" parameterType="com.supshop.suppingmall.comment.Comment" useGeneratedKeys="true" keyProperty="comment_id">
+        INSERT INTO Comment (
+        board_id,
+        title,
+        level,
+        contents,
+        user_id,
+        created_date,
+        updated_date
+        )
+        VALUES (
+        #{boardId},
+        #{title},
+        #{level},
+        #{contents},
+        #{creator.userId},
+        now(),
+        now()
+        )
+    </insert>
+
+    <update id="updateComment" parameterType="com.supshop.suppingmall.comment.Comment">
+        UPDATE Comment
+        SET
+        title = #{title},
+        contents = #{contents},
+        updated_date = now()
+        WHERE comment_id = #{id};
+    </update>
+
+    <delete id="deleteComment" parameterType="com.supshop.suppingmall.comment.Comment">
+        DELETE FROM comment
+        WHERE comment_id = #{id};
+    </delete>
+</mapper>
+

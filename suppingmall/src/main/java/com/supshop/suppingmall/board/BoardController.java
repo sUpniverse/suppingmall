@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 
-@RequestMapping("/boards")
-@Controller
 @Slf4j
+@Controller
+@RequestMapping("/boards")
 public class BoardController {
 
     private BoardService boardService;
@@ -54,7 +54,7 @@ public class BoardController {
 
     @GetMapping("/{id}/form")
     public String modifyBoard(@PathVariable Long id, Model model, HttpSession session) {
-        log.debug("'getBoard'가 실행됨");
+        log.debug("'modifyBoard'가 실행됨");
         Board board = boardService.getBoard(id);
         User user = (User)session.getAttribute("user");
         if(user == null || (user.getUserId() != board.getCreator().getUserId())) {

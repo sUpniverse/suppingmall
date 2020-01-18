@@ -6,38 +6,99 @@
     <div class="container">
         <form role="form" th:method="delete">
         </form>
-        <div class="table table-default">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="writer">writer</label>
-                    <input id="writer" type="text" name="writer" class="form-control" th:value="${board.creator.nickName}" readonly="readonly">
+        <div class="col-lg-8">
+            <div class="container">
+                <!-- Title -->
+                <h1 class="mt-4" th:text="${board.title}"></h1>
+
+                <!-- Author -->
+                <p class="lead">
+                    by [[${board.creator.nickName}]]
+                </p>
+
+                <hr>
+
+                <!-- Date/Time -->
+                <p th:text="${board.createdDate}"></p>
+
+                <hr>
+
+                <!-- Post Content -->
+
+                <p class="lead" th:id="contents" th:utext="${board.contents}"></p>
+
+                <hr>
+                <div class="box-footer">
+                    <button th:if="${not #strings.isEmpty(session.user?.userId) && board.creator.userId.equals(session.user?.userId)}" type="submit" class="btn btn-warning">수정</button>
+                    <button th:if="${not #strings.isEmpty(session.user?.userId) && board.creator.userId.equals(session.user?.userId)}" type="submit" class="btn btn-danger">삭제</button>
+                    <button type="submit" class="btn btn-primary">목록</button>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label for="created">작성일</label>
-                    <input id="created" type="text" name="writer" class="form-control" th:value="${board.createdDate}" readonly="readonly">
+                <hr>
+            </div>
+            <!-- Comments Form -->
+            <div class="card my-4" th:id="comment-form">
+                <h5 class="card-header">댓글</h5>
+                <div class="card-body">
+                    <div class="form-group">
+                        <textarea class="form-control" th:id="comment-text" rows="3"></textarea>
+                    </div>
+                    <button class="btn btn-light" th:id="comment-button">댓글달기</button>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="title">Title</label>
-                <input id="title" type="text" name="title" class="form-control" th:value="${board.title}" readonly="readonly">
+
+            <div th:each="comment : ${board.comments}" id="comments">
+                <!-- Single Comment -->
+                <div class="media mb-4" th:value="${comment.commentId}">
+                    <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                    <div class="media-body">
+                        <h5 class="mt-0" th:text="${comment.creator.nickName}" th:value="${comment.creator.userId}"></h5>
+                        <div class="btn-group"  th:if="${not #strings.isEmpty(session.user?.userId) && comment.creator.userId.equals(session.user?.userId)}">
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                수정 / 삭제 / 신고
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" th:id="comment-update-button">수정</a>
+                                <a class="dropdown-item" th:id="comment-delete-button">삭제</a>
+                            </div>
+                        </div>
+                        <p th:text="${comment.contents}"></p>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label  for="contents">Content</label>
-                <textarea id="contents" rows="3" class="form-control" name="content" th:field="${board.contents}" readonly="readonly"></textarea>
+            <!-- Comment with nested comments -->
+            <div class="media mb-4">
+                <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                <div class="media-body">
+                    <h5 class="mt-0">Commenter Name</h5>
+                    Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+
+                    <div class="media mt-4">
+                        <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                        <div class="media-body">
+                            <h5 class="mt-0">Commenter Name</h5>
+                            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+                        </div>
+                    </div>
+
+                    <div class="media mt-4">
+                        <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                        <div class="media-body">
+                            <h5 class="mt-0">Commenter Name</h5>
+                            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
-        <div class="box-footer">
-            <button type="submit" class="btn btn-warning">Modify</button>
-            <button type="submit" class="btn btn-danger">REMOVE</button>
-            <button type="submit" class="btn btn-primary">LIST ALL</button>
-        </div>
+
     </div>
 </body>
+
 <script th:inline="javascript">
     $(document).ready(function() {
         var formObj = $("form[role='form']");
         var boardId = [[${board.boardId}]];
-        console.log(formObj);
 
         $(".btn-warning").on("click", function() {
             formObj.children().removeAttr("input");
@@ -57,5 +118,137 @@
         });
     });
 </script>
+
+<script>
+    $(document).ready(function (){
+        $("#comment-button").on('click',() => {
+            var boardId = [[${board.boardId}]];
+            var contents = $('#comment-text').val();
+            $.ajax({
+                type:"POST",
+                url:"/comments",
+                dataType: 'text',
+                data: JSON.stringify({
+                    "boardId": boardId,
+                    "contents": contents
+                }),
+                contentType: 'application/json',
+                success: (data) => {
+                    console.log(data);
+                    var response = JSON.parse(data);
+                    var comment_div = '<div id="comments"> </div>';
+                    var comment_contents = response.contents;
+                    var comment_user_name = response.creator.nickName;
+                    var comment =
+                        '<div class="media mb-4">\n' +
+                        '<img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">\n' +
+                        '<div class="media-body">\n' +
+                        '<h5 class="mt-0">'+comment_user_name+'</h5>\n' +
+                        '<p>'+comment_contents+'</p>\n' +
+                        '</div>\n' +
+                        '</div>';
+
+
+                    if($("#comments").length > 0) {
+                        $("#comments").append(comment);
+                    } else {
+                        $("#comment-form").after(comment_div);
+                        $("#comments").append(comment);
+                    }
+                }
+            });
+        });
+
+        $("#comment-update-button").on('click',(e)=> {
+            var comment = e.target.parentElement.parentElement.parentElement.parentElement;
+            var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
+            var comment_text = comment.getElementsByTagName("p").item(0);
+            var text = comment_text.innerText;
+            comment_text.innerHTML = '' +
+                '<div class="form-group">' +
+                '<textarea class="form-control" id="update-comment-text" rows="3" >'+text+'</textarea>' +
+                '</div>' +
+                '<button class="btn btn-primary btn-sm mr-1" id="update-comment-button">수정하기</button>' +
+                '<button class="btn btn-light btn-sm" id="cancel-comment-button">취소하기</button>';
+
+        });
+
+        $("#comment-delete-button").on('click',(e)=> {
+            var comment = e.target.parentElement.parentElement.parentElement.parentElement;
+            var comment_id = comment.getAttribute('value');
+            var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
+
+            console.log(user_id);
+            $.ajax({
+                type:"DELETE",
+                url:"/comments/"+comment_id,
+                dataType: 'text',
+                contentType: 'application/json',
+                success: (data) => {
+                    console.log(data);
+                    comment.remove();
+                }
+            });
+        });
+
+
+        $("#update-comment-button").on('click',(e)=> {
+            var comment = e.target.parentElement.parentElement.parentElement.parentElement;
+            var comment_id = comment.getAttribute('value');
+            var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
+
+            console.log(user_id);
+            $.ajax({
+                type:"PUT",
+                url:"/comments/"+comment_id,
+                dataType: 'text',
+                contentType: 'application/json',
+                success: (data) => {
+                    console.log(data);
+                    comment.remove();
+                }
+            });
+
+        });
+
+        $("#cancel-comment-button").on('click',(e)=> {
+            console.log("응??");
+            var comment = e.target.parentElement.parentElement.parentElement.parentElement;
+            var comment_id = comment.getAttribute('value');
+            var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
+
+            console.log("응??",comment);
+
+            // $.ajax({
+            //     type:"DELETE",
+            //     url:"/comments/"+comment_id,
+            //     dataType: 'text',
+            //     contentType: 'application/json',
+            //     success: (data) => {
+            //         console.log(data);
+            //         comment.remove();
+            //     }
+            // });
+
+        });
+
+    });
+
+
+
+    function isCreator(creator) {
+        var sessionId;
+
+        if([[${not #strings.isEmpty(session.user?.userId)}]]) {
+            // sessionId = [[${session.user?.userId}]];
+        }
+
+        if( sessionId != null && sessionId == creator) {
+            return true;
+        }
+        return false;
+    }
+</script>
+
 <footer th:include="fragments/footer :: footer" />
 </html>

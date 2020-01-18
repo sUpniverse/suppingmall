@@ -29,8 +29,8 @@
         U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",
         C.category_id AS "CategoryId", C.name AS "CategoryName"
         FROM Board AS B
-        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
         LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
+        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
         ORDER BY B.board_id desc
     </select>
 

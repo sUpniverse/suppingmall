@@ -46,13 +46,12 @@
 
         ClassicEditor
             .create( document.querySelector('#editor'), {
-                language:'ko'
+                language: "ko"
             })
             .then( editor => {
                 editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
                     return new MyUploadAdapter(loader);
                 };
-                $('style').append('.ck-editor__editable { min-height: ' + $('textarea[name="editor"]').height() + 'px !important; }');
             })
             .catch(function (error) {
                 console.log(error);
@@ -60,6 +59,7 @@
 
 
         class MyUploadAdapter {
+
             constructor(loader) {
                 this.loader = loader;
             }
@@ -79,7 +79,7 @@
 
             _initRequest() {
                 const xhr = this.xhr = new XMLHttpRequest();
-                xhr.open('POST', '/board/images', true);
+                xhr.open('POST', '/images/board', true);
                 xhr.responseType = 'json';
             }
 
@@ -111,7 +111,7 @@
 
             _sendRequest(file) {
                 const data = new FormData();
-                data.append('upload', file);
+                data.append('file', file);
                 this.xhr.send(data);
             }
         }

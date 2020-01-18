@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.board;
 
+import com.supshop.suppingmall.comment.CommentService;
 import com.supshop.suppingmall.mapper.BoardMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,27 +10,31 @@ import java.util.List;
 @Service
 public class BoardService {
 
-    private BoardMapper mapper;
+    private BoardMapper boardMapper;
+    private CommentService commentService;
 
-    public BoardService(BoardMapper mapper) {
-        this.mapper = mapper;
+    public BoardService(BoardMapper boardMapper, CommentService commentService) {
+        this.boardMapper = boardMapper;
+        this.commentService = commentService;
     }
 
-    public List<Board> getAllBoard() { return mapper.selectAllBoard(); }
+    public List<Board> getAllBoard() { return boardMapper.selectAllBoard(); }
 
     public Board getBoard(Long id) {
-        return mapper.selectBoard(id);
+        Board board = boardMapper.selectBoard(id);
+        board.setComments(commentService.getAllComments(id));
+        return board;
     }
 
     public void createBoard(Board board) {
-        mapper.insertBoard(board);
+        boardMapper.insertBoard(board);
     }
 
     public void updateBoard(Long id, Board board) {
-        mapper.updateBoard(id, board);
+        boardMapper.updateBoard(id, board);
     }
 
     public void deleteBoard(Long id) {
-        mapper.deleteBoard(id);
+        boardMapper.deleteBoard(id);
     }
 }
