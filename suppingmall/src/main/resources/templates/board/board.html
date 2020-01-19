@@ -120,6 +120,7 @@
 </script>
 
 <script>
+
     $(document).ready(function (){
         $("#comment-button").on('click',() => {
             var boardId = [[${board.boardId}]];
@@ -159,21 +160,20 @@
             });
         });
 
-        $("#comment-update-button").on('click',(e)=> {
+        $(document).on('click',"#comment-update-button",(e)=> {
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;
             var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
             var comment_text = comment.getElementsByTagName("p").item(0);
             var text = comment_text.innerText;
-            comment_text.innerHTML = '' +
+            comment_text.innerHTML =
                 '<div class="form-group">' +
                 '<textarea class="form-control" id="update-comment-text" rows="3" >'+text+'</textarea>' +
                 '</div>' +
                 '<button class="btn btn-primary btn-sm mr-1" id="update-comment-button">수정하기</button>' +
                 '<button class="btn btn-light btn-sm" id="cancel-comment-button">취소하기</button>';
-
         });
 
-        $("#comment-delete-button").on('click',(e)=> {
+        $(document).on('click',"#comment-delete-button",(e)=> {
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;
             var comment_id = comment.getAttribute('value');
             var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
@@ -191,13 +191,12 @@
             });
         });
 
-
-        $("#update-comment-button").on('click',(e)=> {
+        $(document).on('click',"#update-comment-button",(e)=> {
+            console.log("댓글 수정버튼 눌렸다!!");
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;
             var comment_id = comment.getAttribute('value');
             var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
 
-            console.log(user_id);
             $.ajax({
                 type:"PUT",
                 url:"/comments/"+comment_id,
@@ -211,24 +210,11 @@
 
         });
 
-        $("#cancel-comment-button").on('click',(e)=> {
-            console.log("응??");
+        $(document).on('click',"#cancel-comment-button",(e)=> {
+
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;
             var comment_id = comment.getAttribute('value');
             var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
-
-            console.log("응??",comment);
-
-            // $.ajax({
-            //     type:"DELETE",
-            //     url:"/comments/"+comment_id,
-            //     dataType: 'text',
-            //     contentType: 'application/json',
-            //     success: (data) => {
-            //         console.log(data);
-            //         comment.remove();
-            //     }
-            // });
 
         });
 
