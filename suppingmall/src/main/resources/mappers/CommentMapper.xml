@@ -65,8 +65,8 @@
     <update id="updateComment" parameterType="com.supshop.suppingmall.comment.Comment">
         UPDATE Comment
         SET
-        title = #{title},
-        contents = #{contents},
+        title = #{comment.title},
+        contents = #{comment.contents},
         updated_date = now()
         WHERE comment_id = #{id};
     </update>

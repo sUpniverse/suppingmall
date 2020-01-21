@@ -135,7 +135,6 @@
                 }),
                 contentType: 'application/json',
                 success: (data) => {
-                    console.log(data);
                     var response = JSON.parse(data);
                     var comment_div = '<div id="comments"> </div>';
                     var comment_contents = response.contents;
@@ -160,18 +159,21 @@
             });
         });
 
+        let text = 0;
+
         $(document).on('click',"#comment-update-button",(e)=> {
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;
             var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
             var comment_text = comment.getElementsByTagName("p").item(0);
-            var text = comment_text.innerText;
+            text = comment_text.innerText;
             comment_text.innerHTML =
                 '<div class="form-group">' +
                 '<textarea class="form-control" id="update-comment-text" rows="3" >'+text+'</textarea>' +
-                '</div>' +
                 '<button class="btn btn-primary btn-sm mr-1" id="update-comment-button">수정하기</button>' +
-                '<button class="btn btn-light btn-sm" id="cancel-comment-button">취소하기</button>';
+                '<button class="btn btn-light btn-sm" id="cancel-comment-button">취소하기</button>'
+                '</div>';
         });
+
 
         $(document).on('click',"#comment-delete-button",(e)=> {
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;
@@ -192,29 +194,32 @@
         });
 
         $(document).on('click',"#update-comment-button",(e)=> {
-            console.log("댓글 수정버튼 눌렸다!!");
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;
             var comment_id = comment.getAttribute('value');
-            var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
+
+            var comment_text = comment.getElementsByTagName("p").item(0);
+            var message = e.target.parentElement.getElementsByTagName("textarea").item(0).value;
 
             $.ajax({
                 type:"PUT",
                 url:"/comments/"+comment_id,
                 dataType: 'text',
+                data: JSON.stringify({
+                    "contents": message
+                }),
                 contentType: 'application/json',
                 success: (data) => {
-                    console.log(data);
-                    comment.remove();
+                    comment_text.innerText = message;
                 }
             });
 
         });
 
         $(document).on('click',"#cancel-comment-button",(e)=> {
-
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;
-            var comment_id = comment.getAttribute('value');
-            var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
+            var comment_text = comment.getElementsByTagName("p").item(0);
+
+            comment_text.innerText = text;
 
         });
 

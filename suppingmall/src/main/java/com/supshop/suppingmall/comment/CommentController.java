@@ -44,8 +44,11 @@ public class CommentController {
     @PutMapping("/{id}")
     public ResponseEntity updateComment(@PathVariable Long id, @RequestBody Comment comment) {
         if(id != null) {
-            commentService.updateComment(id, comment);
-            return ResponseEntity.ok().build();
+            int i = commentService.updateComment(id, comment);
+            if(i == 1) {
+                System.out.println(comment.toString());
+                return ResponseEntity.ok().build();
+            }
         }
         return ResponseEntity.notFound().build();
     }
