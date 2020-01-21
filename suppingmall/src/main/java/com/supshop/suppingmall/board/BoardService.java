@@ -2,12 +2,16 @@ package com.supshop.suppingmall.board;
 
 import com.supshop.suppingmall.comment.CommentService;
 import com.supshop.suppingmall.mapper.BoardMapper;
+import com.supshop.suppingmall.page.Criteria;
+import com.supshop.suppingmall.page.PageMaker;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Slf4j
 public class BoardService {
 
     private BoardMapper boardMapper;
@@ -19,6 +23,14 @@ public class BoardService {
     }
 
     public List<Board> getAllBoard() { return boardMapper.selectAllBoard(); }
+
+    public List<Board> getBoardByCriteria(Criteria criteria) {
+        return boardMapper.selectBoardByCriteria(criteria);
+    }
+
+    public int getBoardCount() {
+        return boardMapper.selectBoardCount();
+    }
 
     public Board getBoard(Long id) {
         Board board = boardMapper.selectBoard(id);

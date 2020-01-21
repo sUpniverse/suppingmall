@@ -21,17 +21,36 @@
             <id property="id" column="CategoryId" />
             <result property="name" column="CategoryName" />
         </association>
+        <collection property="comments" ofType="com.supshop.suppingmall.comment.Comment">
+            <id property="commentId" column="CommentId" />
+        </collection>
     </resultMap>
 
     <select id="selectAllBoard" resultMap="Board">
         SELECT B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents",
         B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate", U.user_id AS "UserId",
         U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",
-        C.category_id AS "CategoryId", C.name AS "CategoryName"
+        C.category_id AS "CategoryId", C.name AS "CategoryName",
+        CM.comment_id AS "CommentId"
         FROM Board AS B
         LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
         LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
+        LEFT OUTER JOIN Comment AS CM on (B.board_id = CM.board_id)
         ORDER BY B.board_id desc
+    </select>
+
+    <select id="selectBoardByCriteria" resultMap="Board">
+        SELECT B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents",
+        B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate", U.user_id AS "UserId",
+        U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",
+        C.category_id AS "CategoryId", C.name AS "CategoryName",
+        CM.comment_id AS "CommentId"
+        FROM Board AS B
+        LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
+        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
+        LEFT OUTER JOIN Comment AS CM on (B.board_id = CM.board_id)
+        ORDER BY B.board_id desc
+        limit #{pageStart}, #{perPageNum}
     </select>
 
     <select id="selectBoard" resultMap="Board">
@@ -43,6 +62,10 @@
         LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
         LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
         WHERE B.board_id = #{id}
+    </select>
+
+    <select id="selectBoardCount" resultType="int">
+        select count(board_id) from Board where board_id > 0
     </select>
 
     <insert id="insertBoard" parameterType="com.supshop.suppingmall.board.Board" useGeneratedKeys="true" keyProperty="board_id">

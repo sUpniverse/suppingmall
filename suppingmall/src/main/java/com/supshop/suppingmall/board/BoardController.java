@@ -1,5 +1,7 @@
 package com.supshop.suppingmall.board;
 
+import com.supshop.suppingmall.page.Criteria;
+import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.user.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -30,9 +32,15 @@ public class BoardController {
     }
 
     @GetMapping("")
-    public String getAllBoard(Model model) {
+    public String getAllBoard(Model model, Criteria criteria) {
         log.debug("'getAllBoard'가 실행됨");
-        model.addAttribute(boardService.getAllBoard());
+        model.addAttribute(boardService.getBoardByCriteria(criteria));
+        log.debug("criteria : {}, {}", criteria.getPage(), criteria.perPageNum);
+        PageMaker pageMaker = new PageMaker();
+        pageMaker.setCriteria(criteria);
+        pageMaker.setTotalCount(boardService.getBoardCount());
+        log.debug("start 인 값 : {}, end 인 값 : {}", pageMaker.getStartPage(), pageMaker.getEndPage());
+        model.addAttribute("pageMaker",pageMaker);
         return "/board/list";
     }
 
