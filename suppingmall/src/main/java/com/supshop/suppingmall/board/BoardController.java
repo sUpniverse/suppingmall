@@ -32,14 +32,16 @@ public class BoardController {
     }
 
     @GetMapping("")
-    public String getAllBoard(Model model, Criteria criteria) {
+    public String getAllBoard(Model model,
+                              Criteria criteria,
+                              @RequestParam(required = false) String type,
+                              @RequestParam(required = false) String searchValue) {
         log.debug("'getAllBoard'가 실행됨");
-        model.addAttribute(boardService.getBoardByCriteria(criteria));
-        log.debug("criteria : {}, {}", criteria.getPage(), criteria.perPageNum);
+        System.out.println(type + " " +searchValue);
+        model.addAttribute(boardService.getBoardByCondition(criteria,type,searchValue));
         PageMaker pageMaker = new PageMaker();
         pageMaker.setCriteria(criteria);
         pageMaker.setTotalCount(boardService.getBoardCount());
-        log.debug("start 인 값 : {}, end 인 값 : {}", pageMaker.getStartPage(), pageMaker.getEndPage());
         model.addAttribute("pageMaker",pageMaker);
         return "/board/list";
     }

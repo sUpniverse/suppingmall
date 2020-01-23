@@ -52,8 +52,8 @@
                     <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
                     <div class="media-body">
                         <h5 class="mt-0" th:text="${comment.creator.nickName}" th:value="${comment.creator.userId}"></h5>
-                        <div class="btn-group"  th:if="${not #strings.isEmpty(session.user?.userId) && comment.creator.userId.equals(session.user?.userId)}">
-                            <button class="btn btn-secondary btn-sm dropdown-toggle float-right" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <div class="btn-group float-right"  th:if="${not #strings.isEmpty(session.user?.userId) && comment.creator.userId.equals(session.user?.userId)}">
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 수정 / 삭제 / 신고
                             </button>
                             <div class="dropdown-menu">

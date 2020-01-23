@@ -9,7 +9,7 @@ public interface BoardMapper {
 
     List<Board> selectAllBoard();
 
-    List<Board> selectBoardByCriteria(Criteria criteria);
+    List<Board> selectBoardByCondition(Criteria criteria, String type, String searchValue);
     
     Board selectBoard(Long id);
 

@@ -4,7 +4,13 @@
 </head>
 <body>
     <nav th:replace="fragments/navigation :: navigation" />
+
     <div class="container">
+        <div class="position-relative overflow-hidden p-1 mb-5 text-center bg-light">
+            <div class="p-lg-5 mx-auto my-2">
+                <h1 class="display-3 font-weight-small">Farm을 운영중인 유저의 공간</h1>
+            </div>
+        </div>
 
         <table class="table table-default">
             <thead>
@@ -18,7 +24,7 @@
             <tbody>
                 <tr th:each="board : ${boardList}">
                     <td th:text="${board.boardId}"/>
-                    <td><a th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}}"></a>  [ [[${#lists.size(board.comments)}]] ]</td>
+                    <td><a th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}}"></a></td>
                     <td th:text="${board.creator.nickName}" />
                     <td th:text="${board.createdDate}" />
                 </tr>
@@ -26,16 +32,16 @@
         </table>
         <a href="/boards/form" class="btn btn-primary float-right">글쓰기</a>
     </div>
-    <div class="container">
+    <div class="container d-flex justify-content-center mb-3">
         <nav aria-label="Page navigation example">
-            <ul class="pagination">
+            <ul class="pagination mx-auto">
                 <li class="page-item">
                     <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/boards?page='+${pageMaker.startPage - 1}}" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
                 <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:if="${pageMaker.criteria.page.equals(idx) ? 'class = active': ''}"><a class="page-link" th:href="@{'/boards?page='+${idx}}">[[${idx}]]</a></li>
-                <li class="page-item" th:if="${not #strings.isEmpty(pageMaker.startPage) && pageMaker.endPage > 0}">
+                <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">
                     <a class="page-link" th:href="@{'/boards?page='+${pageMaker.endPage + 1}}" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
@@ -44,7 +50,25 @@
         </nav>
     </div>
 
-
+    <div class="container d-flex justify-content-center">
+        <form method="get" th:action="@{/boards}">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <select class="btn btn-outline-secondary dropdown-toggle" th:name="type">
+                        <option class="dropdown-item" th:value="title">제목검색</option>
+                        <option class="dropdown-item" th:value="contents">내용검색</option>
+                        <option class="dropdown-item" th:value="creator">작성자검색</option>
+                    </select>
+                </div>
+                <input type="text" class="form-control" th:name="searchValue" aria-label="Text input with dropdown button">
+                <div class="input-group-append">
+                    <button class="input-group-text" type="submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img" viewBox="0 0 24 24" focusable="false"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"/><path d="M21 21l-5.2-5.2"/></svg>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
 </body>
 <footer th:include="fragments/footer :: footer" />
 </html>
