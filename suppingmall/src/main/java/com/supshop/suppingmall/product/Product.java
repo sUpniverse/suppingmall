@@ -1,10 +1,10 @@
 package com.supshop.suppingmall.product;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.user.User;
-import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;

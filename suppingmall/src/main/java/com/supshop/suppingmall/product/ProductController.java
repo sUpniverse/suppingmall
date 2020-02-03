@@ -6,6 +6,7 @@ import com.supshop.suppingmall.user.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -46,18 +47,11 @@ public class ProductController {
         return "";
     }
 
-    // https://baekjungho.github.io/project-springboard15/ 참고 <-- commons libray
-    // https://gofnrk.tistory.com/36 <-- spring boot
-    // https://stackabuse.com/uploading-files-with-spring-boot/
     @PostMapping("")
-    public String createProduct(Product product) {
-//        Arrays.asList(files)
-//                .stream()
-//                .forEach(file -> {
-//                    fileService.uploadFile(file,"product",product.getProductId());
-//                });
+    public String createProduct(Product product, MultipartFile[] thumnails) {
 
-//        productService.createProduct(product);
+
+        productService.createProduct(product);
         return "forward:/";
     }
 

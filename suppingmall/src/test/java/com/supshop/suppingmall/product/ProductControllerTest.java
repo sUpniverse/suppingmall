@@ -29,8 +29,7 @@ public class ProductControllerTest {
     public void testPrdouct() throws Exception {
         //given
         Product product = new Product();
-        Category category = new Category();
-        category.setId(3l);
+        Category category = Category.builder().id(3l).build();
         product.setCategory(category);
         product.setName("맥북프로");
         product.setPrice("2000000");

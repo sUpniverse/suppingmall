@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 public class ImageController {
 
     private static final String boardSourceUrl =  "src/main/resources/images/board/";
+    private static final String productSourceUrl =  "src/main/resources/images/product/";
 
     @PostMapping("/board")
     public ResponseEntity<String> createBoardTempImages(MultipartFile file) throws IOException {
@@ -54,5 +55,42 @@ public class ImageController {
         return ResponseEntity.ok(readImageBytes);
 
     }
+
+    @PostMapping("/product")
+    public ResponseEntity<String> createProductTempImages(MultipartFile file) throws IOException {
+        log.debug("createProductTempImages is called");
+
+        if(file.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        String storedName = LocalDateTime.now()+ "_" + originalFilename;
+        String uploadImageUrl =  productSourceUrl + storedName;
+        byte[] image = file.getBytes();
+        FileOutputStream fos = new FileOutputStream(uploadImageUrl);
+        fos.write(image);
+        fos.close();
+        URI imageUri = URI.create("/product/board/" + storedName);
+        ObjectMapper objectMapper = new ObjectMapper();
+        URI storedImagePath = URI.create(imageUri.toString());
+        ImageVo imageVo = ImageVo.builder().uploaded(true).url(storedImagePath).build();
+        return ResponseEntity.created(imageUri).body(objectMapper.writeValueAsString(imageVo));
+    }
+
+    @GetMapping("/product/{filePath}")
+    public ResponseEntity<byte[]> getProductImage(@PathVariable String filePath) {
+        log.debug("getBoardImage is called");
+        byte[] readImageBytes = new byte[0];
+        try {
+            FileInputStream fis = new FileInputStream(productSourceUrl + filePath);
+            readImageBytes = fis.readAllBytes();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok(readImageBytes);
+
+    }
+
 
 }

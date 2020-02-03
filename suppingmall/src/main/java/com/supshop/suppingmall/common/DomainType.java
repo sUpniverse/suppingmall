@@ -1,6 +1,6 @@
 package com.supshop.suppingmall.common;
 
-public enum domainType {
+public enum DomainType {
 
     PRODUCT("PRODUCT"),
     USER("USER"),
@@ -8,7 +8,7 @@ public enum domainType {
 
     private String title;
 
-    domainType(String title) {
+    DomainType(String title) {
         this.title = title;
     }
 

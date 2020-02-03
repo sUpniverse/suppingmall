@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -31,9 +32,12 @@ public class BoardService {
     }
 
     public Board getBoard(Long id) {
-        Board board = boardMapper.selectBoard(id);
-        board.setComments(commentService.getAllComments(id));
-        return board;
+        Optional<Board> board = boardMapper.selectBoard(id);
+        if(!board.isEmpty()) {
+            board.get().setComments(commentService.getAllComments(id));
+            return board.get();
+        }
+        return null;
     }
 
     public void createBoard(Board board) {

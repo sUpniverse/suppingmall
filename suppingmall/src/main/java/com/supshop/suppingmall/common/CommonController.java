@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @RequestMapping("")
 @Controller
-public class commonController {
+public class CommonController {
 
     @RequestMapping("")
     public String mainPage(){

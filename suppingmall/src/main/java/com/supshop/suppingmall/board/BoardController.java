@@ -49,16 +49,23 @@ public class BoardController {
     @GetMapping("/{id}")
     public String getBoard(@PathVariable Long id, Model model) {
         log.debug("'getBoard'가 실행됨");
-        model.addAttribute("board",boardService.getBoard(id));
-        return "/board/board";
+        Board board = boardService.getBoard(id);
+        if(board != null) {
+            model.addAttribute("board",board);
+            return "/board/board";
+        }
+        return "redirect:/boards";
     }
 
     @PostMapping("")
     public String createBoard(Board board, HttpSession session) {
         log.debug("'createBoard'가 실행됨");
-        User user = (User)session.getAttribute("user");
-        board.setCreator(user);
-        boardService.createBoard(board);
+        User user = (User) session.getAttribute("user");
+
+        if(user != null && user.getUserId().equals(board.getCreator().getUserId())) {
+            boardService.createBoard(board);
+            return "redirect:/boards";
+        }
         return "redirect:/boards";
     }
 
@@ -67,7 +74,7 @@ public class BoardController {
         log.debug("'modifyBoard'가 실행됨");
         Board board = boardService.getBoard(id);
         User user = (User)session.getAttribute("user");
-        if(user == null || (user.getUserId() != board.getCreator().getUserId())) {
+        if(user == null || !user.getUserId().equals(board.getCreator().getUserId())) {
             return "redirect:/boards";
         }
         model.addAttribute("board",board);

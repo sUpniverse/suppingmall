@@ -22,11 +22,12 @@
         <result property="shopAddress" column="ShopAddress" />
         <result property="shopAddressDetail" column="ShopAddressDetail" />
         <result property="shopPostNo" column="ShopPostNo" />
+        <result property="type" column="UserType" typeHandler="com.supshop.suppingmall.user.LoginTypeHandler" />
     </resultMap>
 
     <select id="selectAllUser" resultMap="User">
-        SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword",
-        U.name AS "UserName", U.nickname AS "UserNickName",U.city AS "UserCity",U.city_detail AS "UserCityDetail", U.zipcode AS "UserZipCode",
+        SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
+        U.name AS "UserName", U.nickname AS "UserNickName", U.city AS "UserCity", U.city_detail AS "UserCityDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
         U.shop_city AS "ShopAddress", U.shop_city_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
@@ -46,11 +47,14 @@
                 <bind name="name" value="'%'+name+'%'"/>
                 AND U.name LIKE #{name}
             </if>
+            <if test="type != null">
+                AND U.type = #{type}
+            </if>
         </trim>
     </sql>
 
     <select id="selectUser" resultMap="User">
-        SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword",
+        SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
         U.name AS "UserName", U.nickname AS "UserNickName",U.city AS "UserCity",U.city_detail AS "UserCityDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
@@ -60,7 +64,7 @@
     </select>
 
     <select id="selectUserByEmail" resultMap="User">
-        SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword",
+        SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
         U.name AS "UserName", U.nickname AS "UserNickName",U.city AS "UserCity",U.city_detail AS "UserCityDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
@@ -69,7 +73,7 @@
         WHERE U.email = #{email}
     </select>
 
-    <insert id="insertUser" parameterType="com.supshop.suppingmall.user.User" useGeneratedKeys="true" keyProperty="user_id">
+    <insert id="insertUser" parameterType="com.supshop.suppingmall.user.User" useGeneratedKeys="true" keyProperty="userId">
         INSERT INTO User(
         email,
         password,
@@ -82,7 +86,9 @@
         created_date,
         updated_date,
         delete_yes_or_no,
-        role)
+        role,
+        type
+        )
         VALUES (
         #{email},
         #{password},
@@ -95,7 +101,9 @@
         now(),
         now(),
         'N',
-        'U001')
+        #{role, typeHandler=com.supshop.suppingmall.user.RoleTypeHandler},
+        #{type, typeHandler=com.supshop.suppingmall.user.LoginTypeHandler}
+        )
     </insert>
     
     <update id="updateUser" parameterType="com.supshop.suppingmall.user.User">

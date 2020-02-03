@@ -83,7 +83,7 @@
         select count(board_id) from Board where board_id > 0
     </select>
 
-    <insert id="insertBoard" parameterType="com.supshop.suppingmall.board.Board" useGeneratedKeys="true" keyProperty="board_id">
+    <insert id="insertBoard" parameterType="com.supshop.suppingmall.board.Board" useGeneratedKeys="true" keyProperty="boardId">
         INSERT INTO Board (
         title,
         contents,

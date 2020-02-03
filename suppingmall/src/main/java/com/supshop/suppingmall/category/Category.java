@@ -1,13 +1,12 @@
 package com.supshop.suppingmall.category;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
 @Getter @Setter
-@ToString
+@ToString @Builder
+@AllArgsConstructor @NoArgsConstructor
 public class Category {
 
     private Long id;

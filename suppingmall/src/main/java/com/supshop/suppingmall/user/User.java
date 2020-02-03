@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 
 @Getter @Setter
-@ToString
+@ToString @Builder
+@EqualsAndHashCode(of = "userId")
+@NoArgsConstructor @AllArgsConstructor
 public class User {
 
     private Long userId;
@@ -22,6 +24,8 @@ public class User {
     private LocalDateTime updateDate;
     private String delYn;
     private Role role;
+    private LoginType type;
+
     private String shopName;
     private String shopNumber;
     private String shopAddress;
@@ -41,8 +45,27 @@ public class User {
 
         private String code;
 
+
         public static Role getCodeString(String code) {
             return Arrays.stream(Role.values())
+                    .filter(v -> v.getCode().equals(code))
+                    .findAny()
+                    .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + code + "]"));
+        }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public enum LoginType {
+        LOCAL("000"),
+        GOOGLE("001"),
+        KAKAO("002");
+
+        private String code;
+
+
+        public static LoginType getCodeString(String code) {
+            return Arrays.stream(LoginType.values())
                     .filter(v -> v.getCode().equals(code))
                     .findAny()
                     .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + code + "]"));

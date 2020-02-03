@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter @Setter
-@ToString
+@ToString @Builder
+@NoArgsConstructor @AllArgsConstructor
 public class Board {
 
     private Long boardId;

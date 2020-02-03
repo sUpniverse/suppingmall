@@ -3,6 +3,7 @@ package com.supshop.suppingmall.mapper;
 import com.supshop.suppingmall.user.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserMapper {
 
@@ -10,7 +11,7 @@ public interface UserMapper {
 
     User selectUser(Long id);
 
-    User selectUserByEmail(String email);
+    Optional<User> selectUserByEmail(String email);
 
     void insertUser(User user);
 

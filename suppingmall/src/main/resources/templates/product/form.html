@@ -4,26 +4,6 @@
         <div th:include="fragments/header :: header" />
 
         <script src="https://cdn.ckeditor.com/ckeditor5/15.0.0/classic/ckeditor.js"></script>
-        <style type="text/css">
-            input[type=file] {
-                display: none;
-            }
-
-            .images_wrap {
-
-                border: 2px solid #A8A8A8;
-                margin-top: 30px;
-                margin-bottom: 30px;
-                padding-top: 10px;
-                padding-bottom: 10px;
-
-            }
-            .images_wrap img {
-                max-width: 150px;
-                margin-left: 10px;
-                margin-right: 10px;
-            }
-        </style>
     </head>
     <body>
         <nav th:replace="fragments/navigation :: navigation" />
@@ -138,9 +118,11 @@
                     </div>
 
                     <hr class="mb-4">
-                    <h4 class="mb-3">상품 이미지 첨부</h4>
+                    <h4 class="mb-3">썸네일 이미지 첨부(리스트 노출용)</h4>
                     <div>
-                        <input type="file" value="" name="upload[]" multiple>
+                        <img id="thumnail_preview" src="#" th:height="200px" th:width="300px"/>
+                        <br />
+                        <input type="file" th:name="thumnail" accept=".gif, .jpg, .png" onchange="readURL(this)" multiple />
                     </div>
 
                     <hr class="mb-4">
@@ -226,7 +208,9 @@
                     return new CustomUploadAdapter(loader, "/images/board/press", function (result) {
                         var fileSeq = isEmpty(result[0]) ? "noimage" : result[0];
                         var imageUrl = window.location.protocol + "//" + window.location.host + "/image/" + fileSeq;
-                        return {"default" : imageUrl};
+                        return {
+                            "default" : imageUrl
+                        };
                     });
                 };
             })
@@ -255,5 +239,18 @@
             });
         });
     </script>
+    <script type="text/javascript">
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#thumnail_preview').attr('src', e.target.result);
+                }
+                    reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+
+
     <footer th:include="fragments/footer :: footer" />
 </html>

@@ -16,41 +16,24 @@ public class RoleTypeHandler extends EnumTypeHandler<User.Role> {
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, User.Role parameter, JdbcType jdbcType) throws SQLException {
-        if(parameter != null) {
-            ps.setString(i, parameter.getCode());
-        } else {
-            ps.setString(i, null);
-        }
+        ps.setString(i, parameter.getCode());
     }
 
     @Override
-    public User.Role getResult(ResultSet rs, String columnName) throws SQLException {
+    public User.Role getNullableResult(ResultSet rs, String columnName) throws SQLException {
         String result = rs.getString(columnName);
-        try {
-            return User.Role.getCodeString(result);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-
+        return User.Role.getCodeString(result);
     }
 
     @Override
-    public User.Role getResult(ResultSet rs, int columnIndex) throws SQLException {
+    public User.Role getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         String result = rs.getString(columnIndex);
-        try {
-            return User.Role.getCodeString(result);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+        return User.Role.getCodeString(result);
     }
 
     @Override
-    public User.Role getResult(CallableStatement cs, int columnIndex) throws SQLException {
+    public User.Role getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         String result = cs.getString(columnIndex);
-        try {
-            return User.Role.getCodeString(result);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+        return User.Role.getCodeString(result);
     }
 }

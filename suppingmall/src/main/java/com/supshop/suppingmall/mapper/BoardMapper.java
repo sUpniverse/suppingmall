@@ -4,6 +4,7 @@ import com.supshop.suppingmall.board.Board;
 import com.supshop.suppingmall.page.Criteria;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BoardMapper {
 
@@ -11,7 +12,7 @@ public interface BoardMapper {
 
     List<Board> selectBoardByCondition(Criteria criteria, String type, String searchValue);
     
-    Board selectBoard(Long id);
+    Optional<Board> selectBoard(Long id);
 
     void insertBoard(Board board);
 
