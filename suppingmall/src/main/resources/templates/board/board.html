@@ -159,7 +159,18 @@
             });
         });
 
-        let text = 0;
+        $(document).ready(function () {
+            $("#comment-text").on('click', () => {
+                if([[${#strings.isEmpty(session.user?.userId)}]]) {
+                    var check = confirm("로그인 하시겠습니까?");
+                    if(check == true) {
+                        window.location.href='/users/loginform';
+                    }
+                }
+            });
+        });
+
+        var text = 0;
 
         $(document).on('click',"#comment-update-button",(e)=> {
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;

@@ -19,6 +19,7 @@ public class Board {
     private List<Comment> comments;
     private User creator;
     private Category category;
+    private int hit;
     private String delYn;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;

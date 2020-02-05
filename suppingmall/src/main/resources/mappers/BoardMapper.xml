@@ -7,6 +7,7 @@
         <id property="boardId" column="BoardId" />
         <result property="title" column="BoardTitle" />
         <result property="contents" column="BoardContents" />
+        <result property="hit" column="BoardHit" />
         <result property="delYn" column="BoardDelYn" />
         <result property="createdDate" column="BoardCreatedDate" />
         <result property="updatedDate" column="BoardUpdatedDate" />
@@ -27,7 +28,7 @@
     </resultMap>
 
     <select id="selectAllBoard" resultMap="Board">
-        SELECT distinct B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents",
+        SELECT distinct B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents", B.hit AS "BoardHit",
         B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate", U.user_id AS "UserId",
         U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",
         C.category_id AS "CategoryId", C.name AS "CategoryName"
@@ -38,7 +39,7 @@
     </select>
 
     <select id="selectBoardByCondition" resultMap="Board">
-        SELECT B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents",
+        SELECT B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents", B.hit AS "BoardHit",
         B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate", U.user_id AS "UserId",
         U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",
         C.category_id AS "CategoryId", C.name AS "CategoryName"
@@ -69,7 +70,7 @@
     </sql>
 
     <select id="selectBoard" resultMap="Board">
-        SELECT B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents",
+        SELECT B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents", B.hit AS "BoardHit",
         B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate", U.user_id AS "UserId",
         U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",
         C.category_id AS "CategoryId", C.name AS "CategoryName"
@@ -80,7 +81,9 @@
     </select>
 
     <select id="selectBoardCount" resultType="int">
-        select count(board_id) from Board where board_id > 0
+        SELECT count(board_id)
+        From Board
+        WHERE board_id > 0
     </select>
 
     <insert id="insertBoard" parameterType="com.supshop.suppingmall.board.Board" useGeneratedKeys="true" keyProperty="boardId">
@@ -88,6 +91,7 @@
         title,
         contents,
         user_id,
+        hit,
         category_id,
         created_date,
         updated_date
@@ -96,6 +100,7 @@
         #{title},
         #{contents},
         #{creator.userId},
+        0
         #{category.id},
         now(),
         now()
@@ -115,5 +120,12 @@
         DELETE FROM Board
         WHERE board_id = #{id};
     </delete>
+
+    <update id="updateBoardHit" parameterType="com.supshop.suppingmall.board.Board">
+        UPDATE board
+        SET
+        hit = hit +1
+        WHERE board_id = #{id};
+    </update>
 </mapper>
 

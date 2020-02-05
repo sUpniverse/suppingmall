@@ -5,6 +5,8 @@ import com.supshop.suppingmall.mapper.BoardMapper;
 import com.supshop.suppingmall.page.Criteria;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +36,7 @@ public class BoardService {
     public Board getBoard(Long id) {
         Optional<Board> board = boardMapper.selectBoard(id);
         if(!board.isEmpty()) {
+            boardMapper.updateBoardHit(id);
             board.get().setComments(commentService.getAllComments(id));
             return board.get();
         }

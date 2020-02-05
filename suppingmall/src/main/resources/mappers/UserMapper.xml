@@ -9,8 +9,8 @@
         <result property="password" column="UserPassword" />
         <result property="name" column="Username" />
         <result property="nickName" column="UserNickName" />
-        <result property="city" column="UserCity" />
-        <result property="cityDetail" column="UserCityDetail" />
+        <result property="address" column="UserAddress" />
+        <result property="addressDetail" column="UserAddressDetail" />
         <result property="zipCode" column="UserZipCode" />
         <result property="phoneNumber" column="UserPhoneNumber" />
         <result property="createdDate" column="UserCreatedDate" />
@@ -27,7 +27,7 @@
 
     <select id="selectAllUser" resultMap="User">
         SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
-        U.name AS "UserName", U.nickname AS "UserNickName", U.city AS "UserCity", U.city_detail AS "UserCityDetail", U.zipcode AS "UserZipCode",
+        U.name AS "UserName", U.nickname AS "UserNickName", U.city AS "UserAddress", U.city_detail AS "UserAddressDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
         U.shop_city AS "ShopAddress", U.shop_city_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
@@ -55,20 +55,20 @@
 
     <select id="selectUser" resultMap="User">
         SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
-        U.name AS "UserName", U.nickname AS "UserNickName",U.city AS "UserCity",U.city_detail AS "UserCityDetail", U.zipcode AS "UserZipCode",
+        U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddress    Detail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
-        U.shop_city AS "ShopAddress", U.shop_city_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
+        U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
         FROM User AS U
         WHERE U.user_id = #{id}
     </select>
 
     <select id="selectUserByEmail" resultMap="User">
         SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
-        U.name AS "UserName", U.nickname AS "UserNickName",U.city AS "UserCity",U.city_detail AS "UserCityDetail", U.zipcode AS "UserZipCode",
+        U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddress    Detail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
-        U.shop_city AS "ShopAddress", U.shop_city_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
+        U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
         FROM User AS U
         WHERE U.email = #{email}
     </select>
@@ -79,8 +79,8 @@
         password,
         name,
         nickname,
-        city,
-        city_detail,
+        address,
+        address_detail,
         zipcode,
         phone_number,
         created_date,
@@ -94,8 +94,8 @@
         #{password},
         #{name},
         #{nickName},
-        #{city},
-        #{cityDetail},
+        #{address},
+        #{addressDetail},
         #{zipCode},
         #{phoneNumber},
         now(),
