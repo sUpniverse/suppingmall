@@ -2,14 +2,14 @@ package com.supshop.suppingmall.product;
 
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.user.User;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Builder
 @Getter @Setter
+@AllArgsConstructor @NoArgsConstructor
 @ToString
 public class Product {
 
@@ -24,7 +24,7 @@ public class Product {
 
     private User seller;
     private Category category;
-    private String delYn;
+    private String saleYn;
     private String thumbnail;
     private String picture;
 

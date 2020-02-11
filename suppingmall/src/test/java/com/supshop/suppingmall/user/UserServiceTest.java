@@ -1,6 +1,5 @@
 package com.supshop.suppingmall.user;
 
-import com.supshop.suppingmall.mapper.UserMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +66,30 @@ public class UserServiceTest {
         }
         
         //then
-    
+    }
+
+    @Test
+    @Transactional
+    public void partialUpdateUser() throws Exception {
+        //given
+        Long userId = 1l;
+        User updatedUser = User.builder()
+                .delYn("Y")
+                .nickName("스타벅스")
+                .address(null)
+                .zipCode(null)
+                .phoneNumber(null)
+                .build();
+        //when
+        userService.patchUser(userId,updatedUser);
+
+        //then
+        User user = userService.getUser(userId);
+        assertThat(user.getDelYn()).isEqualTo(updatedUser.getDelYn());
+        assertThat(user.getNickName()).isEqualTo(updatedUser.getNickName());
+        assertThat(user.getAddress()).isNotEqualTo(updatedUser.getAddress());
+        assertThat(user.getZipCode()).isNotEqualTo(updatedUser.getZipCode());
+        assertThat(user.getPhoneNumber()).isNotEqualTo(updatedUser.getPhoneNumber());
+
     }
 }

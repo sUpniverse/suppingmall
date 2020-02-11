@@ -3,20 +3,19 @@
 <head>
     <div th:include="fragments/header :: header" />
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <style>
+        input[type="text"]:read-only {
+            background: #ffffff;
+        }
+    </style>
 </head>
 <body>
-<div th:replace="fragments/navigation :: navigation" />
 <div class="container">
-    <div class="position-relative overflow-hidden p-1 mb-5 text-center bg-light">
-        <div class="p-lg-5 mx-auto my-2">
-            <h1 class="display-4 font-weight-normal">회원정보수정</h1>
-        </div>
-    </div>
+
     <div class="row mb-3">
         <div class="col-md-8 order-md-1  mx-auto">
 
-            <form class="needs-validation mt-5"  novalidate="" th:action="@{/users/{id}(id=${user.userId})}" method="post" name="user" onsubmit="return checkAllValidation()">
-                <input type="hidden" th:name="_method" th:value="PUT">
+            <form class="needs-validation mt-5" name="user" th:id="user">
                 <table class="table table-default">
                     <tbody>
                     <tr>
@@ -35,30 +34,6 @@
                     <tr>
                         <th>가입일</th>
                         <td th:text="${user.createdDate}" />
-                    </tr>
-                    <tr>
-                        <th>비밀번호</th>
-                        <td>
-                            <input type="password" class="form-control is-invalid" id="password" placeholder="비밀번호를 입력하세요" name="password">
-                            <div class="invalid-feedback">
-                                영문,숫자,특수문자를 조합한 8자리 이상을 입력하세요
-                            </div>
-                            <div class="valid-feedback">
-                                적합한 비밀번호입니다.
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>비밀번호확인</th>
-                        <td>
-                            <input type="password" class="form-control is-invalid" placeholder="비밀번호를 한번 더 입력하세요" id="passwordcheck">
-                            <div class="invalid-feedback">
-                                입력한 비밀번호와 일치하지 않습니다.
-                            </div>
-                            <div class="valid-feedback">
-                                입력한 비밀번호와 일치합니다.
-                            </div>
-                        </td>
                     </tr>
                     <tr>
                         <th>이름</th>
@@ -111,7 +86,7 @@
                     </tr>
                     </tbody>
                 </table>
-                <input class="btn btn-primary btn-block" type="submit" value="수정"/>
+                <input class="btn btn-primary btn-block" th:id="updateButton" th:value="수정">
             </form>
         </div>
     </div>
@@ -121,15 +96,19 @@
 
 <script>
     let checkEmailResult = true;
-    let checkPasswordResult = false;
     let checkPhoneResult = true;
     let checkAddressResult = true;
 
     const email = getElement('email');
     const validation = getElement("validEmail");
     const duplication = getElement("duplicateEmail");
-    const password = getElement('password');
-    const passwordcheck = getElement('passwordcheck');
+    let first = getElementValue("phoneFirst");
+    let middle = getElementValue("phoneMiddle");
+    let last = getElementValue("phoneLast");
+    let phone = getElement("phone");
+    var sum = first + middle + last;
+    phone.setAttribute('value',sum);
+
 
     function check(re, what) {
         if(re.test(what.value)) {
@@ -196,28 +175,9 @@
         }
     });
 
-    $(document).on('change keyup paste','#passwordcheck', function () {
-
-
-        if(password.value === passwordcheck.value) {
-            passwordcheck.className = "form-control is-valid";
-            checkPasswordResult = true;
-        } else {
-            passwordcheck.className = "form-control is-invalid";
-            checkPasswordResult  = false;
-        }
-    });
-
-
     $(document).on('click',"#verifyPhone",function () {
 
         var rePhone = /(01[016789])([1-9]{1}[0-9]{2,3})([0-9]{4})$/;
-
-
-        var first = getElementValue("phoneFirst");
-        var middle = getElementValue("phoneMiddle");
-        var last = getElementValue("phoneLast");
-        var phone = getElement("phone");
 
         var sum = first + middle + last;
 
@@ -285,16 +245,13 @@
     });
 
     function checkAllValidation() {
-        if(checkEmailResult && checkPasswordResult && checkPhoneResult && checkAddressResult) {
+        if(checkEmailResult && checkPhoneResult && checkAddressResult) {
             return true;
         } else {
             var point;
             if(!checkEmailResult) {
                 point = "email";
                 email.focus();
-            } else if(!checkPasswordResult) {
-                point = "password";
-                password.focus();
             } else if(!checkPhoneResult) {
                 point = "phone";
                 document.getElementById("phoneFirst").focus();
@@ -304,6 +261,45 @@
             }
             return false;
         }
+    }
+</script>
+<script>
+    $(document).on('click','#updateButton',function () {
+
+        checkAllValidation();
+        var userData = $('#user').serializeObject();
+        var userId = [[${user.userId}]];
+
+        $.ajax({
+            type: 'PATCH',
+            url: "/users/"+userId,
+            data: JSON.stringify(userData),
+            dataType: 'text',
+            contentType: 'application/json',
+            success: () => {
+                window.opener.location.reload();
+                window.close();
+            },
+            error: (response, error) => {
+                alert("서버에 문제가 있습니다.")
+            }
+        })
+    });
+</script>
+<script>
+    jQuery.fn.serializeObject = function() {
+        var obj = null;
+        try {
+            if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) {
+                var arr = this.serializeArray();
+                if(arr){ obj = {};
+                jQuery.each(arr, function() { obj[this.name] = this.value; });
+                }
+            }
+        } catch(e) {
+            alert(e.message);
+        } finally {}
+        return obj;
     }
 </script>
 </html>

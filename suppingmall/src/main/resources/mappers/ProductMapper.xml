@@ -4,15 +4,15 @@
 
 <mapper namespace="com.supshop.suppingmall.mapper.ProductMapper">
     <resultMap id="product" type="com.supshop.suppingmall.product.Product" autoMapping="true">
-        <id property="productId" column="ProductNo" />
+        <id property="productId" column="ProductId" />
         <result property="name" column="ProductName" />
         <result property="price" column="ProductPrice" />
         <result property="registeredDate" column="ProductRegisteredDate" />
-        <result property="delYn" column="ProductDelYn"/>
+        <result property="saleYn" column="ProductSaleYn"/>
         <result property="thumbnail" column="ProductThumbnail" />
         <result property="picture" column="ProductPicture" />
         <association property="detail" column="ProductId" javaType="com.supshop.suppingmall.product.ProductDetail">
-            <id property="id" column="ProductDetailId" />
+            <id property="detailId" column="ProductDetailId" />
             <result property="asNumber" column="ProductAsNumber"/>
             <result property="manuplatedDate" column="ProductManuplatedDate"/>
             <result property="manufacturer" column="ProductManufacturer"/>
@@ -22,6 +22,7 @@
             <result property="spec3" column="ProductSpec3" />
             <result property="spec4" column="ProductSpec4" />
             <result property="spec5" column="ProductSpec5" />
+            <result property="spec6" column="ProductSpec6" />
         </association>
         <association property="seller" javaType="com.supshop.suppingmall.user.User">
             <id property="userId" column="UserId" />
@@ -40,7 +41,7 @@
             <result property="name" column="CategoryName" />
         </association>
         <collection property="options" column="ProductId" ofType="com.supshop.suppingmall.product.ProductOption" >
-            <id property="id" column="ProductOptionId" />
+            <id property="optionId" column="ProductOptionId" />
             <result property="optionName" column="ProductOptionName" />
             <result property="price" column="ProductOptionPrice" />
             <result property="quantity" column="ProductOptionQuantity" />
@@ -93,30 +94,33 @@
         LEFT OUTER JOIN Product_Detail AS PD on (P.product_id = PD.product_id)
         LEFT OUTER JOIN Product_Option AS PO on (P.product_id = PO.product_id)
         LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
-        WHERE P.product_id = #{id} AND P.delYn = 'N'
-        ORDER BY P.product_id, PO.product_option_id, user_id ASC
+        WHERE P.product_id = #{id} AND P.sale_yes_or_no = 'Y'
+        ORDER BY P.product_id, PO.product_option_id ASC
     </select>
 
     <sql id="addProductOptions">
         <if test="options != null and options.size > 0">
             <foreach collection="options" item="option" index="index" separator=";">
-                INSERT INTO Product_Option(
+            INSERT INTO product_option(
+                product_id,
                 product_option_id,
                 name,
                 price,
                 quantity)
                 VALUES (
-                #{option.id},
-                #{option.name},
+                #{productId},
+                #{option.optionId},
+                #{option.optionName},
                 #{option.price},
                 #{option.quantity})
             </foreach>
         </if>
     </sql>
 
-    <sql id="addProductDetail">
-        <if test="detail != null and detail.size > 0">
-            INSERT INTO Product_Detail(
+    <sql id="addProductDetail" >
+        <if test="detail != null">
+            INSERT INTO product_detail(
+            product_id,
             product_detail_id,
             as_number,
             manuplated_date,
@@ -128,52 +132,44 @@
             spec_4,
             spec_5,
             spec_6
---             spec_7,
---             spec_8,
---             spec_9,
---             spec_10
             )
             VALUES (
-            '1',
+            #{productId},
+            1,
             #{detail.asNumber},
             #{detail.manuplatedDate},
             #{detail.manufacturer},
             #{detail.origin},
+            #{detail.spec1},
             #{detail.spec2},
             #{detail.spec3},
             #{detail.spec4},
             #{detail.spec5},
-            #{detail.spec6}
---             #{detail.spec7},
---             #{detail.spec8},
---             #{detail.spec9},
---             #{detail.spec10}
-            )
+            #{detail.spec6});
         </if>
     </sql>
 
-    <insert id="insertProduct" parameterType="com.supshop.suppingmall.product.Product" keyProperty="id">
+    <insert id="insertProduct" parameterType="com.supshop.suppingmall.product.Product" useGeneratedKeys="true" keyProperty="productId">
         INSERT INTO Product(
-                product_id,
-                name,
-                price,
-                registered_date,
-                seller_id,
-                category_id,
-                delYn,
-                thumbnail,
-                picture)
-                VALUES (
-                #{id},
-                #{name},
-                #{registeredDate},
-                #{seller.userId},
-                #{category.id},
-                'N',
-                #{thumbnail},
-                #{picture})
-        <include refid="addProductOptions" />
-        <include refid="addProductDetail" />
+        name,
+        price,
+        registered_date,
+        seller_id,
+        category_id,
+        sale_yes_or_no,
+        thumbnail,
+        picture)
+        VALUES (
+        #{name},
+        #{price},
+        now(),
+        #{seller.userId},
+        #{category.id},
+        'Y',
+        #{thumbnail},
+        #{picture});
+<!--        <include refid="addProductDetail" />-->
+<!--        <include refid="addProductOptions" />-->
     </insert>
 
     <update id="deleteProduct" parameterType="com.supshop.suppingmall.product.Product">

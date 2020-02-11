@@ -5,9 +5,9 @@
 		</a>
 		<a class="py-2 d-none d-md-inline-block" href="/products/">Price</a>
 		<a class="py-2 d-none d-md-inline-block" href="/boards/">Farm</a>
-		<a class="py-2 d-none d-md-inline-block" href="/users/">Users</a>
 		<a class="py-2 d-none d-md-inline-block" href="#">Enterprise</a>
 		<a class="py-2 d-none d-md-inline-block" href="#">Support</a>
+		<a th:if="${session.user?.role}" class="py-2 d-none d-md-inline-block" href="/users/">Users</a>
 		<a th:unless="${session.user}" class="py-2 d-none d-md-inline-block" href="/users/signup">Signup</a>
 		<a th:unless="${session.user}" class="btn btn-outline-dark" href="/users/loginform">Login</a>
 		<a th:if="${session.user}" class="btn btn-outline-dark" href="/users/logout">LogOut</a>

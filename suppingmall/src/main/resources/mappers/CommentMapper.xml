@@ -41,7 +41,7 @@
         WHERE C.comment_id = #{id};
     </select>
 
-    <insert id="insertComment" parameterType="com.supshop.suppingmall.comment.Comment" useGeneratedKeys="true" keyProperty="comment_id">
+    <insert id="insertComment" parameterType="com.supshop.suppingmall.comment.Comment" useGeneratedKeys="true" keyProperty="commentId">
         INSERT INTO Comment (
         board_id,
         title,

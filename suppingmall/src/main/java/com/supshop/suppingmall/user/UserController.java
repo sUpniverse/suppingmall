@@ -1,23 +1,30 @@
 package com.supshop.suppingmall.user;
 
+import com.supshop.suppingmall.page.Criteria;
+import com.supshop.suppingmall.page.PageMaker;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.Map;
 
 @RequestMapping("/users")
 @Controller
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
+    private final ModelMapper modelMapper;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ModelMapper modelMapper) {
         this.userService = userService;
+        this.modelMapper = modelMapper;
     }
 
     @GetMapping("/signup")
@@ -39,8 +46,17 @@ public class UserController {
     }
 
     @GetMapping("")
-    public String getAllUser(Model model) {
-        model.addAttribute(userService.getAllUser());
+    public String getAllUser(Model model,
+                             HttpSession session,
+                             Criteria criteria,
+                             @RequestParam(required = false) String type,
+                             @RequestParam(required = false) String searchValue) {
+        if(!isLoginUser(session)) return "/user/login";
+        model.addAttribute(userService.getAllUser(criteria,type,searchValue));
+        PageMaker pageMaker = new PageMaker();
+        pageMaker.setCriteria(criteria);
+        pageMaker.setTotalCount(userService.getBoardCount());
+        model.addAttribute("pageMaker",pageMaker);
         return "/user/list";
     }
 
@@ -65,14 +81,10 @@ public class UserController {
 
     @PostMapping("/login")
     public String login(String email, String password, HttpSession session) {
-        User user = userService.getUserByEmail(email);
+        User user = userService.isSignInedUser(email,password);
         if(user == null) {
             return "redirect:/users/loginform";
         }
-        if(!password.equals(user.getPassword())) {
-            return "redirect:/users/loginform";
-        }
-
         session.setAttribute("user", user);
         return "redirect:/";
     }
@@ -97,34 +109,61 @@ public class UserController {
     public String update_form(@PathVariable Long id, Model model, HttpSession session) {
         User sessionUser = (User) session.getAttribute("user");
         if(isOwner(id, sessionUser)) {
-            return "redirect:/users/login";
+            model.addAttribute("user", userService.getUser(id));
+            return "/user/updateform";
         }
-        model.addAttribute("user", userService.getUser(id));
-        return "/user/updateform";
+        if(isAdmin(sessionUser)) {
+            model.addAttribute("user", userService.getUser(id));
+            return "/user/adminUpdateForm";
+        }
+
+        return "redirect:/users/loginform";
     }
 
-    private boolean isOwner(@PathVariable Long id, User sessionUser) {
-        return sessionUser == null || !sessionUser.getUserId().equals(id);
+    private boolean isOwner(Long id, User sessionUser) {
+        return sessionUser != null && sessionUser.getUserId().equals(id);
+    }
+
+    private boolean isAdmin(User sessionUser) {
+        return sessionUser != null && (sessionUser.getRole().equals(User.Role.ADMIN) || (sessionUser.getRole().equals(User.Role.MASTER)));
     }
 
     @PutMapping("/{id}")
     public String updateUser(@PathVariable Long id, User user, HttpSession session) {
         User sessionUser = (User) session.getAttribute("user");
-        if(isOwner(id, sessionUser)) {
-            return "redirect:/users/login";
+        if(isOwner(id, sessionUser) || isAdmin(sessionUser)) {
+            userService.updateUser(id, user);
+            return "redirect:/";
         }
-        userService.updateUser(id, user);
-        return "redirect:/";
+        return "redirect:/users/loginform";
     }
 
-    @DeleteMapping("")
-    public String deleteUser(@PathVariable Long id, HttpSession session) {
+    @PatchMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<String> partialUpdateUser(@RequestBody(required = false) @Valid UserVO userVO,
+                                                    @PathVariable Long id,
+                                                    HttpSession session) {
+
         User sessionUser = (User) session.getAttribute("user");
-        if(isOwner(id, sessionUser)) {
-            return "redirect:/users/login";
+        if(isAdmin(sessionUser)) {
+            User user = modelMapper.map(userVO, User.class);
+            userService.patchUser(id,user);
+            return ResponseEntity.ok().build();
         }
-        userService.deleteUser(id);
-        return "redirect:/";
+        return ResponseEntity.badRequest().build();
+    }
+
+
+
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<String> deleteUser(@RequestBody User user, @PathVariable Long id, HttpSession session) {
+        User sessionUser = (User) session.getAttribute("user");
+        if(isAdmin(sessionUser)) {
+            userService.patchUser(id,user);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().build();
     }
 
 }

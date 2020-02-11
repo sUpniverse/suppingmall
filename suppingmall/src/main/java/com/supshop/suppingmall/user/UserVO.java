@@ -8,10 +8,11 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 
 @Getter @Setter
-@ToString @Builder
+@ToString
+@Builder
 @EqualsAndHashCode(of = "userId")
 @NoArgsConstructor @AllArgsConstructor
-public class User {
+public class UserVO {
 
     private static final String emailReg = "^[A-Za-z0-9_]+[A-Za-z0-9]*[@]{1}[A-Za-z0-9]+[A-Za-z0-9]*[.]{1}[A-Za-z]{1,3}$";
     private static final String passwordReg = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,15}$";
@@ -22,10 +23,6 @@ public class User {
     @NotEmpty
     @Pattern(regexp = emailReg)
     private String email;
-
-    @NotEmpty
-    @Pattern(regexp = passwordReg)
-    private String password;
 
     @NotEmpty
     private String name;
@@ -45,9 +42,8 @@ public class User {
     private String phoneNumber;
     private LocalDateTime createdDate;
     private LocalDateTime updateDate;
-    private String delYn;
-    private Role role;
-    private LoginType type;
+    private User.Role role;
+    private User.LoginType type;
 
     private String shopName;
     private String shopNumber;
@@ -66,8 +62,8 @@ public class User {
 
         private String code;
 
-        public static Role getCodeString(String code) {
-            return Arrays.stream(Role.values())
+        public static User.Role getCodeString(String code) {
+            return Arrays.stream(User.Role.values())
                     .filter(v -> v.getCode().equals(code))
                     .findAny()
                     .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + code + "]"));
@@ -84,8 +80,8 @@ public class User {
         private String code;
 
 
-        public static LoginType getCodeString(String code) {
-            return Arrays.stream(LoginType.values())
+        public static User.LoginType getCodeString(String code) {
+            return Arrays.stream(User.LoginType.values())
                     .filter(v -> v.getCode().equals(code))
                     .findAny()
                     .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + code + "]"));

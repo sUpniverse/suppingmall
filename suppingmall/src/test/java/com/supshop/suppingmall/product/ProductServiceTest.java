@@ -6,32 +6,26 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ProductControllerTest {
+public class ProductServiceTest {
 
     @Autowired
     MockMvc mockMvc;
 
-    private MockHttpSession session;
+    @Autowired
+    ProductService productService;
 
     private User addUser() {
 
@@ -40,15 +34,9 @@ public class ProductControllerTest {
                 .build();
     }
 
-    private void addUserInSession(User user) {
-        session = new MockHttpSession();
-        session.setAttribute("user",user);
-
-    }
-
     @Test
     @Transactional
-    public void testPrdouct() throws Exception {
+    public void createProduct() throws Exception {
         //given
         Category category = Category.builder().id(3l).build();
 
@@ -81,7 +69,6 @@ public class ProductControllerTest {
 
 
         User user = addUser();
-        addUserInSession(user);
 
         Product product = Product.builder()
                 .category(category)
@@ -92,17 +79,13 @@ public class ProductControllerTest {
                 .seller(user)
                 .build();
 
+
+
         //when
-        mockMvc.perform(post("/products")
-                .session(session)
-                .requestAttr("product",product)
-                .characterEncoding("UTF-8")
-                .contentType("application/json"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"))
-                .andDo(print());
-        
+        productService.createProduct(product);
+        Product product1 = productService.retrieveProduct(product.getProductId());
+
         //then
-    
+        assertThat(product1.getName()).isEqualTo(product.getName());
     }
 }

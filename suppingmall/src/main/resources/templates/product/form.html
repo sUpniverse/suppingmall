@@ -4,6 +4,12 @@
         <div th:include="fragments/header :: header" />
 
         <script src="https://cdn.ckeditor.com/ckeditor5/15.0.0/classic/ckeditor.js"></script>
+        <style>
+            .ck.ck-editor__editable {
+                min-height: 300px;
+            }
+
+        </style>
     </head>
     <body>
         <nav th:replace="fragments/navigation :: navigation" />
@@ -122,7 +128,7 @@
                     <div>
                         <img id="thumnail_preview" src="#" th:height="200px" th:width="300px"/>
                         <br />
-                        <input type="file" th:name="thumnail" accept=".gif, .jpg, .png" onchange="readURL(this)" multiple />
+                        <input type="file" th:name="thumnails" accept=".gif, .jpg, .png" onchange="readURL(this)" multiple />
                     </div>
 
                     <hr class="mb-4">
@@ -144,10 +150,10 @@
                             </thead>
                             <tbody>
                                 <tr id="optionRow">
-                                    <td><input type="text" class="form-control" th:name="options[0].id" th:value="1" disabled></td>
-                                    <td><input type="text" class="form-control" th:name="options[0].id" placeholder="옵션명"></td>
-                                    <td><input type="text" class="form-control" th:name="options[0].id" placeholder="추가 가격(원)"></td>
-                                    <td><input type="text" class="form-control" th:name="options[0].id" placeholder="재고량"></td>
+                                    <td><input type="text" class="form-control" th:name="options[0].optionId" th:value="1" readonly></td>
+                                    <td><input type="text" class="form-control" th:name="options[0].optionName" placeholder="옵션명"></td>
+                                    <td><input type="text" class="form-control" th:name="options[0].price" placeholder="추가 가격(원)"></td>
+                                    <td><input type="text" class="form-control" th:name="options[0].quantity" placeholder="재고량"></td>
                                     <td><button type="button" class="btn btn-danger btn-sm" onclick="deleteOptionListener(this);">x</button></td>
                                 </tr>
                             </tbody>
@@ -156,7 +162,7 @@
 
                     <hr class="mb-4">
                     <h4 class="mb-3">내용 입력</h4>
-                    <textarea th:name="content" id="editor"></textarea>
+                    <textarea th:name="contents" id="editor"></textarea>
 
                     <hr class="mb-4">
                     <h4 class="mb-3">판매자 정보</h4>
@@ -175,7 +181,7 @@
             var order = count + 1;
             var option =
                 '<tr id="optionRow">\n' +
-                '<td><input type="text" class="form-control" id="option_number" name ="options['+count+'].id" value="'+order+'" disabled></td>\n' +
+                '<td><input type="text" class="form-control" id="option_number" name ="options['+count+'].id" value="'+order+'" readonly></td>\n' +
                 '<td><input type="text" class="form-control" id="option" name="options['+count+'].optionName" placeholder="옵션명"></td>\n' +
                 '<td><input type="text" class="form-control" name="options['+count+'].price" placeholder="추가 가격(원)"></td>\n' +
                 '<td><input type="text" class="form-control" name="options['+count+'].quantity" placeholder="수량"></td>\n' +
@@ -187,7 +193,6 @@
         
         function deleteOptionListener(obj) {
             var tr = $(obj).parent().parent();
-            console.log(tr);
             tr.remove();
         }
         
@@ -198,25 +203,76 @@
         var editor_id = '#editor';
 
         ClassicEditor
-            .create( document.querySelector(editor_id), {
-                language:"ko",
-                height: 500
+            .create( document.querySelector('#editor'), {
+                language: "ko"
             })
-            .then(function (editor) {
-                editoro = editor;
-                editor.plugins.get("FileRepository").createUploadAdapter = function (loader) {
-                    return new CustomUploadAdapter(loader, "/images/board/press", function (result) {
-                        var fileSeq = isEmpty(result[0]) ? "noimage" : result[0];
-                        var imageUrl = window.location.protocol + "//" + window.location.host + "/image/" + fileSeq;
-                        return {
-                            "default" : imageUrl
-                        };
-                    });
+            .then( editor => {
+                editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+                    return new MyUploadAdapter(loader);
                 };
             })
             .catch(function (error) {
-                console.log( error );
-            } );
+                console.log(error);
+            });
+
+
+        class MyUploadAdapter {
+
+            constructor(loader) {
+                this.loader = loader;
+            }
+            upload() {
+                return this.loader.file
+                    .then(file => new Promise((resolve, reject) => {
+                        this._initRequest();
+                        this._initListeners(resolve, reject, file);
+                        this._sendRequest(file);
+                    }));
+            }
+
+            abort() {
+                if (this.xhr) { this.xhr.abort(); }
+
+            }
+
+            _initRequest() {
+                const xhr = this.xhr = new XMLHttpRequest();
+                xhr.open('POST', '/images/product', true);
+                xhr.responseType = 'json';
+            }
+
+            _initListeners(resolve, reject, file) {
+                const xhr = this.xhr;
+                const loader = this.loader;
+                const genericErrorText = `Couldn't upload file: ${ file.name }.`;
+                xhr.addEventListener('error', () => reject(genericErrorText));
+                xhr.addEventListener('abort', () => reject());
+                xhr.addEventListener('load', () => {
+                    const response = xhr.response;
+                    if (!response || response.error) {
+                        return reject(response && response.error ? response.error.message : genericErrorText);
+                    }
+                    resolve({
+                        default: response.url
+                    });
+                });
+
+                if (xhr.upload) {
+                    xhr.upload.addEventListener('progress', evt => {
+                        if (evt.lengthComputable) {
+                            loader.uploadTotal = evt.total;
+                            loader.uploaded = evt.loaded;
+                        }
+                    });
+                }
+            }
+
+            _sendRequest(file) {
+                const data = new FormData();
+                data.append('file', file);
+                this.xhr.send(data);
+            }
+        }
     </script>
 
     <script type="text/javascript">

@@ -1,17 +1,14 @@
 package com.supshop.suppingmall.product;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder
+@Getter @Setter
+@AllArgsConstructor @NoArgsConstructor
+@ToString
 public class ProductOption {
 
-    private int id;
+    private int optionId;
     private String optionName;
     private String price;
     private int quantity;

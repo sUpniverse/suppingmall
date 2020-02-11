@@ -18,7 +18,15 @@ import java.time.LocalDateTime;
 public class ImageController {
 
     private static final String boardSourceUrl =  "src/main/resources/images/board/";
-    private static final String productSourceUrl =  "src/main/resources/images/product/";
+    public static final String productSourceUrl =  "src/main/resources/images/product/";
+    private static final String boardUri =  "/images/board/";
+    public static final String productUri =  "/images/product/";
+
+    private final ImageService imageService;
+
+    public ImageController(ImageService imageService) {
+        this.imageService = imageService;
+    }
 
     @PostMapping("/board")
     public ResponseEntity<String> createBoardTempImages(MultipartFile file) throws IOException {
@@ -28,30 +36,16 @@ public class ImageController {
             return ResponseEntity.badRequest().build();
         }
 
-        String originalFilename = file.getOriginalFilename();
-        String storedName = LocalDateTime.now()+ "_" + originalFilename;
-        String uploadImageUrl =  boardSourceUrl + storedName;
-        byte[] image = file.getBytes();
-        FileOutputStream fos = new FileOutputStream(uploadImageUrl);
-        fos.write(image);
-        fos.close();
-        URI imageUri = URI.create("/images/board/" + storedName);
+        URI storedImagePath = imageService.saveImage(file, boardSourceUrl, boardUri);
         ObjectMapper objectMapper = new ObjectMapper();
-        URI storedImagePath = URI.create(imageUri.toString());
         ImageVo imageVo = ImageVo.builder().uploaded(true).url(storedImagePath).build();
-        return ResponseEntity.created(imageUri).body(objectMapper.writeValueAsString(imageVo));
+        return ResponseEntity.created(storedImagePath).body(objectMapper.writeValueAsString(imageVo));
     }
 
     @GetMapping("/board/{filePath}")
     public ResponseEntity<byte[]> getBoardImage(@PathVariable String filePath) {
         log.debug("getBoardImage is called");
-        byte[] readImageBytes = new byte[0];
-        try {
-            FileInputStream fis = new FileInputStream(boardSourceUrl + filePath);
-            readImageBytes = fis.readAllBytes();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        byte[] readImageBytes = imageService.getImage(boardSourceUrl + filePath);
         return ResponseEntity.ok(readImageBytes);
 
     }
@@ -64,33 +58,17 @@ public class ImageController {
             return ResponseEntity.badRequest().build();
         }
 
-        String originalFilename = file.getOriginalFilename();
-        String storedName = LocalDateTime.now()+ "_" + originalFilename;
-        String uploadImageUrl =  productSourceUrl + storedName;
-        byte[] image = file.getBytes();
-        FileOutputStream fos = new FileOutputStream(uploadImageUrl);
-        fos.write(image);
-        fos.close();
-        URI imageUri = URI.create("/product/board/" + storedName);
+        URI storedImagePath = imageService.saveImage(file, productSourceUrl, productUri);
         ObjectMapper objectMapper = new ObjectMapper();
-        URI storedImagePath = URI.create(imageUri.toString());
         ImageVo imageVo = ImageVo.builder().uploaded(true).url(storedImagePath).build();
-        return ResponseEntity.created(imageUri).body(objectMapper.writeValueAsString(imageVo));
+        return ResponseEntity.created(storedImagePath).body(objectMapper.writeValueAsString(imageVo));
     }
 
     @GetMapping("/product/{filePath}")
     public ResponseEntity<byte[]> getProductImage(@PathVariable String filePath) {
-        log.debug("getBoardImage is called");
-        byte[] readImageBytes = new byte[0];
-        try {
-            FileInputStream fis = new FileInputStream(productSourceUrl + filePath);
-            readImageBytes = fis.readAllBytes();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        log.debug("getProductImage is called");
+
+        byte[] readImageBytes = imageService.getImage(productSourceUrl + filePath);
         return ResponseEntity.ok(readImageBytes);
-
     }
-
-
 }

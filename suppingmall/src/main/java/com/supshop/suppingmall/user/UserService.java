@@ -1,6 +1,7 @@
 package com.supshop.suppingmall.user;
 
 import com.supshop.suppingmall.mapper.UserMapper;
+import com.supshop.suppingmall.page.Criteria;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,8 +26,12 @@ public class UserService implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<User> getAllUser() {
-        return userMapper.selectAllUser();
+    public List<User> getAllUser(Criteria criteria, String type, String searchValue) {
+        return userMapper.selectAllUser(criteria,type,searchValue);
+    }
+
+    public int getBoardCount() {
+        return userMapper.selectUserCount();
     }
 
     public User getUser(Long id) {
@@ -45,7 +50,12 @@ public class UserService implements UserDetailsService {
     }
 
     public void updateUser(Long id, User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userMapper.updateUser(id, user);
+    }
+
+    public void patchUser(Long id, User user) {
+        userMapper.patchUser(id, user);
     }
 
     public void deleteUser(Long id) {
@@ -65,4 +75,16 @@ public class UserService implements UserDetailsService {
                 .collect(Collectors.toSet());
     }
 
+    public User isSignInedUser(String email, String password) {
+        User user = null;
+        try {
+            user = getUserByEmail(email);
+        } catch (UsernameNotFoundException e) {
+            return null;
+        }
+        if(passwordEncoder.matches(password,user.getPassword())) {
+            return user;
+        }
+        return null;
+    }
 }

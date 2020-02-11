@@ -27,35 +27,45 @@
 
     <select id="selectAllUser" resultMap="User">
         SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
-        U.name AS "UserName", U.nickname AS "UserNickName", U.city AS "UserAddress", U.city_detail AS "UserAddressDetail", U.zipcode AS "UserZipCode",
+        U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
-        U.shop_city AS "ShopAddress", U.shop_city_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
+        U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
         FROM User AS U
-<!--        <include refid="conditionalSearch"></include>-->
+        <include refid="conditionalSearch"></include>
+        ORDER BY U.user_id asc
+        limit #{criteria.pageStart}, #{criteria.perPageNum}
     </select>
 
     <sql id="conditionalSearch">
         <trim prefix="WHERE" prefixOverrides="AND|OR">
-            <if test="id != null">
-                AND U.user_id = #{id}
-            </if>
-            <if test="role != null">
-                AND U.role = #{role}
-            </if>
-            <if test="name != null">
-                <bind name="name" value="'%'+name+'%'"/>
-                AND U.name LIKE #{name}
-            </if>
-            <if test="type != null">
-                AND U.type = #{type}
+            <if test="type != null and searchValue != null">
+                <if test='type.equals("id")'>
+                    AND U.user_id LIKE #{searchValue}
+                </if>
+                <if test='type.equals("email")'>
+                    <bind name="searchValue" value="'%'+searchValue+'%'"/>
+                    AND U.email LIKE #{searchValue}
+                </if>
+                <if test='type.equals("name")'>
+                    AND U.name = #{searchValue}
+                </if>
+                <if test='type.equals("nickName")'>
+                    AND U.nickName = #{searchValue}
+                </if>
             </if>
         </trim>
     </sql>
 
+    <select id="selectUserCount" resultType="int">
+        SELECT count(user_id)
+        From USER
+        WHERE user_id > 0
+    </select>
+
     <select id="selectUser" resultMap="User">
         SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
-        U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddress    Detail", U.zipcode AS "UserZipCode",
+        U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
         U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
@@ -65,7 +75,7 @@
 
     <select id="selectUserByEmail" resultMap="User">
         SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
-        U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddress    Detail", U.zipcode AS "UserZipCode",
+        U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
         U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
@@ -112,12 +122,44 @@
         password = #{user.password},
         name = #{user.name},
         nickname = #{user.nickName},
-        city = #{user.city},
-        downtown = #{user.downtown},
         address = #{user.address},
         address_detail = #{user.addressDetail},
-        post_no = #{user.postNo},
+        zipcode = #{user.zipCode},
         phone_number = #{user.phoneNumber},
+        updated_date = now()
+        WHERE user_id = #{id};
+    </update>
+
+    <update id="patchUser" parameterType="com.supshop.suppingmall.user.User">
+        UPDATE User
+        SET
+        <if test="user.name != null">
+            name = #{user.name},
+        </if>
+        <if test="user.nickName != null">
+            nickname = #{user.nickName},
+        </if>
+        <if test="user.address != null">
+            address = #{user.address},
+        </if>
+        <if test="user.addressDetail != null">
+            address_detail = #{user.addressDetail},
+        </if>
+        <if test="user.zipCode != null">
+            zipcode = #{user.zipCode},
+        </if>
+        <if test="user.phoneNumber != null">
+            phone_number = #{user.phoneNumber},
+        </if>
+        <if test="user.role != null">
+            role = #{user.role, typeHandler=com.supshop.suppingmall.user.RoleTypeHandler},
+        </if>
+        <if test="user.type != null">
+            type = #{user.type, typeHandler=com.supshop.suppingmall.user.LoginTypeHandler},
+        </if>
+        <if test="user.delYn != null">
+            delete_yes_or_no = #{user.delYn},
+        </if>
         updated_date = now()
         WHERE user_id = #{id};
     </update>

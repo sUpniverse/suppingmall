@@ -37,7 +37,6 @@ public class BoardController {
                               @RequestParam(required = false) String type,
                               @RequestParam(required = false) String searchValue) {
         log.debug("'getAllBoard'가 실행됨");
-        System.out.println(type + " " +searchValue);
         model.addAttribute(boardService.getBoardByCondition(criteria,type,searchValue));
         PageMaker pageMaker = new PageMaker();
         pageMaker.setCriteria(criteria);

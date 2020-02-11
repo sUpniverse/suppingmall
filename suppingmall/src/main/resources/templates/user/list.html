@@ -19,6 +19,9 @@
                     <th>핸드폰번호</th>
                     <th>생성일</th>
                     <th>권한</th>
+                    <th>삭제여부</th>
+                    <th>수정</th>
+                    <th>삭제</th>
                 </tr>
             </thead>
             <tbody>
@@ -33,10 +36,109 @@
                 <td th:text="${user.phoneNumber}" />
                 <td th:text="${user.createdDate}" />
                 <td th:text="${user.role}" />
+                <td th:text="${user.delYn}" />
+                <td>
+                    <input type="button" th:id="manageButton" class="btn btn-warning" value="수정하기">
+                </td>
+                <td>
+                    <input th:if="${user.delYn.equals('N')}" type="button" th:id="deleteButton" class="btn btn-danger" value="삭제하기">
+                    <input th:if="${user.delYn.equals('Y')}" type="button" th:id="revivalButton" class="btn btn-primary" value="재개하기">
+                </td>
             </tr>
             </tbody>
         </table>
     </div>
+    <div class="container d-flex justify-content-center mb-3">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination mx-auto">
+                <li class="page-item">
+                    <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/users?page='+${pageMaker.startPage - 1}}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:if="${pageMaker.criteria.page.equals(idx) ? 'class = active': ''}"><a class="page-link" th:href="@{'/users?page='+${idx}}">[[${idx}]]</a></li>
+                <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">
+                    <a class="page-link" th:href="@{'/users?page='+${pageMaker.endPage + 1}}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="container d-flex justify-content-center">
+        <form method="get" th:action="@{/users}">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <select class="btn btn-outline-secondary dropdown-toggle" th:name="type">
+                        <option class="dropdown-item" th:value="id">아이디로 검색</option>
+                        <option class="dropdown-item" th:value="email">email로 검색</option>
+                        <option class="dropdown-item" th:value="name">이름으로 검색</option>
+                        <option class="dropdown-item" th:value="nickName">닉네임으로 검색</option>
+                    </select>
+                </div>
+                <input type="text" class="form-control" th:name="searchValue" aria-label="Text input with dropdown button">
+                <div class="input-group-append">
+                    <button class="input-group-text" type="submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img" viewBox="0 0 24 24" focusable="false"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"/><path d="M21 21l-5.2-5.2"/></svg>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
 </body>
 <footer th:include="fragments/footer :: footer" />
+<script>
+    $(document).ready(function() {
+
+        $(document).on("click","#manageButton",function() {
+            var userId = document.getElementById('manageButton').parentElement.parentElement.firstElementChild.textContent;
+            getUpdateUserFom(userId)
+        });
+
+        $(document).on("click","#deleteButton",function() {
+            var userId = document.getElementById('deleteButton').parentElement.parentElement.firstElementChild.textContent;
+            $.ajax({
+                type: "DELETE",
+                url: "/users/" + userId,
+                dataType: 'text',
+                data: JSON.stringify({
+                    "delYn": "Y"
+                }),
+                contentType: 'application/json',
+                success: () => {
+                    document.getElementById('deleteButton').outerHTML = '<input type="button" id="revivalButton" class="btn btn-primary" value="재개하기">';
+                },
+                error: () => {
+
+                }
+            });
+
+        });
+
+        $(document).on("click","#revivalButton",function() {
+            var userId = document.getElementById('revivalButton').parentElement.parentElement.firstElementChild.textContent;
+            console.log(userId);
+            $.ajax({
+                type: "DELETE",
+                url: "/users/" + userId,
+                dataType: 'text',
+                data: JSON.stringify({
+                    "delYn": "N"
+                }),
+                contentType: 'application/json',
+                success: () => {
+                    document.getElementById('revivalButton').outerHTML = '<input type="button" id="deleteButton" class="btn btn-danger" value="삭제하기">';
+                },
+                error: () => {
+
+                }
+            });
+
+        });
+    });
+
+    function getUpdateUserFom(userId) {
+        window.open("/users/"+userId+"/form","_blank","width=500,height=600,left=500,top=100,menubar=no,toolbar=no,location=no");
+    }
+</script>
 </html>

@@ -1,16 +1,18 @@
 package com.supshop.suppingmall.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -21,6 +23,8 @@ public class UserControllerTest {
 
     @Autowired
     MockMvc mockMvc;
+
+    private MockHttpSession session;
 
 
     @Test
@@ -226,4 +230,73 @@ public class UserControllerTest {
         //then
 
     }
+
+    private void addUserInSession(User user) {
+        session = new MockHttpSession();
+        session.setAttribute("user",user);
+
+    }
+
+    private User makeMasterUser() {
+        return User.builder().role(User.Role.MASTER).build();
+    }
+
+    @Test
+    @Transactional
+    public void pathchUserWithOutDelYn() throws Exception {
+        //given
+        addUserInSession(makeMasterUser());
+        ObjectMapper objectMapper = new ObjectMapper();
+        Long userId = 1l;
+        String username = "kmsup2@gmail.com";
+        UserVO user = UserVO.builder()
+                .email(username)
+                .name("운영자")
+                .nickName("운영자")
+                .address("운영자의 집")
+                .addressDetail("그건 엄마집")
+                .zipCode("00000")
+                .phoneNumber("0102223333")
+                .role(User.Role.getCodeString(User.Role.ADMIN.getCode()))
+                .type(User.LoginType.getCodeString(User.LoginType.LOCAL.getCode()))
+                .build();
+
+        //when
+        mockMvc.perform(patch("/users/{id}",userId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user))
+                .session(session)
+        )
+                .andExpect(status().isOk())
+                .andDo(print());
+        //then
+
+    }
+
+    @Test
+    @Transactional
+    public void patchUserWithDelYn() throws Exception {
+        //given
+        addUserInSession(makeMasterUser());
+        ObjectMapper objectMapper = new ObjectMapper();
+        Long userId = 1l;
+
+        String delYn = "{\"delYn\":\"Y\"}";
+
+        //when
+
+        mockMvc.perform(delete("/users/{id}",userId)
+                    .content(delYn)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .session(session)
+        )
+                    .andExpect(status().isOk())
+                    .andDo(print());
+
+
+        //then
+
+    }
+
+
 }
