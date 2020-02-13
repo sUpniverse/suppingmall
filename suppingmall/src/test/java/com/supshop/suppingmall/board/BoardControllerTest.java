@@ -27,6 +27,9 @@ public class BoardControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    @Autowired
+    BoardService boardService;
+
     private MockHttpSession session;
 
     @Test
@@ -113,6 +116,27 @@ public class BoardControllerTest {
                                                 .param("creator.userId",board.getCreator().getUserId().toString()))
                 .andDo(print())
                 .andExpect(redirectedUrl("/boards"));
+    }
+
+    @Test
+    @Transactional
+    public void addBoard() throws Exception {
+        //given
+        //given
+        User user = addUser();
+        Category category = Category.builder().id(1l).build();
+        Board board = Board.builder()
+                .title("test")
+                .contents("test")
+                .category(category)
+                .creator(user)
+                .build();
+
+        //when
+
+        boardService.createBoard(board);
+        //then
+
     }
 
     @Test

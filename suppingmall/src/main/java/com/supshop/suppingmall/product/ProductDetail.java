@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @ToString
 public class ProductDetail {
 
+    private Long productId;
     private int detailId;
     private String asNumber;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

@@ -100,7 +100,7 @@
         #{title},
         #{contents},
         #{creator.userId},
-        0
+        0,
         #{category.id},
         now(),
         now()

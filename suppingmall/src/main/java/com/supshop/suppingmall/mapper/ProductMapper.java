@@ -1,6 +1,8 @@
 package com.supshop.suppingmall.mapper;
 
 import com.supshop.suppingmall.product.Product;
+import com.supshop.suppingmall.product.ProductDetail;
+import com.supshop.suppingmall.product.ProductOption;
 
 import java.util.List;
 
@@ -11,6 +13,8 @@ public interface ProductMapper {
     Product selectProduct(Long id);
 
     void insertProduct(Product product);
+    void addProductOptions(List<ProductOption> options);
+    void addProductDetail(ProductDetail detail);
 
     void updateProduct(Long id, Product product);
 

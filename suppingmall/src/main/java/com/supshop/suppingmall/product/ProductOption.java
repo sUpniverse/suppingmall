@@ -8,6 +8,7 @@ import lombok.*;
 @ToString
 public class ProductOption {
 
+    private Long productId;
     private int optionId;
     private String optionName;
     private String price;

@@ -2,6 +2,7 @@ package com.supshop.suppingmall.product;
 
 import com.supshop.suppingmall.mapper.ProductMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,8 +23,19 @@ public class ProductService {
       return productMapper.selectProduct(id);
     }
 
+    @Transactional
     public void createProduct(Product product) {
         productMapper.insertProduct(product);
+        Long productId = product.getProductId();
+        List<ProductOption> options = product.getOptions();
+        for(ProductOption option : options) {
+            option.setProductId(productId);
+        }
+        productMapper.addProductOptions(options);
+        ProductDetail detail = product.getDetail();
+        detail.setProductId(productId);
+        productMapper.addProductDetail(detail);
+
     }
 
     public void updateProduct(Long id, Product product) {

@@ -16,7 +16,7 @@
             <result property="asNumber" column="ProductAsNumber"/>
             <result property="manuplatedDate" column="ProductManuplatedDate"/>
             <result property="manufacturer" column="ProductManufacturer"/>
-            <result property="orgin" column="ProductOrigin"/>
+            <result property="origin" column="ProductOrigin"/>
             <result property="spec1" column="ProductSpec1" />
             <result property="spec2" column="ProductSpec2" />
             <result property="spec3" column="ProductSpec3" />
@@ -98,58 +98,8 @@
         ORDER BY P.product_id, PO.product_option_id ASC
     </select>
 
-    <sql id="addProductOptions">
-        <if test="options != null and options.size > 0">
-            <foreach collection="options" item="option" index="index" separator=";">
-            INSERT INTO product_option(
-                product_id,
-                product_option_id,
-                name,
-                price,
-                quantity)
-                VALUES (
-                #{productId},
-                #{option.optionId},
-                #{option.optionName},
-                #{option.price},
-                #{option.quantity})
-            </foreach>
-        </if>
-    </sql>
 
-    <sql id="addProductDetail" >
-        <if test="detail != null">
-            INSERT INTO product_detail(
-            product_id,
-            product_detail_id,
-            as_number,
-            manuplated_date,
-            manufacturer,
-            contry_of_origin,
-            spec_1,
-            spec_2,
-            spec_3,
-            spec_4,
-            spec_5,
-            spec_6
-            )
-            VALUES (
-            #{productId},
-            1,
-            #{detail.asNumber},
-            #{detail.manuplatedDate},
-            #{detail.manufacturer},
-            #{detail.origin},
-            #{detail.spec1},
-            #{detail.spec2},
-            #{detail.spec3},
-            #{detail.spec4},
-            #{detail.spec5},
-            #{detail.spec6});
-        </if>
-    </sql>
-
-    <insert id="insertProduct" parameterType="com.supshop.suppingmall.product.Product" useGeneratedKeys="true" keyProperty="productId">
+    <insert id="insertProduct" parameterType="com.supshop.suppingmall.product.Product" useGeneratedKeys="true" keyProperty="productId" keyColumn="product_id">
         INSERT INTO Product(
         name,
         price,
@@ -158,7 +108,9 @@
         category_id,
         sale_yes_or_no,
         thumbnail,
-        picture)
+        picture,
+        contents
+        )
         VALUES (
         #{name},
         #{price},
@@ -167,10 +119,52 @@
         #{category.id},
         'Y',
         #{thumbnail},
-        #{picture});
-<!--        <include refid="addProductDetail" />-->
-<!--        <include refid="addProductOptions" />-->
+        #{picture},
+        #{contents}
+        );
     </insert>
+
+    <insert id="addProductOptions" parameterType="java.util.List">
+        <if test="list != null and list.size > 0">
+                INSERT INTO product_option(
+                product_id,
+                product_option_id,
+                name,
+                price,
+                quantity)
+                VALUES
+            <foreach collection="list" item="option" separator=",">
+                (
+                #{option.productId},
+                #{option.optionId},
+                #{option.optionName},
+                #{option.price},
+                #{option.quantity}
+                )
+            </foreach>
+        </if>
+    </insert>
+
+    <insert id="addProductDetail" parameterType="com.supshop.suppingmall.product.ProductDetail">
+            INSERT INTO Product_Detail(
+            product_id,
+            product_detail_id,
+            as_number,
+            manuplated_date,
+            manufacturer,
+            contry_of_origin
+            )
+            VALUES (
+            #{productId},
+            1,
+            #{asNumber},
+            #{manuplatedDate},
+            #{manufacturer},
+            #{origin}
+            );
+    </insert>
+
+
 
     <update id="deleteProduct" parameterType="com.supshop.suppingmall.product.Product">
         UPDATE Product
