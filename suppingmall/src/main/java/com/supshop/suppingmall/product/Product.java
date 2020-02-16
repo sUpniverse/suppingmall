@@ -18,6 +18,7 @@ public class Product {
     private String price;
     private ProductDetail detail;
     private List<ProductOption> options;
+    private int rating;
     private String contents;
 
     private LocalDateTime registeredDate;

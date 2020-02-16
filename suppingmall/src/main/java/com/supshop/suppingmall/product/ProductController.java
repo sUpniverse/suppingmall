@@ -46,8 +46,10 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public String getProduct(@PathVariable Long id) {
-        return "";
+    public String getProduct(@PathVariable Long id, Model model) {
+        Product product = productService.retrieveProduct(id);
+        model.addAttribute("product",product);
+        return "/product/product";
     }
 
     @PostMapping("")
