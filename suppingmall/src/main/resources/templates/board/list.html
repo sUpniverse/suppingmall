@@ -7,7 +7,7 @@
 
     <div class="container-xs">
         <div class="row no-gutters">
-            <div th:replace="board/right-navigation :: right-navigation" />
+            <div th:replace="board/left-sidebar :: left-sidebar" />
             <div class="col-12 col-md-8">
                 <div class="position-relative overflow-hidden p-1 mb-5 text-center bg-light">
                     <div class="p-lg-5 mx-auto my-2">
@@ -15,20 +15,20 @@
                     </div>
                 </div>
 
-                <table class="table table-default">
+                <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>제목</th>
                             <th>작성자</th>
-                            <th>조회수</th>
+                            <th class="text-center">조회수</th>
                             <th>생성일</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:each="board : ${boardList}">
-                            <td><a th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}}"></a></td>
+                            <td><a class="text-dark" th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}}"></a></td>
                             <td th:text="${board.creator.nickName}" />
-                            <td th:text="${board.hit}"/>
+                            <td class="text-center" th:text="${board.hit}"/>
                             <td th:text="${board.createdDate}" />
                         </tr>
                     </tbody>
@@ -39,13 +39,13 @@
                     <nav aria-label="Page navigation example">
                         <ul class="pagination mx-auto">
                             <li class="page-item">
-                                <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/boards?page='+${pageMaker.startPage - 1}}" aria-label="Previous">
+                                <a class="page-link text-dark" th:if="${pageMaker.prev}" th:href="@{'/boards?page='+${pageMaker.startPage - 1}}" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
-                            <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:if="${pageMaker.criteria.page.equals(idx) ? 'class = active': ''}"><a class="page-link" th:href="@{'/boards?page='+${idx}}">[[${idx}]]</a></li>
+                            <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:if="${pageMaker.criteria.page == idx} ? 'class = active': ''"><a class="page-link text-dark" th:href="@{'/boards?page='+${idx}}">[[${idx}]]</a></li>
                             <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">
-                                <a class="page-link" th:href="@{'/boards?page='+${pageMaker.endPage + 1}}" aria-label="Next">
+                                <a class="page-link text-dark" th:href="@{'/boards?page='+${pageMaker.endPage + 1}}" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>
@@ -75,7 +75,11 @@
             </div>
         </div>
     </div>
-
 </body>
 <footer th:include="fragments/footer :: footer" />
+<script>
+    $(document).on('onscroll','.dropdown-toggle',(e) => {
+        console.log(e);
+    });
+</script>
 </html>

@@ -1,93 +1,179 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:include="fragments/header :: header" >
+<head th:include="fragments/header :: header" />
+<head>
+    <link th:href="@{/css/blog.css}" rel="stylesheet">
+
+    <style>
+        .dropdown-submenu {
+            position: relative;
+        }
+
+        .dropdown-submenu > a.dropdown-item:after {
+
+        }
+
+        .dropdown-submenu > a.dropdown-item:after {
+
+        }
+
+        .dropdown-submenu > .dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: 0px;
+            margin-left: 0px;
+        }
+
+        .dropdown-submenu:hover > .dropdown-menu {
+            display: block;
+        }
+    </style>
 </head>
 <body>
-    <nav th:replace="fragments/navigation :: navigation" />
-    <div class="container mt-5" >
-        <div id="myCarousel" class="carousel slide" data-ride="carousel">
-            <ol class="carousel-indicators">
-                <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-                <li data-target="#myCarousel" data-slide-to="1"></li>
-                <li data-target="#myCarousel" data-slide-to="2"></li>
-            </ol>
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img"><rect width="100%" height="100%" fill="#777"/></svg>
-                    <div class="container">
-                        <div class="carousel-caption text-left">
-                            <h1>Example headline.</h1>
-                            <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                            <p><a class="btn btn-lg btn-primary" href="#" role="button">Sign up today</a></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img"><rect width="100%" height="100%" fill="#777"/></svg>
-                    <div class="container">
-                        <div class="carousel-caption">
-                            <h1>Another example headline.</h1>
-                            <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                            <p><a class="btn btn-lg btn-primary" href="#" role="button">Learn more</a></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img"><rect width="100%" height="100%" fill="#777"/></svg>
-                    <div class="container">
-                        <div class="carousel-caption text-right">
-                            <h1>One more for good measure.</h1>
-                            <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                            <p><a class="btn btn-lg btn-primary" href="#" role="button">Browse gallery</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <a class="carousel-control-prev" href="#myCarousel" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#myCarousel" role="button" data-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
-        </div>
-
-        <div class="container mt-5 mb-1">
+    <div class="container">
+        <header th:replace="product/product-nav :: product-nav" />
+        <nav th:replace="product/product-search :: product-search" />
+    </div>
+    <div th:replace="product/carousel-menu :: carousel-menu" />
+    <div class="mt-5">
+        <div th:if="${session.user}" class="container mb-1">
             <a class="btn btn-outline-danger" href="/products/form">물품등록</a>
         </div>
 
-        <div class="row mb-2 mt-5">
-            <div class="col-6 col-md-3 col-lg" th:each="product : ${products}">
-                <div class="card mb-7" data-toggle="card-collapse">
-                    <a th:href="@{'/products/'+${product.productId}}">
-                        <img class="" th:src="${product.thumbnail}" style="width: fit-content; height: fit-content">
-                    </a>
-                    <div class="card-collapse-parent">
-                        <div class="card-body px-0 bg-white text-center">
-                            <div class="mb-1 font-weight-bold">
-                                <a class="text-body" th:href="@{'/products/'+${product.productId}}">[[${product.name}]]</a>
-                            </div>
-                        </div>
-                        <div class="mb-1 font-weight-bold text-muted text-center">
-                            [[${#numbers.formatInteger(product.price,3,'COMMA')}]]원
-                        </div>
-                        <div class="rating font-size-xxs text-dark justify-content-center">
-                            <div class="rating-item">
-                                <i class="fas fa-star">
-                                </i>
-                            </div>
-                        </div>
-                        <div class="card-collapse collapse">
-                            <div class="card-footer px-0 pt-0 bg-white text-center">
+        <div class="mb-5">
+            <div class="container">
+                <div class="text-center">
+                    <h3 class="text-monospace">오늘의 신상!</h3>
+                    <p class="text-muted">오늘 등록된 새로운 상품들</p>
+                </div>
+                <div class="row mt-3">
+                    <ul th:each="product : ${products}">
+                        <li class="card mb-7" data-toggle="card-collapse" style="width: 255px; height: 420px">
+                            <a th:href="@{'/products/'+${product.productId}}">
+                                <img th:src="${product.thumbnail}" style="width: 249px; height: 320px">
+                            </a>
+                            <div class="card-collapse-parent">
+                                <div class="text-center">
+                                    <div class="mb-1">
+                                        <a class="text-body" th:href="@{'/products/'+${product.productId}}">[[${product.name}]]</a>
+                                    </div>
+                                </div>
+                                <div class="mb-1 font-weight-bold text-muted text-center">
+                                    [[${#numbers.formatInteger(product.price,3,'COMMA')}]]원
+                                </div>
+                                <div class="rating font-size-xxs text-dark justify-content-center">
+                                    <div class="rating-item">
+                                        <i class="fas fa-star">
+                                        </i>
+                                    </div>
+                                </div>
+                                <div class="card-collapse collapse">
+                                    <div class="card-footer px-0 pt-0 bg-white text-center">
 
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="mb-5">
+            <div class="container">
+                <div class="text-center">
+                    <h3 class="text-monospace">유저들의 베스트 초이스</h3>
+                    <p class="text-muted">유저들이 선택한 베스트 상품!!!</p>
+                </div>
+                <div class="row mt-3">
+                    <ul th:each="product : ${products}">
+                        <li class="card mb-7" data-toggle="card-collapse" style="width: 255px; height: 420px">
+                            <a th:href="@{'/products/'+${product.productId}}">
+                                <img th:src="${product.thumbnail}" style="width: 249px; height: 320px">
+                            </a>
+                            <div class="card-collapse-parent">
+                                <div>
+                                    <div class="mb-1">
+                                        <a class="text-body" th:href="@{'/products/'+${product.productId}}">[[${product.name}]]</a>
+                                    </div>
+                                </div>
+                                <div class="mb-1 font-weight-bold">
+                                    [[${#numbers.formatInteger(product.price,3,'COMMA')}]]원
+                                </div>
+                                <div class="rating font-size-xxs text-dark justify-content-center">
+                                    <div class="rating-item">
+                                        <i class="fas fa-star">
+                                        </i>
+                                    </div>
+                                </div>
+                                <div class="card-collapse collapse">
+                                    <div class="card-footer px-0 pt-0 bg-white text-center">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="mb-5 bg-light">
+            <div class="container">
+                <div class="text-center">
+                    <h3 class="text-monospace">이벤트 특가</h3>
+                </div>
+                <div class="row mt-3">
+                    <ul th:each="product : ${products}">
+                        <li class="card mb-7" data-toggle="card-collapse" style="width: 255px; height: 420px">
+                            <a th:href="@{'/products/'+${product.productId}}">
+                                <img th:src="${product.thumbnail}" style="width: 249px; height: 320px">
+                            </a>
+                            <div class="card-collapse-parent">
+                                <div>
+                                    <div class="mb-1">
+                                        <a class="text-body" th:href="@{'/products/'+${product.productId}}">[[${product.name}]]</a>
+                                    </div>
+                                </div>
+                                <div class="mb-1 font-weight-bold">
+                                    [[${#numbers.formatInteger(product.price,3,'COMMA')}]]원
+                                </div>
+                                <div class="rating font-size-xxs text-dark justify-content-center">
+                                    <div class="rating-item">
+                                        <i class="fas fa-star">
+                                        </i>
+                                    </div>
+                                </div>
+                                <div class="card-collapse collapse">
+                                    <div class="card-footer px-0 pt-0 bg-white text-center">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
+
 </body>
 <footer th:include="fragments/footer :: footer" />
+<script>
+
+    $(document).on('mouseenter',"#categoryBtn", function () {
+        var x = document.getElementById("category");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    });
+    //
+    // $(document).on('mouseleave',"#categoryBtn", function () {
+    //     var x = document.getElementById("category");
+    //     if (x.style.display === "block") {
+    //         x.style.display = "none";
+    //     }
+    // });
+
+</script>
 </html>

@@ -10,8 +10,8 @@
 		<a class="py-2 d-none d-md-inline-block" href="#">Enterprise</a>
 		<a class="py-2 d-none d-md-inline-block" href="#">Support</a>
 		<a th:unless="${session.user}" class="py-2 d-none d-md-inline-block" href="/users/signup">Signup</a>
-		<a th:unless="${session.user}" class="btn btn-outline-primary" href="/users/loginform">Login</a>
-		<a th:if="${session.user}" class="btn btn-outline-primary" href="/users/logout">LogOut</a>
+		<a th:unless="${session.user}" class="btn btn-outline-dark" href="/users/loginform">Login</a>
+		<a th:if="${session.user}" class="btn btn-outline-dark" href="/users/logout">LogOut</a>
 		<a class="p-2 text-dark" th:if="${session.user}" th:text="${session.user.name} + 님	" th:href="@{'/users/' + ${session.user.userId} + '/form'}"></a>
 	</div>
 </nav>

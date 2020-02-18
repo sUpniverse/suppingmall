@@ -73,7 +73,7 @@ public class ProductServiceTest {
         Product product = Product.builder()
                 .category(category)
                 .name("맥북프로")
-                .price("2000000")
+                .price(2000000)
                 .detail(productDetail)
                 .options(productOptions)
                 .seller(user)

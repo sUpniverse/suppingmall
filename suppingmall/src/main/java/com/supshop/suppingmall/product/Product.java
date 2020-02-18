@@ -4,6 +4,10 @@ import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.user.User;
 import lombok.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,11 +17,24 @@ import java.util.List;
 @ToString
 public class Product {
 
+
+
     private Long productId;
+
+    @NotEmpty
     private String name;
-    private String price;
+
+
+    @Min(0)
+    @Max(1000000000)
+    private int price;
+
+    @Valid
     private ProductDetail detail;
+    @Valid
     private List<ProductOption> options;
+
+    @Max(5)
     private int rating;
     private String contents;
 

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
@@ -53,7 +54,7 @@ public class ProductController {
     }
 
     @PostMapping("")
-    public String createProduct(Product product, MultipartFile[] thumnails, HttpSession session) {
+    public String createProduct(@Valid Product product, MultipartFile[] thumnails, HttpSession session) {
         User user = (User) session.getAttribute("user");
         if(user == null || !(user.getRole().equals(User.Role.SELLER) || user.getRole().equals(User.Role.MASTER))) {
             return "redirect:/users/loginform";

@@ -1,0 +1,21 @@
+<nav class="nav d-flex justify-content-between sticky-top mt-3 mb-1" th:fragment="product-search">
+    <div class="col-2 p-2  dropdown">
+        <a class="text-dark" data-toggle="dropdown" th:id="categoryBtn" aria-haspopup="true" aria-expanded="false" href="#">
+            전체 카테고리
+        </a>
+        <div th:replace="product/product-category :: product-category" />
+    </div>
+    <a class="col-2 p-2 text-dark" href="#">신상품</a>
+    <a class="col-2 p-2 text-dark" href="#">베스트</a>
+    <div class="col-3 input-group">
+        <input type="text" class="form-control">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img" viewBox="0 0 24 24" focusable="false"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"></circle><path d="M21 21l-5.2-5.2"></path></svg>
+            </button>
+        </div>
+    </div>
+    <a class="col-1 p-2 text-dark" href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-cart"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+    </a>
+</nav>

@@ -20,8 +20,7 @@ import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -37,6 +36,7 @@ public class ProductControllerTest {
 
         return User.builder()
                 .userId(1l)
+                .role(User.Role.SELLER)
                 .build();
     }
 
@@ -48,7 +48,7 @@ public class ProductControllerTest {
 
     @Test
     @Transactional
-    public void testPrdouct() throws Exception {
+    public void creatProduct() throws Exception {
         //given
         Category category = Category.builder().id(3l).build();
 
@@ -86,7 +86,7 @@ public class ProductControllerTest {
         Product product = Product.builder()
                 .category(category)
                 .name("맥북프로")
-                .price("2000000")
+                .price(2000000)
                 .detail(productDetail)
                 .options(productOptions)
                 .seller(user)
@@ -104,5 +104,65 @@ public class ProductControllerTest {
         
         //then
     
+    }
+
+
+    @Test
+    @Transactional
+    public void testProductWrongAsNumber() throws Exception {
+        //given
+        Category category = Category.builder().id(3l).build();
+
+        ProductDetail productDetail = ProductDetail.builder()
+                .detailId(1)
+                .manufacturer("apple")
+                .origin("베트남")
+                .asNumber("03333-333-4444")
+                .spec1("256gb ssd")
+                .spec2("16gb 메모리")
+                .spec3("16인치 디스플레이")
+                .spec4("트랙패드")
+                .spec5("usb c type port 4개")
+                .build();
+
+
+        List<ProductOption> productOptions = new ArrayList<>();
+        ProductOption productOption1 = new ProductOption();
+        productOption1.setOptionId(1);
+        productOption1.setOptionName("256");
+        productOption1.setPrice("0");
+        productOption1.setQuantity(50);
+        ProductOption productOption2 = new ProductOption();
+        productOption2.setOptionId(2);
+        productOption2.setOptionName("512");
+        productOption2.setPrice("300000");
+        productOption2.setQuantity(50);
+        productOptions.add(productOption1);
+        productOptions.add(productOption2);
+
+
+        User user = addUser();
+        addUserInSession(user);
+
+        Product product = Product.builder()
+                .category(category)
+                .name("맥북프로")
+                .price(2000000)
+                .detail(productDetail)
+                .options(productOptions)
+                .seller(user)
+                .build();
+
+        //when
+        mockMvc.perform(post("/products")
+                .session(session)
+                .requestAttr("product",product)
+                .characterEncoding("UTF-8"))
+                .andExpect(status().isBadRequest())
+                .andExpect(model().attribute("user",user))
+                .andDo(print());
+
+        //then
+
     }
 }

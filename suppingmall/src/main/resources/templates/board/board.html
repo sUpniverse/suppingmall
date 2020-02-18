@@ -6,92 +6,104 @@
     <div class="container">
         <form role="form" th:method="delete">
         </form>
-        <div class="col-lg-8">
-            <div class="container">
-                <!-- Title -->
-                <h1 class="mt-4" th:text="${board.title}"></h1>
+        <div class="container">
 
-                <!-- Author -->
-                <p class="lead">
+            <h1 class="mt-4">
+                카테고리
+            </h1>
+
+            <hr>
+
+            <!-- Title -->
+            <h1 class="mt-4" th:text="${board.title}"></h1>
+
+
+            <!-- Author -->
+            <div class="row  bg-light">
+                <span class="col-6 lead">
                     by [[${board.creator.nickName}]]
-                </p>
-
-                <hr>
-
-                <!-- Date/Time -->
-                <p th:text="${board.createdDate}"></p>
-
-                <hr>
-
-                <!-- Post Content -->
-
-                <p class="lead" th:id="contents" th:utext="${board.contents}"></p>
-
-                <hr>
-                <div class="box-footer">
-                    <button th:if="${not #strings.isEmpty(session.user?.userId) && board.creator.userId.equals(session.user?.userId)}" type="submit" class="btn btn-warning">수정</button>
-                    <button th:if="${not #strings.isEmpty(session.user?.userId) && board.creator.userId.equals(session.user?.userId)}" type="submit" class="btn btn-danger">삭제</button>
-                    <button type="submit" class="btn btn-primary">목록</button>
-                </div>
-                <hr>
-            </div>
-            <!-- Comments Form -->
-            <div class="card my-4" th:id="comment-form">
-                <h5 class="card-header">댓글</h5>
-                <div class="card-body">
-                    <div class="form-group">
-                        <textarea class="form-control" th:id="comment-text" rows="3"></textarea>
-                    </div>
-                    <button class="btn btn-light" th:id="comment-button">댓글달기</button>
-                </div>
+                </span>
+                <span class="col-6 d-flex justify-content-end align-items-center">
+                    조회수 : [[${board.hit}]]
+                </span>
             </div>
 
-            <div th:each="comment : ${board.comments}" id="comments">
-                <!-- Single Comment -->
-                <div class="media mb-4" th:value="${comment.commentId}">
-                    <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-                    <div class="media-body">
-                        <h5 class="mt-0" th:text="${comment.creator.nickName}" th:value="${comment.creator.userId}"></h5>
-                        <div class="btn-group float-right"  th:if="${not #strings.isEmpty(session.user?.userId) && comment.creator.userId.equals(session.user?.userId)}">
-                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                수정 / 삭제 / 신고
-                            </button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" th:id="comment-update-button">수정</a>
-                                <a class="dropdown-item" th:id="comment-delete-button">삭제</a>
-                            </div>
-                        </div>
-                        <p th:text="${comment.contents}"></p>
-                    </div>
-                </div>
+
+            <hr class="mb-4 ">
+
+            <!-- Date/Time -->
+            <div class="row">
+                <span class="text-muted text-sm" th:text="${board.createdDate}"></span>
+                <span class="text-muted text-sm"  th:text="${board.updatedDate}"></span>
             </div>
-            <!-- Comment with nested comments -->
-            <div class="media mb-4">
-                <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-                <div class="media-body">
-                    <h5 class="mt-0">Commenter Name</h5>
-                    <p>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</p>
 
-                    <div class="media mt-4">
-                        <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-                        <div class="media-body">
-                            <h5 class="mt-0">Commenter Name</h5>
-                            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-                        </div>
-                    </div>
+            <!-- Post Content -->
 
-                    <div class="media mt-4">
-                        <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-                        <div class="media-body">
-                            <h5 class="mt-0">Commenter Name</h5>
-                            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-                        </div>
-                    </div>
+            <p class="lead" th:id="contents" th:utext="${board.contents}"></p>
 
+            <hr>
+            <div class="box-footer">
+                <button th:if="${not #strings.isEmpty(session.user?.userId) && board.creator.userId.equals(session.user?.userId)}" type="submit" class="btn btn-warning">수정</button>
+                <button th:if="${not #strings.isEmpty(session.user?.userId) && board.creator.userId.equals(session.user?.userId)}" type="submit" class="btn btn-danger">삭제</button>
+                <button type="submit" class="btn btn-primary">목록</button>
+            </div>
+            <hr>
+        </div>
+        <!-- Comments Form -->
+        <div class="card my-4" th:id="comment-form">
+            <h5 class="card-header">댓글</h5>
+            <div class="card-body">
+                <div class="form-group">
+                    <textarea class="form-control" th:id="comment-text" rows="3"></textarea>
                 </div>
+                <button class="btn btn-light" th:id="comment-button">댓글달기</button>
             </div>
         </div>
 
+        <div th:each="comment : ${board.comments}" id="comments">
+            <!-- Single Comment -->
+            <div class="media mb-4" th:value="${comment.commentId}">
+                <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                <div class="media-body">
+                    <h5 class="mt-0" th:text="${comment.creator.nickName}" th:value="${comment.creator.userId}"></h5>
+                    <div class="btn-group float-right"  th:if="${not #strings.isEmpty(session.user?.userId) && comment.creator.userId.equals(session.user?.userId)}">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            수정 / 삭제 / 신고
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" th:id="comment-update-button">수정</a>
+                            <a class="dropdown-item" th:id="comment-delete-button">삭제</a>
+                        </div>
+                    </div>
+                    <p th:text="${comment.contents}"></p>
+                </div>
+            </div>
+        </div>
+        <!-- Comment with nested comments -->
+        <div class="media mb-4">
+            <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+            <div class="media-body">
+                <h5 class="mt-0">Commenter Name</h5>
+                <p>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</p>
+
+                <div class="media mt-4">
+                    <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                    <div class="media-body">
+                        <h5 class="mt-0">Commenter Name</h5>
+                        Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+                    </div>
+                </div>
+
+                <div class="media mt-4">
+                    <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                    <div class="media-body">
+                        <h5 class="mt-0">Commenter Name</h5>
+                        Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 </body>
 
@@ -100,19 +112,19 @@
         var formObj = $("form[role='form']");
         var boardId = [[${board.boardId}]];
 
-        $(".btn-warning").on("click", function() {
+        $().on("click",".btn-warning",function() {
             formObj.children().removeAttr("input");
             formObj.attr("action","/boards/"+boardId+"/form");
             formObj.attr("method","get");
             formObj.submit();
         });
 
-        $(".btn-danger").on("click",function() {
+        $(document).on("click",".btn-danger",function() {
             formObj.attr("action","/boards/"+boardId);
             formObj.submit();
         });
 
-        $(".btn-primary").on("click",function() {
+        $(document).on("click",".btn-primary",function() {
             formObj.attr("action","/boards");
             self.location ="/boards";
         });
