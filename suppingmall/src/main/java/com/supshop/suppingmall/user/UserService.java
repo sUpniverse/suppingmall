@@ -2,6 +2,7 @@ package com.supshop.suppingmall.user;
 
 import com.supshop.suppingmall.mapper.UserMapper;
 import com.supshop.suppingmall.page.Criteria;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -20,10 +22,12 @@ public class UserService implements UserDetailsService {
 
     private UserMapper userMapper;
     private PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
-    public UserService(UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserMapper userMapper, PasswordEncoder passwordEncoder, ModelMapper modelMapper) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.modelMapper = modelMapper;
     }
 
     public List<User> getAllUser(Criteria criteria, String type, String searchValue) {
@@ -36,6 +40,11 @@ public class UserService implements UserDetailsService {
 
     public User getUser(Long id) {
         return userMapper.selectUser(id);
+    }
+    public UserVO getUserVO(Long id) {
+        User user = userMapper.selectUser(id);
+        UserVO vo = modelMapper.map(user, UserVO.class);
+        return vo;
     }
 
     public User getUserByEmail(String email) {
@@ -62,6 +71,16 @@ public class UserService implements UserDetailsService {
         userMapper.deleteUSer(id);
     }
 
+    public List<UserVO> getStore(String type, String value) {
+        List<User> users = userMapper.selectAllStore(null, type, value);
+        List<UserVO> userVOList= new ArrayList<>();
+        for(User user : users) {
+            UserVO map = modelMapper.map(user, UserVO.class);
+            userVOList.add(map);
+        }
+        return userVOList;
+    }
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userMapper.selectUserByEmail(email)
@@ -75,7 +94,7 @@ public class UserService implements UserDetailsService {
                 .collect(Collectors.toSet());
     }
 
-    public User isSignInedUser(String email, String password) {
+    public UserVO isSignedInUser(String email, String password) {
         User user = null;
         try {
             user = getUserByEmail(email);
@@ -83,7 +102,8 @@ public class UserService implements UserDetailsService {
             return null;
         }
         if(passwordEncoder.matches(password,user.getPassword())) {
-            return user;
+            UserVO userVO = modelMapper.map(user, UserVO.class);
+            return userVO;
         }
         return null;
     }

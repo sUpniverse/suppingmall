@@ -3,6 +3,7 @@ package com.supshop.suppingmall.board;
 import com.supshop.suppingmall.page.Criteria;
 import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.user.User;
+import com.supshop.suppingmall.user.UserVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,7 +25,7 @@ public class BoardController {
     @GetMapping("/form")
     public String form(HttpSession session) {
         log.debug("'form'가 실행됨");
-        User user = (User) session.getAttribute("user");
+        UserVO user = (UserVO) session.getAttribute("user");
         if(user == null) {
             return "redirect:/users/loginform";
         }
@@ -59,7 +60,7 @@ public class BoardController {
     @PostMapping("")
     public String createBoard(Board board, HttpSession session) {
         log.debug("'createBoard'가 실행됨");
-        User user = (User) session.getAttribute("user");
+        UserVO user = (UserVO) session.getAttribute("user");
 
         if(user != null && user.getUserId().equals(board.getCreator().getUserId())) {
             boardService.createBoard(board);

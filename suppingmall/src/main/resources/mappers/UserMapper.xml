@@ -17,20 +17,25 @@
         <result property="updatedDate" column="UserUpdatedDate" />
         <result property="role" column="UserRole" typeHandler="com.supshop.suppingmall.user.RoleTypeHandler" />
         <result property="delYn" column="UserDelYn" />
-        <result property="shopName" column="ShopName" />
-        <result property="shopNumber" column="ShopNumber" />
-        <result property="shopAddress" column="ShopAddress" />
-        <result property="shopAddressDetail" column="ShopAddressDetail" />
-        <result property="shopPostNo" column="ShopPostNo" />
         <result property="type" column="UserType" typeHandler="com.supshop.suppingmall.user.LoginTypeHandler" />
+        <association property="storeVO" javaType="com.supshop.suppingmall.user.StoreVO">
+            <result property="storePrivateNumber" column="StorePrivateNumber" />
+            <result property="storeName" column="StoreName" />
+            <result property="storePhoneNumber" column="StorePhoneNumber" />
+            <result property="storeAddress" column="StoreAddress" />
+            <result property="storeAddressDetail" column="StoreAddressDetail" />
+            <result property="storeZipCode" column="StoreZipCode" />
+            <result property="storeApplyYn" column="StoreApplyYn" />
+        </association>
     </resultMap>
 
     <select id="selectAllUser" resultMap="User">
         SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
         U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
-        U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
-        U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
+        U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.store_private_number AS "StorePrivateNumber", U.store_name AS "StoreName",
+        U.store_phone_number AS "StorePhoneNumber", U.store_address AS "StoreAddress", U.store_address_detail AS "StoreAddressDetail",
+        U.store_zipcode AS "StoreZipCode", U.store_apply_yes_or_no AS "StoreApplyYn"
         FROM User AS U
         <include refid="conditionalSearch"></include>
         ORDER BY U.user_id asc
@@ -67,8 +72,9 @@
         SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
         U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
-        U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
-        U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
+        U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.store_private_number AS "StorePrivateNumber", U.store_name AS "StoreName",
+        U.store_phone_number AS "StorePhoneNumber", U.store_address AS "StoreAddress", U.store_address_detail AS "StoreAddressDetail",
+        U.store_zipcode AS "StoreZipCode", U.store_apply_yes_or_no AS "StoreApplyYn"
         FROM User AS U
         WHERE U.user_id = #{id}
     </select>
@@ -77,8 +83,9 @@
         SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
         U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
-        U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.shop_name AS "ShopName", U.shop_number AS "ShopNumber",
-        U.shop_address AS "ShopAddress", U.shop_address_detail AS "ShopAddressDetail", U.shop_zipcode AS "ShopPostNo"
+        U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.store_private_number AS "StorePrivateNumber", U.store_name AS "StoreName",
+        U.store_phone_number AS "StorePhoneNumber", U.store_address AS "StoreAddress", U.store_address_detail AS "StoreAddressDetail",
+        U.store_zipcode AS "StoreZipCode", U.store_apply_yes_or_no AS "StoreApplyYn"
         FROM User AS U
         WHERE U.email = #{email}
     </select>
@@ -97,7 +104,8 @@
         updated_date,
         delete_yes_or_no,
         role,
-        type
+        type,
+        store_apply_yes_or_no
         )
         VALUES (
         #{email},
@@ -112,7 +120,8 @@
         now(),
         'N',
         #{role, typeHandler=com.supshop.suppingmall.user.RoleTypeHandler},
-        #{type, typeHandler=com.supshop.suppingmall.user.LoginTypeHandler}
+        #{type, typeHandler=com.supshop.suppingmall.user.LoginTypeHandler},
+        'N'
         )
     </insert>
     
@@ -160,8 +169,54 @@
         <if test="user.delYn != null">
             delete_yes_or_no = #{user.delYn},
         </if>
+        <if test="user.storeVO != null">
+            <if test="user.storeVO.storePrivateNumber != null">
+                store_private_number = #{user.storeVO.storePrivateNumber},
+            </if>
+            <if test="user.storeVO.storeName != null">
+                store_name = #{user.storeVO.storeName},
+            </if>
+            <if test="user.storeVO.storeZipCode != null">
+                store_zipcode = #{user.storeVO.storeZipCode},
+            </if>
+            <if test="user.storeVO.storeAddress != null">
+                store_address = #{user.storeVO.storeAddress},
+            </if>
+            <if test="user.storeVO.storeAddressDetail != null">
+                store_address_detail = #{user.storeVO.storeAddressDetail},
+            </if>
+            <if test="user.storeVO.storeApplyYn != null">
+                store_apply_yes_or_no = #{user.storeVO.storeApplyYn},
+            </if>
+        </if>
         updated_date = now()
         WHERE user_id = #{id};
     </update>
-    
+
+    <select id="selectAllStore" resultMap="User">
+        SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.name AS "UserName", U.nickname AS "UserNickName",
+        U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.store_private_number AS "StorePrivateNumber", U.store_name AS "StoreName",
+        U.store_phone_number AS "StorePhoneNumber", U.store_address AS "StoreAddress", U.store_address_detail AS "StoreAddressDetail",
+        U.store_zipcode AS "StoreZipCode", U.store_apply_yes_or_no AS "StoreApplyYn"
+        FROM User AS U
+        <include refid="conditionalSearchStore"></include>
+        ORDER BY U.user_id asc
+    </select>
+
+    <sql id="conditionalSearchStore">
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="type != null and searchValue != null">
+                <if test='type.equals("id")'>
+                    AND U.user_id LIKE #{searchValue}
+                </if>
+                <if test='type.equals("number")'>
+                    AND U.store_private_number = #{searchValue}
+                </if>
+                <if test='type.equals("name")'>
+                    AND U.store_name LIKE #{searchValue}
+                </if>
+            </if>
+        </trim>
+    </sql>
+
 </mapper>

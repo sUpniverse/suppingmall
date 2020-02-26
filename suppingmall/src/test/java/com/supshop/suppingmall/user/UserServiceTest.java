@@ -92,4 +92,32 @@ public class UserServiceTest {
         assertThat(user.getPhoneNumber()).isNotEqualTo(updatedUser.getPhoneNumber());
 
     }
+
+    @Test
+    @Transactional
+    public void applySeller() throws Exception {
+        //given
+        Long userId = 1l;
+        StoreVO store = StoreVO.builder()
+                .storePrivateNumber("000-000-000")
+                .storeAddress("서울시 중구 신당동 432")
+                .storeAddressDetail("서프라이즈빌딩 502호")
+                .storeZipCode("347532")
+                .storeApplyYn("Y")
+                .build();
+        User userApply = User.builder().storeVO(store).build();
+
+        //when
+        userService.patchUser(userId,userApply);
+
+        //then
+        User user = userService.getUser(userId);
+        assertThat(user.getStoreVO().getStorePrivateNumber()).isEqualTo(store.getStorePrivateNumber());
+        assertThat(user.getStoreVO().getStoreName()).isEqualTo(store.getStoreName());
+        assertThat(user.getStoreVO().getStoreZipCode()).isEqualTo(store.getStoreZipCode());
+        assertThat(user.getStoreVO().getStoreAddress()).isEqualTo(store.getStoreAddress());
+        assertThat(user.getStoreVO().getStoreAddressDetail()).isEqualTo(store.getStoreAddressDetail());
+        assertThat(user.getStoreVO().getStorePhoneNumber()).isEqualTo(store.getStorePhoneNumber());
+        assertThat(user.getStoreVO().getStoreApplyYn()).isEqualTo(store.getStoreApplyYn());
+    }
 }

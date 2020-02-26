@@ -4,6 +4,7 @@ import com.supshop.suppingmall.category.CategoryService;
 import com.supshop.suppingmall.image.ImageController;
 import com.supshop.suppingmall.image.ImageService;
 import com.supshop.suppingmall.user.User;
+import com.supshop.suppingmall.user.UserVO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,7 @@ public class ProductController {
 
     @GetMapping("/form")
     public String form(HttpSession session,Model model) {
-        User user = (User) session.getAttribute("user");
+        UserVO user = (UserVO) session.getAttribute("user");
         if(user == null || !(user.getRole().equals(User.Role.SELLER) || user.getRole().equals(User.Role.MASTER))) {
             return "redirect:/users/loginform";
         }
@@ -55,7 +56,7 @@ public class ProductController {
 
     @PostMapping("")
     public String createProduct(@Valid Product product, MultipartFile[] thumnails, HttpSession session) {
-        User user = (User) session.getAttribute("user");
+        UserVO user = (UserVO) session.getAttribute("user");
         if(user == null || !(user.getRole().equals(User.Role.SELLER) || user.getRole().equals(User.Role.MASTER))) {
             return "redirect:/users/loginform";
         }

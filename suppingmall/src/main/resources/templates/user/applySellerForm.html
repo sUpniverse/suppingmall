@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:include="fragments/header :: header" />
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" />
+</head>
+<body>
+<div th:replace="fragments/navigation-fix :: navigation-fix" />
+<div class="container">
+    <div class="row">
+        <nav th:replace="user/user-left-bar :: user-left-bar" />
+        <div class="col-md-9 ml-sm-auto col-lg-9 pt-3 px-4">
+            <div class="d-flex flex-wrap flex-md-nowrap align-items-center pb-2 mt-5">
+                <h1 class="h2 mr-3">회원전환</h1>
+                | 셀러회원으로 전환하여 자유로운 판매활동을 해보세요
+            </div>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Profile</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <div  class="mt-5">
+                        <h3>전환가입절차</h3>
+                        <div class="card">
+                            <div class="card-body row">
+                                <div class="col-4 border-right">
+                                    <h5 class="card-title">1.판이용약관동의</h5>
+                                    <p class="card-text">판매활동에 필요한 약관에 동의합니다.</p>
+                                </div>
+                                <div class="col-4 border-right">
+                                    <h5 class="card-title">2.추가 정보 입력</h5>
+                                    <p class="card-text">판매에 필요한 추가적인 정보를 입력합니다.</p>
+                                </div>
+                                <div class="col-4">
+                                    <h5 class="card-title">3.전환 심사 제출</h5>
+                                    <p class="card-text">심사 제출 후 3일내에 심사가 완료 됩니다.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <ul class="mt-3">
+                            <li class="text-muted">
+                                거짓정보 입력 시 활동이 제한될 수 있습니다.
+                            </li>
+                        </ul>
+                    </div>
+                    <div  class="mt-5">
+                        <h3>판매이용 약관</h3>
+                        <div class="card" style="overflow:scroll; width: 700px; height: 124px">
+                            <div class="card-body row" data-spy="scroll">
+                                <p class="card-text" th:replace="user/low :: low" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-5">
+                        <h3 class="h2 mr-3">추가정보입력</h3>
+                         거짓정보 입력 시 심사에 탈락할 수 있습니다.
+                        <form th:action="@{/users/seller/{id}(id=${user.userId})}" method="post" name="store" onsubmit="return checkAllValidation()">
+                            <input type="hidden" name="_method" value="put">
+                            <input type="hidden" name="storeApplyYn" value="Y">
+                            <table class="table table-default mt-1">
+                                <tbody>
+                                <tr>
+                                    <th class="bg-light">개인사업자번호</th>
+                                    <td>
+                                        <div class="form-row">
+                                            <div class="col-md-2">
+                                                <input type="text" class="form-control" id="privateFirst">
+                                            </div>
+                                                -
+                                            <div class="col-md-2">
+                                                <input type="text" class="form-control" id="privateMiddle">
+                                            </div>
+                                                -
+                                            <div class="col-md-2">
+                                                <input type="text" class="form-control" id="privateLast">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="button" class="btn btn-outline-secondary" id="verifyPrivateNumber" value="인증">
+                                            </div>
+                                            <input type="hidden" id="privateNumber" name="storePrivateNumber">
+
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">스토어명</th>
+                                    <td class="row">
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" id="storeName" name="storeName">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="button" class="btn btn-outline-secondary" id="nameCheck" value="중복확인">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">전화번호</th>
+                                    <td class="form-row">
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="phoneFirst">
+                                        </div>
+                                            -
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="phoneMiddle">
+                                        </div>
+                                            -
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="phoneLast">
+                                        </div>
+                                        <input type="button" class="btn btn-outline-secondary" id="verifyPhoneNumber" value="인증">
+                                        <input type="hidden" id="phone" name="storePhoneNumber">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">우편번호</th>
+                                    <td class="row">
+                                        <div class="col-md-9 mb-3">
+                                            <input type="text" class="form-control" id="zip" name="storeZipCode" readonly>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="button" class="btn btn-outline-secondary" id="search_address" value="우편번호 찾기">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">주소</th>
+                                    <td>
+                                        <input type="text" class="form-control" id="address" name="storeAddress" readonly>
+                                        <div class="invalid-feedback">
+                                            Please enter your shipping address.
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">상세주소</th>
+                                    <td>
+                                        <input type="text" class="form-control" id="addressDetail" placeholder="상세주소를 기입해주세요" name="storeAddressDetail">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="agree">
+                                <label class="form-check-label" for="agree">
+                                    <span>개인정보 수집/이용 동의</span>
+                                </label>
+                                <li>
+                                    고객님께서는 동의를 거부하실 수 있으며, 동의 거부 시 출고지/반품/교환지주소 등록이 불가합니다.
+                                </li>
+                            </div>
+                            <div>
+                                <table class="table table-sm mt-3">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <td>수집/이용 목적</td>
+                                            <td>수집항목</td>
+                                            <td>보유/이용기간</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>출고지/반품/교환지정보 관련</td>
+                                            <td>이름,연락처,주소</td>
+                                            <td>회원 탈퇴시 까지</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="text-center mt-5 md-5">
+                                <input type="submit" class="btn btn-primary" value="확인">
+                                <input type="button" class="btn btn-primary" value="취소">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<footer th:include="fragments/footer :: footer" />
+<script>
+
+    var emptyReg = /^\s+|\s+$/g;
+    var checkName = false;
+
+    var checkPrivateNumber = true;
+    var checkPhoneResult = false;
+    var checkAddressResult = false;
+    var checkAgree = false;
+
+
+    $(document).on('change',"#privateFirst",function () {
+        checkPrivateNumber = false;
+    });
+
+    $(document).on('change',"#privateMiddle",function () {
+        checkPrivateNumber = false;
+    });
+
+    $(document).on('change',"#privateLast",function () {
+        checkPrivateNumber = false;
+    });
+
+    $(document).on('click',"#verifyPrivateNumber",(e) => {
+        let first = getElementValue("privateFirst");
+        let middle = getElementValue("privateMiddle");
+        let last = getElementValue("privateLast");
+        let number = getElement("privateNumber");
+        var sum = first + '-' + middle+ '-' + last;
+        checkPrivateNumber = true;
+        // if (rePhone.test(sum)) {
+        //     number.setAttribute('value',sum);
+        //     alert("인증되었습니다.");
+        //     checkPrivateNumber = true;
+        // } else {
+        //     alert("유효한 전화번호가 아닙니다.");
+        //     checkPrivateNumber = false;
+        // }
+    });
+
+    $(document).on('change',"#storeName",() => {
+        checkName = false;
+    });
+
+    $(document).on('click',"#nameCheck",() => {
+        let name = getElement("storeName");
+        if(!check(emptyReg,name)) {
+            checkName = true;
+            $.ajax({
+                type:"GET",
+                url:"/users/seller",
+                dataType: 'json',
+                data: ({
+                    "type": "name",
+                    "value" : getElementValue("storeName")
+                }) ,
+                contentType: 'application/json',
+                success: (data, textStatus, xhr) => {
+                    if(xhr.status === 204) {
+                        alert("사용 가능한 스토어 명입니다.");
+                        checkName = true;
+
+                    } else {
+                        alert("중복되는 스토어명이 있습니다.");
+                    }
+                }
+            });
+        } else {
+            alert("공백은 허용되지 않습니다.");
+            name.value = "";
+            checkName = false;
+        }
+    });
+
+    function check(re, what) {
+        if(re.test(what.value)) {
+            return true;
+        }
+    }
+
+    function getElement(id) {
+        return document.getElementById(id);
+    }
+
+    function getElementValue(id) {
+        return document.getElementById(id).value;
+    }
+
+    var rePhone = /^(0(2|3[1-3]|4[1-4]|5[1-5]|6[1-4]))-(\d{3,4})-(\d{4})$/;
+
+    $(document).on('change',"#phoneFirst",function () {
+        checkPhoneResult = false;
+    });
+
+    $(document).on('change',"#phoneMiddle",function () {
+        checkPhoneResult = false;
+    });
+
+    $(document).on('change',"#phoneLast",function () {
+        checkPhoneResult = false;
+    });
+
+    $(document).on('click', "#verifyPhoneNumber",function () {
+        let first = getElementValue("phoneFirst");
+        let middle = getElementValue("phoneMiddle");
+        let last = getElementValue("phoneLast");
+        let phone = getElement("phone");
+        var sum = first + '-' + middle+ '-' + last;
+        if (rePhone.test(sum)) {
+            phone.setAttribute('value',sum);
+            alert("인증되었습니다.");
+            checkPhoneResult = true;
+        } else {
+            alert("유효한 전화번호가 아닙니다.");
+            checkPhoneResult = false;
+        }
+    });
+
+    $(document).on('click',"#search_address",function () {
+        var zipcode;
+        var address;
+
+        new daum.Postcode({
+            popupName: 'postcodePopup',
+            theme: {
+                searchBgColor: "#0B65C8", //검색창 배경색
+                queryTextColor: "#FFFFFF" //검색창 글자색
+            },
+            autoClose: false,
+
+            oncomplete: function(data) {
+                zipcode = data.zonecode;
+                if(data.userSelectedType === "R") {
+                    address = data.roadAddress;
+                } else if(data.userSelectedType === "J") {
+                    address = data.jibunAddress;
+                }
+
+                $('#zip').val(zipcode);
+                $('#address').val(address);
+            },
+
+            onclose: function(state) {
+                //state는 우편번호 찾기 화면이 어떻게 닫혔는지에 대한 상태 변수 이며, 상세 설명은 아래 목록에서 확인하실 수 있습니다.
+                if(state === 'FORCE_CLOSE'){
+                    //사용자가 브라우저 닫기 버튼을 통해 팝업창을 닫았을 경우, 실행될 코드를 작성하는 부분입니다.
+                    checkAddressResult = false;
+
+                } else if(state === 'COMPLETE_CLOSE'){
+                    //사용자가 검색결과를 선택하여 팝업창이 닫혔을 경우, 실행될 코드를 작성하는 부분입니다.
+                    //oncomplete 콜백 함수가 실행 완료된 후에 실행됩니다.
+                    checkAddressResult = true;
+                }
+            }
+        }).open();
+    });
+
+    $(document).on('click',"#agree", function (e) {
+        var box = e.target;
+        if(box.checked == true) {
+            checkAgree = true;
+        } else {
+            checkAgree = false;
+        }
+    })
+
+    function checkAllValidation() {
+
+        if(checkPrivateNumber && checkName && checkPhoneResult && checkAddressResult && checkAgree) {
+            return true;
+        } else {
+            if(!checkPrivateNumber) {
+                alert("개인사업자인증이 필요합니다.");
+            } else if(!checkName) {
+                alert("스토어명 중복확인을 해주세요");
+            } else if(!checkPhoneResult) {
+                alert("올바른 전화번호를 입력해주세요");
+            } else if(!checkAddressResult) {
+                alert("주소를 입력해주세요");
+            } else if(!checkAgree) {
+                alert("약관에 동의하세요")
+            }
+            return false;
+        }
+    }
+</script>
+</html>

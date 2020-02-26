@@ -231,14 +231,14 @@ public class UserControllerTest {
 
     }
 
-    private void addUserInSession(User user) {
+    private void addUserInSession(UserVO user) {
         session = new MockHttpSession();
         session.setAttribute("user",user);
 
     }
 
-    private User makeMasterUser() {
-        return User.builder().role(User.Role.MASTER).build();
+    private UserVO makeMasterUser() {
+        return UserVO.builder().userId(1l).role(User.Role.MASTER).build();
     }
 
     @Test
@@ -293,6 +293,53 @@ public class UserControllerTest {
                     .andExpect(status().isOk())
                     .andDo(print());
 
+
+        //then
+
+    }
+
+    @Test
+    @Transactional
+    public void putSellerApply() throws Exception {
+        //given
+        addUserInSession(makeMasterUser());
+        StoreVO store = StoreVO.builder()
+                .storePrivateNumber("000-000-000")
+                .storeAddress("서울시 중구 신당동 432")
+                .storeAddressDetail("서프라이즈빌딩 502호")
+                .storeZipCode("347532")
+                .storeApplyYn("Y")
+                .build();
+        Long userId = 1l;
+
+        //when
+        mockMvc.perform(put("/users/seller/{id}",userId)
+                                .session(session)
+                                .requestAttr("store",store))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/user/"+userId+"/form"))
+                .andDo(print())
+        ;
+
+        //then
+
+    }
+
+    @Test
+    public void getStore() throws Exception {
+        //given
+        addUserInSession(makeMasterUser());
+
+
+        //when
+        mockMvc.perform(get("/users/seller")
+                .session(session)
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("type","name")
+                .param("value","뚱뚱")
+        )
+                .andDo(print())
+                .andExpect(status().isNoContent());
 
         //then
 

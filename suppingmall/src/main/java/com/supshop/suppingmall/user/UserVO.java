@@ -8,15 +8,14 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 
 @Getter @Setter
-@ToString
-@Builder
+@ToString @Builder
 @EqualsAndHashCode(of = "userId")
 @NoArgsConstructor @AllArgsConstructor
 public class UserVO {
 
     private static final String emailReg = "^[A-Za-z0-9_]+[A-Za-z0-9]*[@]{1}[A-Za-z0-9]+[A-Za-z0-9]*[.]{1}[A-Za-z]{1,3}$";
     private static final String passwordReg = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,15}$";
-    private static final String phoneReg = "(01[016789])([0-9]{3,4})([0-9]{4})$";
+    private static final String phoneReg = "^(?:(010\\d{4})|(01[1|6|7|8|9]\\d{3,4}))(\\d{4})$";
 
     private Long userId;
 
@@ -45,12 +44,7 @@ public class UserVO {
     private User.Role role;
     private User.LoginType type;
 
-    private String shopName;
-    private String shopNumber;
-    private String shopAddress;
-    private String shopAddressDetail;
-    private String shopPostNo;
-
+    private StoreVO storeVO;
 
     @Getter
     @AllArgsConstructor

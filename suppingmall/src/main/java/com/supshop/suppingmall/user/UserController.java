@@ -6,14 +6,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.Map;
+import java.util.List;
 
 @RequestMapping("/users")
 @Controller
@@ -21,6 +20,7 @@ public class UserController {
 
     private final UserService userService;
     private final ModelMapper modelMapper;
+    private final String sessionUser = "user";
 
     public UserController(UserService userService, ModelMapper modelMapper) {
         this.userService = userService;
@@ -40,7 +40,7 @@ public class UserController {
     }
 
     private boolean isLoginUser(HttpSession session) {
-        User user = (User) session.getAttribute("user");
+        UserVO user = (UserVO) session.getAttribute("user");
         if (user == null) return false;
         return true;
     }
@@ -81,7 +81,7 @@ public class UserController {
 
     @PostMapping("/login")
     public String login(String email, String password, HttpSession session) {
-        User user = userService.isSignInedUser(email,password);
+        UserVO user = userService.isSignedInUser(email,password);
         if(user == null) {
             return "redirect:/users/loginform";
         }
@@ -97,8 +97,7 @@ public class UserController {
 
     @PostMapping("")
     public String createUser(@Valid User user, HttpSession session) {
-        User sessionUser = (User) session.getAttribute("user");
-        if(sessionUser != null) {
+        if(isLoginUser(session)) {
             return "redirect:/";
         }
         userService.createUser(user);
@@ -106,33 +105,47 @@ public class UserController {
     }
 
     @GetMapping("/{id}/form")
-    public String update_form(@PathVariable Long id, Model model, HttpSession session) {
-        User sessionUser = (User) session.getAttribute("user");
+    public String getUpdateForm(@PathVariable Long id, Model model, HttpSession session) {
+        UserVO sessionUser = getSessionUser(session);
+        // 개인화원 자격으로 자신의 회원 정보를 수정할 시 사용
         if(isOwner(id, sessionUser)) {
-            model.addAttribute("user", userService.getUser(id));
-            return "/user/updateform";
+            model.addAttribute("user",sessionUser);
+            return "/user/updateForm";
         }
+        // 운영자 자격으로 해당 회원의 정보를 수정할 시 사용
         if(isAdmin(sessionUser)) {
-            model.addAttribute("user", userService.getUser(id));
+            model.addAttribute("user", sessionUser);
             return "/user/adminUpdateForm";
         }
 
         return "redirect:/users/loginform";
     }
 
-    private boolean isOwner(Long id, User sessionUser) {
+    private UserVO getSessionUser(HttpSession session) {
+        return (UserVO) session.getAttribute(sessionUser);
+    }
+
+    private boolean isOwner(Long id, UserVO sessionUser) {
         return sessionUser != null && sessionUser.getUserId().equals(id);
     }
 
-    private boolean isAdmin(User sessionUser) {
+    private boolean isAdmin(UserVO sessionUser) {
         return sessionUser != null && (sessionUser.getRole().equals(User.Role.ADMIN) || (sessionUser.getRole().equals(User.Role.MASTER)));
+    }
+
+    private void updateSession(HttpSession session) {
+        UserVO sessionUser = getSessionUser(session);
+        UserVO userVO = userService.getUserVO(sessionUser.getUserId());
+        session.removeAttribute("user");
+        session.setAttribute("user",userVO);
     }
 
     @PutMapping("/{id}")
     public String updateUser(@PathVariable Long id, User user, HttpSession session) {
-        User sessionUser = (User) session.getAttribute("user");
+        UserVO sessionUser = getSessionUser(session);
         if(isOwner(id, sessionUser) || isAdmin(sessionUser)) {
             userService.updateUser(id, user);
+            updateSession(session);
             return "redirect:/";
         }
         return "redirect:/users/loginform";
@@ -144,26 +157,75 @@ public class UserController {
                                                     @PathVariable Long id,
                                                     HttpSession session) {
 
-        User sessionUser = (User) session.getAttribute("user");
-        if(isAdmin(sessionUser)) {
+        if(isAdmin(getSessionUser(session))) {
             User user = modelMapper.map(userVO, User.class);
+            userService.patchUser(id,user);
+            updateSession(session);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<String> deleteUser(@RequestBody User user, @PathVariable Long id, HttpSession session) {
+        if(isAdmin(getSessionUser(session))) {
             userService.patchUser(id,user);
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
     }
 
+    @GetMapping("/{id}/applySellerForm")
+    public String getApplySellerRoleForm(@PathVariable Long id, Model model, HttpSession session) {
+        UserVO sessionUser = getSessionUser(session);
+        if(isOwner(id, sessionUser)) {
+            model.addAttribute("user", sessionUser);
+            return "/user/applySellerForm";
+        }
+        return "redirect:/users/loginform";
+    }
 
-
-    @DeleteMapping("/{id}")
+    @GetMapping("/seller")
     @ResponseBody
-    public ResponseEntity<String> deleteUser(@RequestBody User user, @PathVariable Long id, HttpSession session) {
-        User sessionUser = (User) session.getAttribute("user");
-        if(isAdmin(sessionUser)) {
-            userService.patchUser(id,user);
-            return ResponseEntity.ok().build();
+    public ResponseEntity<String> getSellerInfoByName(@RequestParam String type,
+                                                      @RequestParam String value,
+                                                      HttpSession session) {
+        if(isLoginUser(session)) {
+            List<UserVO> stores = userService.getStore(type, value);
+            if(stores.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+                return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping("/seller/{id}")
+    public String getSeller(@PathVariable Long id, Model model, HttpSession session) {
+        if(isOwner(id, getSessionUser(session))) {
+            model.addAttribute("user", sessionUser);
+            return "redirect:/user/"+id+"/form";
+        }
+        return "redirect:/users/loginform";
+    }
+
+    @PutMapping("/seller/{id}")
+    public String applySellerRole(@PathVariable Long id,@Valid StoreVO store, HttpSession session) {
+        if(isOwner(id, getSessionUser(session))) {
+            userService.patchUser(id,User.builder().storeVO(store).build());
+            updateSession(session);
+            return "redirect:/users/"+id+"/form";
+        }
+        return "redirect:/users/loginform";
+    }
+
+    @PatchMapping("/seller/{id}")
+    public String grantSellerRole(@PathVariable Long id,StoreVO store, HttpSession session) {
+        if(isOwner(id, getSessionUser(session))) {
+
+        }
+        return "";
     }
 
 }
