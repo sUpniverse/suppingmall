@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.comment;
 
+import com.supshop.suppingmall.board.Board;
 import com.supshop.suppingmall.user.User;
 import lombok.*;
 
@@ -11,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor
 public class Comment {
 
-    private Long boardId;
+    private Board board;
     private Long commentId;
     private int level;
     private String title;

@@ -52,7 +52,7 @@
         updated_date
         )
         VALUES (
-        #{boardId},
+        #{board.boardId},
         #{title},
         #{level},
         #{contents},

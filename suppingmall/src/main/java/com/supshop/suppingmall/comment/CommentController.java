@@ -19,7 +19,6 @@ public class CommentController {
 
     @PostMapping("")
     public ResponseEntity createComment(@RequestBody Comment comment, HttpSession session, Errors errors) {
-        System.out.println(comment);
         User user = (User)session.getAttribute("user");
         comment.setCreator(user);
         int result = commentService.insertComment(comment);
@@ -27,8 +26,6 @@ public class CommentController {
         if(result != 1) {
             return ResponseEntity.badRequest().build();
         }
-//        linkTo((CommentController.class)).slash()
-
         return ResponseEntity.ok().body(comment);
     }
 

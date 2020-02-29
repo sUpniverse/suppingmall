@@ -20,7 +20,7 @@ public class ProductOption {
 
     @Min(0)
     @Max(1000000000)
-    private String price;
+    private int price;
 
     @Min(0)
     private int quantity;

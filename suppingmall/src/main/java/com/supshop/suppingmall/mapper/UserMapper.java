@@ -1,10 +1,7 @@
 package com.supshop.suppingmall.mapper;
 
-import com.supshop.suppingmall.board.Board;
 import com.supshop.suppingmall.page.Criteria;
-import com.supshop.suppingmall.user.StoreVO;
 import com.supshop.suppingmall.user.User;
-import com.supshop.suppingmall.user.UserVO;
 
 import java.util.List;
 import java.util.Optional;

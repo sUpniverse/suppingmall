@@ -15,7 +15,7 @@ public class User {
 
     private final String emailReg = "^[A-Za-z0-9_]+[A-Za-z0-9]*[@]{1}[A-Za-z0-9]+[A-Za-z0-9]*[.]{1}[A-Za-z]{1,3}$";
     private final String passwordReg = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,15}$";
-    private static final String phoneReg = "^(?:(010\\d{4})|(01[1|6|7|8|9]\\d{3,4}))(\\d{4})$";
+    private final String phoneReg = "^(?:(010\\d{4})|(01[1|6|7|8|9]\\d{3,4}))(\\d{4})$";
 
     private Long userId;
 
@@ -55,11 +55,12 @@ public class User {
     @Getter
     @AllArgsConstructor
     public enum Role {
-        MASTER("U000"),
-        ADMIN("U001"),
-        SELLER("U002"),
-        USER("U003");
+        MASTER("운영자","U000"),
+        ADMIN("관리자","U001"),
+        SELLER("판매회원","U002"),
+        USER("일반회원","U003");
 
+        private String title;
         private String code;
 
         public static Role getCodeString(String code) {
@@ -73,12 +74,12 @@ public class User {
     @Getter
     @AllArgsConstructor
     public enum LoginType {
-        LOCAL("000"),
-        GOOGLE("001"),
-        KAKAO("002");
+        LOCAL("일반로그인","000"),
+        GOOGLE("구글","001"),
+        KAKAO("카카오","002");
 
+        private String title;
         private String code;
-
 
         public static LoginType getCodeString(String code) {
             return Arrays.stream(LoginType.values())

@@ -17,17 +17,18 @@ import java.util.List;
 @ToString
 public class Product {
 
-
-
     private Long productId;
 
     @NotEmpty
     private String name;
 
-
     @Min(0)
     @Max(1000000000)
     private int price;
+
+    @Min(0)
+    @Max(1000000000)
+    private int deliveryPrice;
 
     @Valid
     private ProductDetail detail;
@@ -37,9 +38,7 @@ public class Product {
     @Max(5)
     private int rating;
     private String contents;
-
     private LocalDateTime registeredDate;
-
     private User seller;
     private Category category;
     private String saleYn;
