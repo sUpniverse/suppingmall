@@ -19,7 +19,7 @@
                 <h2>물품 등록</h2>
             </div>
 
-            <div class="col-md order-md-1">
+            <div class="col-md orders-md-1">
                 <h4 class="mb-3">물품 기본정보 입력</h4>
                 <form class="needs-validation" th:action="@{/products}" th:method="post" enctype="multipart/form-data" onsubmit="return checkAllValidation()">
                     <input th:type="hidden" th:name="seller.userId" th:value="${session.user.userId}" >
@@ -158,10 +158,10 @@
         $(document).on('click',"#addOptionButton", () => {
             var count = $("#option_table tbody tr").length;
             if(count < 20) {
-                var order = count + 1;
+                var orders = count + 1;
                 var option =
                     '<tr id="optionRow">\n' +
-                    '<td><input type="text" class="form-control" name ="options['+count+'].optionId" value="'+order+'" readonly></td>\n' +
+                    '<td><input type="text" class="form-control" name ="options['+count+'].optionId" value="'+orders+'" readonly></td>\n' +
                     '<td><input type="text" class="form-control" name="options['+count+'].optionName" placeholder="옵션명"></td>\n' +
                     '<td><input type="text" class="form-control" name="options['+count+'].price" placeholder="추가 가격(원)"></td>\n' +
                     '<td><input type="text" class="form-control" name="options['+count+'].quantity" placeholder="재고량"></td>\n' +

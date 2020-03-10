@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.supshop.suppingmall.mapper.PaymentMapper">
+    <resultMap id="Payment" type="com.supshop.suppingmall.payment.Payment" autoMapping="true">
+        <id property="paymentId" column="PaymentId" />
+        <result property="price" column="PaymentPrice" />
+        <result property="paymentType" column="PaymentType" typeHandler="com.supshop.suppingmall.payment.PaymentGroupTypeHandler" />
+        <result property="accountNumber" column="PaymentAccountNumber" />
+        <result property="status" column="PaymentStatus" typeHandler="com.supshop.suppingmall.payment.PaymentStatusTypeHandler" />
+        <result property="payedDate" column="PaymentPayedDate" />
+        <result property="updatedDate" column="PaymentUpdatedDate" />
+        <association property="card" javaType="com.supshop.suppingmall.payment.CardVO">
+            <result property="vendor" column="PaymentCardVendor" typeHandler="com.supshop.suppingmall.payment.CardVendorTypeHandler" />
+            <result property="cardNumber" column="PaymentCardNumber" />
+            <result property="installmentMonth" column="PaymentInstallmentMonth" />
+            <result property="vendorCheckNumber" column="PaymentVendorCheckNumber" />
+        </association>
+    </resultMap>
+
+    <select id="findAll" resultMap="Payment">
+        SELECT P.payment_id AS "PaymentId", P.price AS "PaymentPrice" ,P.type AS "PaymentType", P.vendor AS "PaymentCardVendor",
+        P.installment_month AS "PaymentInstallmentMonth", P.vendor_check_number AS "vendorCheckNumber", P.account_number AS "PaymentAccountNumber",
+        P.status AS "PaymentStatus", P.payed_date AS "PaymentPayedDate", P.updated_date AS "PaymentUpdatedDate"
+        FROM Payment AS P
+    </select>
+
+    <select id="findOne" resultMap="Payment">
+        SELECT P.payment_id AS "PaymentId", P.price AS "PaymentPrice", P.type AS "PaymentType", P.vendor AS "PaymentCardVendor",
+        P.card_number AS "PaymentCardNumber", P.installment_month AS "PaymentInstallmentMonth", P.vendor_check_number AS "vendorCheckNumber",
+        P.account_number AS "PaymentAccountNumber",P.status AS "PaymentStatus", P.payed_date AS "PaymentPayedDate", P.updated_date AS "PaymentUpdatedDate"
+        FROM Payment AS P
+        WHERE payment_id = #{id}
+    </select>
+
+    <insert id="insertPayment" parameterType="com.supshop.suppingmall.payment.Payment" useGeneratedKeys="true" keyProperty="paymentId">
+        INSERT INTO Payment(
+        price,
+        type,
+        vendor,
+        card_number,
+        installment_month,
+        vendor_check_number,
+        account_number,
+        status,
+        payed_date
+        )
+        VALUES (
+        #{price},
+        #{paymentType, typeHandler=com.supshop.suppingmall.payment.PaymentGroupTypeHandler},
+        #{card.vendor, typeHandler=com.supshop.suppingmall.payment.CardVendorTypeHandler},
+,       #{card.cardNumber}
+        #{card.installmentMonth},
+        #{card.vendorCheckNumber},
+        #{accountNumber},
+        #{status, typeHandler=com.supshop.suppingmall.payment.PaymentStatusTypeHandler},
+        #{payedDate}
+        )
+    </insert>
+
+</mapper>

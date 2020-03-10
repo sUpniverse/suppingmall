@@ -195,7 +195,7 @@
                 '<textarea class="form-control" id="update-comment-text" rows="3" >'+text+'</textarea>' +
                 '<button class="btn btn-primary btn-sm mr-1" id="update-comment-button">수정하기</button>' +
                 '<button class="btn btn-light btn-sm" id="cancel-comment-button">취소하기</button>'
-            '</div>';
+                '</div>';
         });
 
 
@@ -204,7 +204,6 @@
             var comment_id = comment.getAttribute('value');
             var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
 
-            console.log(user_id);
             $.ajax({
                 type:"DELETE",
                 url:"/comments/"+comment_id,

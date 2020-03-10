@@ -3,6 +3,7 @@ package com.supshop.suppingmall.board;
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.comment.Comment;
 import com.supshop.suppingmall.user.User;
+import com.supshop.suppingmall.user.UserVO;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ public class Board {
     private String title;
     private String contents;
     private List<Comment> comments;
-    private User creator;
+    private UserVO creator;
     private Category category;
     private int hit;
     private String delYn;

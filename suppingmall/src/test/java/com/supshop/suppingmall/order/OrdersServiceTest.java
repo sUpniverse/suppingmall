@@ -1,12 +1,15 @@
 package com.supshop.suppingmall.order;
 
 import com.supshop.suppingmall.delivery.Delivery;
+import com.supshop.suppingmall.payment.CardVO;
 import com.supshop.suppingmall.payment.Payment;
+import com.supshop.suppingmall.payment.PaymentService;
 import com.supshop.suppingmall.product.Product;
 import com.supshop.suppingmall.product.ProductOption;
 import com.supshop.suppingmall.product.ProductService;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserService;
+import com.supshop.suppingmall.user.UserVO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class OrderServiceTest {
+public class OrdersServiceTest {
 
     @Autowired
     ProductService productService;
@@ -33,6 +36,9 @@ public class OrderServiceTest {
     @Autowired
     OrderService orderService;
 
+    @Autowired
+    PaymentService paymentService;
+
     @Test
     @Transactional
     public void orderProduct() throws Exception {
@@ -40,7 +46,8 @@ public class OrderServiceTest {
 
             //유저정보
         User user = userService.getUser(19l);
-            //배송입력정보
+        UserVO userVO = UserVO.builder().userId(user.getUserId()).build();
+        //배송입력정보
         Delivery delivery = Delivery.builder()
                 .address(user.getAddress())
                 .address(user.getAddressDetail())
@@ -61,43 +68,46 @@ public class OrderServiceTest {
                 .product(product)
                 .productOption(productOption)
                 .count(2)
-                .orderPrice(orderPrice)
+                .price(orderPrice)
                 .build();
 
         orderItems.add(orderItem);
 
-            // 결제정보
+        CardVO card = CardVO.builder().vendor(Payment.CardVendor.HYUNDAI).installmentMonth(1).cardNumber("000-000-000").build();
+        // 결제정보
         Payment payment = Payment.builder()
-                .paymentType(Payment.PayGroup.CARD)
-                .vendor(Payment.CardVendor.HYUNDAI)
+                .paymentType(Payment.PayGroupType.CARD)
+                .card(card)
                 .price(orderPrice)
                 .status(Payment.PaymentStatus.COMPLETE)
-                .installmentMonth(1)
                 .payedDate(LocalDateTime.now())
                 .build();
 
 
-        Order order = Order.builder()
+        Orders orders = Orders.builder()
                 .orderItems(orderItems)
-                .buyer(user)
+                .buyer(userVO)
                 .delivery(delivery)
                 .payment(payment)
                 .build();
 
         //when
-        Long orderId = orderService.createOrder(order);
-        Order order1 = orderService.retrieveOrder(orderId);
+
+
+
+        Long orderId = orderService.createOrder(orders);
+        Orders orders1 = orderService.retrieveOrder(orderId);
 
         //then
-        assertThat(order1.getOrderId()).isEqualTo(order.getOrderId());
-        assertThat(order1.getStatus()).isEqualTo(order.getStatus());
-        assertThat(order1.getPayment().getPaymentId()).isEqualTo(order.getPayment().getPaymentId());
-        assertThat(order1.getPayment().getPaymentType()).isEqualTo(order.getPayment().getPaymentType());
-        assertThat(order1.getPayment().getPrice()).isEqualTo(order.getPayment().getPrice());
-        assertThat(order1.getPayment().getPayedDate()).isEqualTo(order.getPayment().getPayedDate());
-        for(OrderItem orderNewItem : order1.getOrderItems()) {
+        assertThat(orders1.getOrderId()).isEqualTo(orders.getOrderId());
+        assertThat(orders1.getStatus()).isEqualTo(orders.getStatus());
+        assertThat(orders1.getPayment().getPaymentId()).isEqualTo(orders.getPayment().getPaymentId());
+        assertThat(orders1.getPayment().getPaymentType()).isEqualTo(orders.getPayment().getPaymentType());
+        assertThat(orders1.getPayment().getPrice()).isEqualTo(orders.getPayment().getPrice());
+        assertThat(orders1.getPayment().getPayedDate()).isEqualTo(orders.getPayment().getPayedDate());
+        for(OrderItem orderNewItem : orders1.getOrderItems()) {
             assertThat(orderNewItem.getCount()).isEqualTo(orderItem.getCount());
-            assertThat(orderNewItem.getOrderPrice()).isEqualTo(orderItem.getOrderPrice());
+            assertThat(orderNewItem.getPrice()).isEqualTo(orderItem.getPrice());
             assertThat(orderNewItem.getProduct().getProductId()).isEqualTo(product.getProductId());
             assertThat(orderNewItem.getProductOption().getOptionId()).isEqualTo(productOption.getOptionId());
         }

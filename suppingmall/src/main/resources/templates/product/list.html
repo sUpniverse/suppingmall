@@ -3,31 +3,7 @@
 <head th:include="fragments/header :: header" />
 <head>
     <link th:href="@{/css/blog.css}" rel="stylesheet">
-
-    <style>
-        .dropdown-submenu {
-            position: relative;
-        }
-
-        .dropdown-submenu > a.dropdown-item:after {
-
-        }
-
-        .dropdown-submenu > a.dropdown-item:after {
-
-        }
-
-        .dropdown-submenu > .dropdown-menu {
-            top: 0;
-            left: 100%;
-            margin-top: 0px;
-            margin-left: 0px;
-        }
-
-        .dropdown-submenu:hover > .dropdown-menu {
-            display: block;
-        }
-    </style>
+    <link th:href="@{/css/category.css}" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -48,9 +24,9 @@
                 </div>
                 <div class="row mt-3">
                     <ul th:each="product : ${products}">
-                        <li class="card mb-7" data-toggle="card-collapse" style="width: 255px; height: 420px">
+                        <li class="card mb-7" data-toggle="card-collapse" style="width: 320px; height: 420px">
                             <a th:href="@{'/products/'+${product.productId}}">
-                                <img th:src="${product.thumbnail}" style="width: 249px; height: 320px">
+                                <img th:src="${product.thumbnail}" style="width: 315px; height: 320px">
                             </a>
                             <div class="card-collapse-parent">
                                 <div class="text-center">

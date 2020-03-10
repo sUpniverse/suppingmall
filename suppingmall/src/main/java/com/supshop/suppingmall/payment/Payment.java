@@ -12,34 +12,32 @@ public class Payment {
 
     private Long paymentId;
     private int price;
-    private PayGroup paymentType;
+    private PayGroupType paymentType;
 
-    //C : 카드결제
-    private CardVendor vendor;          //vendor사 List로 가져와야함
-    private int installmentMonth;
-    private String checkNumber;     // vendor사 결제승인번호
+    // CARD : 카드
+    private CardVO card;
 
-    //B : 계좌이체
+    //CASH : 계좌이체
     private String accountNumber;
 
-    private PaymentStatus status; // Todo: enum으로  C : (결제완료) , B : (입금대기, 입금확인, 환불완료) , 결제취소
+    private PaymentStatus status;
     private LocalDateTime payedDate;
     private LocalDateTime updatedDate; // 결제에 따른 상태 변경날짜
 
 
     @Getter
     @AllArgsConstructor
-    public enum PayGroup {
+    public enum PayGroupType {
 
-        CASH("계좌이체","P000"),
-        CARD("카드","P001"),
-        ETC("포인트","P002");
+        CASH("현금","PG00"),
+        CARD("카드","PG01"),
+        ETC("포인트","PG02");
 
         private String title;
         private String code;
 
-        public static PayGroup getCodeString(String code) {
-            return Arrays.stream(PayGroup.values())
+        public static PayGroupType getCodeString(String code) {
+            return Arrays.stream(PayGroupType.values())
                     .filter(v -> v.getCode().equals(code))
                     .findAny()
                     .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + code + "]"));
@@ -54,7 +52,8 @@ public class Payment {
         SAMSUNG("삼성카드","CD00"),
         HYUNDAI("현대카드","CD01"),
         KUKMIN("국민카드","CD02"),
-        WOORIE("우리카드","CD03");
+        WOORIE("우리카드","CD03"),
+        BC("BC카드","CD03");
 
 
         private String title;
@@ -73,12 +72,13 @@ public class Payment {
     @AllArgsConstructor
     public enum PaymentStatus {
 
-        COMPLETE("결제완료","PS00"),
-        WAITING("입금대기","PS01"),
-        CHECKED("입금확인","PS02"),
-        CANCEL("결제취소","PS03"),
-        REFUNDED("환불완료","PS04");
-        //C : (결제완료) , B : (입금대기, 입금확인, 환불완료) , 결제취소
+        WAITING("결제대기","PS00"),
+        COMPLETE("결제완료","PS01"),
+        BACKING_WAITING("입금대기","PS02"),
+        BACKING_CHECKED("입금확인","PS03"),
+        CANCEL("결제취소","PS04"),
+        REFUND  ("환불완료","PS05");
+        //C : (결제완료,결제취소) , B : (입금대기, 입금확인,결제취소, 환불완료)
 
         private String title;
         private String code;

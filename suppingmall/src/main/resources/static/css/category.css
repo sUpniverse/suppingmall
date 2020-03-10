@@ -1,0 +1,22 @@
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu > a.dropdown-item:after {
+
+}
+
+.dropdown-submenu > a.dropdown-item:after {
+
+}
+
+.dropdown-submenu > .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: 0px;
+    margin-left: 0px;
+}
+
+.dropdown-submenu:hover > .dropdown-menu {
+    display: block;
+}

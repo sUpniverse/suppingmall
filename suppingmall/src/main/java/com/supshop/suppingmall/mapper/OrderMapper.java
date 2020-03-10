@@ -1,12 +1,12 @@
 package com.supshop.suppingmall.mapper;
 
-import com.supshop.suppingmall.order.Order;
+import com.supshop.suppingmall.order.Orders;
 
 import java.util.Optional;
 
 public interface OrderMapper {
     
-    void insertOrder(Order order);
+    void insertOrder(Orders orders);
 
-    Optional<Order> findOne(Long orderId);
+    Optional<Orders> findOne(Long orderId);
 }

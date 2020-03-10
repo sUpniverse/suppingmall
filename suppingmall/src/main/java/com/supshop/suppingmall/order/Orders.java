@@ -1,8 +1,10 @@
 package com.supshop.suppingmall.order;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.payment.Payment;
 import com.supshop.suppingmall.user.User;
+import com.supshop.suppingmall.user.UserVO;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -12,16 +14,21 @@ import java.util.List;
 @Getter @Setter
 @Builder @ToString
 @AllArgsConstructor @NoArgsConstructor
-public class Order {
+public class Orders {
 
     private Long orderId;
     private List<OrderItem> orderItems;
     private LocalDateTime orderedDate;
-    private User buyer;
+    private UserVO buyer;
+    private UserVO seller;
     private Payment payment;
     private Delivery delivery;
     private OrderStatus status; //Todo : enum (주문완료,배송,구매완료,취소)
 
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
+    }
 
     @Getter
     @AllArgsConstructor

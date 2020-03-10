@@ -2,6 +2,7 @@ package com.supshop.suppingmall.board;
 
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.user.User;
+import com.supshop.suppingmall.user.UserVO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +70,7 @@ public class BoardControllerTest {
     @Test
     public void getBoardWriteFormWithLogin() throws Exception {
         //given
-        User user = addUser();
+        UserVO user = addUser();
 
         //when
         addUserInSession(user);
@@ -79,14 +80,14 @@ public class BoardControllerTest {
                 .andExpect(status().isOk());
     }
 
-    private User addUser() {
+    private UserVO addUser() {
 
-        return User.builder()
+        return UserVO.builder()
                 .userId(1l)
                 .build();
     }
 
-    private void addUserInSession(User user) {
+    private void addUserInSession(UserVO user) {
         session = new MockHttpSession();
         session.setAttribute("user",user);
 
@@ -96,7 +97,7 @@ public class BoardControllerTest {
     @Transactional
     public void createBoardWithLogin() throws Exception {
         //given
-        User user = addUser();
+        UserVO user = addUser();
         Category category = Category.builder().id(1l).build();
         Board board = Board.builder()
                 .title("test")
@@ -123,7 +124,7 @@ public class BoardControllerTest {
     public void addBoard() throws Exception {
         //given
         //given
-        User user = addUser();
+        UserVO user = addUser();
         Category category = Category.builder().id(1l).build();
         Board board = Board.builder()
                 .title("test")
@@ -142,7 +143,7 @@ public class BoardControllerTest {
     @Test
     public void createBoardWithOutLogin() throws Exception {
         //given
-        User user = addUser();
+        UserVO user = addUser();
         Category category = Category.builder().id(1l).build();
         Board board = Board.builder()
                 .title("test")
@@ -166,7 +167,7 @@ public class BoardControllerTest {
     @Test
     public void createBoardWithLoginDifferUser() throws Exception {
         //given
-        User user = addUser();
+        UserVO user = addUser();
         Category category = Category.builder().id(1l).build();
         Board board = Board.builder()
                 .title("test")

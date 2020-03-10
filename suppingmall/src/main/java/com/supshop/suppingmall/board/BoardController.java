@@ -84,7 +84,7 @@ public class BoardController {
     @PutMapping("/{id}")
     public String updateBoard(@PathVariable Long id, Board board, HttpSession session) {
         log.debug("'updateBoard'가 실행됨");
-        User user = (User)session.getAttribute("user");
+        UserVO user = (UserVO)session.getAttribute("user");
         board.setCreator(user);
         boardService.updateBoard(id, board);
         return "redirect:/boards/"+id;
@@ -93,7 +93,7 @@ public class BoardController {
     @DeleteMapping("/{id}")
     public String deleteBoard(@PathVariable Long id, HttpSession session) {
         log.debug("'deleteBoard'가 실행됨");
-        User user = (User)session.getAttribute("user");
+        UserVO user = (UserVO)session.getAttribute("user");
 //        if(user.getUserId() != userId) {
 //            return "redirect:/boards";
 //        }
