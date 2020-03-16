@@ -6,7 +6,8 @@ import java.util.Optional;
 
 public interface OrderMapper {
     
-    void insertOrder(Orders orders);
+    void save(Orders orders);
 
     Optional<Orders> findOne(Long orderId);
+
 }

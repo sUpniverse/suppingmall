@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.order;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.payment.CardVO;
 import com.supshop.suppingmall.payment.Payment;
@@ -41,12 +42,63 @@ public class OrdersServiceTest {
 
     @Test
     @Transactional
+    public void createTempOrder() throws Exception {
+        //given
+
+        //상품정보
+        List<OrderItemForm> orderItems = new ArrayList<>();
+
+        Product product = productService.retrieveProduct(23l);
+        Product newProduct = Product.builder().productId(23l).build();
+
+        List<ProductOption> options = new ArrayList<>();
+        ProductOption productOption = product.getOptions().get(1);
+        options.add(productOption);
+
+        int count = 2;
+        OrderItemForm orderItemForm = OrderItemForm.builder()
+                .product(newProduct)
+                .productOption(productOption)
+                .count(count)
+                .price(productOption.getPrice())
+                .build();
+        orderItems.add(orderItemForm);
+
+
+
+
+        TempOrderForm tempOrderForm = new TempOrderForm();
+        long buyerId = 19l;
+        tempOrderForm.setBuyerId(buyerId);
+        tempOrderForm.setSellerId(product.getSeller().getUserId());
+        ObjectMapper objectMapper = new ObjectMapper();
+        tempOrderForm.setOrderItems(objectMapper.writeValueAsString(orderItems));
+
+        //when
+        Orders tempOrder = orderService.createTempOrder(tempOrderForm);
+
+
+        //then
+        assertThat(tempOrder.getStatus()).isEqualTo(Orders.OrderStatus.WAIT);
+
+        for(OrderItem orderNewItem : tempOrder.getOrderItems()) {
+            assertThat(orderNewItem.getCount()).isEqualTo(count);
+            assertThat(orderNewItem.getPrice()).isEqualTo(productOption.getPrice());
+            assertThat(orderNewItem.getProduct().getProductId()).isEqualTo(product.getProductId());
+            assertThat(orderNewItem.getProductOption().getOptionId()).isEqualTo(productOption.getOptionId());
+        }
+
+    }
+
+    @Test
+    @Transactional
     public void orderProduct() throws Exception {
         //given
 
-            //유저정보
+        //유저정보
         User user = userService.getUser(19l);
         UserVO userVO = UserVO.builder().userId(user.getUserId()).build();
+
         //배송입력정보
         Delivery delivery = Delivery.builder()
                 .address(user.getAddress())
@@ -95,7 +147,7 @@ public class OrdersServiceTest {
 
 
 
-        Long orderId = orderService.createOrder(orders);
+        Long orderId = orderService.order(orders);
         Orders orders1 = orderService.retrieveOrder(orderId);
 
         //then

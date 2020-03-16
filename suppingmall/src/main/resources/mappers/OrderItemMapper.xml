@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.supshop.suppingmall.mapper.OrderItemMapper">
+    <resultMap id="OrderItem" type="com.supshop.suppingmall.order.OrderItem" autoMapping="true">
+        <id property="orderItemId" column="OrderItemId" />
+        <result property="count" column="OrderItemCount" />
+        <result property="price" column="OrderItemPrice" />
+        <association property="orders" javaType="com.supshop.suppingmall.order.Orders">
+        </association>
+        <association property="product" javaType="com.supshop.suppingmall.product.Product">
+        </association>
+        <association property="productOption" javaType="com.supshop.suppingmall.product.ProductOption">
+        </association>
+    </resultMap>
+
+
+    <insert id="saveList" useGeneratedKeys="true" keyProperty="orderItemId">
+        insert into order_item (
+        order_id,
+        product_id,
+        product_option_id,
+        price,
+        count
+        )
+        values
+        <foreach item="orderItem" collection="list" separator=",">
+            (
+            #{orderItem.orders.orderId},
+            #{orderItem.product.productId},
+            #{orderItem.productOption.optionId},
+            #{orderItem.price},
+            #{orderItem.count}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

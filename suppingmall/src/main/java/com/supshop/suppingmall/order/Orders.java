@@ -1,42 +1,37 @@
 package com.supshop.suppingmall.order;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.payment.Payment;
-import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserVO;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @Getter @Setter
 @Builder @ToString
-@AllArgsConstructor @NoArgsConstructor
 public class Orders {
 
     private Long orderId;
-    private List<OrderItem> orderItems;
-    private LocalDateTime orderedDate;
+    private List<OrderItem> orderItems = new ArrayList<>();
     private UserVO buyer;
     private UserVO seller;
     private Payment payment;
     private Delivery delivery;
     private OrderStatus status; //Todo : enum (주문완료,배송,구매완료,취소)
-
-
-    public void setOrderItems(List<OrderItem> orderItems) {
-        this.orderItems = orderItems;
-    }
+    private LocalDateTime orderDate;
+    private LocalDateTime updateDate;
 
     @Getter
     @AllArgsConstructor
     public enum  OrderStatus {
 
-        ORDER("주문완료","O000"),
-        CANCEL("주문취소","O001"),
-        COMPLETE("구매확정","O002");
+        WAIT("결제대기","O000"),
+        ORDER("주문완료","O001"),
+        CANCEL("주문취소","O002"),
+        COMPLETE("구매확정","O003");
 
         private String title;
         private String code;
@@ -52,5 +47,36 @@ public class Orders {
 
     }
 
+    //임시 주문아이디 생성 (결제 시스템의 식별)
+    public static Orders createTempOrder(List<OrderItem> orderItemList, UserVO buyer, UserVO seller) {
+        Orders orders = Orders.builder()
+                            .buyer(buyer)
+                            .seller(seller)
+                            .orderItems(orderItemList)
+                            .orderDate(LocalDateTime.now())
+                            .orderDate(LocalDateTime.now())
+                            .status(OrderStatus.WAIT)
+                            .build();
+        return orders;
+    }
 
+    public void addOrderItem(OrderItem orderItem) {
+        orderItems.add(orderItem);
+    }
+
+    public int getAmountPrice() {
+        int price = 0;
+        for(OrderItem orderItem : this.orderItems) {
+            price += orderItem.getPrice();
+        }
+        return price;
+    }
+
+    public int getAmountCount() {
+        int count = 0;
+        for(OrderItem orderItem : this.orderItems) {
+            count += orderItem.getCount();
+        }
+        return  count;
+    }
 }

@@ -328,10 +328,10 @@
 
             var orderItemJson = setOrderItemJson();
             document.getElementById("orderItemJson").setAttribute('value',JSON.stringify(orderItemJson));
-            console.log(document.getElementById("orderItemJson").value);
-            formObj.attr("action","/orders/orderSheet");
-            formObj.attr("method","post");
-            formObj.submit();
+            console.log(orderItemJson);
+            // formObj.attr("action","/orders/orderSheet");
+            // formObj.attr("method","post");
+            // formObj.submit();
         });
 
     });

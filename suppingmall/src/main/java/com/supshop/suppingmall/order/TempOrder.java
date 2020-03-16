@@ -1,38 +1,42 @@
 package com.supshop.suppingmall.order;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter @Setter
-@AllArgsConstructor @NoArgsConstructor
 public class TempOrder {
 
     private Long tempOrderId;
-    private Long productId;
     private Long sellerId;
-    private String orderItems;
-    private List<OrderItem> orderItemList;
-    private int amountCount;
-    private int amountPrice;
+    private List<OrderItem> orderItemList = new ArrayList<>();      //Json String 파싱을 통해 변환된 주문내역
 
+    public static TempOrder create(Long sellerId, List<OrderItem> orderItemList) {
+        TempOrder tempOrder = new TempOrder();
+        tempOrder.setSellerId(sellerId);
+        tempOrder.setOrderItemList(orderItemList);
+        return tempOrder;
+    }
 
-    public void setAmountPrice() {
+    public void addOrderItem(OrderItem orderItem) {
+        orderItemList.add(orderItem);
+    }
+
+    public int getAmountPrice() {
         int price = 0;
         for(OrderItem orderItem : this.orderItemList) {
             price += orderItem.getPrice();
         }
-        this.amountPrice = price;
+        return price;
     }
 
-    public void setAmountCount() {
+    public int getAmountCount() {
         int count = 0;
         for(OrderItem orderItem : this.orderItemList) {
             count += orderItem.getCount();
         }
-        this.amountCount = count;
+        return  count;
     }
 }

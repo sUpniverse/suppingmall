@@ -41,6 +41,7 @@ public class UserService implements UserDetailsService {
     public User getUser(Long id) {
         return userMapper.selectUser(id);
     }
+
     public UserVO getUserVO(Long id) {
         User user = userMapper.selectUser(id);
         UserVO vo = modelMapper.map(user, UserVO.class);

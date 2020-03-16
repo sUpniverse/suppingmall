@@ -1,13 +1,19 @@
 <!DOCTYPE html>
     <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head>
+        <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
         <div th:include="fragments/header :: header" />
         <style>
             ul{
                 list-style:none;
                 padding: unset;
             }
+            li{
+                margin-top: 1rem;
+            }
         </style>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
+        <script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.5.js"></script>
     </head>
     <body>
         <div class="container">
@@ -34,18 +40,21 @@
                         <tbody>
                         <tr>
                             <td class="row">
-                                <div>
+                                <div class="mr-3">
                                     <rect width="100%" height="100%" fill="#eee">
-                                        <img class="bd-placeholder-img rounded-circle" width="140" height="140" th:src="${product.thumbnail}">
+                                        <img class="bd-placeholder-img rounded-circle" width="100" height="100" th:src="${product.thumbnail}">
                                     </rect>
                                 </div>
                                 <div>
                                     <strong>[[${product.name}]]</strong>
-                                    <ul>
-                                        <li th:each="orderItem : ${orderItems}">
-                                            [[${orderItem.productOption.optionName}]] / [[${orderItem.count}]]개
-                                        </li>
-                                    </ul>
+                                    <div>
+                                        <ul>
+                                            <li th:each="orderItem : ${orderItems}">
+                                                [[${orderItem.productOption.optionName}]] / [[${orderItem.count}]]개
+                                            </li>
+                                        </ul>
+                                    </div>
+
                                 </div>
                             </td>
                             <td>
@@ -58,7 +67,7 @@
                                 [[${tempOrder.amountCount}]]개
                             </td>
                             <td>
-                                [[${tempOrder.amountPrice}]]원
+                                [[${#numbers.formatInteger(tempOrder.amountPrice,3,'COMMA')}]]원
                             </td>
                         </tr>
                         </tbody>
@@ -69,18 +78,71 @@
                         <div class="row">
                             <div class="col-12 col-md-8">
                                 <h4>배송지정보</h4>
-                                <ul>
-                                    <li>
-                                        [[${session.user.name}]]
-                                    </li>
-                                    <li>
-                                        [[${session.user.phoneNumber}]]
-                                    </li>
-                                    <li>
-                                        ([[${session.user.zipCode}]])  [[${session.user.address}]]  [[${session.user.addressDetail}]]
-                                    </li>
-                                </ul>
-                                <input type="text" name="">
+                                <strong class="mr-3 mb-3">배송지 선택</strong>
+                                <div class="container">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="delivery" id="delivery1" value="origin" checked>
+                                        <label class="form-check-label" for="delivery1">기본 배송지</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="delivery" id="delivery2" value="new">
+                                        <label class="form-check-label" for="delivery2">신규 배송지</label>
+                                    </div>
+                                </div>
+                                <div style="display: block;" id="originDelivery">
+                                    <input hidden>
+                                    <ul>
+                                        <li>
+                                            [[${session.user.name}]]
+                                        </li>
+                                        <li>
+                                            [[${session.user.phoneNumber}]]
+                                        </li>
+                                        <li>
+                                            ([[${session.user.zipCode}]])  [[${session.user.address}]]  [[${session.user.addressDetail}]]
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="newDelivery" style="display: none;">
+                                    <ul>
+                                        <li class="media text-muted pt-3">
+                                            <strong>수령인</strong>
+                                            <div class="media-body ml-4">
+                                                <input type="text" class="form-control col-3" th:value="${session.user.name}" name="orders.delivery.name">
+                                            </div>
+                                        </li>
+                                        <li class="media text-muted pt-3">
+                                            <strong>연락처</strong>
+                                            <div class="media-body ml-4 row">
+                                                <select id="phoneFirst" class="custom-select col">
+                                                    <option th:selected="${#strings.substring(session.user.phoneNumber,0,3).equals('010')}" value="010">010</option>
+                                                    <option th:selected="${#strings.substring(session.user.phoneNumber,0,3).equals('011')}" value="011">011</option>
+                                                    <option th:selected="${#strings.substring(session.user.phoneNumber,0,3).equals('018')}" value="018">018</option>
+                                                    <option th:selected="${#strings.substring(session.user.phoneNumber,0,3).equals('019')}" value="019">019</option>
+                                                </select>
+                                                -
+                                                <input type="text" class="form-control col" th:value="${#strings.substring(session.user.phoneNumber,3,7)}" id="phoneMiddle">
+                                                -
+                                                <input type="text" class="form-control col" th:value="${#strings.substring(session.user.phoneNumber,7,11)}" id="phoneLast">
+                                                <input type="button" class="btn btn-outline-secondary col ml-2" id="verifyPhone" value="핸드폰 인증">
+                                                <input type="hidden" id="orders.delivery.phone" name="phoneNumber">
+                                            </div>
+                                        </li>
+                                        <li class="media text-muted pt-3">
+                                            <strong>우편번호</strong>
+                                            <div class="media-body ml-4">
+                                                <div class="row">
+                                                    <input type="text" name="orders.delivery.zipCode" class="form-control col-3 mr-2" id="zipCode" th:value="${session.user.zipCode}" readonly>
+                                                    <input type="button" class="btn btn-outline-secondary col-3" id="search_address" value="우편번호 찾기">
+                                                </div>
+                                                <div class="mt-3 row">
+                                                    <input type="text" class="form-control col mr-2" name="orders.delivery.address" id="address" th:value="${session.user.address}" readonly>
+                                                    <input type="text" class="form-control col" name="orders.delivery.addressDetail" th:value="${session.user.addressDetail}" id="addressDetail">
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                             <div class="col-12 col-md-4">
                                 <h4>주문자정보</h4>
@@ -102,17 +164,20 @@
                 <div class="row mt-5">
                     <div class="col-12 col-md-8">
                         <h4>결제정보</h4>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" checked>
-                            <label class="form-check-label" for="inlineRadio1">신용카드</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
-                            <label class="form-check-label" for="inlineRadio2">실시간 계좌이체</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3">
-                            <label class="form-check-label" for="inlineRadio3">핸드폰 결제</label>
+                        <strong class="mr-3 mb-3">결제방법</strong>
+                        <div class="container">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="paymentType" id="pay1" value="card" checked>
+                                <label class="form-check-label" for="pay1">신용카드</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="paymentType" id="pay2" value="trans">
+                                <label class="form-check-label" for="pay2">실시간 계좌이체</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="paymentType" id="pay3" value="phone">
+                                <label class="form-check-label" for="pay3">핸드폰 결제</label>
+                            </div>
                         </div>
                     </div>
                     <div class="col-12 col-md-4">
@@ -135,8 +200,104 @@
                 </div>
             </form>
             <div class="text-center mt-5 pd-5">
-                <button type="button" class="btn btn-success btn-lg">결제하기</button>
+                <button type="button" class="btn btn-success btn-lg" id="payButton">결제하기</button>
             </div>
         </div>
     </body>
+<script>
+    $(document).on('click',"#payButton",function () {
+        // var tempOrderId = [[${tempOrder.tempOrderId}]];
+
+        // var payInitInfo = {
+        //     pg : 'html5_inicis',
+        //     pay_method : pay,
+        //     merchant_uid : '',
+        //     name : [[${product.name}]],
+        //     amount : [[${tempOrder.amountPrice}]],
+        //     buyer_email : [[${session.user.email}]],
+        //     buyer_name : [[${session.user.name}]],
+        //     buyer_tel : [[${session.user.phoneNumber}]],
+        //     buyer_addr : [[${session.user.address}]] +" "+[[${session.user.addressDetail}]],
+        //     buyer_postcode : [[${session.user.zipCode}]]
+        // };
+
+
+        $.ajax({
+            type : "post",
+            url : "/payModule",
+            contentType : "application/json",
+            data : JSON.stringify(payInitInfo),
+            success : (data) => {
+                console.log(data);
+            },
+            error : (data) => {
+
+            }
+        });
+
+    });
+
+
+    $(document).on('click','input[name=delivery]',function (e) {
+        if(e.target.value === 'origin') {
+            document.getElementById('originDelivery').setAttribute('style','display: block;');
+            document.getElementById('newDelivery').setAttribute('style','display: none;');
+        } else if(e.target.value === 'new') {
+            document.getElementById('originDelivery').setAttribute('style','display: none;');
+            document.getElementById('newDelivery').setAttribute('style','display: block;');
+        }
+    });
+
+    function getRadioValue(name) {
+        var radios = document.getElementsByName(name);
+        var radio_value;
+        for(var i=0; i< radios.length; i++) {
+            if(radios[i].checked) {
+                radio_value = radios[i].value;
+            }
+        }
+        return radio_value
+    }
+</script>
+<script>
+    $(document).on('click',"#search_address",function () {
+        var zipcode;
+        var address;
+
+        new daum.Postcode({
+            popupName: 'postcodePopup',
+            theme: {
+                searchBgColor: "#0B65C8", //검색창 배경색
+                queryTextColor: "#FFFFFF" //검색창 글자색
+            },
+            autoClose: false,
+
+            oncomplete: function (data) {
+                zipcode = data.zonecode;
+                if (data.userSelectedType === "R") {
+                    address = data.roadAddress;
+                } else if (data.userSelectedType === "J") {
+                    address = data.jibunAddress;
+                }
+
+                document.getElementById("zip").setAttribute("value", zipcode);
+                document.getElementById("address").setAttribute("value", address);
+
+            },
+
+            onclose: function (state) {
+                //state는 우편번호 찾기 화면이 어떻게 닫혔는지에 대한 상태 변수 이며, 상세 설명은 아래 목록에서 확인하실 수 있습니다.
+                if (state === 'FORCE_CLOSE') {
+                    //사용자가 브라우저 닫기 버튼을 통해 팝업창을 닫았을 경우, 실행될 코드를 작성하는 부분입니다.
+                    checkAddressResult = false;
+
+                } else if (state === 'COMPLETE_CLOSE') {
+                    //사용자가 검색결과를 선택하여 팝업창이 닫혔을 경우, 실행될 코드를 작성하는 부분입니다.
+                    //oncomplete 콜백 함수가 실행 완료된 후에 실행됩니다.
+                    checkAddressResult = true;
+                }
+            }
+        }).open();
+    });
+</script>
 </html>

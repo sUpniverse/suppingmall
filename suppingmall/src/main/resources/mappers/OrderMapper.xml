@@ -2,33 +2,33 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.supshop.suppingmall.mapper.PaymentMapper">
+<mapper namespace="com.supshop.suppingmall.mapper.OrderMapper">
     <resultMap id="Orders" type="com.supshop.suppingmall.order.Orders" autoMapping="true">
         <id property="orderId" column="OrderId" />
         <result property="orderedDate" column="ordered_date" />
         <result property="status" column="status" typeHandler="com.supshop.suppingmall.order.OrderStatusTypeHandler" />
-        <association property="buyer" resultMap="User" />
-        <association property="payment" resultMap="Payment" />
-        <association property="delivery" resultMap="Delivery" />
-        <collection property="orderItems" resultMap="OrderItem" />
+        <association property="buyer" javaType="com.supshop.suppingmall.user.UserVO" >
+        </association>
+        <association property="seller" javaType="com.supshop.suppingmall.user.UserVO">
+        </association>
+        <collection property="orderItems" ofType="com.supshop.suppingmall.order.OrderItem">
+            <id property="orderItemId" column="OrderItemId" />
+        </collection>
     </resultMap>
 
-    <insert id="insertOrder" parameterType="com.supshop.suppingmall.order.Orders" useGeneratedKeys="true" keyProperty="orderId">
+    <insert id="save" parameterType="com.supshop.suppingmall.order.Orders" useGeneratedKeys="true" keyProperty="orderId">
         INSERT INTO Orders (
-        ordered_date,
-        user_id,
-        delivery_id,
+        buyer_id,
+        seller_id,
         status,
-        payment_id
+        ordered_date
         )
         VALUES (
-        now(),
-        #{user.userId},
-        #{delivery.deliveryId},
-        #{status, typeHandler=com.supshop.suppingmall.order.OrderStatusTypeHandler}
-        #{payment.paymentId}
+        #{buyer.userId},
+        #{seller.userId},
+        #{status, typeHandler=com.supshop.suppingmall.order.OrderStatusTypeHandler},
+        now()
         )
     </insert>
-
 
 </mapper>

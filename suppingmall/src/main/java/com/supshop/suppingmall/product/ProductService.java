@@ -1,19 +1,18 @@
 package com.supshop.suppingmall.product;
 
 import com.supshop.suppingmall.mapper.ProductMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class ProductService {
 
-    private ProductMapper productMapper;
-
-    public ProductService(ProductMapper productMapper) {
-        this.productMapper = productMapper;
-    }
+    private final ProductMapper productMapper;
 
     public List<Product> retrieveAllProduct() {
         return productMapper.selectAllProduct();
@@ -38,10 +37,12 @@ public class ProductService {
 
     }
 
+    @Transactional
     public void updateProduct(Long id, Product product) {
         productMapper.updateProduct(id, product);
     }
 
+    @Transactional
     public void deleteProduct(Long id) {
         productMapper.deleteProduct(id);
     }
