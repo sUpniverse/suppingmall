@@ -7,9 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 
 
 @RunWith(SpringRunner.class)
@@ -23,18 +21,21 @@ public class PaymentServiceTest {
     @Transactional
     public void insertTest() throws Exception {
         //given
-        PayInfo payInfo = PayInfo.builder().amount(200000).name("맥북프로").build();
+        Payment payment = Payment.builder()
+                .price(200000)
+                .paymentType(Payment.PayGroupType.CARD)
+                .status(Payment.PaymentStatus.COMPLETE)
+                .vendorCheckNumber("001-222-3333")
+                .build();
         //when
-        Long payId = paymentService.insertPayment(null);
-        Payment paymentTest = paymentService.retrievePayment(payId);
+        Long payId = paymentService.save(payment);
+        Payment paymentTest = paymentService.findPayment(payId);
 
         //then
-//        assertThat(paymentTest.getPrice()).isEqualTo(payment.getPrice());
-//        assertThat(paymentTest.getPaymentType()).isEqualTo(payment.getPaymentType());
-//        assertThat(paymentTest.getVendor().getTitle()).isEqualTo(payment.getVendor().getTitle());
-//        assertThat(paymentTest.getInstallmentMonth()).isEqualTo(payment.getInstallmentMonth());
-//        assertThat(paymentTest.getStatus()).isEqualTo(payment.getStatus());
-
+        assertEquals(paymentTest.getPrice(),payment.getPrice());
+        assertEquals(paymentTest.getPaymentType(),payment.getPaymentType());
+        assertEquals(paymentTest.getStatus(),payment.getStatus());
+        assertEquals(paymentTest.getVendorCheckNumber(),payment.getVendorCheckNumber());
     }
 
 }

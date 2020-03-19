@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.supshop.suppingmall.mapper.DeliveryMapper">
+    <resultMap id="delivery" type="com.supshop.suppingmall.delivery.Delivery" autoMapping="true">
+        <id property="deliveryId" column="DeliveryDeliveryId" />
+        <result property="name" column="DeliveryName" />
+        <result property="address" column="DeliveryAddress" />
+        <result property="addressDetail" column="DeliveryAddressDetail" />
+        <result property="zipCode" column="DeliveryZipCode" />
+        <result property="phone" column="DeliveryPhone" />
+        <result property="status" column="DeliveryStatus" />
+        <result property="vendor" column="DeliveryVendor" />
+        <result property="trackingNumber" column="DeliveryTrackingNumber" />
+        <result property="memo" column="DeliveryMemo" />
+    </resultMap>
+
+    <select id="findOne" resultMap="delivery">
+        SELECT
+        D.name AS "DeliveryName",D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode",
+        D.phone AS "DeliveryPhone", D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo"
+        FROM delivery AS D
+        WHERE D.delivery_id = #{deliveryId}
+    </select>
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="deliveryId">
+        INSERT INTO Delivery (
+        name ,
+        address,
+        address_detail,
+        zipcode,
+        phone,
+        memo,
+        vendor,
+        tracking_number
+        )
+        VALUES (
+        #{name},
+        #{address},
+        #{addressDetail},
+        #{zipCode},
+        #{phone},
+        #{memo},
+        #{vendor},
+        #{trackingNumber}
+        );
+    </insert>
+
+</mapper>

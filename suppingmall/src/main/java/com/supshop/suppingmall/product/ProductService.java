@@ -43,6 +43,11 @@ public class ProductService {
     }
 
     @Transactional
+    public void updateProductOption(List<ProductOption> productOptionList) {
+        productMapper.updateProductOption(productOptionList);
+    }
+
+    @Transactional
     public void deleteProduct(Long id) {
         productMapper.deleteProduct(id);
     }

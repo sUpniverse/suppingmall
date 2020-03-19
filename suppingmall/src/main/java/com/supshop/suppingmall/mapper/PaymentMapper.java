@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface PaymentMapper {
 
-    void insertPayment(Payment payment);
+    void save(Payment payment);
 
     Payment findOne(Long id);
 

@@ -17,7 +17,7 @@ public class PaymentController {
 
     @PostMapping("")
     public ResponseEntity<String> createPayment(Payment payment) {
-        paymentService.insertPayment(payment);
+        paymentService.save(payment);
         return ResponseEntity.ok().build();
     }
 

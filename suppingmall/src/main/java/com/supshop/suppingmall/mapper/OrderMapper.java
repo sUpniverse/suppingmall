@@ -10,4 +10,5 @@ public interface OrderMapper {
 
     Optional<Orders> findOne(Long orderId);
 
+    void order(Long orderId,Orders.OrderStatus status,Long deliveryId, Long paymentId);
 }

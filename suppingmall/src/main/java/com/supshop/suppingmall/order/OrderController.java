@@ -25,7 +25,7 @@ public class OrderController {
                                 Model model) {
 
         // 임시주문
-        Orders tempOrder = orderService.createTempOrder(tempOrderForm);
+        Orders tempOrder = orderService.createOrder(tempOrderForm);
 
         // 반영된 주문 표시
         model.addAttribute("orderItems", tempOrder.getOrderItems());
@@ -38,8 +38,8 @@ public class OrderController {
     }
 
     @PostMapping("")
-    public String createOrder(Orders orders){
-        orderService.order(orders);
+    public String createOrder(OrderForm orderForm){
+
         return "";
     }
 }

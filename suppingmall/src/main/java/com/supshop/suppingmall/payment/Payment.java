@@ -14,14 +14,10 @@ public class Payment {
     private int price;
     private PayGroupType paymentType;
 
-    // CARD : 카드
-    private CardVO card;
-
-    //CASH : 계좌이체
-    private String accountNumber;
+    private String vendorCheckNumber;
 
     private PaymentStatus status;
-    private LocalDateTime payedDate;
+    private LocalDateTime payDate;
     private LocalDateTime updatedDate; // 결제에 따른 상태 변경날짜
 
 
@@ -37,6 +33,9 @@ public class Payment {
         private String code;
 
         public static PayGroupType getCodeString(String code) {
+            if(code == null) {
+                return null;
+            }
             return Arrays.stream(PayGroupType.values())
                     .filter(v -> v.getCode().equals(code))
                     .findAny()
@@ -60,6 +59,9 @@ public class Payment {
         private String code;
 
         public static CardVendor getCodeString(String code) {
+            if(code == null) {
+                return null;
+            }
             return Arrays.stream(CardVendor.values())
                     .filter(v -> v.getCode().equals(code))
                     .findAny()
@@ -84,6 +86,9 @@ public class Payment {
         private String code;
 
         public static PaymentStatus getCodeString(String code) {
+            if(code == null) {
+                return null;
+            }
             return Arrays.stream(PaymentStatus.values())
                     .filter(v -> v.getCode().equals(code))
                     .findAny()

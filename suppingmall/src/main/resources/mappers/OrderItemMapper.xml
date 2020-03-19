@@ -10,14 +10,31 @@
         <association property="orders" javaType="com.supshop.suppingmall.order.Orders">
         </association>
         <association property="product" javaType="com.supshop.suppingmall.product.Product">
+            <id property="productId" column="ProductId" />
+            <result property="name" column="ProductName" />
+            <result property="price" column="ProductPrice" />
+            <result property="thumbnail" column="ProductThumbnail" />
+            <association property="seller" javaType="com.supshop.suppingmall.user.User">
+                <id property="userId" column="UserId" />
+                <association property="storeVO" javaType="com.supshop.suppingmall.user.StoreVO">
+                    <result property="storeName" column="StoreName" />
+                    <result property="storePhoneNumber" column="StorePhoneNumber" />
+                    <result property="storeAddress" column="StoreAddress" />
+                    <result property="storeAddressDetail" column="StoreAddressDetail" />
+                </association>
+            </association>
         </association>
         <association property="productOption" javaType="com.supshop.suppingmall.product.ProductOption">
+            <id property="optionId" column="ProductOptionId" />
+            <result property="optionName" column="ProductOptionName" />
+            <result property="price" column="ProductOptionPrice" />
+            <result property="quantity" column="ProductOptionQuantity" />
         </association>
     </resultMap>
 
 
     <insert id="saveList" useGeneratedKeys="true" keyProperty="orderItemId">
-        insert into order_item (
+        insert into orderitem (
         order_id,
         product_id,
         product_option_id,

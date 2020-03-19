@@ -18,5 +18,7 @@ public interface ProductMapper {
 
     void updateProduct(Long id, Product product);
 
+    void updateProductOption(List<ProductOption> productOptionList);
+
     void deleteProduct(Long id);
 }

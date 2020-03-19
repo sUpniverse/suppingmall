@@ -14,7 +14,7 @@ public class Delivery {
     private String addressDetail;
     private String zipCode;
     private String phone;
-    private String status; // Todo : enum으로 OrderStatus
+    private String memo;
     private String vendor; // 배송사
     private String trackingNumber; // 송장번호
 

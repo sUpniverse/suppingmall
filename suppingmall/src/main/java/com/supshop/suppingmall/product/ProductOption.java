@@ -25,4 +25,24 @@ public class ProductOption {
     @Min(0)
     private int quantity;
 
+    /**
+     * stock 증가
+     * @param quantity
+     */
+    public void addStock(int quantity) {
+        this.quantity += quantity;
+    }
+
+    /**
+     * stock 감소
+     * @param quantity
+     */
+    public void removeStock(int quantity) {
+        int restStock = this.quantity - quantity;
+        if(restStock < 0) {
+            throw new RuntimeException("need more Stock");
+        }
+        this.quantity = restStock;
+    }
+
 }

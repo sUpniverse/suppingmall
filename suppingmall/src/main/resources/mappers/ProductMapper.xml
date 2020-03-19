@@ -167,6 +167,17 @@
             );
     </insert>
 
+    <update id="updateProductOption" parameterType="java.util.List">
+        <foreach item="productOption" index="index" collection="list">
+        UPDATE product_option
+        SET
+        name = #{productOption.optionName},
+        price = #{productOption.price},
+        quantity = #{productOption.quantity}
+        where
+        product_id = #{productOption.productId} AND product_option_id = #{productOption.optionId}
+        </foreach>
+    </update>
 
 
     <update id="deleteProduct" parameterType="com.supshop.suppingmall.product.Product">

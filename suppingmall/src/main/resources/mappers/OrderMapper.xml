@@ -3,25 +3,88 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.supshop.suppingmall.mapper.OrderMapper">
-    <resultMap id="Orders" type="com.supshop.suppingmall.order.Orders" autoMapping="true">
+    <resultMap id="order" type="com.supshop.suppingmall.order.Orders" autoMapping="true">
         <id property="orderId" column="OrderId" />
-        <result property="orderedDate" column="ordered_date" />
-        <result property="status" column="status" typeHandler="com.supshop.suppingmall.order.OrderStatusTypeHandler" />
+        <result property="status" column="OrderStatus" typeHandler="com.supshop.suppingmall.order.OrderStatusTypeHandler" />
+        <result property="orderDate" column="OrderDate"/>
+        <result property="updateDate" column="OrderUpdateDate"/>
         <association property="buyer" javaType="com.supshop.suppingmall.user.UserVO" >
+            <id property="userId" column="BuyerId" />
+            <result property="nickName" column="BuyerNickName" />
         </association>
-        <association property="seller" javaType="com.supshop.suppingmall.user.UserVO">
+        <association property="seller" javaType="com.supshop.suppingmall.user.UserVO" >
+            <id property="userId" column="SellerId" />
+            <association property="storeVO" javaType="com.supshop.suppingmall.user.StoreVO">
+                <result property="storeName" column="SellerStoreName" />
+                <result property="storePhoneNumber" column="SellerStorePhoneNumber" />
+            </association>
         </association>
-        <collection property="orderItems" ofType="com.supshop.suppingmall.order.OrderItem">
+        <association property="delivery" javaType="com.supshop.suppingmall.delivery.Delivery">
+            <id property="deliveryId" column="DeliveryId" />
+            <result property="address" column="DeliveryAddress" />
+            <result property="addressDetail" column="DeliveryAddressDetail" />
+            <result property="zipCode" column="DeliveryZipCode" />
+            <result property="phone" column="DeliveryPhone" />
+            <result property="vendor" column="DeliveryVendor" />
+            <result property="trackingNumber" column="DeliveryTrackingNumber" />
+            <result property="memo" column="DeliveryMemo" />
+        </association>
+        <association property="payment" javaType="com.supshop.suppingmall.payment.Payment">
+            <id property="paymentId" column="PaymentId" />
+            <result property="price" column="PaymentPrice" />
+            <result property="paymentType" column="PaymentType" typeHandler="com.supshop.suppingmall.payment.PaymentGroupTypeHandler" />
+            <result property="status" column="PaymentStatus" typeHandler="com.supshop.suppingmall.payment.PaymentStatusTypeHandler" />
+            <result property="payDate" column="PaymentPayedDate" />
+            <result property="updatedDate" column="PaymentUpdatedDate" />
+        </association>
+        <collection property="orderItems" column="OrderItemId" ofType="com.supshop.suppingmall.order.OrderItem">
             <id property="orderItemId" column="OrderItemId" />
+            <result property="count" column="OrderItemCount" />
+            <result property="price" column="OrderItemPrice" />
+            <association property="product" javaType="com.supshop.suppingmall.product.Product">
+                <id property="productId" column="ProductId" />
+                <result property="name" column="ProductName" />
+                <result property="price" column="ProductPrice" />
+                <result property="thumbnail" column="ProductThumbnail" />
+            </association>
+            <association property="productOption" javaType="com.supshop.suppingmall.product.ProductOption">
+                <id property="productId" column="ProductId" />
+                <id property="optionId" column="ProductOptionId" />
+                <result property="optionName" column="ProductOptionName" />
+                <result property="price" column="ProductOptionPrice" />
+                <result property="quantity" column="ProductOptionQuantity" />
+            </association>
         </collection>
     </resultMap>
+
+    <select id="findOne" resultMap="order">
+        SELECT O.order_id AS "OrderId", O.status AS "OrderStatus", O.order_date AS "OrderDate", O.update_date AS "OrderUpdateDate",
+        B.user_id AS "BuyerId", B.nickName AS "BuyerNickName", S.user_id AS "SellerId", S.store_name AS "SellerStoreName",
+        S.store_phone_number AS "SellerStorePhoneNumber", D.delivery_id AS "DeliveryId", D.address AS "DeliveryAddress",
+        D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode", D.phone AS "DeliveryPhone",
+        D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo",
+        PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus",
+        PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
+        OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice",
+        P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail",
+        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity"
+        FROM Orders AS O
+        LEFT OUTER JOIN User AS B on (O.buyer_id = B.user_id)
+        LEFT OUTER JOIN User AS S on (O.seller_id = S.user_id)
+        LEFT OUTER JOIN Delivery AS D on (O.delivery_id = D.delivery_id)
+        LEFT OUTER JOIN Payment AS PA on (O.payment_id = PA.payment_id)
+        LEFT OUTER JOIN OrderItem AS OI on (O.order_id = OI.order_id)
+        LEFT OUTER JOIN Product AS P on (OI.product_id = P.product_id)
+        LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
+        WHERE O.order_id = #{orderId}
+    </select>
 
     <insert id="save" parameterType="com.supshop.suppingmall.order.Orders" useGeneratedKeys="true" keyProperty="orderId">
         INSERT INTO Orders (
         buyer_id,
         seller_id,
         status,
-        ordered_date
+        order_date
         )
         VALUES (
         #{buyer.userId},
@@ -31,4 +94,13 @@
         )
     </insert>
 
+    <update id="order" parameterType="com.supshop.suppingmall.order.Orders">
+        update orders
+        set
+        status = #{status, typeHandler=com.supshop.suppingmall.order.OrderStatusTypeHandler},
+        delivery_id = #{deliveryId},
+        payment_id = #{paymentId},
+        update_date = now()
+        where order_id = #{orderId};
+    </update>
 </mapper>
