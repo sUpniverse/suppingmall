@@ -2,6 +2,7 @@ package com.supshop.suppingmall.mapper;
 
 import com.supshop.suppingmall.order.Orders;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface OrderMapper {
@@ -11,4 +12,6 @@ public interface OrderMapper {
     Optional<Orders> findOne(Long orderId);
 
     void order(Long orderId,Orders.OrderStatus status,Long deliveryId, Long paymentId);
+
+    List<Orders> findAll();
 }

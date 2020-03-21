@@ -83,7 +83,7 @@ public class ProductServiceTest {
 
         //when
         productService.createProduct(product);
-        Product product1 = productService.retrieveProduct(product.getProductId());
+        Product product1 = productService.findProduct(product.getProductId());
 
         //then
         assertThat(product1.getName()).isEqualTo(product.getName());

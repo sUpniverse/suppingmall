@@ -49,6 +49,8 @@
                     <div class="col-12 col-md-6 pl-lg-10">
                         <form role="form">
                             <input type="hidden" name="productId" th:value="${product.productId}">
+                            <input type="hidden" name="buyerId" th:value="${session.user.userId}">
+                            <input type="hidden" name="sellerId" th:value="${product.seller.userId}">
                             <input type="hidden" name="orderItems" id="orderItemJson">
                             <!-- manufacturer -->
                             <div class="font-weight-bold">
@@ -329,9 +331,9 @@
             var orderItemJson = setOrderItemJson();
             document.getElementById("orderItemJson").setAttribute('value',JSON.stringify(orderItemJson));
             console.log(orderItemJson);
-            // formObj.attr("action","/orders/orderSheet");
-            // formObj.attr("method","post");
-            // formObj.submit();
+            formObj.attr("action","/orders/orderSheet");
+            formObj.attr("method","post");
+            formObj.submit();
         });
 
     });

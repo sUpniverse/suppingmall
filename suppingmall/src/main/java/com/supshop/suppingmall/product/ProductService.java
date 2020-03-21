@@ -18,7 +18,7 @@ public class ProductService {
         return productMapper.selectAllProduct();
     }
 
-    public Product retrieveProduct(Long id) {
+    public Product findProduct(Long id) {
       return productMapper.selectProduct(id);
     }
 

@@ -175,7 +175,7 @@
         price = #{productOption.price},
         quantity = #{productOption.quantity}
         where
-        product_id = #{productOption.productId} AND product_option_id = #{productOption.optionId}
+        product_id = #{productOption.productId} AND product_option_id = #{productOption.optionId};
         </foreach>
     </update>
 

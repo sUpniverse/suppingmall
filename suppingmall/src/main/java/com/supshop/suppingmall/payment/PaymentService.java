@@ -16,6 +16,12 @@ public class PaymentService {
 
     @Transactional
     public Long save(Payment payment) {
+        Payment.PayGroupType paymentType = payment.getPaymentType();
+        if(paymentType.equals(Payment.PayGroupType.CARD)) {
+            payment.setStatus(Payment.PaymentStatus.COMPLETE);
+        } else if(paymentType.equals(Payment.PayGroupType.CASH)) {
+            payment.setStatus(Payment.PaymentStatus.BACKING_CHECKED);
+        }
         paymentMapper.save(payment);
         return payment.getPaymentId();
     }

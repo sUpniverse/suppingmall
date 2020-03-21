@@ -50,7 +50,7 @@ public class OrdersServiceTest {
         //상품정보
         List<OrderItemForm> orderItems = new ArrayList<>();
 
-        Product product = productService.retrieveProduct(23l);
+        Product product = productService.findProduct(23l);
         Product newProduct = Product.builder().productId(23l).build();
 
         List<ProductOption> options = new ArrayList<>();
@@ -109,7 +109,7 @@ public class OrdersServiceTest {
         //상품정보
         List<OrderItemForm> orderItems = new ArrayList<>();
 
-        Product product = productService.retrieveProduct(23l);
+        Product product = productService.findProduct(23l);
         Product newProduct = Product.builder().productId(23l).build();
 
         List<ProductOption> options = new ArrayList<>();

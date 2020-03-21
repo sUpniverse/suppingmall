@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.net.URI;
 import java.util.List;
 
 @RequestMapping("/products")
@@ -49,7 +48,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public String getProduct(@PathVariable Long id, Model model) {
-        Product product = productService.retrieveProduct(id);
+        Product product = productService.findProduct(id);
         model.addAttribute("product",product);
         return "/product/product";
     }

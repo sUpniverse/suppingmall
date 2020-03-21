@@ -36,6 +36,11 @@ public class OrderService {
         return order.orElseThrow(NoSuchElementException::new);
     }
 
+    public List<Orders> findOrders() {
+        List<Orders> ordersList = orderMapper.findAll();
+        return ordersList;
+    }
+
     @Transactional
     public Long order(OrderForm orderForm) {
 
@@ -109,9 +114,9 @@ public class OrderService {
         List<OrderItem> orderItems = this.setJsonToOrderItem(tempOrderForm.getOrderItems());
 
         // 상품조회
-        Product product = productService.retrieveProduct(orderItems.get(0).getProduct().getProductId());
+        Product product = productService.findProduct(tempOrderForm.getProductId());
 
-
+        // 가져온 상품정보를 이용해 상품 옵션의 필요내용 설정
         for (OrderItem orderItem : orderItems) {
             int optionId = orderItem.getProductOption().getOptionId();
             orderItem.setProductOption(product.getOptions().get(optionId - 1));

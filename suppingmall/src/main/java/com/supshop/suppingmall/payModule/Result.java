@@ -9,8 +9,9 @@ import java.io.Serializable;
 @Builder @ToString
 public class Result implements Serializable {
 
-    private Long uid;
+    private String uid;
     private Long merchant_uid;
+    private String apply_num;
+    private String pay_method;
     private int paid_amount;
-    private Long apply_num;
 }

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <div th:include="fragments/header :: header" />
+</head>
+<body>
+<div class="container">
+    <header th:replace="product/product-nav :: product-nav" />
+</div>
+<div>
+    <h1>주문이 완료 되었습니다.</h1>
+    <a class="btn btn-primary" href="/products/">상품리스트로</a>
+    <a class="btn btn-primary" href="/orders/">주문내역으로</a>
+</div>
+</body>
+</html>
