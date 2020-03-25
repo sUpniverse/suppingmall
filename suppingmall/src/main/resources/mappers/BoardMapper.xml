@@ -11,7 +11,7 @@
         <result property="delYn" column="BoardDelYn" />
         <result property="createdDate" column="BoardCreatedDate" />
         <result property="updatedDate" column="BoardUpdatedDate" />
-        <association property="creator" javaType="com.supshop.suppingmall.user.User">
+        <association property="creator" javaType="com.supshop.suppingmall.user.UserVO">
             <id property="userId" column="UserId" />
             <result property="email" column="UserEmail" />
             <result property="nickName" column="UserNickName" />
@@ -48,7 +48,7 @@
         LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
         <include refid="conditionalSearch"></include>
         ORDER BY B.board_id desc
-        limit #{criteria.pageStart}, #{criteria.perPageNum}
+        limit #{boardCriteria.pageStart}, #{boardCriteria.perPageNum}
     </select>
 
     <sql id="conditionalSearch">

@@ -26,7 +26,9 @@
                     </thead>
                     <tbody>
                         <tr th:each="board : ${boardList}">
-                            <td><a class="text-dark" th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}}"></a></td>
+                            <td>
+                                <a class="text-dark" th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}}" ></a>
+                            </td>
                             <td th:text="${board.creator.nickName}" />
                             <td class="text-center" th:text="${board.hit}"/>
                             <td th:text="${board.createdDate}" />
@@ -39,13 +41,13 @@
                     <nav aria-label="Page navigation example">
                         <ul class="pagination mx-auto">
                             <li class="page-item">
-                                <a class="page-link text-dark" th:if="${pageMaker.prev}" th:href="@{'/boards?page='+${pageMaker.startPage - 1}}" aria-label="Previous">
+                                <a class="page-link text-dark" th:if="${boardPageMaker.prev}" th:href="@{'/boards?page='+${boardPageMaker.startPage - 1}}" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
-                            <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:if="${pageMaker.criteria.page == idx} ? 'class = active': ''"><a class="page-link text-dark" th:href="@{'/boards?page='+${idx}}">[[${idx}]]</a></li>
-                            <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">
-                                <a class="page-link text-dark" th:href="@{'/boards?page='+${pageMaker.endPage + 1}}" aria-label="Next">
+                            <li class="page-item" th:each="idx : ${#numbers.sequence(boardPageMaker.startPage,boardPageMaker.endPage)}" th:if="${boardPageMaker.boardCriteria.page == idx} ? 'class = active': ''"><a class="page-link text-dark" th:href="@{'/boards?page='+${idx}}">[[${idx}]]</a></li>
+                            <li class="page-item" th:if="${boardPageMaker.next && boardPageMaker.endPage > 0}">
+                                <a class="page-link text-dark" th:href="@{'/boards?page='+${boardPageMaker.endPage + 1}}" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>

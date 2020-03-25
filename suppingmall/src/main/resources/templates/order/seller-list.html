@@ -15,21 +15,10 @@
 <header th:replace="product/product-nav-dark :: product-nav-dark" />
 <div class="container mt-5">
     <h3>주문내역</h3>
-    <table class="d-flex p-3 my-3 bg-light rounded shadow-sm mt-5 border">
-        <tr>
-            <td>
-                <div class="row row-cols-3">
-                    <input type="date" id="fromDate" class="form-control col">
-                    <span class="col">~</span>
-                    <input type="date" id="toDate" class="form-control col">
-                </div>
-            </td>
-            <td>
-                <a class="btn btn-success" href="javascript:search()">조회</a>
-            </td>
-        </tr>
-    </table>
-    <ul class="mt-5">
+    <div class="border">
+
+    </div>
+    <ul>
         <li th:each="order : ${orders}" class="row border-bottom mt-4 pb-4">
             <div class="col row">
                 <a th:href="@{'/orders/'+${order.orderId}}">
@@ -40,7 +29,7 @@
                         <span th:text="${order.orderItems[0].product.name}" class="text-dark" style="font-size: 16px"></span>
                         <ul class="container row">
                             <li>
-                               <span th:text="@{${#numbers.formatInteger(order.getAmountPrice(),3,'COMMA')}+'원'}" class="text-dark" style="font-size: 13px;"></span>
+                                <span th:text="@{${#numbers.formatInteger(order.getAmountPrice(),3,'COMMA')}+'원'}" class="text-dark" style="font-size: 13px;"></span>
                             </li>
                             <li>
                                 <span th:text="${order.orderDate}" class="text-muted" style="font-size: 13px; display: inline-block; padding-left: 11px"></span>
@@ -62,14 +51,5 @@
         </li>
     </ul>
 </div>
-<script>
-
-   function search() {
-        var fromDate = document.getElementById('fromDate').value;
-        var toDate = document.getElementById('toDate').value;
-        console.log("1 : " +fromDate +" 2 :" +toDate);
-        $(location).attr('href','/orders/main?fromDate=' + fromDate + '&toDate=' + toDate);
-    }
-</script>
 </body>
 </html>

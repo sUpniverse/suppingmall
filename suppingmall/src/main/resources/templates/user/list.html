@@ -52,13 +52,13 @@
         <nav aria-label="Page navigation example">
             <ul class="pagination mx-auto">
                 <li class="page-item">
-                    <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/users?page='+${pageMaker.startPage - 1}}" aria-label="Previous">
+                    <a class="page-link" th:if="${boardPageMaker.prev}" th:href="@{'/users?page='+${boardPageMaker.startPage - 1}}" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
-                <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:if="${pageMaker.criteria.page.equals(idx) ? 'class = active': ''}"><a class="page-link" th:href="@{'/users?page='+${idx}}">[[${idx}]]</a></li>
-                <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">
-                    <a class="page-link" th:href="@{'/users?page='+${pageMaker.endPage + 1}}" aria-label="Next">
+                <li class="page-item" th:each="idx : ${#numbers.sequence(boardPageMaker.startPage,boardPageMaker.endPage)}" th:if="${boardPageMaker.boardCriteria.page.equals(idx) ? 'class = active': ''}"><a class="page-link" th:href="@{'/users?page='+${idx}}">[[${idx}]]</a></li>
+                <li class="page-item" th:if="${boardPageMaker.next && boardPageMaker.endPage > 0}">
+                    <a class="page-link" th:href="@{'/users?page='+${boardPageMaker.endPage + 1}}" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>

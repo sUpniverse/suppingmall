@@ -1,6 +1,6 @@
 package com.supshop.suppingmall.mapper;
 
-import com.supshop.suppingmall.page.Criteria;
+import com.supshop.suppingmall.page.BoardCriteria;
 import com.supshop.suppingmall.user.User;
 
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface UserMapper {
 
-    List<User> selectAllUser(Criteria criteria, String type, String searchValue);
+    List<User> selectAllUser(BoardCriteria boardCriteria, String type, String searchValue);
 
     User selectUser(Long id);
 
@@ -24,5 +24,5 @@ public interface UserMapper {
 
     void patchUser(Long id, User user);
 
-    List<User> selectAllStore(Criteria criteria, String type, String searchValue);
+    List<User> selectAllStore(BoardCriteria boardCriteria, String type, String searchValue);
 }

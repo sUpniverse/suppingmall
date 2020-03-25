@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @Getter @Setter
 @ToString
-public class PageMaker {
+public class BoardPageMaker {
 
     private int totalCount;
     private int startPage;
@@ -16,7 +16,7 @@ public class PageMaker {
 
     private static final int displayPageNum = 5;
 
-    private Criteria criteria;
+    private BoardCriteria boardCriteria;
 
     public void setTotalCount(int totalCount) {
         this.totalCount = totalCount;
@@ -24,10 +24,10 @@ public class PageMaker {
     }
 
     private void calcData() {
-        this.endPage = (int) (Math.ceil(criteria.getPage() / (double) displayPageNum) * displayPageNum);
+        this.endPage = (int) (Math.ceil(boardCriteria.getPage() / (double) displayPageNum) * displayPageNum);
         this.startPage = (endPage - displayPageNum) + 1;
 
-        int tempEndPage = (int) (Math.ceil(totalCount / (double) criteria.perPageNum));
+        int tempEndPage = (int) (Math.ceil(totalCount / (double) boardCriteria.perPageNum));
 
         if( this.endPage > tempEndPage) {
             this.endPage = tempEndPage;
@@ -35,7 +35,7 @@ public class PageMaker {
 
         this.prev = this.startPage == 1 ? false : true;
 
-        this.next = this.endPage * criteria.perPageNum >= totalCount ? false : true;
+        this.next = this.endPage * boardCriteria.perPageNum >= totalCount ? false : true;
     }
 
 }

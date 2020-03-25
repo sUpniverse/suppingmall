@@ -2,19 +2,21 @@ package com.supshop.suppingmall.order;
 
 import com.supshop.suppingmall.common.SessionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequestMapping("/orders")
 @RequiredArgsConstructor
 @Controller
+@Slf4j
 public class OrderController {
 
     private final OrderService orderService;
@@ -49,8 +51,32 @@ public class OrderController {
     }
 
     @GetMapping("")
-    public String getOrder(HttpSession session, Model model) {
-        List<Orders> orders = orderService.findOrders();
+    public String getOrders(@RequestParam(required = false) @DateTimeFormat(pattern = "YYYY-MM-dd") LocalDate fromDate,
+                            @RequestParam(required = false) @DateTimeFormat(pattern = "YYYY-MM-dd") LocalDate toDate,
+                            @RequestParam(required = false) String type,
+                            HttpSession session,
+                            Model model) {
+        List<Orders> orders = orderService.findOrders(fromDate,toDate);
+        model.addAttribute("orders",orders);
+        return "/order/list";
+    }
+
+    @GetMapping("/{id}")
+    public String getOrder(@PathVariable Long id, HttpSession session, Model model) {
+        Orders order = orderService.findOrder(id);
+        model.addAttribute("order",order);
+        return "/order/detail";
+    }
+
+    @GetMapping("/main")
+    public String getOrderById(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+                               @RequestParam(required = false) String type,
+                               @RequestParam(required = false) String searchValue,
+                               HttpSession session,
+                               Model model) {
+        Long userId = SessionService.getSessionUser(session).getUserId();
+        List<Orders> orders = orderService.findOrderByBuyerId(userId,fromDate,toDate,type,searchValue);
         model.addAttribute("orders",orders);
         return "/order/list";
     }

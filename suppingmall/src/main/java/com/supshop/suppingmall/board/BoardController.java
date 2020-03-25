@@ -1,7 +1,7 @@
 package com.supshop.suppingmall.board;
 
-import com.supshop.suppingmall.page.Criteria;
-import com.supshop.suppingmall.page.PageMaker;
+import com.supshop.suppingmall.page.BoardCriteria;
+import com.supshop.suppingmall.page.BoardPageMaker;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserVO;
 import lombok.extern.slf4j.Slf4j;
@@ -34,15 +34,15 @@ public class BoardController {
 
     @GetMapping("")
     public String getAllBoard(Model model,
-                              Criteria criteria,
+                              BoardCriteria boardCriteria,
                               @RequestParam(required = false) String type,
                               @RequestParam(required = false) String searchValue) {
         log.debug("'getAllBoard'가 실행됨");
-        model.addAttribute(boardService.getBoardByCondition(criteria,type,searchValue));
-        PageMaker pageMaker = new PageMaker();
-        pageMaker.setCriteria(criteria);
-        pageMaker.setTotalCount(boardService.getBoardCount());
-        model.addAttribute("pageMaker",pageMaker);
+        model.addAttribute(boardService.getBoardByCondition(boardCriteria,type,searchValue));
+        BoardPageMaker boardPageMaker = new BoardPageMaker();
+        boardPageMaker.setBoardCriteria(boardCriteria);
+        boardPageMaker.setTotalCount(boardService.getBoardCount());
+        model.addAttribute("pageMaker", boardPageMaker);
         return "/board/list";
     }
 

@@ -13,10 +13,14 @@ import com.supshop.suppingmall.product.ProductService;
 import com.supshop.suppingmall.user.UserService;
 import com.supshop.suppingmall.user.UserVO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -36,8 +40,36 @@ public class OrderService {
         return order.orElseThrow(NoSuchElementException::new);
     }
 
-    public List<Orders> findOrders() {
-        List<Orders> ordersList = orderMapper.findAll();
+    public List<Orders> findOrderByBuyerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, String searchValue) {
+        if(fromDate == null && toDate == null) {
+            List<Orders> ordersList = orderMapper.findByBuyerId(userId, null, null, type, searchValue);
+            return ordersList;
+        }
+        LocalDateTime formDateTime = fromDate.atStartOfDay();
+        LocalDateTime toDateTime = toDate.atTime(23, 59);
+        List<Orders> ordersList = orderMapper.findByBuyerId(userId, formDateTime, toDateTime, type, searchValue);
+        return ordersList;
+    }
+
+    public List<Orders> findOrderBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, String searchValue) {
+        if(fromDate == null && toDate == null) {
+            List<Orders> ordersList = orderMapper.findBySellerId(userId, null, null, type, searchValue);
+            return ordersList;
+        }
+        LocalDateTime formDateTime = fromDate.atStartOfDay();
+        LocalDateTime toDateTime = toDate.atTime(23, 59);
+        List<Orders> ordersList = orderMapper.findBySellerId(userId, formDateTime, toDateTime, type, searchValue);
+        return ordersList;
+    }
+
+    public List<Orders> findOrders(LocalDate fromDate, LocalDate toDate) {
+        if(fromDate == null && toDate == null) {
+            List<Orders> ordersList = orderMapper.findAll(null, null);
+            return ordersList;
+        }
+        LocalDateTime formDateTime = fromDate.atStartOfDay();
+        LocalDateTime toDateTime = toDate.atTime(23, 59);
+        List<Orders> ordersList = orderMapper.findAll(formDateTime, toDateTime);
         return ordersList;
     }
 
@@ -72,6 +104,28 @@ public class OrderService {
 
         return order.getOrderId();
     }
+
+//    @Transactional
+//    public Long cancelOrder(Long orderId) {
+//        // 주문 가져오기
+//        Orders order = orderMapper.findOne(orderId).get();
+//
+//        // 주문 상태 변경
+//        order.setStatus(Orders.OrderStatus.CANCEL);
+//
+//        // 물품 수량 변경
+//        List<OrderItem> orderItems = order.getOrderItems();
+//        List<ProductOption> productOptionList = new ArrayList<>();
+//        for(OrderItem orderItem : orderItems) {
+//            ProductOption productOption = orderItem.getProductOption();
+//            productOption.addStock(orderItem.getCount());
+//            productOptionList.add(productOption);
+//        }
+//        productService.updateProductOption(productOptionList);
+//
+//        // 결제 취소
+//        return 1l;
+//    }
 
     @Transactional
     public Orders createOrder(TempOrderForm tempOrderForm) {

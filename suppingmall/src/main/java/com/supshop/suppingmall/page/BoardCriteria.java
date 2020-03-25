@@ -5,12 +5,12 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class Criteria {
+public class BoardCriteria {
 
     private int page;
     public static final int perPageNum = 10;
 
-    public Criteria() {
+    public BoardCriteria() {
         this.page = 1;
     }
 

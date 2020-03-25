@@ -2,11 +2,9 @@ package com.supshop.suppingmall.board;
 
 import com.supshop.suppingmall.comment.CommentService;
 import com.supshop.suppingmall.mapper.BoardMapper;
-import com.supshop.suppingmall.page.Criteria;
+import com.supshop.suppingmall.page.BoardCriteria;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,8 +23,8 @@ public class BoardService {
 
     public List<Board> getAllBoard() { return boardMapper.selectAllBoard(); }
 
-    public List<Board> getBoardByCondition(Criteria criteria, String type, String searchValue) {
-        return boardMapper.selectBoardByCondition(criteria, type, searchValue);
+    public List<Board> getBoardByCondition(BoardCriteria boardCriteria, String type, String searchValue) {
+        return boardMapper.selectBoardByCondition(boardCriteria, type, searchValue);
     }
 
     public int getBoardCount() {

@@ -36,8 +36,11 @@ public class Orders {
 
         WAIT("결제대기","O000"),
         ORDER("주문완료","O001"),
-        CANCEL("주문취소","O002"),
-        COMPLETE("구매확정","O003");
+        DELIVERY("배송","O002"),
+        COMPLETE("구매확정","O003"),
+        CANCEL("주문취소","O004"),
+        REFUND("반품요청","O005"),
+        CHANGE("교환요청","O006");
 
         private String title;
         private String code;

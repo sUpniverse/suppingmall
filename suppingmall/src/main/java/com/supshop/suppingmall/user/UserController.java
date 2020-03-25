@@ -1,7 +1,7 @@
 package com.supshop.suppingmall.user;
 
-import com.supshop.suppingmall.page.Criteria;
-import com.supshop.suppingmall.page.PageMaker;
+import com.supshop.suppingmall.page.BoardCriteria;
+import com.supshop.suppingmall.page.BoardPageMaker;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -48,15 +48,15 @@ public class UserController {
     @GetMapping("")
     public String getAllUser(Model model,
                              HttpSession session,
-                             Criteria criteria,
+                             BoardCriteria boardCriteria,
                              @RequestParam(required = false) String type,
                              @RequestParam(required = false) String searchValue) {
         if(!isLoginUser(session)) return "/user/login";
-        model.addAttribute(userService.getAllUser(criteria,type,searchValue));
-        PageMaker pageMaker = new PageMaker();
-        pageMaker.setCriteria(criteria);
-        pageMaker.setTotalCount(userService.getBoardCount());
-        model.addAttribute("pageMaker",pageMaker);
+        model.addAttribute(userService.getAllUser(boardCriteria,type,searchValue));
+        BoardPageMaker boardPageMaker = new BoardPageMaker();
+        boardPageMaker.setBoardCriteria(boardCriteria);
+        boardPageMaker.setTotalCount(userService.getBoardCount());
+        model.addAttribute("pageMaker", boardPageMaker);
         return "/user/list";
     }
 

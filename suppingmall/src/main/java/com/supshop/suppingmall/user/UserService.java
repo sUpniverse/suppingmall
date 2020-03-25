@@ -1,7 +1,7 @@
 package com.supshop.suppingmall.user;
 
 import com.supshop.suppingmall.mapper.UserMapper;
-import com.supshop.suppingmall.page.Criteria;
+import com.supshop.suppingmall.page.BoardCriteria;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,8 +30,8 @@ public class UserService implements UserDetailsService {
         this.modelMapper = modelMapper;
     }
 
-    public List<User> getAllUser(Criteria criteria, String type, String searchValue) {
-        return userMapper.selectAllUser(criteria,type,searchValue);
+    public List<User> getAllUser(BoardCriteria boardCriteria, String type, String searchValue) {
+        return userMapper.selectAllUser(boardCriteria,type,searchValue);
     }
 
     public int getBoardCount() {

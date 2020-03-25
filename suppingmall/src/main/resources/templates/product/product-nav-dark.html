@@ -1,21 +1,21 @@
-<header class="blog-header py-3" th:fragment="product-nav">
-    <div class="row flex-nowrap justify-content-between align-items-center">
+<header class="site-header py-3" th:fragment="product-nav-dark">
+    <div class="row flex-nowrap justify-content-center align-items-center">
         <div class="col-2">
-            <a class="text-muted" href="/boards">Farm으로</a>
+            <a class="d-md-inline-block" href="/boards">Farm으로</a>
         </div>
         <div class="col-4 text-center">
-            <a class="blog-header-logo text-dark" href="/products/">SuppingMall</a>
+            <a class="blog-header-logo d-md-inline-block" href="/products/">SuppingMall</a>
         </div>
         <div th:if="${session.user}" class="col-3 d-flex justify-content-end align-items-center">
-            <a class="text-muted" th:href="@{'/users/' + ${session.user.userId} + '/form'}">
+            <a class="d-md-inline-block" th:href="@{'/users/' + ${session.user.userId} + '/form'}">
                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 <내정보></내정보>
             </a>
-            <a class="btn btn-sm btn-outline-secondary mx-3" href="/users/logout">로그아웃</a>
+            <a class="btn btn-outline-dark mx-3" href="/users/logout">로그아웃</a>
         </div>
         <div th:unless="${session.user}" class="col-3 d-flex justify-content-end align-items-center">
-            <a class="btn btn-sm btn-outline-secondary" href="/users/signup">회원가입</a>
-            <a class="btn btn-sm btn-outline-secondary mx-3" href="/users/loginform">로그인</a>
+            <a class="btn btn-outline-dark btn-sm" href="/users/signup">회원가입</a>
+            <a class="btn btn-outline-dark btn-sm mx-3" href="/users/loginform">로그인</a>
         </div>
     </div>
 </header>
