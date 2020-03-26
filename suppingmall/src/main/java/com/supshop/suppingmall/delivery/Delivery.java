@@ -20,7 +20,7 @@ public class Delivery {
     private String memo;
     private String vendor; // 배송사
     private String trackingNumber; // 송장번호
-    private DeliveryStatus deliveryStatus; // 배송상태
+    private DeliveryStatus status; // 배송상태
 
 
     @Getter
@@ -36,10 +36,14 @@ public class Delivery {
 
 
         public static Delivery.DeliveryStatus getCode(String code) {
+            if(code == null) {
+                return null;
+            }
             return Arrays.stream(Delivery.DeliveryStatus.values())
                     .filter(v -> v.getCode().equals(code))
                     .findAny()
                     .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + code + "]"));
         }
+
     }
 }

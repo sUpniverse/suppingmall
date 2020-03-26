@@ -41,11 +41,11 @@
             <ul class="mt-5">
                 <li th:each="order : ${orders}" class="row border-bottom mt-4 pb-4">
                     <div class="col row">
-                        <a th:href="@{'/orders/'+${order.orderId}}">
+                        <a th:href="@{'/orders/'+${order.orderId}+'/seller'}">
                             <img th:src="${order.orderItems[0].product.thumbnail}" style="width: 90px; height: 90px">
                         </a>
                         <div class="ml-3">
-                            <a th:href="@{'/orders/'+${order.orderId}}" style="text-decoration: none;">
+                            <a th:href="@{'/orders/'+${order.orderId}+'/seller'}" style="text-decoration: none;">
                                 <span th:text="${order.orderItems[0].product.name}" class="text-dark" style="font-size: 16px"></span>
                                 <ul class="container row">
                                     <li>
@@ -62,27 +62,33 @@
                         </div>
                     </div>
                     <div class="col-md-auto">
-                        <span th:text="${order.seller.storeVO?.storeName}"></span>
-                        <span th:text="${order.seller.storeVO?.storePhoneNumber}"></span>
+                        <span th:text="${order.buyer.name}"></span>
+                        <br>
+                        <span class="text-muted" th:text="@{'('+${order.buyer.phoneNumber}+')'}" style="font-size: 14px"></span>
                     </div>
                     <div class="col col-lg-2  d-flex align-items-center">
-                        <button class="form-control">재구매</button>
+                        <div th:if="${#strings.equals(order.delivery?.status,'WAIT')}">
+                            <span class="text-center"  th:text="${order.delivery.status.title}"></span>
+                            <br>
+                            <button class="form-control">송장등록</button>
+                        </div>
+                        <span th:if="${#strings.equals(order.delivery?.status,'DELIVERY')}" th:text="@{'('+${order.delivery.trackingNumber}}"></span>
+                        <button class="form-control" th:if="${order.delivery?.status} == null">배송등록</button>
                     </div>
                 </li>
             </ul>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-1">
         </div>
     </div>
 </div>
 <script>
 
-   function search() {
+    function search() {
         var fromDate = document.getElementById('fromDate').value;
         var toDate = document.getElementById('toDate').value;
-       var status = document.getElementById('status').value;
-        console.log("1 : " +fromDate +" 2 :" +toDate);
-        $(location).attr('href','/orders/main?fromDate=' + fromDate + '&toDate=' + toDate + '&type=order&status=' + status);
+        var status = document.getElementById('status').value;
+        $(location).attr('href','/orders/seller/main?fromDate=' + fromDate + '&toDate=' + toDate +'&type=delivery&status=' + status);
     }
 </script>
 </body>

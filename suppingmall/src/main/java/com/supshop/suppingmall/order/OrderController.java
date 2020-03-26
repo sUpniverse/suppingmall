@@ -1,6 +1,7 @@
 package com.supshop.suppingmall.order;
 
 import com.supshop.suppingmall.common.SessionService;
+import com.supshop.suppingmall.delivery.Delivery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @RequestMapping("/orders")
@@ -69,15 +70,39 @@ public class OrderController {
     }
 
     @GetMapping("/main")
-    public String getOrderById(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
-                               @RequestParam(required = false) String type,
-                               @RequestParam(required = false) String searchValue,
-                               HttpSession session,
-                               Model model) {
+    public String getOrdersByBuyerId(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+                                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+                                    @RequestParam(required = false) String type,
+                                    @RequestParam(required = false) Orders.OrderStatus status,
+                                    HttpSession session,
+                                    Model model) {
+
         Long userId = SessionService.getSessionUser(session).getUserId();
-        List<Orders> orders = orderService.findOrderByBuyerId(userId,fromDate,toDate,type,searchValue);
+        List<Orders> orders = orderService.findOrderByBuyerId(userId,fromDate,toDate,type,status);
         model.addAttribute("orders",orders);
+        model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.values()));
         return "/order/list";
+    }
+
+    @GetMapping("/seller/main")
+    public String getOrdersBySellerId(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+                                     @RequestParam(required = false) String type,
+                                     @RequestParam(required = false) Delivery.DeliveryStatus status,
+                                     HttpSession session,
+                                     Model model) {
+
+        Long userId = SessionService.getSessionUser(session).getUserId();
+        List<Orders> orders = orderService.findOrderBySellerId(userId,fromDate,toDate,type,status);
+        model.addAttribute("orders",orders);
+        model.addAttribute("statusList", Arrays.asList(Delivery.DeliveryStatus.values()));
+        return "/order/seller/list";
+    }
+
+    @GetMapping("/{id}/seller")
+    public String getOrderBySellerId(@PathVariable Long id, HttpSession session, Model model) {
+        Orders order = orderService.findOrder(id);
+        model.addAttribute("order",order);
+        return "/order/seller/detail";
     }
 }

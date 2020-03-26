@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.mapper;
 
+import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.order.Orders;
 
 import java.time.LocalDate;
@@ -13,11 +14,11 @@ public interface OrderMapper {
 
     Optional<Orders> findOne(Long orderId);
 
-    void order(Long orderId,Orders.OrderStatus status,Long deliveryId, Long paymentId);
-
     List<Orders> findAll(LocalDateTime fromDate, LocalDateTime toDate);
 
     List<Orders> findByBuyerId(Long userId, LocalDateTime fromDate, LocalDateTime toDate, String type, String searchValue);
 
     List<Orders> findBySellerId(Long userId, LocalDateTime fromDate, LocalDateTime toDate, String type, String searchValue);
+
+    void updateOrder(Long orderId,Orders.OrderStatus status,Long deliveryId, Long paymentId);
 }

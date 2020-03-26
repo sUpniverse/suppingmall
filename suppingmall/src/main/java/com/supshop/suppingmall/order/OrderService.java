@@ -13,14 +13,17 @@ import com.supshop.suppingmall.product.ProductService;
 import com.supshop.suppingmall.user.UserService;
 import com.supshop.suppingmall.user.UserVO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -34,41 +37,34 @@ public class OrderService {
     private final OrderItemMapper orderItemMapper;
     private final PaymentService paymentService;
     private final DeliveryService deliveryService;
+    private static final String payModuleUrl = "/payModule";
 
     public Orders findOrder(Long orderId) {
         Optional<Orders> order = orderMapper.findOne(orderId);
         return order.orElseThrow(NoSuchElementException::new);
     }
 
-    public List<Orders> findOrderByBuyerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, String searchValue) {
-        if(fromDate == null && toDate == null) {
-            List<Orders> ordersList = orderMapper.findByBuyerId(userId, null, null, type, searchValue);
-            return ordersList;
-        }
-        LocalDateTime formDateTime = fromDate.atStartOfDay();
-        LocalDateTime toDateTime = toDate.atTime(23, 59);
-        List<Orders> ordersList = orderMapper.findByBuyerId(userId, formDateTime, toDateTime, type, searchValue);
+    //구매자의 관점에서 주문을 조회
+    public List<Orders> findOrderByBuyerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Orders.OrderStatus status) {
+        LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
+        LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(23, 59)).orElse(null);
+        String code = Optional.ofNullable(status).map(Orders.OrderStatus::getCode).orElse(null);
+        List<Orders> ordersList = orderMapper.findByBuyerId(userId, formDateTime, toDateTime, type,  code);
         return ordersList;
     }
 
-    public List<Orders> findOrderBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, String searchValue) {
-        if(fromDate == null && toDate == null) {
-            List<Orders> ordersList = orderMapper.findBySellerId(userId, null, null, type, searchValue);
-            return ordersList;
-        }
-        LocalDateTime formDateTime = fromDate.atStartOfDay();
-        LocalDateTime toDateTime = toDate.atTime(23, 59);
-        List<Orders> ordersList = orderMapper.findBySellerId(userId, formDateTime, toDateTime, type, searchValue);
+    //판매자의 관점에서 주문을 조회
+    public List<Orders> findOrderBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Delivery.DeliveryStatus status) {
+        LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
+        LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(23, 59)).orElse(null);
+        String code = Optional.ofNullable(status).map(Delivery.DeliveryStatus::getCode).orElse(null);
+        List<Orders> ordersList = orderMapper.findBySellerId(userId, formDateTime, toDateTime, type,  code);
         return ordersList;
     }
 
     public List<Orders> findOrders(LocalDate fromDate, LocalDate toDate) {
-        if(fromDate == null && toDate == null) {
-            List<Orders> ordersList = orderMapper.findAll(null, null);
-            return ordersList;
-        }
-        LocalDateTime formDateTime = fromDate.atStartOfDay();
-        LocalDateTime toDateTime = toDate.atTime(23, 59);
+        LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
+        LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(23, 59)).orElse(null);
         List<Orders> ordersList = orderMapper.findAll(formDateTime, toDateTime);
         return ordersList;
     }
@@ -100,32 +96,47 @@ public class OrderService {
         productService.updateProductOption(productOptionList);
 
         //주문상태 변경, 결제, 배송 내용 수정
-        orderMapper.order(order.getOrderId(),order.getStatus(),deliveryId,paymentId);
+        orderMapper.updateOrder(order.getOrderId(),order.getStatus(),deliveryId,paymentId);
 
         return order.getOrderId();
     }
 
-//    @Transactional
-//    public Long cancelOrder(Long orderId) {
-//        // 주문 가져오기
-//        Orders order = orderMapper.findOne(orderId).get();
-//
-//        // 주문 상태 변경
-//        order.setStatus(Orders.OrderStatus.CANCEL);
-//
-//        // 물품 수량 변경
-//        List<OrderItem> orderItems = order.getOrderItems();
-//        List<ProductOption> productOptionList = new ArrayList<>();
-//        for(OrderItem orderItem : orderItems) {
-//            ProductOption productOption = orderItem.getProductOption();
-//            productOption.addStock(orderItem.getCount());
-//            productOptionList.add(productOption);
-//        }
-//        productService.updateProductOption(productOptionList);
-//
-//        // 결제 취소
-//        return 1l;
-//    }
+    @Transactional
+    public Long cancelOrder(Long orderId) {
+
+        // 주문 가져오기
+        Orders order = orderMapper.findOne(orderId).get();
+
+        //결제 취소
+        String vendorCheckNumber = order.getPayment().getVendorCheckNumber();
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity entity = new HttpEntity(headers);
+        ResponseEntity<String> response = restTemplate.exchange(payModuleUrl, HttpMethod.DELETE, entity, String.class);
+        if(!response.getStatusCode().is2xxSuccessful()) {
+            //재 전송 RetryTemplate 같은걸 사용 예정
+            new RuntimeException("결제모듈 오류");
+        }
+
+        // 주문 상태 변경
+        order.setStatus(Orders.OrderStatus.CANCEL);
+
+        // 물품 수량 변경
+        List<OrderItem> orderItems = order.getOrderItems();
+        List<ProductOption> productOptionList = new ArrayList<>();
+        for(OrderItem orderItem : orderItems) {
+            ProductOption productOption = orderItem.getProductOption();
+            productOption.addStock(orderItem.getCount());
+            productOptionList.add(productOption);
+        }
+        productService.updateProductOption(productOptionList);
+
+        //주문상태 수정
+        orderMapper.updateOrder(order.getOrderId(), order.getStatus(),null,null);
+
+        // 결제 취소
+        return order.getOrderId();
+    }
 
     @Transactional
     public Orders createOrder(TempOrderForm tempOrderForm) {

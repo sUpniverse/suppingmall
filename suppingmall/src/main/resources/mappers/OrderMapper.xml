@@ -11,6 +11,8 @@
         <association property="buyer" javaType="com.supshop.suppingmall.user.UserVO" >
             <id property="userId" column="BuyerId" />
             <result property="nickName" column="BuyerNickName" />
+            <result property="name" column="BuyerName" />
+            <result property="phoneNumber" column="BuyerPhoneNumber" />
         </association>
         <association property="seller" javaType="com.supshop.suppingmall.user.UserVO" >
             <id property="userId" column="SellerId" />
@@ -29,6 +31,7 @@
             <result property="vendor" column="DeliveryVendor" />
             <result property="trackingNumber" column="DeliveryTrackingNumber" />
             <result property="memo" column="DeliveryMemo" />
+            <result property="status" column="DeliveryStatus" typeHandler="com.supshop.suppingmall.delivery.DeliveryStatusHandler" />
         </association>
         <association property="payment" javaType="com.supshop.suppingmall.payment.Payment">
             <id property="paymentId" column="PaymentId" />
@@ -63,7 +66,7 @@
         B.user_id AS "BuyerId", B.nickName AS "BuyerNickName", S.user_id AS "SellerId", S.store_name AS "SellerStoreName",
         S.store_phone_number AS "SellerStorePhoneNumber", D.delivery_id AS "DeliveryId", D.name AS "DeliveryName",
         D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode", D.phone AS "DeliveryPhone",
-        D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo",
+        D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
         PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus",
         PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
         OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice",
@@ -85,7 +88,7 @@
         B.user_id AS "BuyerId", B.nickName AS "BuyerNickName", S.user_id AS "SellerId", S.store_name AS "SellerStoreName",
         S.store_phone_number AS "SellerStorePhoneNumber", D.delivery_id AS "DeliveryId", D.name AS "DeliveryName",
         D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode", D.phone AS "DeliveryPhone",
-        D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo",
+        D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
         PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus",
         PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
         OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice",
@@ -106,10 +109,10 @@
 
     <select id="findBySellerId" resultMap="order">
         SELECT O.order_id AS "OrderId", O.status AS "OrderStatus", O.order_date AS "OrderDate", O.update_date AS "OrderUpdateDate",
-        B.user_id AS "BuyerId", B.nickName AS "BuyerNickName", S.user_id AS "SellerId", S.store_name AS "SellerStoreName",
-        S.store_phone_number AS "SellerStorePhoneNumber", D.delivery_id AS "DeliveryId", D.name AS "DeliveryName",
-        D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode", D.phone AS "DeliveryPhone",
-        D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo",
+        B.user_id AS "BuyerId", B.nickName AS "BuyerNickName", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber",
+        D.delivery_id AS "DeliveryId", D.name AS "DeliveryName", D.address AS "DeliveryAddress",
+        D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode", D.phone AS "DeliveryPhone",
+        D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
         PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus",
         PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
         OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice",
@@ -133,7 +136,7 @@
         B.user_id AS "BuyerId", B.nickName AS "BuyerNickName", S.user_id AS "SellerId", S.store_name AS "SellerStoreName",
         S.store_phone_number AS "SellerStorePhoneNumber", D.delivery_id AS "DeliveryId", D.name AS "DeliveryName",
         D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode", D.phone AS "DeliveryPhone",
-        D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo",
+        D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
         PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus",
         PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
         OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice",
@@ -153,8 +156,11 @@
 
     <sql id="conditionalSearch">
         <if test="type != null and searchValue != null">
-            <if test='type.equals("status")'>
+            <if test='type.equals("order")'>
                 AND O.status LIKE #{searchValue}
+            </if>
+            <if test='type.equals("delivery")'>
+                AND D.status LIKE #{searchValue}
             </if>
         </if>
         <if test="fromDate != null and toDate != null">
@@ -185,12 +191,18 @@
         )
     </insert>
 
-    <update id="order" parameterType="com.supshop.suppingmall.order.Orders">
+    <update id="updateOrder" parameterType="com.supshop.suppingmall.order.Orders">
         update orders
         set
-        status = #{status, typeHandler=com.supshop.suppingmall.order.OrderStatusTypeHandler},
-        delivery_id = #{deliveryId},
-        payment_id = #{paymentId},
+        <if test="status != null">
+            status = #{status, typeHandler=com.supshop.suppingmall.order.OrderStatusTypeHandler},
+        </if>
+        <if test="deliveryId != null">
+            delivery_id = #{deliveryId},
+        </if>
+        <if test="paymentId != null">
+            payment_id = #{paymentId},
+        </if>
         update_date = now()
         where order_id = #{orderId};
     </update>
