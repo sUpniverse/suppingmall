@@ -34,7 +34,7 @@ public class ModuleController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> cancelPay(@PathVariable Long id) {
+    public ResponseEntity<String> cancelPay(@PathVariable String id) {
 
         return ResponseEntity.ok().build();
     }

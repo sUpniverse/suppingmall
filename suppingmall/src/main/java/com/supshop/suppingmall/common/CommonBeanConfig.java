@@ -14,5 +14,9 @@ public class CommonBeanConfig {
         return new RestTemplateBuilder().build();
     }
 
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
 
 }

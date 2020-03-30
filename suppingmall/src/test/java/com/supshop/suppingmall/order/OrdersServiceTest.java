@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.order;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.payment.Payment;
@@ -15,8 +16,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,16 +34,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class OrdersServiceTest {
 
     @Autowired
-    ProductService productService;
+    private ProductService productService;
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @Autowired
-    OrderService orderService;
+    private OrderService orderService;
 
     @Autowired
-    PaymentService paymentService;
+    private PaymentService paymentService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Test
     @Transactional
@@ -167,23 +176,11 @@ public class OrdersServiceTest {
 
 
         //배송입력정보
-        Delivery delivery = Delivery.builder()
-                .name(user.getName())
-                .address(user.getAddress())
-                .address(user.getAddressDetail())
-                .zipCode(user.getZipCode())
-                .phone(user.getPhoneNumber())
-                .vendor("대한통운")
-                .build();
+        Delivery delivery = buildDelivery(user);
 
 
         // 결제정보
-        Payment payment = Payment.builder()
-                .paymentType(Payment.PayGroupType.CARD)
-                .price(order.getAmountPrice())
-                .status(Payment.PaymentStatus.COMPLETE)
-                .payDate(LocalDateTime.now())
-                .build();
+        Payment payment = buildPayment(order);
 
         OrderForm orderForm = new OrderForm();
         orderForm.setDelivery(delivery);
@@ -206,6 +203,120 @@ public class OrdersServiceTest {
         assertEquals(newOrder.getDelivery().getVendor(), delivery.getVendor());
         assertEquals(newOrder.getOrderItems().get(0).getProductOption().getQuantity(), order.getOrderItems().get(0).getProductOption().getQuantity());
 
+    }
+
+
+
+    @Test
+    @Transactional
+    public void cancelOrder() throws Exception {
+
+        //given
+        Orders orders = buildOrder();
+        OrderItem originOrderItem = orders.getOrderItems().get(0);
+
+
+        //when
+        orderService.cancelOrder(orders.getOrderId());
+        Orders order = orderService.findOrder(orders.getOrderId());
+        Long paymentId = order.getPayment().getPaymentId();
+        Payment payment = paymentService.findPayment(paymentId);
+        OrderItem orderItem = order.getOrderItems().get(0);
+
+
+        //then
+        assertEquals(Orders.OrderStatus.CANCEL,order.getStatus());
+        assertEquals(Payment.PaymentStatus.CANCEL,payment.getStatus());
+        assertEquals(originOrderItem.getProductOption().getQuantity() + orderItem.getCount(), orderItem.getProductOption().getQuantity());
+
+
+    }
+
+    private Orders buildOrder() throws JsonProcessingException {
+        //임시상품정보
+        Long tempOrderId = buildTempOrder();
+
+        //유저정보
+        User user = userService.getUser(19l);
+        UserVO userVO = UserVO.builder().userId(user.getUserId()).build();
+
+        Orders order = orderService.findOrder(tempOrderId);
+
+        //배송입력정보
+        Delivery delivery = buildDelivery(user);
+
+        // 결제정보
+        Payment payment = buildPayment(order);
+
+        //실제 주문
+        order(order, delivery, payment);
+
+        return order;
+    }
+
+    private Long order(Orders order, Delivery delivery, Payment payment) {
+        OrderForm orderForm = new OrderForm();
+        orderForm.setDelivery(delivery);
+        orderForm.setPayment(payment);
+        orderForm.setOrderId(order.getOrderId());
+        Long orderId = orderService.order(orderForm);
+        return orderId;
+    }
+
+    private Long buildTempOrder() throws JsonProcessingException {
+        List<OrderItemForm> orderItems = new ArrayList<>();
+
+        long productId = 23l;
+        Product product = productService.findProduct(productId);
+        Product newProduct = Product.builder().productId(productId).build();
+
+        List<ProductOption> options = new ArrayList<>();
+        ProductOption productOption = product.getOptions().get(1);
+        options.add(productOption);
+
+        int count = 2;
+        OrderItemForm orderItemForm = OrderItemForm.builder()
+                .product(newProduct)
+                .productOption(productOption)
+                .count(count)
+                .price(productOption.getPrice())
+                .build();
+        orderItems.add(orderItemForm);
+
+        TempOrderForm tempOrderForm = new TempOrderForm();
+        long buyerId = 19l;
+        tempOrderForm.setBuyerId(buyerId);
+        long sellerId = 18l;
+        tempOrderForm.setSellerId(sellerId);
+        tempOrderForm.setProductId(productId);
+
+        tempOrderForm.setOrderItems(objectMapper.writeValueAsString(orderItems));
+
+        Long orderId = orderService.createOrder(tempOrderForm).getOrderId();
+
+        return orderId;
+    }
+
+    private Payment buildPayment(Orders order) {
+
+        return Payment.builder()
+                .paymentType(Payment.PayGroupType.CARD)
+                .price(order.getAmountPrice())
+                .status(Payment.PaymentStatus.COMPLETE)
+                .payDate(LocalDateTime.now())
+                .vendorCheckNumber("vaf00")
+                .build();
+    }
+
+    private Delivery buildDelivery(User user) {
+        return Delivery.builder()
+                .name(user.getName())
+                .address(user.getAddress())
+                .address(user.getAddressDetail())
+                .zipCode(user.getZipCode())
+                .phone(user.getPhoneNumber())
+                .vendor("대한통운")
+                .build();
     }
 
 }

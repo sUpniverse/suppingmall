@@ -236,7 +236,6 @@
                 setPaymentInfo(data);
                 setDeliveryCheckNameNull();
 
-                console.log(document.getElementById("paymentType").value);
                 var formObj = $("form[role='form']");
                 formObj.attr("method","post");
                 formObj.attr("action","/orders");

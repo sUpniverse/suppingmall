@@ -43,5 +43,12 @@
         #{payDate}
         )
     </insert>
+    
+    <update id="updateStatus" parameterType="com.supshop.suppingmall.payment.Payment">
+        UPDATE payment SET
+        status = #{status, typeHandler=com.supshop.suppingmall.payment.PaymentStatusTypeHandler},
+        updated_date = now()
+        where payment_id = #{paymentId}
+    </update>
 
 </mapper>

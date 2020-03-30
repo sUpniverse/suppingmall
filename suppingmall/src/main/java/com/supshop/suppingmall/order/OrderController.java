@@ -105,4 +105,19 @@ public class OrderController {
         model.addAttribute("order",order);
         return "/order/seller/detail";
     }
+
+    @GetMapping("/cancelForm/{id}")
+    public String getCancelForm(@PathVariable Long id, HttpSession session, Model model) {
+        Orders order = orderService.findOrder(id);
+        model.addAttribute("order",order);
+        return "/order/cancel-form";
+    }
+
+    @PostMapping("/{id}/cancel")
+    public String cancelOrder(@PathVariable Long id, HttpSession session, Model model) {
+        orderService.cancelOrder(id);
+        Orders order = orderService.findOrder(id);
+        model.addAttribute("order",order);
+        return "/order/cancel";
+    }
 }

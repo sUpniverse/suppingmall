@@ -11,4 +11,6 @@ public interface PaymentMapper {
     Payment findOne(Long id);
 
     List<Payment> findAll();
+
+    void updateStatus(Payment payment);
 }

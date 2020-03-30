@@ -5,6 +5,7 @@ import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.delivery.DeliveryService;
 import com.supshop.suppingmall.mapper.OrderItemMapper;
 import com.supshop.suppingmall.mapper.OrderMapper;
+import com.supshop.suppingmall.payModule.ModuleController;
 import com.supshop.suppingmall.payment.Payment;
 import com.supshop.suppingmall.payment.PaymentService;
 import com.supshop.suppingmall.product.Product;
@@ -15,13 +16,14 @@ import com.supshop.suppingmall.user.UserVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -38,6 +40,9 @@ public class OrderService {
     private final PaymentService paymentService;
     private final DeliveryService deliveryService;
     private static final String payModuleUrl = "/payModule";
+    private final ObjectMapper objectMapper;
+    private final RestTemplate restTemplate;
+    private final ModuleController moduleController;
 
     public Orders findOrder(Long orderId) {
         Optional<Orders> order = orderMapper.findOne(orderId);
@@ -108,15 +113,20 @@ public class OrderService {
         Orders order = orderMapper.findOne(orderId).get();
 
         //결제 취소
-        String vendorCheckNumber = order.getPayment().getVendorCheckNumber();
-        RestTemplate restTemplate = new RestTemplate();
+        Long paymentId = order.getPayment().getPaymentId();
+        Payment payment = paymentService.findPayment(paymentId);
+        String vendorCheckNumber = payment.getVendorCheckNumber();
         HttpHeaders headers = new HttpHeaders();
         HttpEntity entity = new HttpEntity(headers);
-        ResponseEntity<String> response = restTemplate.exchange(payModuleUrl, HttpMethod.DELETE, entity, String.class);
+//        URI payModuleURI = UriComponentsBuilder.fromHttpUrl(payModuleUrl + "/" + vendorCheckNumber).build().toUri();
+//        ResponseEntity<String> response = restTemplate.exchange(payModuleURI, HttpMethod.DELETE, entity, String.class);
+        ResponseEntity<String> response = moduleController.cancelPay(vendorCheckNumber);
         if(!response.getStatusCode().is2xxSuccessful()) {
             //재 전송 RetryTemplate 같은걸 사용 예정
             new RuntimeException("결제모듈 오류");
         }
+        payment.setStatus(Payment.PaymentStatus.CANCEL);
+        paymentService.cancelPayment(payment);
 
         // 주문 상태 변경
         order.setStatus(Orders.OrderStatus.CANCEL);
@@ -197,7 +207,6 @@ public class OrderService {
      * @return List<OrderItem>
      */
     private List<OrderItem> setJsonToOrderItem(String orderItems) {
-        ObjectMapper objectMapper = new ObjectMapper();
         List<OrderItem> items = null;
 
         try {
