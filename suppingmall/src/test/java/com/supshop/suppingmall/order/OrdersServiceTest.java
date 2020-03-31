@@ -232,6 +232,21 @@ public class OrdersServiceTest {
 
     }
 
+    @Test
+    @Transactional
+    public void changeOrderStatus() throws Exception {
+        //given
+        Orders orders = buildOrder();
+
+        //when
+        orderService.updateOrderStatusByCancelOrRefund(orders.getOrderId(), Orders.OrderStatus.REFUND);
+        Orders changedOrder = orderService.findOrder(orders.getOrderId());
+
+        //then
+        assertEquals(Orders.OrderStatus.REFUND, changedOrder.getStatus());
+
+    }
+
     private Orders buildOrder() throws JsonProcessingException {
         //임시상품정보
         Long tempOrderId = buildTempOrder();

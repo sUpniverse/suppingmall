@@ -15,11 +15,11 @@ public class ProductService {
     private final ProductMapper productMapper;
 
     public List<Product> retrieveAllProduct() {
-        return productMapper.selectAllProduct();
+        return productMapper.findProducts();
     }
 
     public Product findProduct(Long id) {
-      return productMapper.selectProduct(id);
+      return productMapper.findProduct(id);
     }
 
     @Transactional
@@ -50,5 +50,9 @@ public class ProductService {
     @Transactional
     public void deleteProduct(Long id) {
         productMapper.deleteProduct(id);
+    }
+
+    public List<Product> findProductsBySellerId(Long userId) {
+        return productMapper.findProductsById(userId);
     }
 }

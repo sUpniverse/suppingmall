@@ -47,7 +47,7 @@
         </collection>
     </resultMap>
 
-    <select id="selectAllProduct" resultMap="product" >
+    <select id="findProducts" resultMap="product">
         SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice",
         P.registered_date AS "ProductRegisteredDate", P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory",
         P.thumbnail AS "ProductThumbnail", P.picture AS "ProductPicture", P.rating AS "ProductRating",
@@ -61,7 +61,7 @@
         LEFT OUTER JOIN Product_Option AS PO on (P.product_id = PO.product_id)
         LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
 <!--        <include refid="conditionalSearch"></include>-->
-        ORDER BY P.product_id, PO.product_option_id, PD.product_detail_id ASC
+        ORDER BY P.product_id ASC, PO.product_option_id ASC
     </select>
 
     <sql id="conditionalSearch">
@@ -76,11 +76,35 @@
                 <bind name="name" value="'%'+name+'%'"/>
                 AND P.name LIKE #{name}
             </if>
-            WHERE P.product_id = #{id} AND P.delYn = 'Y'
         </trim>
     </sql>
 
-    <select id="selectProduct" resultMap="product" >
+    <select id="findProductsById" resultMap="product">
+        SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice",
+        P.registered_date AS "ProductRegisteredDate", P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory",
+        P.thumbnail AS "ProductThumbnail", P.picture AS "ProductPicture", P.rating AS "ProductRating",
+        PD.product_detail_id AS "ProductDetailId", PD.as_number AS "ProductAsNumber", PD.manuplated_date AS "PrdouctManuplatedDate",
+        PD.contry_of_origin AS "ProductOrigin", PD.manufacturer AS "ProductManufacturer", PD.spec_1 AS "ProductSpec1",
+        PD.spec_2 AS "ProductSpec2",PD.spec_3 AS "ProductSpec3", PD.spec_4 AS "ProductSpec4", PD.spec_5 AS "ProductSpec5",
+        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.quantity AS "ProductOptionQuantity",
+        C.category_id AS "CategoryId", C.name AS "CategoryName"
+        FROM Product AS P
+        LEFT OUTER JOIN Product_Detail AS PD on (P.product_id = PD.product_id)
+        LEFT OUTER JOIN Product_Option AS PO on (P.product_id = PO.product_id)
+        LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
+        <include refid="conditionalSearchById"></include>
+        ORDER BY P.product_id DESC, PO.product_option_id ASC
+    </select>
+
+    <sql id="conditionalSearchById">
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="sellerId != null">
+                AND P.seller_id = #{sellerId}
+            </if>
+        </trim>
+    </sql>
+
+    <select id="findProduct" resultMap="product" >
         SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice",
         P.registered_date AS "ProductRegisteredDate", P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory",
         P.thumbnail AS "ProductThumbnail", P.picture AS "ProductPicture", P.rating AS "ProductRating", P.contents AS "ProductContents",

@@ -73,12 +73,12 @@
                     </td>
                     <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${item.productOption.optionId} > 1">
                         <div th:if="${#strings.equals(order.status,'DELIVERY')}">
-                            <a class="btn btn-danger btn-sm" href="#">반품신청</a>
+                            <a class="btn btn-danger btn-sm" th:href="@{'/orders/'+${order.orderId} +'/refundForm/'}">반품신청</a>
                             <br>
                             <a class="btn btn-warning btn-sm mt-1" href="#">교환신청</a>
                         </div>
                         <div th:if="${#strings.equals(order.status,'ORDER')}">
-                            <a class="btn btn-danger btn-sm" th:href="@{'/orders/cancelForm/'+${order.orderId}}">결제취소</a>
+                            <a class="btn btn-danger btn-sm" th:href="@{'/orders/'+${order.orderId} +'/cancelForm/'}">결제취소</a>
                         </div>
                     </td>
                 </tr>
@@ -197,7 +197,8 @@
                 </tr>
                 <tr>
                     <td colspan="3">
-                        결제수단 [[${order.payment.paymentType.title}]]
+                        <span>결제수단 [[${order.payment.paymentType.title}]]</span>
+                        <span class="text-danger" th:if="${#strings.equals(order.status,'CANCEL')}" th:text="${order.payment.status.title}"></span>
                     </td>
                 </tr>
             </table>

@@ -8,9 +8,10 @@ import java.util.List;
 
 public interface ProductMapper {
 
-    List<Product> selectAllProduct();
+    List<Product> findProducts();
+    List<Product> findProductsById(Long sellerId);
 
-    Product selectProduct(Long id);
+    Product findProduct(Long sellerId);
 
     void insertProduct(Product product);
     void addProductOptions(List<ProductOption> options);
@@ -21,4 +22,5 @@ public interface ProductMapper {
     void updateProductOption(List<ProductOption> productOptionList);
 
     void deleteProduct(Long id);
+
 }

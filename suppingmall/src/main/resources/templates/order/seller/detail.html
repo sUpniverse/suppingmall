@@ -80,6 +80,12 @@
                     <div th:if="${#strings.equals(order.status,'ORDER')}">
                         <a class="btn btn-danger btn-sm" href="#">결제취소</a>
                     </div>
+                    <div th:if="${#strings.equals(order.status,'REFUND')}">
+                        <a class="btn btn-danger btn-sm" href="#">반품확인</a>
+                    </div>
+                    <div th:if="${#strings.equals(order.status,'CHANGE')}">
+                        <a class="btn btn-danger btn-sm" href="#">교환완료</a>
+                    </div>
                 </td>
             </tr>
             </tbody>
@@ -197,7 +203,8 @@
                 </tr>
                 <tr>
                     <td colspan="3">
-                        결제수단 [[${order.payment.paymentType.title}]]
+                        <span>결제수단 [[${order.payment.paymentType.title}]]</span>
+                        <span class="text-danger" th:if="${#strings.equals(order.status,'CANCEL')}" th:text="${order.payment.status.title}"></span>
                     </td>
                 </tr>
             </table>

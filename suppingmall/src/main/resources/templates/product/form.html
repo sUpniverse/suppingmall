@@ -157,7 +157,7 @@
         // 옵션 추가 스크립트
         $(document).on('click',"#addOptionButton", () => {
             var count = $("#option_table tbody tr").length;
-            if(count < 20) {
+            if(count < 10) {
                 var orders = count + 1;
                 var option =
                     '<tr id="optionRow">\n' +
@@ -170,7 +170,7 @@
 
                 $("#option_table tbody tr:last").after(option);
             } else {
-                alert("옵션은 20개이상 추가가 불가능합니다.");
+                alert("옵션은 10개이상 추가가 불가능합니다.");
             }
         });
         

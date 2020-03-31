@@ -1,10 +1,12 @@
 package com.supshop.suppingmall.product;
 
 import com.supshop.suppingmall.category.CategoryService;
+import com.supshop.suppingmall.common.SessionService;
 import com.supshop.suppingmall.image.ImageController;
 import com.supshop.suppingmall.image.ImageService;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserVO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,17 +19,12 @@ import java.util.List;
 
 @RequestMapping("/products")
 @Controller
+@RequiredArgsConstructor
 public class ProductController {
 
     private final ProductService productService;
     private final CategoryService categoryService;
     private final ImageService imageService;
-
-    public ProductController(ProductService productService, CategoryService categoryService, ImageService imageService) {
-        this.productService = productService;
-        this.categoryService = categoryService;
-        this.imageService = imageService;
-    }
 
     @GetMapping("/form")
     public String form(HttpSession session,Model model) {
@@ -82,5 +79,14 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public String deleteProduct(@PathVariable Long id) {
         return "";
+    }
+
+    @GetMapping("/seller")
+    public String getProductsBySeller(HttpSession session,Model model) {
+        UserVO sessionUser = SessionService.getSessionUser(session);
+        List<Product> products = productService.findProductsBySellerId(sessionUser.getUserId());
+        model.addAttribute("user",sessionUser);
+        model.addAttribute("products",products);
+        return "/product/seller/list";
     }
 }

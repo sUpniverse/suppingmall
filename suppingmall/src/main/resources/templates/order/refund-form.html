@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <div th:include="fragments/header :: header" />
+</head>
+<body>
+<header th:replace="product/product-nav-dark :: product-nav-dark" />
+<div class="container-fluid  mt-5">
+    <h1>반품 요청</h1>
+    <table class="d-flex p-3 my-3 bg-light rounded shadow-sm mt-5 border">
+        <tr>
+            <td>
+                <strong>환불은 물품 접수 및 검수 뒤 환불됩니다.</strong>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span>반품 주소지 및 문의 내용은 아래내용을 참조하시기 바랍니다.</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                스토어이름
+            </td>
+            <td th:text="${order.seller.storeVO.storeName}"></td>
+        </tr>
+        <tr>
+            <td>
+                스토어 전화번호
+            </td>
+            <td th:text="${order.seller.storeVO.storePhoneNumber}"></td>
+        </tr>
+        <tr>
+            <td>
+                스토어 우편번호
+            </td>
+            <td th:text="${order.seller.storeVO.storeZipCode}"></td>
+        </tr>
+        <tr>
+            <td>
+                스토어 주소
+            </td>
+            <td th:text="@{${order.seller.storeVO.storeAddress} +' '+${order.seller.storeVO.storeAddressDetail}}"></td>
+        </tr>
+    </table>
+    <form role="form">
+        <table class="table table-default border-bottom">
+            <thead>
+            <tr class="text-center">
+                <th>상품주문번호</th>
+                <th>상품정보</th>
+                <th>상품금액(수량)</th>
+                <th class="bg-light border">배송비/판매자정보</th>
+                <th>총 금액</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${order.getOrderItems()}">
+                <td class="text-center align-middle" th:text="${item.orderItemId}"></td>
+                <td>
+                    <div class="row">
+                        <a th:href="@{'/product/'+${item.product.productId}}">
+                            <img th:src="${item.product.thumbnail}" style="width: 90px; height: 90px">
+                        </a>
+                        <div class="ml-3">
+                            <a th:href="@{'/product/'+${item.product.productId}}" th:text="${item.product.name}" class="text-dark" style="font-size: 16px">
+                            </a>
+                            <br>
+                            <span class="text-muted" th:text="@{'옵션명 : '+${item.productOption.optionName}}" style="font-size: 13px"></span>
+                        </div>
+                    </div>
+                </td>
+                <td class="text-center align-middle">
+                    <span th:text="@{${#numbers.formatInteger(item.price,3,'COMMA')}+'원'}" class="text-dark" style="font-size: 13px;"></span>
+                    <br>
+                    <span th:text="@{'('+${item.count}+'개)'}" style="font-size: 13px;"></span>
+                </td>
+                <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${item.productOption.optionId} > 1">
+                    <span th:text="@{${#numbers.formatInteger(item.product?.deliveryPrice,3,'COMMA')}+'원'}"></span>
+                    <br>
+                    <span class="text-muted" th:text="${order.seller.storeVO?.storeName}"></span>
+                    <br>
+                    <span class="text-muted" th:text="@{'('+${order.seller.storeVO?.storePhoneNumber}+')'}" style="font-size: 13px;"></span>
+                </td>
+                <td class="align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${item.productOption.optionId} > 1">
+                    <strong th:text="@{${#numbers.formatInteger(order.getAmountPrice(),3,'COMMA')}+'원'}"></strong>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="mt-5 align-middle text-center">
+            <button class="btn btn-danger" id="cancelOrder">취소하기</button>
+            <a class="btn btn-primary" th:href="@{'/orders/'+${order.orderId}}">되돌아가기</a>
+        </div>
+    </form>
+</div>
+</body>
+<script th:inline="javascript">
+    $(document).on('click','#cancelOrder',() => {
+        var formObj = $("form[role='form']");
+        formObj.attr("method","post");
+        formObj.attr("action","/orders/"+[[${order.orderId}]]+"/refund");
+        formObj.submit();
+    });
+
+</script>
+</html>

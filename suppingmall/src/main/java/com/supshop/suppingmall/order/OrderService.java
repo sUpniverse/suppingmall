@@ -106,6 +106,36 @@ public class OrderService {
         return order.getOrderId();
     }
 
+    //상품 교환 or 취소시
+    @Transactional
+    public Long updateOrderStatusByCancelOrRefund(Long orderId, Orders.OrderStatus orderStatus) {
+        orderMapper.updateOrder(orderId, orderStatus, null, null);
+        return orderId;
+    }
+
+    //상품교환 확정 시
+    @Transactional
+    public Long updateOrderByChange(Long orderId) {
+        // 주문 가져오기
+        Orders order = orderMapper.findOne(orderId).get();
+
+        // 받은 상품 개수에 반환된 물품개수 추가
+        List<OrderItem> orderItems = order.getOrderItems();
+        List<ProductOption> productOptionList = new ArrayList<>();
+        for(OrderItem orderItem : orderItems) {
+            ProductOption productOption = orderItem.getProductOption();
+            productOption.addStock(orderItem.getCount());
+            productOptionList.add(productOption);
+        }
+        productService.updateProductOption(productOptionList);
+
+        // 다시 보내야할 상품 개수를 통해 물품개수 감소
+
+
+        return orderId;
+    }
+
+    //주문 취소 (결제취소 + 제품환불시)
     @Transactional
     public Long cancelOrder(Long orderId) {
 
