@@ -18,7 +18,7 @@ public class Delivery {
     private String zipCode;
     private String phone;
     private String memo;
-    private String vendor; // 배송사
+    private DeliveryVendor vendor; // 배송사
     private String trackingNumber; // 송장번호
     private DeliveryStatus status; // 배송상태
 
@@ -45,5 +45,30 @@ public class Delivery {
                     .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + code + "]"));
         }
 
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public enum DeliveryVendor{
+
+        OFFICE("우체국택배","DV00"),
+        CJ("대한통운","DV01"),
+        HANJIN("한진택배","DV02"),
+        LOGEN("로젠택배","DV03"),
+        LOTTE("롯데택배","DV04");
+
+        private String title;
+        private String code;
+
+
+        public static Delivery.DeliveryVendor getCode(String code) {
+            if(code == null) {
+                return null;
+            }
+            return Arrays.stream(Delivery.DeliveryVendor.values())
+                    .filter(v -> v.getCode().equals(code))
+                    .findAny()
+                    .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + code + "]"));
+        }
     }
 }

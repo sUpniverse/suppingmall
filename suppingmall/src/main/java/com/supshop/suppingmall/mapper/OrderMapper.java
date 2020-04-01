@@ -21,4 +21,7 @@ public interface OrderMapper {
     List<Orders> findBySellerId(Long userId, LocalDateTime fromDate, LocalDateTime toDate, String type, String searchValue);
 
     void updateOrder(Long orderId,Orders.OrderStatus status,Long deliveryId, Long paymentId);
+
+    Orders findOneByDeliveryId(Long deliveryId);
+
 }

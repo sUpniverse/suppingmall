@@ -130,7 +130,7 @@ public class OrderController {
 
     @PostMapping("/{id}/refund")
     public String refundOrder(@PathVariable Long id, HttpSession session, Model model) {
-        orderService.updateOrderStatusByCancelOrRefund(id, Orders.OrderStatus.REFUND);
+        orderService.updateOrderStatus(id, Orders.OrderStatus.REFUND);
         Orders order = orderService.findOrder(id);
         model.addAttribute("order",order);
         return "/order/refund";

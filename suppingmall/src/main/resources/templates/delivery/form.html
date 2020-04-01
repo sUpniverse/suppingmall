@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <div th:include="fragments/header :: header" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" />
+    <style>
+        ul{
+            list-style:none;
+            padding: unset;
+        }
+    </style>
+</head>
+<body>
+
+<header th:replace="product/product-nav-dark :: product-nav-dark" />
+<div class="container-fluid">
+    <form role="form" th:id="vendor">
+        <table class="table table-default">
+            <tr>
+                <td>
+                    택배사
+                </td>
+                <td>
+                    <select class="form-control" name="vendor">
+                        <option selected>택배사를 선택해주세요</option>
+                        <option value="OFFICE">우체국</option>
+                        <option value="CJ">대한통운</option>
+                        <option value="HANJIN">한진택배</option>
+                        <option value="LOGEN">로젠택배</option>
+                        <option value="LOTTE">롯데택배</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    송장번호
+                </td>
+                <td>
+                    <input type="text" name="trackingNumber" class="form-control" placeholder="운송 번호를 -없이 입력해주세요">
+                </td>
+            </tr>
+        </table>
+        <div class="text-center">
+            <input th:id="submit" class="btn btn-primary" value="등록"></input>
+        </div>
+    </form>
+</div>
+</body>
+<script th:inline="javascript">
+    $(document).on('click','#submit',function () {
+
+        var vendorData = $('#vendor').serializeObject();
+        var deliveryId = [[${delivery.deliveryId}]];
+
+        $.ajax({
+            type: 'POST',
+            url: "/delivery/"+deliveryId+"/vendor",
+            data: JSON.stringify(vendorData),
+            dataType: 'text',
+            contentType: 'application/json',
+            success: () => {
+                window.opener.location.reload();
+                window.close();
+            },
+            error: (response, error) => {
+                alert("서버에 문제가 있습니다.")
+            }
+        })
+    });
+</script>
+<script>
+    jQuery.fn.serializeObject = function() {
+        var obj = null;
+        try {
+            if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) {
+                var arr = this.serializeArray();
+                if(arr){ obj = {};
+                    jQuery.each(arr, function() { obj[this.name] = this.value; });
+                }
+            }
+        } catch(e) {
+            alert(e.message);
+        } finally {}
+        return obj;
+    }
+</script>
+</html>

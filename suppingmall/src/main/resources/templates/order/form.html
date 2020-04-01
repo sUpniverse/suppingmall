@@ -121,7 +121,7 @@
                                                 -
                                                 <input type="text" class="form-control col" th:value="${#strings.substring(session.user.phoneNumber,7,11)}" id="phoneLast">
                                                 <input type="button" class="btn btn-outline-secondary col ml-2" id="verifyPhone" value="핸드폰 인증">
-                                                <input type="hidden" th:name="delivery.phone" th:id="phone">
+                                                <input type="hidden" th:name="delivery.phone" th:value="${session.user.phoneNumber}" th:id="phone">
                                             </div>
                                         </li>
                                         <li class="media text-muted pt-3">
@@ -262,6 +262,8 @@
             document.getElementById('newDelivery').setAttribute('style','display: block;');
 
             // input value 비우기
+            document.getElementById("phoneNumber").setAttribute("value","");
+            document.getElementById("phoneNumber").setAttribute("value","");
             document.getElementById("zipCode").setAttribute("value","");
             document.getElementById("address").setAttribute("value","");
             document.getElementById("addressDetail").setAttribute("value","");

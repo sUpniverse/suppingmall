@@ -20,10 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -74,12 +72,16 @@ public class OrderService {
         return ordersList;
     }
 
+    public Orders findOrderByDeliveryId(Long deliveryId) {
+        return orderMapper.findOneByDeliveryId(deliveryId);
+    }
+
     @Transactional
     public Long order(OrderForm orderForm) {
 
         //실제 주문 상태로 변경
         Orders order = orderMapper.findOne(orderForm.getOrderId()).get();
-        order.setStatus(Orders.OrderStatus.ORDER);
+        order.setStatus(Orders.OrderStatus.DELIVERY);
 
         //결제 내용 추가
         Payment payment = orderForm.getPayment();
@@ -108,7 +110,7 @@ public class OrderService {
 
     //상품 교환 or 취소시
     @Transactional
-    public Long updateOrderStatusByCancelOrRefund(Long orderId, Orders.OrderStatus orderStatus) {
+    public Long updateOrderStatus(Long orderId, Orders.OrderStatus orderStatus) {
         orderMapper.updateOrder(orderId, orderStatus, null, null);
         return orderId;
     }
@@ -246,7 +248,6 @@ public class OrderService {
         }
         return items;
     }
-
 
 
 

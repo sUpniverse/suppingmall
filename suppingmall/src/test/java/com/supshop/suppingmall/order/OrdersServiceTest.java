@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpMethod;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -239,7 +238,7 @@ public class OrdersServiceTest {
         Orders orders = buildOrder();
 
         //when
-        orderService.updateOrderStatusByCancelOrRefund(orders.getOrderId(), Orders.OrderStatus.REFUND);
+        orderService.updateOrderStatus(orders.getOrderId(), Orders.OrderStatus.REFUND);
         Orders changedOrder = orderService.findOrder(orders.getOrderId());
 
         //then
@@ -330,7 +329,7 @@ public class OrdersServiceTest {
                 .address(user.getAddressDetail())
                 .zipCode(user.getZipCode())
                 .phone(user.getPhoneNumber())
-                .vendor("대한통운")
+                .vendor(Delivery.DeliveryVendor.CJ)
                 .build();
     }
 

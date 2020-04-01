@@ -36,7 +36,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="item : ${order.getOrderItems()}">
+                <tr th:each="item,iter : ${order.getOrderItems()}">
                     <td class="text-center align-middle" th:text="${item.orderItemId}"></td>
                     <td>
                         <div class="row">
@@ -56,28 +56,28 @@
                         <br>
                         <span th:text="@{'('+${item.count}+'개)'}" style="font-size: 13px;"></span>
                     </td>
-                    <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${item.productOption.optionId} > 1">
+                    <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${iter.index} > 0">
                         <span th:text="@{${#numbers.formatInteger(item.product?.deliveryPrice,3,'COMMA')}+'원'}"></span>
                         <br>
-                        <span class="text-muted" th:text="${order.seller.storeVO?.storeName}"></span>
+                        <span class="text-muted" th:text="${order.seller.storeVO.storeName}"></span>
                         <br>
-                        <span class="text-muted" th:text="@{'('+${order.seller.storeVO?.storePhoneNumber}+')'}" style="font-size: 13px;"></span>
+                        <span class="text-muted" th:text="@{'('+${order.seller.storeVO.storePhoneNumber}+')'}" style="font-size: 13px;"></span>
                     </td>
-                    <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${item.productOption.optionId} > 1">
-                        <span th:unless="${#strings.equals(order.status,'DELIVERY')}" th:text="${order.status.title}"></span>
-                        <div th:if="${#strings.equals(order.status,'DELIVERY')}">
+                    <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${iter.index} > 0">
+                        <span th:if="${not #strings.equals(order.delivery.status,'DELIVERY')}" th:text="${order.status.title}"></span>
+                        <div th:if="${#strings.equals(order.delivery.status,'DELIVERY')}">
                             <span th:text="${order.delivery.status.title}"></span>
                             <br>
                             <button class="btn btn-success btn-sm" href="#">배송조회</button>
                         </div>
                     </td>
-                    <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${item.productOption.optionId} > 1">
-                        <div th:if="${#strings.equals(order.status,'DELIVERY')}">
+                    <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${iter.index} > 0">
+                        <div th:if="${#strings.equals(order.delivery.status,'DELIVERY')}">
                             <a class="btn btn-danger btn-sm" th:href="@{'/orders/'+${order.orderId} +'/refundForm/'}">반품신청</a>
                             <br>
                             <a class="btn btn-warning btn-sm mt-1" href="#">교환신청</a>
                         </div>
-                        <div th:if="${#strings.equals(order.status,'ORDER')}">
+                        <div th:if="${#strings.equals(order.delivery.status,'WAIT')}">
                             <a class="btn btn-danger btn-sm" th:href="@{'/orders/'+${order.orderId} +'/cancelForm/'}">결제취소</a>
                         </div>
                     </td>
@@ -208,5 +208,8 @@
         <a class="btn btn-info" href="/orders/main">목록</a>
     </div>
 </div>
+<script th:inline="javascript">
+    console.log([[${order.status}]]);
+</script>
 </body>
 </html>

@@ -4,14 +4,14 @@
 
 <mapper namespace="com.supshop.suppingmall.mapper.DeliveryMapper">
     <resultMap id="delivery" type="com.supshop.suppingmall.delivery.Delivery" autoMapping="true">
-        <id property="deliveryId" column="DeliveryDeliveryId" />
+        <id property="deliveryId" column="DeliveryId" />
         <result property="name" column="DeliveryName" />
         <result property="address" column="DeliveryAddress" />
         <result property="addressDetail" column="DeliveryAddressDetail" />
         <result property="zipCode" column="DeliveryZipCode" />
         <result property="phone" column="DeliveryPhone" />
         <result property="status" column="DeliveryStatus" />
-        <result property="vendor" column="DeliveryVendor" />
+        <result property="vendor" column="DeliveryVendor" typeHandler="com.supshop.suppingmall.delivery.DeliveryVendorHandler"/>
         <result property="trackingNumber" column="DeliveryTrackingNumber" />
         <result property="memo" column="DeliveryMemo" />
         <result property="status" column="DeliveryStatus" typeHandler="com.supshop.suppingmall.delivery.DeliveryStatusHandler" />
@@ -19,6 +19,7 @@
 
     <select id="findOne" resultMap="delivery">
         SELECT
+        D.delivery_id AS "DeliveryId",
         D.name AS "DeliveryName",D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode",
         D.phone AS "DeliveryPhone", D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo"
         FROM delivery AS D
@@ -44,10 +45,18 @@
         #{zipCode},
         #{phone},
         #{memo},
-        #{vendor},
+        #{vendor, typeHandler=com.supshop.suppingmall.delivery.DeliveryVendorHandler},
         #{trackingNumber},
         #{status, typeHandler=com.supshop.suppingmall.delivery.DeliveryStatusHandler}
         );
     </insert>
+
+    <update id="saveVendor">
+        UPDATE Delivery SET
+        vendor = #{delivery.vendor, typeHandler=com.supshop.suppingmall.delivery.DeliveryVendorHandler},
+        tracking_number = #{delivery.trackingNumber},
+        status = #{delivery.status, typeHandler=com.supshop.suppingmall.delivery.DeliveryStatusHandler}
+        WHERE delivery_id = #{deliveryId}
+    </update>
 
 </mapper>

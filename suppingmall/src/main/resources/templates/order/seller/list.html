@@ -67,13 +67,11 @@
                         <span class="text-muted" th:text="@{'('+${order.buyer.phoneNumber}+')'}" style="font-size: 14px"></span>
                     </div>
                     <div class="col col-lg-2  d-flex align-items-center text-center">
-                        <div th:if="${#strings.equals(order.delivery?.status,'WAIT')}">
-                            <span class="text-center"  th:text="${order.delivery.status.title}"></span>
-                            <br>
-                            <button class="form-control">송장등록</button>
+                        <div th:if="${#strings.equals(order.delivery?.status,'DELIVERY')}" >
+                            <span th:text="${order.delivery.vendor.title}"></span>
+                            <span th:text="@{'('+${order.delivery.trackingNumber} +')'}"></span>
                         </div>
-                        <span th:if="${#strings.equals(order.delivery?.status,'DELIVERY')}" th:text="@{'('+${order.delivery.trackingNumber}}"></span>
-                        <button class="form-control" th:if="${order.delivery?.status} == null">배송등록</button>
+                        <a class="form-control" href="#" th:href="'javascript:getDeliveryForm('+${order.delivery.deliveryId}+')'" th:if="${#strings.equals(order.delivery?.status,'WAIT')}">송장등록</a>
                     </div>
                 </li>
             </ul>
@@ -89,6 +87,10 @@
         var toDate = document.getElementById('toDate').value;
         var status = document.getElementById('status').value;
         $(location).attr('href','/orders/seller/main?fromDate=' + fromDate + '&toDate=' + toDate +'&type=delivery&status=' + status);
+    }
+
+    function getDeliveryForm(deliveryId) {
+        window.open("/delivery/"+deliveryId+"/form","_blank","width=500,height=600,left=500,top=100,menubar=no,toolbar=no,location=no");
     }
 </script>
 </body>

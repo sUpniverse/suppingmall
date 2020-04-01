@@ -24,7 +24,6 @@ public class DeliveryServiceTest {
     public void saveDelivery() throws Exception {
         //given
         UserVO user = userService.getUserVO(2l);
-        String vendor = "대한통운";
         String memo = "경비실에 맞겨주세요";
         Delivery delivery = Delivery.builder()
                 .name(user.getName())
@@ -32,7 +31,7 @@ public class DeliveryServiceTest {
                 .zipCode(user.getZipCode())
                 .address(user.getAddress())
                 .addressDetail(user.getAddressDetail())
-                .vendor(vendor)
+                .vendor(Delivery.DeliveryVendor.CJ)
                 .memo(memo)
                 .build();
         //when

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <div th:include="fragments/header :: header" />
+</head>
+<body>
+    <header th:replace="product/product-nav-dark :: product-nav-dark" />
+    <div class="container mt-5">
+        <h1>송장 입력이 완료 되었습니다.</h1>
+        <div class="container mt-5 text-center">
+            <a class="btn btn-primary" href="/orders/seller/main">상품리스트로</a>
+            <a class="btn btn-primary" href="/orders/main">주문내역으로</a>
+        </div>
+    </div>
+</body>
+</html>
