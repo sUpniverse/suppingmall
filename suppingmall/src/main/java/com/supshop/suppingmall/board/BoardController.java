@@ -42,7 +42,7 @@ public class BoardController {
         BoardPageMaker boardPageMaker = new BoardPageMaker();
         boardPageMaker.setBoardCriteria(boardCriteria);
         boardPageMaker.setTotalCount(boardService.getBoardCount());
-        model.addAttribute("pageMaker", boardPageMaker);
+        model.addAttribute("boardPageMaker", boardPageMaker);
         return "/board/list";
     }
 

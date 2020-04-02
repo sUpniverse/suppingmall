@@ -137,41 +137,23 @@
         <h4>반품/교환 정보</h4>
         <table class="mt-3 table table">
             <tr>
-                <th>
-                    판매자명
-                </th>
-                <td>
-
-                </td>
+                <th>판매자명</th>
+                <td th:text="${product.seller.storeVO.storeName}"></td>
             </tr>
             <tr>
-                <th>
-                    고객문의 대표번호
-                </th>
-                <td>
-
-                </td>
+                <th>고객문의 대표번호</th>
+                <td th:text="${product.seller.storeVO.storePhoneNumber}">
             </tr>
             <tr>
-                <th>
-                    반품/교환 배송비
-                </th>
-                <td>
-
-                </td>
+                <th>반품/교환 배송비</th>
+                <td th:text="${product.deliveryPrice}">
             </tr>
             <tr>
-                <th>
-                    반품/교환지 주소
-                </th>
-                <td>
-
-                </td>
+                <th>반품/교환지 주소</th>
+                <td th:text="@{${product.seller.storeVO.storeZipCode}+' '+${product.seller.storeVO.storeAddress}+' '+${product.seller.storeVO.storeAddressDetail}}">
             </tr>
             <tr>
-                <th>
-                    반품/교환 안내
-                </th>
+                <th> 반품/교환 안내</th>
                 <td>
 
                 </td>

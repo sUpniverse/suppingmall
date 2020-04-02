@@ -72,7 +72,7 @@
                         </div>
                     </td>
                     <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${iter.index} > 0">
-                        <div th:if="${#strings.equals(order.delivery.status,'DELIVERY')}">
+                        <div th:if="${#strings.equals(order.delivery.status ,'DELIVERY')}">
                             <a class="btn btn-danger btn-sm" th:href="@{'/orders/'+${order.orderId} +'/refundForm/'}">반품신청</a>
                             <br>
                             <a class="btn btn-warning btn-sm mt-1" href="#">교환신청</a>
