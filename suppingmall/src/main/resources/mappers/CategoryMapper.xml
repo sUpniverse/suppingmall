@@ -6,22 +6,46 @@
     <resultMap id="Category" type="com.supshop.suppingmall.category.Category" autoMapping="true">
         <id property="id" column="CategoryId" />
         <result property="name" column="CategoryName" />
+        <result property="memo" column="CategoryMemo" />
         <collection property="child" ofType="com.supshop.suppingmall.category.Category">
             <id property="id" column="ChildCategoryId" />
             <result property="name" column="ChildCategoryName" />
+            <result property="memo" column="CategoryMemo" />
         </collection>
     </resultMap>
 
+    <resultMap id="CategoryLazy" type="com.supshop.suppingmall.category.Category" autoMapping="true">
+        <id property="id" column="CategoryId" />
+        <result property="name" column="CategoryName" />
+        <result property="memo" column="CategoryMemo" />
+        <collection property="child" ofType="com.supshop.suppingmall.category.Category" fetchType="lazy" select="findOneByCategory" column="child.id" />
+        <collection property="parent" ofType="com.supshop.suppingmall.category.Category" fetchType="lazy" select="findOneByCategory" column="parent.id" />
+    </resultMap>
+
     <select id="findAll" resultMap="Category">
-        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName",
+        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName", C.memo AS "CategoryMemo",
         CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName"
         FROM category AS C
         LEFT OUTER JOIN category AS CH on (C.category_id = CH.parent_id)
         ORDER BY C.category_id ASC
     </select>
 
+    <select id="findAllByTop" resultMap="CategoryLazy">
+        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName", C.memo AS "CategoryMemo"
+        FROM category AS C
+        WHERE parent_id IS null
+        ORDER BY C.category_id ASC
+    </select>
+
+    <select id="findOneByCategory" resultMap="CategoryLazy">
+        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName", C.memo AS "CategoryMemo"
+        FROM category AS C
+        WHERE parent_id = #{id};
+        ORDER BY C.category_id ASC
+    </select>
+
     <select id="findOne" resultMap="Category">
-        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName",
+        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName",  C.memo AS "CategoryMemo",
         CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName"
         FROM category AS C
         LEFT OUTER JOIN category AS CH on (C.category_id = CH.parent_id)

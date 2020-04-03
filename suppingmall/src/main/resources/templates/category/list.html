@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:include="fragments/header :: header" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" />
+</head>
+<body>
+<div th:replace="fragments/navigation-fix :: navigation-fix" />
+<div class="container-fluid">
+    <div class="row">
+        <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
+        <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
+            <div>
+                <h3>카테고리 관리</h3>
+            </div>
+            <div>
+                <table class="table table-default">
+                    <tr>
+                        <th>상위 카테고리</th>
+                        <td class="form-row">
+                            <div class="col">
+                                <select class="form-control" th:id="category_top">
+                                    <option th:value="0" selected>선택하세요</option>
+                                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-control mx-3" th:id="category_middle">
+                                    <option th:value="0" selected>선택하세요</option>
+                                </select>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>카테고리명</th>
+                        <td>
+                            <input class="form-control">
+                        </td>
+                        <th>카테고리 메모</th>
+                        <td>
+                            <input class="form-control">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-2">
+            여기도 광고?
+        </div>
+    </div>
+</div>
+</body>
+<footer th:include="fragments/footer :: footer" />
+<script type="text/javascript" th:src="@{/js/getCategory.js}"></script>
+</html>

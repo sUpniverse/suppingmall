@@ -1,0 +1,16 @@
+<div class="container d-flex flex-column flex-md-row justify-content-between" th:fragment="navigation-div">
+    <a class="py-2" href="/">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="d-block mx-auto" role="img" viewBox="0 0 24 24" focusable="false"><title>Product</title><circle cx="12" cy="12" r="10"></circle><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83m13.79-4l-5.74 9.94"></path></svg>
+    </a>
+    <a class="py-2 d-none d-md-inline-block" href="/products/">Price</a>
+    <a class="py-2 d-none d-md-inline-block" href="/boards/">Farm</a>
+    <a class="py-2 d-none d-md-inline-block" href="#">Enterprise</a>
+    <a class="py-2 d-none d-md-inline-block" href="#">Support</a>
+    <a th:unless="${session.user}" class="py-2 d-none d-md-inline-block" href="/users/signup">Signup</a>
+    <a th:unless="${session.user}" class="btn btn-outline-dark" href="/users/loginform">Login</a>
+    <a th:if="${session.user}" class="btn btn-outline-dark" href="/users/logout">LogOut</a>
+    <div th:if="    ${session.user}">
+        <a class="p-2 text-muted align-middle text-center" th:if="${not #strings.equals(session.user.role,'MASTER')}" th:text="${session.user.name} + 님	" th:href="@{'/users/' + ${session.user.userId} + '/form'}"></a>
+        <a class="p-2 text-muted align-middle text-center" th:if="${#strings.equals(session.user.role,'MASTER')}" th:text="${session.user.name} + 님	" th:href="@{'/users/admin/' +${session.user.userId}+ '/form'}"></a>
+    </div>
+</div>

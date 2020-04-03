@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:include="fragments/header :: header" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" />
+</head>
+<body>
+<div th:replace="fragments/navigation-fix :: navigation-fix" />
+<div class="container-fluid">
+    <div class="row">
+        <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
+        <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
+            뭘 넣지..?
+        </div>
+        <div class="col-md-2">
+            여기도 광고?
+        </div>
+    </div>
+</div>
+
+</body>
+<footer th:include="fragments/footer :: footer" />
+</html>

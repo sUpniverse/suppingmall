@@ -2,6 +2,7 @@ package com.supshop.suppingmall.category;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter @Setter
@@ -13,6 +14,7 @@ public class Category {
     private Category parent;
     private String name;
     private List<Category> child;
-
+    private LocalDateTime createDate;
+    private String memo;
 
 }

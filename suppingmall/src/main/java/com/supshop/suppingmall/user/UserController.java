@@ -56,7 +56,7 @@ public class UserController {
         BoardPageMaker boardPageMaker = new BoardPageMaker();
         boardPageMaker.setBoardCriteria(boardCriteria);
         boardPageMaker.setTotalCount(userService.getBoardCount());
-        model.addAttribute("pageMaker", boardPageMaker);
+        model.addAttribute("boardPageMaker", boardPageMaker);
         return "/user/list";
     }
 
@@ -226,6 +226,18 @@ public class UserController {
 
         }
         return "";
+    }
+
+    @GetMapping("/admin/{id}/form")
+    public String getAdminPage(@PathVariable Long id, Model model, HttpSession session) {
+        UserVO sessionUser = getSessionUser(session);
+        // 개인화원 자격으로 자신의 회원 정보를 수정할 시 사용
+        if(isOwner(id, sessionUser)) {
+            model.addAttribute("user",sessionUser);
+            return "/user/admin/main";
+        }
+
+        return "redirect:/users/loginform";
     }
 
 }
