@@ -39,12 +39,6 @@ public class UserController {
         return "/user/login";
     }
 
-    private boolean isLoginUser(HttpSession session) {
-        UserVO user = (UserVO) session.getAttribute("user");
-        if (user == null) return false;
-        return true;
-    }
-
     @GetMapping("")
     public String getAllUser(Model model,
                              HttpSession session,
@@ -104,42 +98,6 @@ public class UserController {
         return "redirect:/users/loginform";
     }
 
-    @GetMapping("/{id}/form")
-    public String getUpdateForm(@PathVariable Long id, Model model, HttpSession session) {
-        UserVO sessionUser = getSessionUser(session);
-        // 개인화원 자격으로 자신의 회원 정보를 수정할 시 사용
-        if(isOwner(id, sessionUser)) {
-            model.addAttribute("user",sessionUser);
-            return "/user/updateForm";
-        }
-        // 운영자 자격으로 해당 회원의 정보를 수정할 시 사용
-        if(isAdmin(sessionUser)) {
-            model.addAttribute("user", sessionUser);
-            return "/user/adminUpdateForm";
-        }
-
-        return "redirect:/users/loginform";
-    }
-
-    private UserVO getSessionUser(HttpSession session) {
-        return (UserVO) session.getAttribute(sessionUser);
-    }
-
-    private boolean isOwner(Long id, UserVO sessionUser) {
-        return sessionUser != null && sessionUser.getUserId().equals(id);
-    }
-
-    private boolean isAdmin(UserVO sessionUser) {
-        return sessionUser != null && (sessionUser.getRole().equals(User.Role.ADMIN) || (sessionUser.getRole().equals(User.Role.MASTER)));
-    }
-
-    private void updateSession(HttpSession session) {
-        UserVO sessionUser = getSessionUser(session);
-        UserVO userVO = userService.getUserVO(sessionUser.getUserId());
-        session.removeAttribute("user");
-        session.setAttribute("user",userVO);
-    }
-
     @PutMapping("/{id}")
     public String updateUser(@PathVariable Long id, User user, HttpSession session) {
         UserVO sessionUser = getSessionUser(session);
@@ -176,6 +134,39 @@ public class UserController {
         return ResponseEntity.badRequest().build();
     }
 
+    @GetMapping("/{id}/form")
+    public String getUserPage(@PathVariable Long id, Model model, HttpSession session) {
+        UserVO sessionUser = getSessionUser(session);
+        if(!isLoginUser(session)) {
+            return "redirect:/users/loginform";
+        }
+
+        // 관리자 일 경우 관리자 메인페이지로
+        if(isAdmin(sessionUser)) {
+            model.addAttribute("user",sessionUser);
+            return "/user/admin/main";
+        }
+
+        return "/user/main";
+    }
+
+    @GetMapping("/{id}/updateForm")
+    public String getUpdateForm(@PathVariable Long id, Model model, HttpSession session) {
+        UserVO sessionUser = getSessionUser(session);
+        // 개인화원 자격으로 자신의 회원 정보를 수정할 시 사용
+        if(isOwner(id, sessionUser)) {
+            model.addAttribute("user",sessionUser);
+            return "/user/updateForm";
+        }
+        // 운영자 자격으로 해당 회원의 정보를 수정할 시 사용
+        if(isAdmin(sessionUser)) {
+            model.addAttribute("user", sessionUser);
+            return "/user/adminUpdateForm";
+        }
+
+        return "redirect:/users/loginform";
+    }
+
     @GetMapping("/{id}/applySellerForm")
     public String getApplySellerRoleForm(@PathVariable Long id, Model model, HttpSession session) {
         UserVO sessionUser = getSessionUser(session);
@@ -185,6 +176,7 @@ public class UserController {
         }
         return "redirect:/users/loginform";
     }
+
 
     @GetMapping("/seller")
     @ResponseBody
@@ -228,16 +220,31 @@ public class UserController {
         return "";
     }
 
-    @GetMapping("/admin/{id}/form")
-    public String getAdminPage(@PathVariable Long id, Model model, HttpSession session) {
-        UserVO sessionUser = getSessionUser(session);
-        // 개인화원 자격으로 자신의 회원 정보를 수정할 시 사용
-        if(isOwner(id, sessionUser)) {
-            model.addAttribute("user",sessionUser);
-            return "/user/admin/main";
-        }
 
-        return "redirect:/users/loginform";
+    private boolean isLoginUser(HttpSession session) {
+        UserVO user = (UserVO) session.getAttribute("user");
+        if (user == null) return false;
+        return true;
+    }
+
+    private UserVO getSessionUser(HttpSession session) {
+        return (UserVO) session.getAttribute(sessionUser);
+    }
+
+    //세션의 유저와 주인의 아이디가 같은지 확인
+    private boolean isOwner(Long id, UserVO sessionUser) {
+        return sessionUser != null && sessionUser.getUserId().equals(id);
+    }
+
+    private boolean isAdmin(UserVO sessionUser) {
+        return sessionUser != null && (sessionUser.getRole().equals(User.Role.ADMIN) || (sessionUser.getRole().equals(User.Role.MASTER)));
+    }
+
+    private void updateSession(HttpSession session) {
+        UserVO sessionUser = getSessionUser(session);
+        UserVO userVO = userService.getUserVO(sessionUser.getUserId());
+        session.removeAttribute("user");
+        session.setAttribute("user",userVO);
     }
 
 }

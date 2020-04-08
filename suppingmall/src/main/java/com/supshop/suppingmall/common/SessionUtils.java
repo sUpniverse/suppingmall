@@ -5,7 +5,7 @@ import org.apache.ibatis.javassist.NotFoundException;
 
 import javax.servlet.http.HttpSession;
 
-public class SessionService {
+public class SessionUtils {
 
     public static boolean isSameUser(Long id, HttpSession session) {
         UserVO user = (UserVO) session.getAttribute("user");

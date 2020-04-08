@@ -29,9 +29,15 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<List<Category>> getCategories(@PathVariable Long id) {
-        List<Category> category = categoryService.getCategory(id).getChild();
-        System.out.println(category);
+    public ResponseEntity<Category> getCategories(@PathVariable Long id) {
+        Category category = categoryService.getCategory(id);
+        return ResponseEntity.ok(category);
+    }
+
+    @GetMapping("/{id}/child")
+    @ResponseBody
+    public ResponseEntity<List<Category>> getChildCategories(@PathVariable Long id) {
+        List<Category> category = categoryService.getChildByParent(id);
         return ResponseEntity.ok(category);
     }
 }

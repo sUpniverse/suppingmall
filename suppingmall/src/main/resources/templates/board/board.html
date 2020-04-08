@@ -4,43 +4,26 @@
 <body>
 <nav th:replace="fragments/navigation :: navigation" />
     <div class="container">
-        <form role="form" th:method="delete">
+        <form role="form" th:method="post">
         </form>
         <div class="container">
-
-            <h1 class="mt-4">
-                카테고리
-            </h1>
-
+            <h1 class="mt-4">카테고리</h1>
             <hr>
-
             <!-- Title -->
             <h1 class="mt-4" th:text="${board.title}"></h1>
-
-
             <!-- Author -->
             <div class="row  bg-light">
-                <span class="col-6 lead">
-                    by [[${board.creator.nickName}]]
-                </span>
-                <span class="col-6 d-flex justify-content-end align-items-center">
-                    조회수 : [[${board.hit}]]
-                </span>
+                <span class="col-6 lead" th:text="${board.creator.nickName}"></span>
+                <span class="col-6 d-flex justify-content-end align-items-center" th:text="${board.hit}"></span>
             </div>
-
-
             <hr class="mb-4 ">
-
             <!-- Date/Time -->
             <div class="row">
                 <span class="text-muted text-sm" th:text="${board.createdDate}"></span>
                 <span class="text-muted text-sm"  th:text="${board.updatedDate}"></span>
             </div>
-
             <!-- Post Content -->
-
             <p class="lead" th:id="contents" th:utext="${board.contents}"></p>
-
             <hr>
             <div class="box-footer">
                 <button th:if="${not #strings.isEmpty(session.user?.userId) && board.creator.userId.equals(session.user?.userId)}" type="submit" class="btn btn-warning">수정</button>
@@ -93,7 +76,6 @@
                         Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
                     </div>
                 </div>
-
                 <div class="media mt-4">
                     <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
                     <div class="media-body">
@@ -101,7 +83,6 @@
                         Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -132,7 +113,6 @@
 </script>
 
 <script>
-
 
     $(document).ready(function (){
         $("#comment-button").on('click',() => {

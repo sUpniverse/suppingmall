@@ -1,6 +1,6 @@
 package com.supshop.suppingmall.order;
 
-import com.supshop.suppingmall.common.SessionService;
+import com.supshop.suppingmall.common.SessionUtils;
 import com.supshop.suppingmall.delivery.Delivery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class OrderController {
         model.addAttribute("product",tempOrder.getOrderItems().get(0).getProduct());
         model.addAttribute("tempOrder",tempOrder);
 
-        if(SessionService.isSessionNull(session)) {
+        if(SessionUtils.isSessionNull(session)) {
         }
         return "/order/form";
     }
@@ -77,7 +77,7 @@ public class OrderController {
                                     HttpSession session,
                                     Model model) {
 
-        Long userId = SessionService.getSessionUser(session).getUserId();
+        Long userId = SessionUtils.getSessionUser(session).getUserId();
         List<Orders> orders = orderService.findOrderByBuyerId(userId,fromDate,toDate,type,status);
         model.addAttribute("orders",orders);
         model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.values()));
@@ -92,7 +92,7 @@ public class OrderController {
                                      HttpSession session,
                                      Model model) {
 
-        Long userId = SessionService.getSessionUser(session).getUserId();
+        Long userId = SessionUtils.getSessionUser(session).getUserId();
         List<Orders> orders = orderService.findOrderBySellerId(userId,fromDate,toDate,type,status);
         model.addAttribute("orders",orders);
         model.addAttribute("statusList", Arrays.asList(Delivery.DeliveryStatus.values()));

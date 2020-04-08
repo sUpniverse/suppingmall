@@ -1,7 +1,7 @@
 package com.supshop.suppingmall.product;
 
 import com.supshop.suppingmall.category.CategoryService;
-import com.supshop.suppingmall.common.SessionService;
+import com.supshop.suppingmall.common.SessionUtils;
 import com.supshop.suppingmall.image.ImageController;
 import com.supshop.suppingmall.image.ImageService;
 import com.supshop.suppingmall.user.User;
@@ -83,7 +83,7 @@ public class ProductController {
 
     @GetMapping("/seller")
     public String getProductsBySeller(HttpSession session,Model model) {
-        UserVO sessionUser = SessionService.getSessionUser(session);
+        UserVO sessionUser = SessionUtils.getSessionUser(session);
         List<Product> products = productService.findProductsBySellerId(sessionUser.getUserId());
         model.addAttribute("user",sessionUser);
         model.addAttribute("products",products);

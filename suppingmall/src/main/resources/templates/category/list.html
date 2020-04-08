@@ -2,46 +2,71 @@
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <div th:include="fragments/header :: header" />
+    <link rel="stylesheet" th:href="@{/css/jquery.treeview.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/readonly.css}" />
+    <script th:src="@{/js/jquery.treeview.js}" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function() {
+            $("#tree").treeview({
+                collapsed: true,
+                animated: "medium",
+                control:"#sidetreecontrol",
+                persist: "location"
+            });
+        })
+    </script>
 </head>
 <body>
 <div th:replace="fragments/navigation-fix :: navigation-fix" />
 <div class="container-fluid">
     <div class="row">
         <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
-        <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
+        <div class="col-md-6 ml-sm-auto col-lg-8 pl-5 pt-5">
             <div>
                 <h3>카테고리 관리</h3>
             </div>
-            <div>
-                <table class="table table-default">
-                    <tr>
-                        <th>상위 카테고리</th>
-                        <td class="form-row">
-                            <div class="col">
-                                <select class="form-control" th:id="category_top">
-                                    <option th:value="0" selected>선택하세요</option>
-                                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
-                                </select>
-                            </div>
-                            <div class="col">
-                                <select class="form-control mx-3" th:id="category_middle">
-                                    <option th:value="0" selected>선택하세요</option>
-                                </select>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>카테고리명</th>
-                        <td>
-                            <input class="form-control">
-                        </td>
-                        <th>카테고리 메모</th>
-                        <td>
-                            <input class="form-control">
-                        </td>
-                    </tr>
-                </table>
+            <div class="row mt-5">
+                <div class="col-md-5">
+                    <h5>카테고리 분류</h5>
+                    <div class="bg-secondary">
+                        <button class="my-3 ml-3" id="add">카테고리 추가</button>
+                        <button class="my-3">
+                            <span class="text-danger">x</span>
+                            삭제
+                        </button>
+                    </div>
+                    <div class="border">
+                        <ul id="tree" class="treeview">
+                            <li class="expandable" th:each="category : ${categories}">
+                                <div class="hitarea expandable-hitarea"></div>
+                                <a href="#" th:id="${category.id}" th:text="${category.name}"></a>
+                                <ul style="display: none;" th:if="${not #lists.isEmpty(category.getChild())}">
+                                    <li th:each="child : ${category.getChild()}">
+                                        <a href="#" th:text="${child.name}" th:id="${child.id}"></a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-5 ml-sm-3">
+                    <h5>카테고리 상세</h5>
+                    <table class="table table-default">
+                        <tr>
+                            <th>카테고리 이름</th>
+                            <td th:id="name"></td>
+                        </tr>
+                        <tr>
+                            <th>카테고리 설명</th>
+                            <td th:id="memo"></td>
+                        </tr>
+                    </table>
+                    <div class="text-center">
+                        <button class="btn btn-warning">변경하기</button>
+                        <button class="btn btn-primary">삭제하기</button>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-2">
@@ -51,5 +76,6 @@
 </div>
 </body>
 <footer th:include="fragments/footer :: footer" />
-<script type="text/javascript" th:src="@{/js/getCategory.js}"></script>
+<script th:inline="javascript" th:src="@{/js/getCategoryByOnClick.js}">
+</script>
 </html>

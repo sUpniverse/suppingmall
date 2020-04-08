@@ -9,8 +9,7 @@
     <a th:unless="${session.user}" class="py-2 d-none d-md-inline-block" href="/users/signup">Signup</a>
     <a th:unless="${session.user}" class="btn btn-outline-dark" href="/users/loginform">Login</a>
     <a th:if="${session.user}" class="btn btn-outline-dark" href="/users/logout">LogOut</a>
-    <div th:if="    ${session.user}">
-        <a class="p-2 text-muted align-middle text-center" th:if="${not #strings.equals(session.user.role,'MASTER')}" th:text="${session.user.name} + 님	" th:href="@{'/users/' + ${session.user.userId} + '/form'}"></a>
-        <a class="p-2 text-muted align-middle text-center" th:if="${#strings.equals(session.user.role,'MASTER')}" th:text="${session.user.name} + 님	" th:href="@{'/users/admin/' +${session.user.userId}+ '/form'}"></a>
+    <div class="py-2" th:if="${session.user}">
+        <a th:text="${session.user.name} + 님	" th:href="@{'/users/' +${session.user.userId}+ '/form'}"></a>
     </div>
 </div>

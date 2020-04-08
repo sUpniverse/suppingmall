@@ -21,4 +21,8 @@ public class CategoryService {
     public List<Category> getCategories() {
         return categoryMapper.findAllByTop();
     }
+
+    public List<Category> getChildByParent(Long id) {
+        return categoryMapper.findChildByParent(id);
+    }
 }

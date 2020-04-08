@@ -11,4 +11,6 @@ public interface CategoryMapper {
     List<Category> findAll();
 
     List<Category> findAllByTop();
+
+    List<Category> findChildByParent(Long id);
 }
