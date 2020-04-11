@@ -25,4 +25,10 @@ public class CategoryService {
     public List<Category> getChildByParent(Long id) {
         return categoryMapper.findChildByParent(id);
     }
+
+    @Transactional
+    public Long saveCategory(Category category) {
+        categoryMapper.save(category);
+        return category.getId();
+    }
 }

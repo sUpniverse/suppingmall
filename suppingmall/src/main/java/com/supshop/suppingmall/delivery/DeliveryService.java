@@ -29,7 +29,6 @@ public class DeliveryService {
     public Long saveVendor(Long id,Delivery delivery) {
         // 택배사 등록 및 배송상태 변경
         delivery.setStatus(Delivery.DeliveryStatus.DELIVERY);
-        System.out.println(delivery);
         deliveryMapper.saveVendor(id,delivery);
         return delivery.getDeliveryId();
     }

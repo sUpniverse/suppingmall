@@ -13,4 +13,7 @@ public interface CategoryMapper {
     List<Category> findAllByTop();
 
     List<Category> findChildByParent(Long id);
+
+    void save(Category category);
+
 }

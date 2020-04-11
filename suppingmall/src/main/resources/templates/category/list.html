@@ -41,9 +41,11 @@
                             <li class="expandable" th:each="category : ${categories}">
                                 <div class="hitarea expandable-hitarea"></div>
                                 <a href="#" th:id="${category.id}" th:text="${category.name}"></a>
-                                <ul style="display: none;" th:if="${not #lists.isEmpty(category.getChild())}">
+                                <ul style="display: none;" th:if="${category.getChild()}">
                                     <li th:each="child : ${category.getChild()}">
+                                        <div class="hitarea expandable-hitarea"></div>
                                         <a href="#" th:text="${child.name}" th:id="${child.id}"></a>
+                                        <ul style="display: none"></ul>
                                     </li>
                                 </ul>
                             </li>
@@ -52,21 +54,59 @@
                 </div>
                 <div class="col-md-5 ml-sm-3">
                     <h5>카테고리 상세</h5>
-                    <table class="table table-default">
-                        <tr>
-                            <th>카테고리 이름</th>
-                            <td th:id="name"></td>
-                        </tr>
-                        <tr>
-                            <th>카테고리 설명</th>
-                            <td th:id="memo"></td>
-                        </tr>
-                    </table>
+                    <form role="form">
+                        <input type="hidden" th:id="id">
+                        <table class="table table-default">
+                            <tr>
+                                <th>카테고리 이름</th>
+                                <td th:id="name"></td>
+                            </tr>
+                            <tr>
+                                <th>카테고리 설명</th>
+                                <td th:id="memo"></td>
+                            </tr>
+                        </table>
+                    </form>
                     <div class="text-center">
                         <button class="btn btn-warning">변경하기</button>
-                        <button class="btn btn-primary">삭제하기</button>
                     </div>
                 </div>
+            </div>
+            <div class="mt-5">
+                <form id="addCategoryForm" style="display: none">
+                    <table class="table table-default">
+                        <tr>
+                            <th>상위 카테고리</th>
+                            <td class="form-row">
+                                <div class="col">
+                                    <select class="form-control" th:id="category_top">
+                                        <option th:value="0" selected>선택하세요</option>
+                                        <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <select class="form-control mx-3" th:id="category_middle">
+                                        <option th:value="0" selected>선택하세요</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>카테고리명</th>
+                            <td>
+                                <input th:id="addCategoryName" class="form-control" th:name="name">
+                            </td>
+                            <th>카테고리 메모</th>
+                            <td>
+                                <input th:id="addCategoryMemo" class="form-control" th:name="memo">
+                            </td>
+                        </tr>
+                    </table>
+                    <div th:class="form-inline">
+                        <input type="button" th:class="form-control" th:id="addCategoryBtn" value="추가">
+                        <input type="button" th:class="form-control" th:id="addCategoryCancelBtn" value="취소">
+                    </div>
+                </form>
             </div>
         </div>
         <div class="col-md-2">
@@ -76,6 +116,100 @@
 </div>
 </body>
 <footer th:include="fragments/footer :: footer" />
-<script th:inline="javascript" th:src="@{/js/getCategoryByOnClick.js}">
+<script th:inline="javascript" th:src="@{/js/getCategoryByOnClick.js}"></script>
+<script th:inline="javascript" th:src="@{/js/getCategoryBySelectedOption.js}"></script>
+<script th:inline="javascript">
+
+    $(document).on("click",".btn-warning",function() {
+        document.getElementById('name').innerText
+    });
+
+    $(document).on("click",'#add',function() {
+        document.getElementById("addCategoryForm").style.display = 'block';
+    });
+
+    $(document).on("click",'#addCategoryBtn',function () {
+
+        var parentId = 0;
+        var name = "";
+        var memo = "";
+
+        var category = {
+            parent : {
+                id: parentId
+            },
+            name : name,
+            memo : memo
+        };
+
+        var middle_id = $("#category_middle option:selected").val();
+
+        if(middle_id === 0) {
+            var top_id = $("#category_top option:selected").val();
+            if(top_id === 0) {
+                alert("카테고리를 선택해주세요");
+                return;
+            }
+            category.parent.id = top_id;
+        } else {
+            category.parent.id = middle_id;
+        }
+        category.name  = document.getElementById('addCategoryName').value;
+        category.memo = document.getElementById('addCategoryMemo').value;
+
+        addCategory(category);
+
+    });
+
+    $(document).on("click",'#addCategoryCancelBtn',function () {
+        document.getElementById('category_top').val(0).prop('selected',true);
+        document.getElementById('addCategoryName').textContent = "";
+        document.getElementById('addCategoryMemo').textContent = "";
+        document.getElementById("addCategoryForm").style.display = 'none';
+    });
+
+    function addCategory(category) {
+
+
+        $.ajax({
+            type:"POST",
+            url:"/category",
+            contentType: 'application/json',
+            data : JSON.stringify(category),
+            success: (data,status,xhr) => {
+                var url = xhr.getResponseHeader("Location");
+                var id = url.split("/")[4];
+                successAddCategory(id,category);
+
+            },
+            error: () => {
+                alert('카테고리를 가져올 수 없습니다.');
+            }
+        });
+
+        function successAddCategory(categoryId,category) {
+            var option = '<li class="expandable">' +
+                            '<div class="hitarea expandable-hitarea"></div>' +
+                             '<a href="#" id="'+categoryId+'" class="">'+category.name+'</a>' +
+                          '</li>';
+            document.getElementById(category.parent.id).nextSibling.nextSibling.innerHTML  = option;
+            document.getElementById('addCategoryName').textContent = "";
+            document.getElementById('addCategoryMemo').textContent = "";
+            document.getElementById("addCategoryForm").style.display = 'none';
+        }
+    }
+
+    function isEmpty(str) {
+        if(typeof str === "undefined" || str === null || str === "")
+            return true;
+        else
+            return false;
+    }
+
+</script>
+<script th:inline="javascript">
+
+
+
 </script>
 </html>

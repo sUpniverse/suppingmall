@@ -61,5 +61,17 @@
         WHERE C.category_id = #{id}
     </select>
 
+    <insert id="save" useGeneratedKeys="true" keyProperty="id" parameterType="com.supshop.suppingmall.category.Category">
+        INSERT INTO Category (
+        parent_id,
+        name,
+        memo)
+        VALUES (
+        #{parent.id},
+        #{name},
+        #{memo}
+        )
+    </insert>
+
 </mapper>
 

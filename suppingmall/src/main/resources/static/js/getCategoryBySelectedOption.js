@@ -8,6 +8,16 @@ $('#category_top').on('change',(e) => {
     }
 });
 
+function setOption(data,optionName) {
+    $(optionName).find("option").remove();
+    var option = '<option th:value="0" selected>선택하세요</option>';
+    $(optionName).append(option);
+    for(var i = 0; i < data.child.length; i++) {
+        var option = '<option value="'+data.child[i].id+'">'+data.child[i].name+'</option>';
+        $(optionName).append(option);
+    }
+}
+
 function getCategoryBySelectedOption(category_id, place) {
     $.ajax({
         type:"GET",
