@@ -3,7 +3,6 @@ package com.supshop.suppingmall.category;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -35,7 +34,7 @@ public class CategoryController {
         return ResponseEntity.ok(category);
     }
 
-    @GetMapping("/{id}/child")
+    @GetMapping("/{id}/children")
     @ResponseBody
     public ResponseEntity<List<Category>> getChildCategories(@PathVariable Long id) {
         List<Category> category = categoryService.getChildByParent(id);

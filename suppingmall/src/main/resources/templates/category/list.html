@@ -38,10 +38,10 @@
                     </div>
                     <div class="border">
                         <ul id="tree" class="treeview">
-                            <li class="expandable" th:each="category : ${categories}">
-                                <div class="hitarea expandable-hitarea"></div>
+                            <li th:class="${not #arrays.isEmpty(category.getChild())} ? 'expandable' : ''" th:each="category : ${categories}">
+                                <div class="hitarea expandable-hitarea" th:if="${not #arrays.isEmpty(category.getChild())}"></div>
                                 <a href="#" th:id="${category.id}" th:text="${category.name}"></a>
-                                <ul style="display: none;" th:if="${category.getChild()}">
+                                <ul style="display: none;" th:if="${not #arrays.isEmpty(category.getChild())}">
                                     <li th:each="child : ${category.getChild()}">
                                         <div class="hitarea expandable-hitarea"></div>
                                         <a href="#" th:text="${child.name}" th:id="${child.id}"></a>
@@ -170,7 +170,6 @@
 
     function addCategory(category) {
 
-
         $.ajax({
             type:"POST",
             url:"/category",
@@ -179,7 +178,7 @@
             success: (data,status,xhr) => {
                 var url = xhr.getResponseHeader("Location");
                 var id = url.split("/")[4];
-                successAddCategory(id,category);
+                addNewCategoryInList(id,category);
 
             },
             error: () => {
@@ -187,16 +186,16 @@
             }
         });
 
-        function successAddCategory(categoryId,category) {
-            var option = '<li class="expandable">' +
-                            '<div class="hitarea expandable-hitarea"></div>' +
-                             '<a href="#" id="'+categoryId+'" class="">'+category.name+'</a>' +
-                          '</li>';
-            document.getElementById(category.parent.id).nextSibling.nextSibling.innerHTML  = option;
-            document.getElementById('addCategoryName').textContent = "";
-            document.getElementById('addCategoryMemo').textContent = "";
-            document.getElementById("addCategoryForm").style.display = 'none';
-        }
+    }
+
+    function addNewCategoryInList(categoryId, category) {
+        var option = '<li class="expandable">' +
+                     '<a href="#" id="'+categoryId+'" class="">'+category.name+'</a>' +
+                     '</li>';
+        document.getElementById(category.parent.id).nextSibling.nextSibling.innerHTML  = option;
+        document.getElementById('addCategoryName').textContent = "";
+        document.getElementById('addCategoryMemo').textContent = "";
+        document.getElementById("addCategoryForm").style.display = 'none';
     }
 
     function isEmpty(str) {
@@ -206,10 +205,55 @@
             return false;
     }
 
+
 </script>
 <script th:inline="javascript">
 
+    $(document).on('click','li.expandable > div',function (e) {
+        var parentId = e.target.nextSibling.nextSibling.getAttribute('id');
+        if(parentId === null) {
+            parentId = e.target.nextSibling.getAttribute('id');
+        }
+        if(isEmpty(document.getElementById(parentId).parentElement.getElementsByTagName("ul")[0].innerHTML)) {
+            getChildCategory(parentId);
+        }
 
+    });
+
+    function getChildCategory(parentId) {
+
+        $.ajax({
+            type:"GET",
+            url:"/category/"+parentId+'/children',
+            contentType: 'application/json',
+            success: (data,status,xhr) => {
+                addCategoryInList(parentId,data);
+            },
+            error: () => {
+                alert('카테고리를 가져올 수 없습니다.');
+            }
+        });
+    }
+
+    function addCategoryInList(parentId,child) {
+        child.forEach(category => {
+            var option ="";
+            console.log(category);
+            if(category.child.length === 0) {
+                option+='<li>' +
+                        '<a href="#" id="'+category.id+'">'+category.name+'</a>' +
+                        '</li>';
+            } else {
+                option+= '<li class="expandable">' +
+                            '<div class="hitarea expandable-hitarea"></div>' +
+                            '<a href="#" id="'+category.id+'">'+category.name+'</a>' +
+                            '<ul style="display: none;"></ul>' +
+                         '</li>';
+            }
+            // document.getElementById(parentId).parentElement.getElementsByTagName("ul")[0].innerHTML += option;
+            document.getElementById(parentId).parentElement.getElementsByTagName("ul")[0].insertAdjacentHTML('beforeend',option);
+        });
+    }
 
 </script>
 </html>

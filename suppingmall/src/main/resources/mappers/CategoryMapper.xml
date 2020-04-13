@@ -10,7 +10,7 @@
         <collection property="child" ofType="com.supshop.suppingmall.category.Category">
             <id property="id" column="ChildCategoryId" />
             <result property="name" column="ChildCategoryName" />
-            <result property="memo" column="CategoryMemo" />
+            <result property="memo" column="ChildCategoryMemo" />
         </collection>
     </resultMap>
 
@@ -46,10 +46,12 @@
         ORDER BY C.category_id ASC
     </select>
 
-    <select id="findChildByParent" resultMap="CategoryLazy">
-        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName", C.memo AS "CategoryMemo"
+    <select id="findChildByParent" resultMap="Category">
+        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName", C.memo AS "CategoryMemo",
+        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName", CH.memo AS "ChildCategoryMemo"
         FROM category AS C
-        WHERE parent_id = #{id};
+        LEFT OUTER JOIN category AS CH on (C.category_id = CH.parent_id)
+        WHERE C.parent_id = #{id}
         ORDER BY C.category_id ASC
     </select>
 
