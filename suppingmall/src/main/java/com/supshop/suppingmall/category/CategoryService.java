@@ -31,4 +31,14 @@ public class CategoryService {
         categoryMapper.save(category);
         return category.getId();
     }
+
+    @Transactional
+    public void deleteCategory(Long id) {
+        categoryMapper.delete(id);
+    }
+
+    @Transactional
+    public void updateCategory(Long id,Category category) {
+        categoryMapper.update(id,category);
+    }
 }

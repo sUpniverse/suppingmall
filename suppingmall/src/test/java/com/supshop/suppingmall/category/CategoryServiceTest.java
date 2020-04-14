@@ -33,7 +33,7 @@ public class CategoryServiceTest {
     @Transactional
     public void saveCategory() throws Exception{
         //given
-        Category category = Category.builder().name("청소기").build();
+        Category category = buildCategory();
 
         //when
         Long categoryId = categoryService.saveCategory(category);
@@ -43,4 +43,10 @@ public class CategoryServiceTest {
         assertEquals(category.getName(), newCategory.getName());
         assertEquals(category.getMemo(), newCategory.getMemo());
     }
+
+    private Category buildCategory() {
+        return Category.builder().name("청소기").build();
+    }
+
+
 }

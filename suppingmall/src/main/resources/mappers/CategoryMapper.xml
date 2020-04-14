@@ -72,8 +72,20 @@
         #{parent.id},
         #{name},
         #{memo}
-        )
+        );
     </insert>
+
+    <update id="update">
+        UPDATE category SET
+        name = #{category.name},
+        memo = #{category.memo}
+        WHERE category_id = #{id}
+    </update>
+    
+    <delete id="delete">
+        DELETE FROM category
+        where category_id = #{id}
+    </delete>
 
 </mapper>
 

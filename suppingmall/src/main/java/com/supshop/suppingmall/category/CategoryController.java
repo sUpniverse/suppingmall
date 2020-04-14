@@ -48,4 +48,18 @@ public class CategoryController {
         URI uri = linkTo(CategoryController.class).slash(categoryId).toUri();
         return ResponseEntity.created(uri).build();
     }
+
+    @PutMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<String> updateCategory(@PathVariable Long id,@RequestBody Category category) {
+        categoryService.updateCategory(id,category);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.ok().build();
+    }
 }
