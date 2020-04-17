@@ -129,6 +129,8 @@
         INSERT INTO Product(
         name,
         price,
+        delivery_price,
+        delivery_vendor,
         registered_date,
         seller_id,
         category_id,
@@ -141,6 +143,8 @@
         VALUES (
         #{name},
         #{price},
+        #{deliveryPrice},
+        #{deliveryVendor, typeHandler=com.supshop.suppingmall.delivery.DeliveryVendorHandler},
         now(),
         #{seller.userId},
         #{category.id},

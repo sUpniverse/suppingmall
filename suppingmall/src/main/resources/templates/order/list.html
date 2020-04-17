@@ -13,10 +13,10 @@
 </head>
 <body>
 
-<header th:replace="product/product-nav-dark :: product-nav-dark" />
+<div th:replace="fragments/navigation-fix :: navigation-fix" />
 <div class="container-fluid">
     <div class="row">
-        <nav th:replace="user/user-left-bar :: user-left-bar" />
+        <nav th:replace="user/user-left-bar :: user-left-bar" th:if="${#strings.equals(session.user.getRole(),'USER')}"/>
         <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
             <table class="d-flex p-3 my-3 bg-light rounded shadow-sm mt-5 border">
                 <tr>

@@ -45,7 +45,7 @@
         #{zipCode},
         #{phone},
         #{memo},
-        #{vendor, typeHandler=com.supshop.suppingmall.delivery.DeliveryVendorHandler},
+        #{deliveryVendor, typeHandler=com.supshop.suppingmall.delivery.DeliveryVendorHandler},
         #{trackingNumber},
         #{status, typeHandler=com.supshop.suppingmall.delivery.DeliveryStatusHandler}
         );

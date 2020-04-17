@@ -13,10 +13,15 @@
 </head>
 <body>
 
-<header th:replace="product/product-nav-dark :: product-nav-dark" />
+<div th:replace="fragments/navigation-fix :: navigation-fix" />
 <div class="container-fluid">
     <div class="row">
-        <nav th:replace="user/user-left-bar :: user-left-bar" />
+        <div th:if="${#strings.equals(session.user.getRole(),'SELLER')}">
+            <nav th:replace="user/user-left-bar :: user-left-bar" />
+        </div>
+        <div th:if="${#strings.equals(session.user.getRole(),'ADMIN') || #strings.equals(session.user.getRole(),'MASTER')}">
+            <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
+        </div>
         <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
             <table class="d-flex p-3 my-3 bg-light rounded shadow-sm mt-5 border">
                 <tr>

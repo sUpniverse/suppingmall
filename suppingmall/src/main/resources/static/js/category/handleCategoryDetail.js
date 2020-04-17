@@ -37,7 +37,7 @@ $(document).on("click",".btn-danger.delete",function() {
         url: "/category/"+id,
         contentType: 'application/json',
         success: (data,status,xhr) => {
-            document.getElementById(id).remove();
+            document.getElementById(id).parentElement.innerText = "";
         },
         error: () => {
             alert("카테고리 삭제 실패");

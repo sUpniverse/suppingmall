@@ -4,6 +4,7 @@
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <div th:include="fragments/header :: header" />
     <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}" />
     <style>
         ul{
             list-style:none;
@@ -13,10 +14,15 @@
 </head>
 <body>
 
-<header th:replace="product/product-nav-dark :: product-nav-dark" />
+<div th:replace="fragments/navigation-fix :: navigation-fix" />
 <div class="container-fluid">
     <div class="row">
-        <nav th:replace="user/user-left-bar :: user-left-bar" />
+        <div th:if="${#strings.equals(session.user.getRole(),'SELLER')}">
+            <nav th:replace="user/user-left-bar :: user-left-bar" />
+        </div>
+        <div th:if="${#strings.equals(session.user.getRole(),'ADMIN') || #strings.equals(session.user.getRole(),'MASTER')}">
+            <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
+        </div>
         <div class="col-md-6 ml-sm-auto col-lg-10 p-5">
             <div>
                 <div>
@@ -73,7 +79,7 @@
                 <table class="table table-default mt-3 text-sm">
                     <thead class="table-secondary">
                         <tr>
-                            <th>상품아이디</th>
+                            <th>상품번호</th>
                             <th>상품카테고리</th>
                             <th>상품명</th>
                             <th>옵션명</th>
@@ -87,7 +93,9 @@
                             <tr th:each="option : ${product?.options}">
                                 <td th:text="${product?.productId}"></td>
                                 <td th:text="${product?.category.name}"></td>
-                                <td th:text="${product?.name}"></td>
+                                <td>
+                                    <a th:href="@{'/products/'+${product.productId}}" style="color: #333333" th:text="${product?.name}"></a>
+                                </td>
                                 <td th:text="${option?.optionName}"></td>
                                 <td th:text="${option?.quantity}"></td>
                                 <td th:text="${product?.deliveryPrice}"></td>

@@ -2,6 +2,8 @@ package com.supshop.suppingmall.order;
 
 import com.supshop.suppingmall.common.SessionUtils;
 import com.supshop.suppingmall.delivery.Delivery;
+import com.supshop.suppingmall.user.User;
+import com.supshop.suppingmall.user.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -66,6 +68,12 @@ public class OrderController {
     public String getOrder(@PathVariable Long id, HttpSession session, Model model) {
         Orders order = orderService.findOrder(id);
         model.addAttribute("order",order);
+        UserVO sessionUser = SessionUtils.getSessionUser(session);
+        if(sessionUser.getRole().equals(User.Role.SELLER)) {
+            return "/order/seller/detail";
+        } else if(sessionUser.getRole().equals(User.Role.ADMIN) || sessionUser.getRole().equals(User.Role.MASTER) ) {
+            return "/order/seller/detail";
+        }
         return "/order/detail";
     }
 
@@ -77,10 +85,20 @@ public class OrderController {
                                     HttpSession session,
                                     Model model) {
 
-        Long userId = SessionUtils.getSessionUser(session).getUserId();
-        List<Orders> orders = orderService.findOrderByBuyerId(userId,fromDate,toDate,type,status);
+        UserVO sessionUser = SessionUtils.getSessionUser(session);
+
+//        if(sessionUser.getRole().equals(User.Role.SELLER)) {
+//            List<Orders> sellerOrders = orderService.findOrderBySellerId(sessionUser.getUserId(),fromDate,toDate,type,status);
+//            model.addAttribute("orders",sellerOrders);
+//            model.addAttribute("statusList", Arrays.asList(Delivery.DeliveryStatus.values()));
+//            return "/order/seller/list";
+//        } else if(sessionUser.getRole().equals(User.Role.ADMIN) || sessionUser.getRole().equals(User.Role.MASTER) ) {
+//            return "/order/seller/list";
+//        }
+        List<Orders> orders = orderService.findOrderByBuyerId(sessionUser.getUserId(),fromDate,toDate,type,status);
         model.addAttribute("orders",orders);
         model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.values()));
+
         return "/order/list";
     }
 
@@ -135,4 +153,5 @@ public class OrderController {
         model.addAttribute("order",order);
         return "/order/refund";
     }
+
 }

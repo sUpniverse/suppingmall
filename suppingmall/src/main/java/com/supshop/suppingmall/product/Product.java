@@ -1,6 +1,7 @@
 package com.supshop.suppingmall.product;
 
 import com.supshop.suppingmall.category.Category;
+import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.user.User;
 import lombok.*;
 
@@ -26,9 +27,12 @@ public class Product {
     @Max(1000000000)
     private int price;
 
+
     @Min(0)
     @Max(1000000000)
     private int deliveryPrice;
+
+    private Delivery.DeliveryVendor deliveryVendor;
 
     @Valid
     private ProductDetail detail;

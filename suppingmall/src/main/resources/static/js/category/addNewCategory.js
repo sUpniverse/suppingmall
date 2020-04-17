@@ -16,14 +16,14 @@ $(document).on("click",'#addCategoryBtn',function () {
         memo : memo
     };
 
-    var middle_id = $("#category_middle option:selected").val();
-
+    var middle_id = parseInt($("#category_middle option:selected").val());
     if(middle_id === 0) {
-        var top_id = $("#category_top option:selected").val();
+        var top_id = parseInt($("#category_top option:selected").val());
         if(top_id === 0) {
             alert("카테고리를 선택해주세요");
             return;
         }
+        console.log(top_id)
         category.parent.id = top_id;
     } else {
         category.parent.id = middle_id;
@@ -32,14 +32,13 @@ $(document).on("click",'#addCategoryBtn',function () {
     category.memo = document.getElementById('addCategoryMemo').value;
 
     addCategory(category);
-
 });
 
 $(document).on("click",'#addCategoryCancelBtn',function () {
     document.getElementById('category_top').selectedIndex = 0;
     document.getElementById('category_middle').selectedIndex = 0;
-    document.getElementById('addCategoryName').textContent = "";
-    document.getElementById('addCategoryMemo').textContent = "";
+    document.getElementById('addCategoryName').value = "";
+    document.getElementById('addCategoryMemo').value = "";
     document.getElementById("addCategoryForm").style.display = 'none';
 });
 
@@ -68,8 +67,10 @@ function addNewCategoryInList(categoryId, category) {
         '<a href="#" id="'+categoryId+'" class="">'+category.name+'</a>' +
         '</li>';
     document.getElementById(category.parent.id).nextSibling.nextSibling.innerHTML += option;
-    document.getElementById('addCategoryName').textContent = "";
-    document.getElementById('addCategoryMemo').textContent = "";
+    document.getElementById('category_top').selectedIndex = 0;
+    document.getElementById('category_middle').selectedIndex = 0;
+    document.getElementById('addCategoryName').value = "";
+    document.getElementById('addCategoryMemo').value = "";
     document.getElementById("addCategoryForm").style.display = 'none';
 }
 

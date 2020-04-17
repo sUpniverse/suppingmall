@@ -2,10 +2,12 @@
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <div th:include="fragments/header :: header" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}" />
 </head>
 <body>
     <nav th:replace="fragments/navigation :: navigation" />
-    <div class="container-fluid">
+    <div class="container-fluid mt-5">
+        <h3>회원관리</h3>
         <table class="table table-default">
             <thead>
                 <tr>

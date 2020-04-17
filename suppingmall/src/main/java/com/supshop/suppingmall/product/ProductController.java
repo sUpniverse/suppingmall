@@ -2,6 +2,7 @@ package com.supshop.suppingmall.product;
 
 import com.supshop.suppingmall.category.CategoryService;
 import com.supshop.suppingmall.common.SessionUtils;
+import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.image.ImageController;
 import com.supshop.suppingmall.image.ImageService;
 import com.supshop.suppingmall.user.User;
@@ -33,6 +34,7 @@ public class ProductController {
             return "redirect:/users/loginform";
         }
         model.addAttribute("categories",categoryService.getCategory(2L).getChild());
+        model.addAttribute("vendors", Delivery.DeliveryVendor.values());
         return "/product/form";
     }
 
