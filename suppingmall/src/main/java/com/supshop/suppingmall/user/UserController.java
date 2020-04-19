@@ -153,15 +153,18 @@ public class UserController {
     @GetMapping("/{id}/updateForm")
     public String getUpdateForm(@PathVariable Long id, Model model, HttpSession session) {
         UserVO sessionUser = getSessionUser(session);
+
+        // 운영자 자격으로 해당 회원의 정보를 수정할 시 사용
+        if(isAdmin(sessionUser)) {
+            UserVO userVO = userService.getUserVO(id);
+            model.addAttribute("user",userVO);
+            return "/user/adminUpdateForm";
+        }
+
         // 개인화원 자격으로 자신의 회원 정보를 수정할 시 사용
         if(isOwner(id, sessionUser)) {
             model.addAttribute("user",sessionUser);
             return "/user/updateForm";
-        }
-        // 운영자 자격으로 해당 회원의 정보를 수정할 시 사용
-        if(isAdmin(sessionUser)) {
-            model.addAttribute("user", sessionUser);
-            return "/user/adminUpdateForm";
         }
 
         return "redirect:/users/loginform";

@@ -92,13 +92,13 @@
 <script>
     $(document).ready(function() {
 
-        $(document).on("click","#manageButton",function() {
-            var userId = document.getElementById('manageButton').parentElement.parentElement.firstElementChild.textContent;
+        $(document).on("click","#manageButton",function(e) {
+            var userId = e.target.parentElement.parentElement.firstElementChild.textContent;
             getUpdateUserFom(userId)
         });
 
-        $(document).on("click","#deleteButton",function() {
-            var userId = document.getElementById('deleteButton').parentElement.parentElement.firstElementChild.textContent;
+        $(document).on("click","#deleteButton",function(e) {
+            var userId = e.target.parentElement.parentElement.firstElementChild.textContent;
             $.ajax({
                 type: "DELETE",
                 url: "/users/" + userId,
@@ -117,8 +117,8 @@
 
         });
 
-        $(document).on("click","#revivalButton",function() {
-            var userId = document.getElementById('revivalButton').parentElement.parentElement.firstElementChild.textContent;
+        $(document).on("click","#revivalButton",function(e) {
+            var userId = e.target.parentElement.parentElement.firstElementChild.textContent;
             console.log(userId);
             $.ajax({
                 type: "DELETE",
@@ -140,7 +140,7 @@
     });
 
     function getUpdateUserFom(userId) {
-        window.open("/users/"+userId+"/form","_blank","width=500,height=600,left=500,top=100,menubar=no,toolbar=no,location=no");
+        window.open("/users/"+userId+"/updateForm","_blank","width=500,height=600,left=500,top=100,menubar=no,toolbar=no,location=no");
     }
 </script>
 </html>

@@ -106,7 +106,7 @@
         LEFT OUTER JOIN OrderItem AS OI on (O.order_id = OI.order_id)
         LEFT OUTER JOIN Product AS P on (OI.product_id = P.product_id)
         LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
-        WHERE NOT O.status = 'O000' AND O.buyer_id = ${userId}
+        WHERE O.buyer_id = ${userId} AND NOT O.status = 'O000'
         <include refid="conditionalSearch"></include>
         ORDER BY O.order_date desc
     </select>
@@ -130,7 +130,7 @@
         LEFT OUTER JOIN OrderItem AS OI on (O.order_id = OI.order_id)
         LEFT OUTER JOIN Product AS P on (OI.product_id = P.product_id)
         LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
-        WHERE NOT O.status = 'O000' AND O.seller_id = ${userId}
+        WHERE O.seller_id = ${userId} AND NOT O.status = 'O000'
         <include refid="conditionalSearch"></include>
         ORDER BY O.order_date desc
     </select>
@@ -154,7 +154,7 @@
         LEFT OUTER JOIN OrderItem AS OI on (O.order_id = OI.order_id)
         LEFT OUTER JOIN Product AS P on (OI.product_id = P.product_id)
         LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
-        WHERE NOT O.status = 'O000' AND O.order_id = ${orderId}
+        WHERE O.order_id = ${orderId}
         ORDER BY O.order_date desc
     </select>
 
@@ -188,6 +188,11 @@
             </if>
             <if test='type.equals("delivery")'>
                 AND D.status LIKE #{searchValue}
+            </if>
+        </if>
+        <if test="type != null and searchValue == null">
+            <if test='type.equals("order")'>
+                AND (O.status LIKE "O004" OR O.status LIKE "O005" OR O.status LIKE "O006")
             </if>
         </if>
         <if test="fromDate != null and toDate != null">

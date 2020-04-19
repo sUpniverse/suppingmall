@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <div th:include="fragments/header :: header" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" />
+    <style>
+        ul{
+            list-style:none;
+            padding: unset;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="fragments/navigation-fix :: navigation-fix" />
+<div class="container-fluid">
+    <div class="row">
+        <div th:if="${#strings.equals(session.user.getRole(),'SELLER')}">
+            <nav th:replace="user/user-left-bar :: user-left-bar" />
+        </div>
+        <div th:if="${#strings.equals(session.user.getRole(),'ADMIN') || #strings.equals(session.user.getRole(),'MASTER')}">
+            <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
+        </div>
+        <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
+            <table class="d-flex p-3 my-3 bg-light rounded shadow-sm mt-5 border">
+                <tr>
+                    <td>
+                        <div class="row row-cols-3 ml-3">
+                            <input type="date" id="fromDate" class="form-control col">
+                            <span class="col">~</span>
+                            <input type="date" id="toDate" class="form-control col">
+                        </div>
+                    </td>
+                    <td>
+                        <select class="form-control ml-4" id="status">
+                            <option th:text="전체상태" value="" selected></option>
+                            <option th:each="status : ${statusList}" th:text="${status.title}" th:value="${status}"></option>
+                        </select>
+                    </td>
+                    <td>
+                        <a class="btn btn-success ml-5" href="javascript:search()">조회</a>
+                    </td>
+                </tr>
+            </table>
+            <ul class="mt-5">
+                <li th:each="order : ${orders}" class="row border-bottom mt-4 pb-4">
+                    <div class="col row">
+                        <a th:href="@{'/orders/'+${order.orderId}+'/seller'}">
+                            <img th:src="${order.orderItems[0].product.thumbnail}" style="width: 90px; height: 90px">
+                        </a>
+                        <div class="ml-3">
+                            <a th:href="@{'/orders/'+${order.orderId}+'/seller'}" style="text-decoration: none;">
+                                <span th:text="${order.orderItems[0].product.name}" class="text-dark" style="font-size: 16px"></span>
+                                <ul class="container row">
+                                    <li>
+                                        <span th:text="@{${#numbers.formatInteger(order.getAmountPrice(),3,'COMMA')}+'원'}" class="text-dark" style="font-size: 13px;"></span>
+                                    </li>
+                                    <li>
+                                        <span th:text="${order.orderDate}" class="text-muted" style="font-size: 13px; display: inline-block; padding-left: 11px"></span>
+                                    </li>
+                                </ul>
+                                <div>
+                                    <span th:if="${not #strings.equals(order.status.title,'DELIVERY')}" th:text="${order.status.title}" class="text-dark" style="font-size: 16px"></span>
+                                    <span th:if="${#strings.equals(order.status.title,'DELIVERY')}" th:text="${order.delivery.status.title}" class="text-dark" style="font-size: 16px"></span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-auto text-center align-items-center">
+                        <span th:text="${order.buyer.name}"></span>
+                        <br>
+                        <span class="text-muted" th:text="@{'('+${order.buyer.phoneNumber}+')'}" style="font-size: 14px"></span>
+                    </div>
+                    <div class="col col-lg-2  d-flex align-items-center text-center">
+                        <a class="form-control" href="#" th:href="'javascript:getDeliveryForm('+${order.delivery.deliveryId}+')'" th:if="${#strings.equals(order.delivery?.status,'CHANGE')}">교환확인</a>
+                        <a class="form-control" href="#" th:href="'javascript:getDeliveryForm('+${order.delivery.deliveryId}+')'" th:if="${#strings.equals(order.delivery?.status,'REFUND')}">환불확인</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-1">
+        </div>
+    </div>
+</div>
+<script>
+
+    function search() {
+        var fromDate = document.getElementById('fromDate').value;
+        var toDate = document.getElementById('toDate').value;
+        var status = document.getElementById('status').value;
+        $(location).attr('href','/orders/seller/main?fromDate=' + fromDate + '&toDate=' + toDate +'&type=order&status=' + status);
+    }
+</script>
+</body>
+</html>

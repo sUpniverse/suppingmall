@@ -103,16 +103,21 @@ public class OrderController {
     }
 
     @GetMapping("/seller/main")
-    public String getOrdersBySellerId(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+    public String getOrdersBySellerIdOnDelivery(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
                                      @RequestParam(required = false) String type,
-                                     @RequestParam(required = false) Delivery.DeliveryStatus status,
+                                     @RequestParam(required = false) Delivery.DeliveryStatus deliveryStatus,
+                                     @RequestParam(required = false) Orders.OrderStatus orderStatus,
                                      HttpSession session,
                                      Model model) {
 
         Long userId = SessionUtils.getSessionUser(session).getUserId();
-        List<Orders> orders = orderService.findOrderBySellerId(userId,fromDate,toDate,type,status);
+        List<Orders> orders = orderService.findOrderBySellerId(userId,fromDate,toDate,type,deliveryStatus,orderStatus);
         model.addAttribute("orders",orders);
+        if(type != null && type.equals("order")) {
+            model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.CANCEL,Orders.OrderStatus.REFUND,Orders.OrderStatus.CHANGE));
+            return "/order/seller/refund-list";
+        }
         model.addAttribute("statusList", Arrays.asList(Delivery.DeliveryStatus.values()));
         return "/order/seller/list";
     }

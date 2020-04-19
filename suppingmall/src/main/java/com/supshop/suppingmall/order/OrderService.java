@@ -57,10 +57,15 @@ public class OrderService {
     }
 
     //판매자의 관점에서 주문을 조회
-    public List<Orders> findOrderBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Delivery.DeliveryStatus status) {
+    public List<Orders> findOrderBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Delivery.DeliveryStatus deliveryStatus, Orders.OrderStatus orderStatus) {
         LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
         LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(23, 59)).orElse(null);
-        String code = Optional.ofNullable(status).map(Delivery.DeliveryStatus::getCode).orElse(null);
+        String code = "";
+        if(type != null && type.equals("delivery")) {
+            code = Optional.ofNullable(deliveryStatus).map(Delivery.DeliveryStatus::getCode).orElse(null);
+        } else if(type != null && type.equals("order")) {
+            code = Optional.ofNullable(orderStatus).map(Orders.OrderStatus::getCode).orElse(null);
+        }
         List<Orders> ordersList = orderMapper.findBySellerId(userId, formDateTime, toDateTime, type,  code);
         return ordersList;
     }
