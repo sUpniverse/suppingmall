@@ -36,7 +36,8 @@
         memo,
         vendor,
         tracking_number,
-        status
+        status,
+        create_date
         )
         VALUES (
         #{name},
@@ -45,9 +46,10 @@
         #{zipCode},
         #{phone},
         #{memo},
-        #{deliveryVendor, typeHandler=com.supshop.suppingmall.delivery.DeliveryVendorHandler},
+        #{vendor, typeHandler=com.supshop.suppingmall.delivery.DeliveryVendorHandler},
         #{trackingNumber},
-        #{status, typeHandler=com.supshop.suppingmall.delivery.DeliveryStatusHandler}
+        #{status, typeHandler=com.supshop.suppingmall.delivery.DeliveryStatusHandler},
+        now()
         );
     </insert>
 
@@ -55,8 +57,15 @@
         UPDATE Delivery SET
         vendor = #{delivery.vendor, typeHandler=com.supshop.suppingmall.delivery.DeliveryVendorHandler},
         tracking_number = #{delivery.trackingNumber},
-        status = #{delivery.status, typeHandler=com.supshop.suppingmall.delivery.DeliveryStatusHandler}
+        status = #{delivery.status, typeHandler=com.supshop.suppingmall.delivery.DeliveryStatusHandler},
+        updated_date = now()
         WHERE delivery_id = #{deliveryId}
     </update>
+
+    <delete id="delete">
+        DELETE
+        FROM delivery
+        WHERE delivery_id = #{delivery.id}
+    </delete>
 
 </mapper>

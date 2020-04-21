@@ -73,8 +73,8 @@
                         <span class="text-muted" th:text="@{'('+${order.buyer.phoneNumber}+')'}" style="font-size: 14px"></span>
                     </div>
                     <div class="col col-lg-2  d-flex align-items-center text-center">
-                        <a class="form-control" href="#" th:href="'javascript:getDeliveryForm('+${order.delivery.deliveryId}+')'" th:if="${#strings.equals(order.delivery?.status,'CHANGE')}">교환확인</a>
-                        <a class="form-control" href="#" th:href="'javascript:getDeliveryForm('+${order.delivery.deliveryId}+')'" th:if="${#strings.equals(order.delivery?.status,'REFUND')}">환불확인</a>
+                        <a class="form-control" href="#" th:href="'javascript:checkChange('+${order.delivery.deliveryId}+')'" th:if="${#strings.equals(order.delivery?.status,'CHANGE')}">교환확인</a>
+                        <a class="form-control" href="#" th:href="'javascript:checkRefund('+${order.delivery.deliveryId}+')'" th:if="${#strings.equals(order.delivery?.status,'REFUND')}">환불확인</a>
                     </div>
                 </li>
             </ul>
@@ -90,6 +90,14 @@
         var toDate = document.getElementById('toDate').value;
         var status = document.getElementById('status').value;
         $(location).attr('href','/orders/seller/main?fromDate=' + fromDate + '&toDate=' + toDate +'&type=order&status=' + status);
+    }
+
+    function checkChange(deliveryId) {
+        // window.open("/delivery/"+deliveryId+"/form","_blank","width=500,height=600,left=500,top=100,menubar=no,toolbar=no,location=no");
+    }
+
+    function checkRefund(deliveryId) {
+
     }
 </script>
 </body>

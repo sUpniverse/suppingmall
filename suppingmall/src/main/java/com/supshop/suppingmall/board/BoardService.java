@@ -3,6 +3,8 @@ package com.supshop.suppingmall.board;
 import com.supshop.suppingmall.comment.CommentService;
 import com.supshop.suppingmall.mapper.BoardMapper;
 import com.supshop.suppingmall.page.BoardCriteria;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -11,15 +13,11 @@ import java.util.Optional;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class BoardService {
 
-    private BoardMapper boardMapper;
-    private CommentService commentService;
-
-    public BoardService(BoardMapper boardMapper, CommentService commentService) {
-        this.boardMapper = boardMapper;
-        this.commentService = commentService;
-    }
+    private final BoardMapper boardMapper;
+    private final CommentService commentService;
 
     public List<Board> getAllBoard() { return boardMapper.selectAllBoard(); }
 
@@ -51,5 +49,10 @@ public class BoardService {
 
     public void deleteBoard(Long id) {
         boardMapper.deleteBoard(id);
+    }
+
+    public List<Board> getBoardsByProduct(Long productId,Long categoryId) {
+        List<Board> boards = boardMapper.findBoardsByProductId(productId,categoryId);
+        return boards;
     }
 }

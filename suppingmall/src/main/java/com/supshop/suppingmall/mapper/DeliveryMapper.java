@@ -8,4 +8,6 @@ public interface DeliveryMapper {
     Long save(Delivery delivery);
 
     Long saveVendor(Long deliveryId,Delivery delivery);
+
+    void delete(Delivery delivery);
 }

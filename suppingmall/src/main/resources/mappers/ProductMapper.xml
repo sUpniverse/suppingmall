@@ -13,6 +13,8 @@
         <result property="picture" column="ProductPicture" />
         <result property="rating" column="ProductRating" />
         <result property="contents" column="ProductContents" />
+        <result property="deliveryPrice" column="ProductDeliveryPrice" />
+        <result property="deliveryVendor" column="ProductDeliveryVendor" typeHandler="com.supshop.suppingmall.delivery.DeliveryVendorHandler"/>
         <association property="detail" column="ProductId" javaType="com.supshop.suppingmall.product.ProductDetail">
             <id property="detailId" column="ProductDetailId" />
             <result property="asNumber" column="ProductAsNumber"/>
@@ -81,8 +83,8 @@
     </sql>
 
     <select id="findProductsById" resultMap="product">
-        SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice",
-        P.registered_date AS "ProductRegisteredDate", P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory",
+        SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.registered_date AS "ProductRegisteredDate",
+        P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
         P.thumbnail AS "ProductThumbnail", P.picture AS "ProductPicture", P.rating AS "ProductRating",
         PD.product_detail_id AS "ProductDetailId", PD.as_number AS "ProductAsNumber", PD.manuplated_date AS "PrdouctManuplatedDate",
         PD.contry_of_origin AS "ProductOrigin", PD.manufacturer AS "ProductManufacturer", PD.spec_1 AS "ProductSpec1",
@@ -106,8 +108,8 @@
     </sql>
 
     <select id="findProduct" resultMap="product" >
-        SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice",
-        P.registered_date AS "ProductRegisteredDate", P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory",
+        SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.registered_date AS "ProductRegisteredDate",
+        P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
         P.thumbnail AS "ProductThumbnail", P.picture AS "ProductPicture", P.rating AS "ProductRating", P.contents AS "ProductContents",
         PD.product_detail_id AS "ProductDetailId", PD.as_number AS "ProductAsNumber", PD.manuplated_date AS "PrdouctManuplatedDate",
         PD.contry_of_origin AS "ProductOrigin", PD.manufacturer AS "ProductManufacturer", PD.spec_1 AS "ProductSpec1",

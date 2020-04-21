@@ -1,13 +1,18 @@
 package com.supshop.suppingmall.product;
 
+import com.supshop.suppingmall.board.Board;
+import com.supshop.suppingmall.board.BoardService;
+import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryService;
 import com.supshop.suppingmall.common.SessionUtils;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.image.ImageController;
 import com.supshop.suppingmall.image.ImageService;
+import com.supshop.suppingmall.product.Form.QnaForm;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserVO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +31,7 @@ public class ProductController {
     private final ProductService productService;
     private final CategoryService categoryService;
     private final ImageService imageService;
+    private final BoardService boardService;
 
     @GetMapping("/form")
     public String form(HttpSession session,Model model) {
@@ -48,7 +54,12 @@ public class ProductController {
     @GetMapping("/{id}")
     public String getProduct(@PathVariable Long id, Model model) {
         Product product = productService.findProduct(id);
+        List<Board> qnaList = boardService.getBoardsByProduct(id,30l);
+        List<Board> reviews = boardService.getBoardsByProduct(id,29l);
+
         model.addAttribute("product",product);
+        model.addAttribute("qnaList",qnaList);
+        model.addAttribute("reviews",reviews);
         return "/product/product";
     }
 
@@ -90,5 +101,60 @@ public class ProductController {
         model.addAttribute("user",sessionUser);
         model.addAttribute("products",products);
         return "/product/seller/list";
+    }
+
+    @GetMapping("/{productId}/qnas/form")
+    public String getQnaForm(@PathVariable Long productId,
+                             HttpSession session,
+                             Model model) {
+        model.addAttribute("productId",productId);
+        return "/product/board/qnaForm";
+    }
+
+    @PostMapping("/{id}/qnas")
+    @ResponseBody
+    public ResponseEntity createQnaByProductId(@RequestBody QnaForm qna,
+                                               @PathVariable Long id,
+                                               HttpSession session) {
+
+
+        Board board = Board.builder()
+                .category(Category.builder().id(30l).build())
+                .title(qna.getTitle())
+                .product(Product.builder().productId(id).build())
+                .creator(UserVO.builder().userId(qna.getUserId()).build()).build();
+        boardService.createBoard(board);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/qnas/{id}")
+    public String getQna(@PathVariable Long id,
+                                       Board board,
+                                       HttpSession session) {
+        return "";
+    }
+
+    @PutMapping("/qnas/{qnaId}")
+    @ResponseBody
+    public ResponseEntity updateQna(@PathVariable Long qnaId,
+                                    @RequestBody Board board,
+                                    HttpSession session) {
+        boardService.updateBoard(qnaId, board);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/qnas/{id}")
+    @ResponseBody
+    public ResponseEntity deleteQna(@PathVariable Long qnaId,
+                                       HttpSession session) {
+
+        boardService.deleteBoard(qnaId);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @GetMapping("/{productId}/reivews")
+    public String getReviewForm(@PathVariable Long productId) {
+        return "";
     }
 }

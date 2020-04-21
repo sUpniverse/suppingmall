@@ -19,6 +19,7 @@ public class DeliveryController {
     public String getDeliveryForm(@PathVariable Long id, HttpSession session, Model model) {
         Delivery delivery = deliveryService.findDelivery(id);
         model.addAttribute("delivery",delivery);
+        model.addAttribute("vendors", Delivery.DeliveryVendor.values());
         return "/delivery/form";
     }
 

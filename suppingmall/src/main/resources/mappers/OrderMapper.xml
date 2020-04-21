@@ -53,6 +53,8 @@
                 <result property="name" column="ProductName" />
                 <result property="price" column="ProductPrice" />
                 <result property="thumbnail" column="ProductThumbnail" />
+                <result property="deliveryPrice" column="ProductDeliveryPrice" />
+                <result property="deliveryVendor" column="ProductDeliveryVendor" typeHandler="com.supshop.suppingmall.delivery.DeliveryVendorHandler"/>
             </association>
             <association property="productOption" javaType="com.supshop.suppingmall.product.ProductOption">
                 <id property="productId" column="ProductId" />
@@ -71,7 +73,7 @@
         D.delivery_id AS "DeliveryId", D.name AS "DeliveryName", D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode",
         D.phone AS "DeliveryPhone", D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
         PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus",
-        PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
+        PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
         OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice",
         P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail",
         PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity"
@@ -96,7 +98,7 @@
         PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus",
         PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
         OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice",
-        P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail",
+        P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
         PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity"
         FROM Orders AS O
         LEFT OUTER JOIN User AS B on (O.buyer_id = B.user_id)

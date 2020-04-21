@@ -68,7 +68,8 @@
                     <div th:if="${#strings.equals(order.status,'DELIVERY')}">
                         <span th:text="${order.delivery.status.title}"></span>
                         <br>
-                        <button class="btn btn-success btn-sm" href="#">배송조회</button>
+                        <button th:if="${not #strings.equals(order.delivery.status,'WAIT')}" class="btn btn-success btn-sm" href="#">배송조회</button>
+                        <a class="form-control" href="#" th:href="'javascript:getDeliveryForm('+${order.delivery.deliveryId}+')'" th:if="${#strings.equals(order.delivery.status,'WAIT')}">송장등록</a>
                     </div>
                 </td>
                 <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${iter.index} > 0">
@@ -223,4 +224,9 @@
     </div>
 </div>
 </body>
+<script>
+    function getDeliveryForm(deliveryId) {
+        window.open("/delivery/"+deliveryId+"/form","_blank","width=500,height=600,left=500,top=100,menubar=no,toolbar=no,location=no");
+    }
+</script>
 </html>

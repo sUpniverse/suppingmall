@@ -2,6 +2,7 @@ package com.supshop.suppingmall.board;
 
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.comment.Comment;
+import com.supshop.suppingmall.product.Product;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserVO;
 import lombok.*;
@@ -22,6 +23,7 @@ public class Board {
     private Category category;
     private int hit;
     private String delYn;
+    private Product product;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 

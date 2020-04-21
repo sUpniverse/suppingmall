@@ -77,13 +77,16 @@ public class Orders {
         for(OrderItem orderItem : this.orderItems) {
             price += orderItem.getPrice();
         }
-
         return price;
     }
 
     public int getAmountPrice() {
-        int deliveryPrice = this.orderItems.get(0).getProduct().getDeliveryPrice();
+        int deliveryPrice = getDeliveryPrice();
         return this.getAmountProductPrice() + deliveryPrice;
+    }
+
+    public int getDeliveryPrice() {
+        return this.orderItems.get(0).getProduct().getDeliveryPrice();
     }
 
     public int getAmountProductCount() {
@@ -93,4 +96,6 @@ public class Orders {
         }
         return count;
     }
+
+
 }

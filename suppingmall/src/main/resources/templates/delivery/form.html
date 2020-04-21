@@ -23,12 +23,12 @@
                 </td>
                 <td>
                     <select class="form-control" name="vendor">
-                        <option selected>택배사를 선택해주세요</option>
-                        <option value="OFFICE">우체국</option>
-                        <option value="CJ">대한통운</option>
-                        <option value="HANJIN">한진택배</option>
-                        <option value="LOGEN">로젠택배</option>
-                        <option value="LOTTE">롯데택배</option>
+                        <option th:each="vendor : ${vendors}" th:text="${vendor.title}" th:selected="${#strings.equals(vendor,delivery.vendor)}" th:value="${vendor}"></option>
+<!--                        <option value="OFFICE">우체국</option>-->
+<!--                        <option value="CJ">대한통운</option>-->
+<!--                        <option value="HANJIN">한진택배</option>-->
+<!--                        <option value="LOGEN">로젠택배</option>-->
+<!--                        <option value="LOTTE">롯데택배</option>-->
                     </select>
                 </td>
             </tr>
@@ -84,5 +84,8 @@
         } finally {}
         return obj;
     }
+</script>
+<script>
+    console.log([[${delivery.vendor}]]);
 </script>
 </html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:include="fragments/header :: header" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" />
+    <style>
+        ul{
+            list-style:none;
+            padding: unset;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark">
+    <h3 class="navbar-brand" >상품 Q&A 작성하기</h3>
+</nav>
+<div class="container">
+    <div class="mt-3">
+        <form role="form" th:method="POST" name="qna" th:action="@{/products/{id}/qnas(id=${productId})}">
+            <input type="hidden" th:name="userId" th:value="${session.user.userId}">
+            <div>
+                <textarea type="text" class="form-control" name="title"></textarea>
+            </div>
+        </form>
+    </div>
+    <div class="mt-3 align-items-center form-inline">
+        <a class="btn btn-success btn-sm form-control" href="#" th:href="'javascript:submit()'">등록하기</a>
+        <a class="form-control btn-sm text-center" href="#" th:href="'javascript:cancel()'">취소</a>
+    </div>
+</div>
+<div class="mt-3 bg-light">
+    <div class="border">
+        <a href="#" role="button" aria-expanded="true">
+            <strong>상품 Q&amp;A 작성 유의사항</strong>
+        </a>
+    </div>
+    <ul class="mt-2">
+        <li class="notice_item">상품 Q&amp;A는 상품 및 상품 구매 과정(배송, 반품/취소, 교환/변경)에 대해 판매자에게 문의하는 ​게시판입니다.</li>
+        <li class="notice_item">상품 및 상품 구매 과정과 관련 없는 비방/욕설/명예훼손성 게시글 및 상품과 관련 없는 광고글 등 부적절한 게시글 등록 시 글쓰기 제한 및 게시글이 삭제 조치 될 수 있습니다.</li>
+        <li class="notice_item">상품에 대한 이용 후기는 리뷰에 남겨 주세요.</li>
+    </ul>
+</div>
+
+</body>
+<script>
+
+    function submit() {
+        var qna = $("form[role='form']").serializeObject();
+        var productId = [[${productId}]];
+        $.ajax({
+            type: 'POST',
+            url: "/products/"+productId+"/qnas",
+            dataType: 'text',
+            data: JSON.stringify(qna),
+            contentType: 'application/json',
+            success: () => {
+                alert("Q&A가 등록되었습니다.");
+                window.opener.location.reload();
+                window.close();
+            },
+            error: (response, error) => {
+                alert("Q&A등록에 실패했습니다.")
+            }
+        })
+    }
+</script>
+<script>
+    jQuery.fn.serializeObject = function() {
+        var obj = null;
+        try {
+            if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) {
+                var arr = this.serializeArray();
+                if(arr){ obj = {};
+                    jQuery.each(arr, function() { obj[this.name] = this.value; });
+                }
+            }
+        } catch(e) {
+            alert(e.message);
+        } finally {}
+        return obj;
+    }
+</script>
+<script>
+    function cancel() {
+        window.close();
+    }
+</script>
+</html>

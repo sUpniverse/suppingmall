@@ -32,4 +32,10 @@ public class DeliveryService {
         deliveryMapper.saveVendor(id,delivery);
         return delivery.getDeliveryId();
     }
+
+    @Transactional
+    public void delete(Delivery delivery) {
+        //결제 취소시 배송기록 삭제
+        deliveryMapper.delete(delivery);
+    }
 }

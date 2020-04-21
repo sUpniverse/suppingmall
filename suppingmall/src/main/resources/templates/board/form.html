@@ -1,125 +1,125 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <div th:include="fragments/header :: header" />
-        <script src="https://cdn.ckeditor.com/ckeditor5/15.0.0/classic/ckeditor.js"></script>
-        <style>
-            .ck.ck-editor__editable {
-                min-height: 300px;
-            }
+<head>
+    <div th:include="fragments/header :: header" />
+    <script src="https://cdn.ckeditor.com/ckeditor5/15.0.0/classic/ckeditor.js"></script>
+    <style>
+        .ck.ck-editor__editable {
+            min-height: 300px;
+        }
 
-        </style>
-    </head>
-    <body>
-        <nav th:replace="fragments/navigation :: navigation" />
-        <div class="container">
-            <form th:action="@{/boards}" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="category.id" th:value="1">
-                <input th:type="hidden" th:name="creator.userId" th:value="${session.user.userId}" >
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th scope="col">게시판 작성</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>
-                            <select type="text">
-                                <option disabled selected value> -- 옵션을 선택하세요 -- </option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input class="form-control" type="text" name="title" placeholder="제목">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <textarea th:name="contents" id="editor"></textarea>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <input class="btn btn-success" type="submit" value="등록하기">
-            </form>
-        </div>
-    </body>
-    <script type="text/javascript">
+    </style>
+</head>
+<body>
+    <nav th:replace="fragments/navigation :: navigation" />
+    <div class="container">
+        <form th:action="@{/boards}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="category.id" th:value="1">
+            <input th:type="hidden" th:name="creator.userId" th:value="${session.user.userId}" >
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">게시판 작성</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <select type="text">
+                            <option disabled selected value> -- 옵션을 선택하세요 -- </option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input class="form-control" type="text" name="title" placeholder="제목">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <textarea th:name="contents" id="editor"></textarea>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <input class="btn btn-success" type="submit" value="등록하기">
+        </form>
+    </div>
+</body>
+<script type="text/javascript">
 
 
-        ClassicEditor
-            .create( document.querySelector('#editor'), {
-                language: "ko"
-            })
-            .then( editor => {
-                editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-                    return new MyUploadAdapter(loader);
-                };
-            })
-            .catch(function (error) {
-                console.log(error);
+    ClassicEditor
+        .create( document.querySelector('#editor'), {
+            language: "ko"
+        })
+        .then( editor => {
+            editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+                return new MyUploadAdapter(loader);
+            };
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+
+    class MyUploadAdapter {
+
+        constructor(loader) {
+            this.loader = loader;
+        }
+        upload() {
+            return this.loader.file
+                .then(file => new Promise((resolve, reject) => {
+                    this._initRequest();
+                    this._initListeners(resolve, reject, file);
+                    this._sendRequest(file);
+                }));
+        }
+
+        abort() {
+            if (this.xhr) { this.xhr.abort(); }
+
+        }
+
+        _initRequest() {
+            const xhr = this.xhr = new XMLHttpRequest();
+            xhr.open('POST', '/images/board', true);
+            xhr.responseType = 'json';
+        }
+
+        _initListeners(resolve, reject, file) {
+            const xhr = this.xhr;
+            const loader = this.loader;
+            const genericErrorText = `Couldn't upload file: ${ file.name }.`;
+            xhr.addEventListener('error', () => reject(genericErrorText));
+            xhr.addEventListener('abort', () => reject());
+            xhr.addEventListener('load', () => {
+                const response = xhr.response;
+                if (!response || response.error) {
+                    return reject(response && response.error ? response.error.message : genericErrorText);
+                }
+                resolve({
+                    default: response.url
+                });
             });
 
-
-        class MyUploadAdapter {
-
-            constructor(loader) {
-                this.loader = loader;
-            }
-            upload() {
-                return this.loader.file
-                    .then(file => new Promise((resolve, reject) => {
-                        this._initRequest();
-                        this._initListeners(resolve, reject, file);
-                        this._sendRequest(file);
-                    }));
-            }
-
-            abort() {
-                if (this.xhr) { this.xhr.abort(); }
-
-            }
-
-            _initRequest() {
-                const xhr = this.xhr = new XMLHttpRequest();
-                xhr.open('POST', '/images/board', true);
-                xhr.responseType = 'json';
-            }
-
-            _initListeners(resolve, reject, file) {
-                const xhr = this.xhr;
-                const loader = this.loader;
-                const genericErrorText = `Couldn't upload file: ${ file.name }.`;
-                xhr.addEventListener('error', () => reject(genericErrorText));
-                xhr.addEventListener('abort', () => reject());
-                xhr.addEventListener('load', () => {
-                    const response = xhr.response;
-                    if (!response || response.error) {
-                        return reject(response && response.error ? response.error.message : genericErrorText);
+            if (xhr.upload) {
+                xhr.upload.addEventListener('progress', evt => {
+                    if (evt.lengthComputable) {
+                        loader.uploadTotal = evt.total;
+                        loader.uploaded = evt.loaded;
                     }
-                    resolve({
-                        default: response.url
-                    });
                 });
-
-                if (xhr.upload) {
-                    xhr.upload.addEventListener('progress', evt => {
-                        if (evt.lengthComputable) {
-                            loader.uploadTotal = evt.total;
-                            loader.uploaded = evt.loaded;
-                        }
-                    });
-                }
-            }
-
-            _sendRequest(file) {
-                const data = new FormData();
-                data.append('file', file);
-                this.xhr.send(data);
             }
         }
 
-    </script>
+        _sendRequest(file) {
+            const data = new FormData();
+            data.append('file', file);
+            this.xhr.send(data);
+        }
+    }
+
+</script>
 </html>

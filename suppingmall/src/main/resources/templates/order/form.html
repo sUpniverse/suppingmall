@@ -54,18 +54,10 @@
 
                                 </div>
                             </td>
-                            <td>
-                                <!--                                <a href="">[[${product.seller.storeVO.storeName}</a>-->
-                            </td>
-                            <td>
-                                배송비
-                            </td>
-                            <td>
-                                [[${tempOrder.getAmountProductCount()}]]개
-                            </td>
-                            <td>
-                                [[${#numbers.formatInteger(tempOrder.getAmountPrice(),3,'COMMA')}]]원
-                            </td>
+                            <td><!--                                <a href="">[[${product.seller.storeVO.storeName}</a>--></td>
+                            <td>배송비</td>
+                            <td th:text="@{${tempOrder.getAmountProductCount()}+'개'}"></td>
+                            <td th:text="@{${#numbers.formatInteger(tempOrder.getAmountPrice(),3,'COMMA')}+'원'}"></td>
                         </tr>
                         </tbody>
                     </table>
@@ -88,15 +80,9 @@
                                 </div>
                                 <div style="display: block;" id="originDelivery">
                                     <ul>
-                                        <li>
-                                            [[${session.user.name}]]
-                                        </li>
-                                        <li>
-                                            [[${session.user.phoneNumber}]]
-                                        </li>
-                                        <li>
-                                            ([[${session.user.zipCode}]])  [[${session.user.address}]]  [[${session.user.addressDetail}]]
-                                        </li>
+                                        <li th:text="${session.user.name}"></li>
+                                        <li th:text="${session.user.phoneNumber}"></li>
+                                        <li th:text="@{${session.user.zipCode} + ' ' +${session.user.address}+' '+${session.user.addressDetail}}"></li>
                                     </ul>
                                 </div>
                                 <div id="newDelivery" style="display: none;">
@@ -144,15 +130,9 @@
                                 <h4>주문자정보</h4>
                                 <input type="hidden" name="delivery.name" th:value="${session.user.name}">
                                 <ul>
-                                    <li>
-                                        [[${session.user.name}]]
-                                    </li>
-                                    <li>
-                                        [[${session.user.phoneNumber}]]
-                                    </li>
-                                    <li>
-                                        [[${session.user.email}]]
-                                    </li>
+                                    <li th:text="${session.user.name}"></li>
+                                    <li th:text="${session.user.phoneNumber}"></li>
+                                    <li th:text="${session.user.email}"></li>
                                 </ul>
                             </div>
                         </div>
@@ -181,16 +161,11 @@
                         <h4>결제금액</h4>
                         <ul>
                             <li>
-                                <h1>
-                                    [[${#numbers.formatInteger(tempOrder.getAmountPrice(),3,'COMMA')}]]원
-                                </h1>
+                                <h1 th:text="@{${#numbers.formatInteger(tempOrder.getAmountPrice(),3,'COMMA')}+'원'}"></h1>
                             </li>
                             <hr />
-                            <li>
-                                총 상품금액 [[${#numbers.formatInteger(tempOrder.getAmountProductPrice(),3,'COMMA')}]]원
-                            </li>
-                            <li>
-                                배송비 원
+                            <li th:text="@{'총 상품금액 : ' + ${#numbers.formatInteger(tempOrder.getAmountProductPrice(),3,'COMMA')}}"></li>
+                            <li th:text="@{'배송비 : ' + ${#numbers.formatInteger(product.deliveryPrice,3,'COMMA')}+'원'}">
                             </li>
                         </ul>
                     </div>

@@ -68,7 +68,7 @@
                         <span th:text="${order.seller.storeVO?.storePhoneNumber}"></span>
                     </div>
                     <div class="col col-lg-2  d-flex align-items-center">
-                        <button class="form-control">재구매</button>
+                        <a class="form-control text-center" th:href="@{'/products/'+${order.orderItems[0].product.productId}}" th:text="재구매"></a>
                     </div>
                 </li>
             </ul>

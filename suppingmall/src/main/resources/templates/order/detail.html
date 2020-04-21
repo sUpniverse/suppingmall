@@ -64,11 +64,11 @@
                         <span class="text-muted" th:text="@{'('+${order.seller.storeVO.storePhoneNumber}+')'}" style="font-size: 13px;"></span>
                     </td>
                     <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${iter.index} > 0">
-                        <span th:if="${not #strings.equals(order.delivery.status,'DELIVERY')}" th:text="${order.status.title}"></span>
-                        <div th:if="${#strings.equals(order.delivery.status,'DELIVERY')}">
+                        <span th:if="${not #strings.equals(order.status,'DELIVERY')}" th:text="${order.status.title}"></span>
+                        <div th:if="${#strings.equals(order.status,'DELIVERY')}">
                             <span th:text="${order.delivery.status.title}"></span>
                             <br>
-                            <button class="btn btn-success btn-sm" href="#">배송조회</button>
+                            <button th:if="${not #strings.equals(order.delivery.status,'WAIT')}" class="btn btn-success btn-sm" href="#">배송조회</button>
                         </div>
                     </td>
                     <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${iter.index} > 0">
@@ -132,7 +132,7 @@
                                     </li>
                                     <li class="text-muted">
                                         <span>배송비</span>
-                                        <span class="align-right"></span>
+                                        <span class="align-right" th:text="@{${#numbers.formatInteger(order.getDeliveryPrice(),3,'COMMA')}+'원'}"></span>
                                     </li>
                                 </ul>
                             </dl>
@@ -172,8 +172,9 @@
                         <dl>
                             <dt>총 결제금액</dt>
                             <dd class="text-right text-danger">
-                                    <strong th:text="@{${#numbers.formatInteger(order.getAmountPrice(),3,'COMMA')}}"></strong>
-                                    원
+                                <h3>
+                                    <strong th:text="@{${#numbers.formatInteger(order.getAmountPrice(),3,'COMMA')}+'원'}"></strong>
+                                </h3>
                             </dd>
                             <div class="container bg-white">
                                 <li>
@@ -197,7 +198,7 @@
                 </tr>
                 <tr>
                     <td colspan="3">
-                        <span>결제수단 [[${order.payment.paymentType.title}]]</span>
+                        <span th:text="@{'결제수단' + ${order.payment.paymentType.title}}"></span>
                         <span class="text-danger" th:if="${#strings.equals(order.status,'CANCEL')}" th:text="${order.payment.status.title}"></span>
                     </td>
                 </tr>
@@ -209,7 +210,6 @@
     </div>
 </div>
 <script th:inline="javascript">
-    console.log([[${order.status}]]);
 </script>
 </body>
 </html>

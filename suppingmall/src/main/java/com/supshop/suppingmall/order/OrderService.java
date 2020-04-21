@@ -14,6 +14,7 @@ import com.supshop.suppingmall.product.ProductService;
 import com.supshop.suppingmall.user.UserService;
 import com.supshop.suppingmall.user.UserVO;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -94,6 +95,7 @@ public class OrderService {
 
         //배송 내용 추가
         Delivery delivery = orderForm.getDelivery();
+        delivery.setStatus(Delivery.DeliveryStatus.WAIT);
         Long deliveryId = deliveryService.save(delivery);
 
         //상품 수량 변경
@@ -116,6 +118,13 @@ public class OrderService {
     //상품 교환 or 취소시
     @Transactional
     public Long updateOrderStatus(Long orderId, Orders.OrderStatus orderStatus) {
+        Optional<Orders> one = orderMapper.findOne(orderId);
+        if(one.isEmpty()) {
+           return null;
+        }
+        Orders orders = one.get();
+        paymentService.cancelPayment(orders.getPayment());
+        orders.getDelivery().getDeliveryId();
         orderMapper.updateOrder(orderId, orderStatus, null, null);
         return orderId;
     }
@@ -164,6 +173,9 @@ public class OrderService {
         }
         payment.setStatus(Payment.PaymentStatus.CANCEL);
         paymentService.cancelPayment(payment);
+
+        //배송 기록 삭제
+        deliveryService.delete(order.getDelivery());
 
         // 주문 상태 변경
         order.setStatus(Orders.OrderStatus.CANCEL);

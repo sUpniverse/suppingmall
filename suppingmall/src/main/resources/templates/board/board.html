@@ -87,7 +87,7 @@
         </div>
     </div>
 </body>
-
+<footer th:include="fragments/footer :: footer" />
 <script th:inline="javascript">
     $(document).ready(function() {
         var formObj = $("form[role='form']");
@@ -240,6 +240,4 @@
         return false;
     }
 </script>
-
-<footer th:include="fragments/footer :: footer" />
 </html>

@@ -46,11 +46,12 @@ public class OrderController {
 
     @PostMapping("")
     public String createOrder(OrderForm orderForm, HttpSession session){
-        //성공
+        System.out.println(orderForm.toString());
         orderService.order(orderForm);
+        //성공
         return "/order/success";
 
-        //실패
+
     }
 
     @GetMapping("")

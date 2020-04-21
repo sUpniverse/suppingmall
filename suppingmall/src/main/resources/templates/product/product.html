@@ -59,14 +59,10 @@
                             <hr>
                             <!-- price -->
                             <div>
-                                <h4 class="mb-1 font-weight-bold text-muted">
-                                    [[${#numbers.formatInteger(product.price,3,'COMMA')}]]원
-                                </h4>
+                                <h4 class="mb-1 font-weight-bold text-muted" th:text="@{${#numbers.formatInteger(product.price,3,'COMMA')}+'원'}"></h4>
                             </div>
                             <hr>
-                            <p>
-                                배송비 : 무료 | 도서산간배송비 추가
-                            </p>
+                            <p th:text="@{'배송사 : '+${product.deliveryVendor.title}+'  배송비 :' + ${#numbers.formatInteger(product.deliveryPrice,3,'COMMA')}+'원'+' | 도서산간배송비 추가'}"></p>
                             <hr>
                             <!-- origin -->
                             <div class="font-weight-bold">
@@ -116,21 +112,35 @@
         <h4>전체리뷰</h4>
         <hr>
         <ul>
-            <li>
+            <li th:each="reivew : ${reviews}">
                 <p>와우 좋아요!</p>
             </li>
         </ul>
     </div>
     <div class="mt-5" th:id="qna">
+        <h4>Q&A</h4>
+        <p>구매하시려는 상품에 궁금하신 점이 있으신 경우 문의해 주세요</p>
+        <a class="btn btn-dark" href="#" th:href="'javascript:getCreateQnaFom('+${product.productId}+')'" th:if="${session.user}">상품 Q&A 작성하기</a>
+        <hr>
         <table class="mt-3 table">
            <thead class="thead-light">
                <tr>
-                   <th>문의유형</th>
-                   <th>문의/답변</th>
+                   <th>답변상태</th>
+                   <th>제목</th>
                    <th>작성자</th>
                    <th>작성일</th>
                </tr>
            </thead>
+           <tbody>
+             <tr th:each="qna : ${qnaList}">
+                 <td>
+
+                 </td>
+                 <td th:text="${qna.title}"></td>
+                 <td th:text="${qna.creator.nickName}"></td>
+                 <td th:text="${qna.createdDate}"></td>
+             </tr>
+           </tbody>
         </table>
     </div>
     <div class="mt-5" th:id="sellerInfo">
@@ -170,214 +180,7 @@
     </div>
 </div>
 </body>
-<script th:inline="javascript">
-
-    var optionArray = new Array();
-
-    $(document).on('change',"#product_options",() => {
-
-        let id = $("#product_options option").index($("#product_options option:selected"));
-
-        if(optionArray.indexOf(id) !== -1) {
-            alert('이미 선택되었습니다.');
-            $("#product_options option:first").prop("selected",true);
-            return;
-        }
-        optionArray.push(id);
-
-        let price = $("#product_options option:selected").val();
-        let name = $("#product_options option:selected").text();
-
-        var optionUl = document.getElementById('add_option_area');
-        var optionLi = document.createElement("li");
-        optionLi.setAttribute('class','card mb-3');
-        optionLi.setAttribute('data-prdno',id);
-        optionLi.innerHTML =
-            '<div class="card-body">\n' +
-            '    <h5 class="card-title">'+name+'</h5>\n' +
-            '<div class="row">\n' +
-            '  <div class="col-4">\n' +
-            '    <div class="input-group">\n' +
-            '      <div class="input-group-prepend">\n' +
-            '        <button type="button" class="btn btn-outline-dark btn-sm" id="subtractOption">-</button>\n' +
-            '      </div>\n' +
-            '      <input type="text" id="cuid_'+id+'" class="form-control text-center" value="1">\n' +
-            '      <div class="input-group-append">\n' +
-            '        <button type="button" class="btn btn-outline-dark btn-sm" id="plusOption">+</button>\n' +
-            '      </div>\n' +
-            '    </div>\n' +
-            '  </div>\n' +
-            '<div class="col-6">\n' +
-            '    <p class="card-text text-right"><strong class="mr-1">'+numberWithCommas(price)+'</strong>원</p>\n' +
-            '</div>\n' +
-            '<div class="col-1">\n' +
-            ' <button type="button" class="btn btn-secondary btn-sm" id="cancelProduct">x</button>\n' +
-            '</div>\n' +
-            '  </div>\n' +
-            '</div>';
-
-        optionUl.appendChild(optionLi);
-
-
-        $("#product_options option:first").prop("selected",true);
-        getSumPrice();
-
-    });
-
-
-    function getSumPrice() {
-        var pricePrint = document.getElementById("total_pr");
-        var wholePrice = numberWithCommas(getWholePrice());
-        if(!document.getElementById("total_price")) {
-            pricePrint.innerHTML =
-                '<hr>\n' +
-                '<div class="row justify-content-between" id="total_price">\n' +
-                '<strong class="col-4">총 합계 금액</strong>\n' +
-                '<span class="col-5 row">\n' +
-                '<h4 class="text-danger  mr-1" id="ui_total_price">'+wholePrice+'</h4>\n' +
-                '원\n' +
-                '</span>\n' +
-                '</div>\n' +
-                '<hr>';
-        } else {
-            document.getElementById("ui_total_price").textContent = wholePrice;
-        }
-    }
-
-    function changeButtonValue(e,fuc) {
-        var button = e.target;
-        var valueButton = button.parentElement.parentElement.getElementsByTagName('input').item(0);
-        var value = parseInt(valueButton.value);
-
-
-        priceTag = button.parentElement.parentElement.parentElement.nextElementSibling.getElementsByTagName('strong').item(0);
-
-        var attributeId = valueButton.getAttribute('id').charAt(5);
-        var eachPrice = document.getElementById('product_options')[attributeId].value;
-
-        if(fuc === "sub") {
-            if( value > 1) {
-                valueButton.value = value - 1;
-                priceTag.textContent = numberWithCommas(eachPrice * (value-1));
-                getSumPrice();
-            }
-        } else if (fuc === "add") {
-            valueButton.value = value + 1;
-            priceTag.textContent = numberWithCommas(eachPrice * (value+1));
-            getSumPrice();
-        } else if (fuc === "change") {
-            priceTag.textContent = eachPrice * value;
-            getSumPrice();
-        }
-    }
-
-    $(document).on('click',"#subtractOption",(e) => {
-        changeButtonValue(e,"sub");
-
-    });
-
-    $(document).on('click',"#plusOption",(e) => {
-        changeButtonValue(e,"add");
-    });
-
-    $(document).on('change',"#cuid_",(e) => {
-        changeButtonValue(e,"change");
-    });
-
-    $(document).on('click',"#cancelProduct",(e) =>{
-        var button = e.target;
-        var parent = button.parentElement.parentElement.parentElement.parentElement;
-        var parentId = parseInt(parent.getAttribute('data-prdno'));
-        parent.remove();
-        getSumPrice(parseInt(button.parentElement.parentElement.getElementsByTagName("strong").item(0).textContent) * -1);
-        var number = optionArray.indexOf(parentId);
-        optionArray.splice(number,1);
-
-        if(optionArray.length === 0) {
-            document.getElementById("total_pr").innerText = '';
-        }
-    });
-</script>
-<script th:inline="javascript">
-
-    $(document).ready(function() {
-        var formObj = $("form[role='form']");
-        var productId = [[${product.productId}]];
-
-        $().on("click","#basket",function() {
-
-        });
-
-        $(document).on("click","#purchase",function(e) {
-
-            var orderItemJson = setOrderItemJson();
-            document.getElementById("orderItemJson").setAttribute('value',JSON.stringify(orderItemJson));
-            console.log(orderItemJson);
-            formObj.attr("action","/orders/orderSheet");
-            formObj.attr("method","post");
-            formObj.submit();
-        });
-
-    });
-
-    function setOrderItemJson() {
-        var optionItems = document.getElementById('add_option_area').getElementsByTagName('li');
-        var Optionlength = optionItems.length;
-        var orderItems = [];
-        var temp = new Array();
-        for(var i = 0; i < Optionlength; i++) {
-            var id = optionItems[i].getAttribute('data-prdno');
-            var price = parseInt(RemoveCommas(optionItems[i].getElementsByTagName('strong').item(0).textContent));
-            var count = parseInt(optionItems[i].getElementsByTagName('input').item(0).value);
-            var orderItem = {
-                productOption : {
-                    optionId : id,
-                },
-                price : price,
-                count : count
-            };
-            temp[id] = orderItem;
-        }
-        for(var i = 0; i < temp.length; i++) {
-            if(temp[i] !== undefined) {
-                orderItems.push(temp[i]);
-            }
-        }
-        return orderItems;
-    }
-
-    function getWholePrice() {
-        var optionItems = document.getElementById("add_option_area").getElementsByTagName("li");
-        var length = optionItems.length;
-        var whole_price = 0;
-        for(var i = 0; i < length; i++) {
-            if(optionItems[i] !== null) {
-                var price = parseInt(RemoveCommas(optionItems[i].getElementsByTagName('strong').item(0).textContent));
-                whole_price += price;
-            }
-        }
-        return whole_price;
-    }
-
-    function getWholeCount() {
-        var optionItems = document.getElementById("add_option_area").getElementsByTagName("li");
-        var length = optionItems.length;
-        var whole_count = 0;
-        for(var i = 0; i < length; i++) {
-            if(optionItems[i] !== null) {
-                var count = parseInt(optionItems[i].getElementsByTagName('input').item(0).value);
-                whole_count += count;
-            }
-        }
-        return whole_count;
-    }
-
-    function numberWithCommas(x) {
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-
-    function RemoveCommas(x) {
-        return x.toString().replace(/,/gi,"")
-    }
-</script>
+<script th:inline="javascript" th:src="@{/js/product/createBuyingList.js}"></script>
+<script th:inline="javascript" th:src="@{/js/product/buyProduct.js}"></script>
+<script th:inline="javascript" th:src="@{/js/product/qna.js}"></script>
 </html>

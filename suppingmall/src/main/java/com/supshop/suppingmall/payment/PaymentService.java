@@ -34,7 +34,7 @@ public class PaymentService {
         return paymentMapper.findAll();
     }
 
-    public void cancelPayment(Payment paymentId) {
-        paymentMapper.updateStatus(paymentId);
+    public void cancelPayment(Payment payment) {
+        paymentMapper.updateStatus(payment);
     }
 }

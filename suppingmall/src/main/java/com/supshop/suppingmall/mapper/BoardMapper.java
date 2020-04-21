@@ -23,4 +23,6 @@ public interface BoardMapper {
     int selectBoardCount();
 
     void updateBoardHit(Long id);
+
+    List<Board> findBoardsByProductId(Long productId,Long categoryId);
 }
