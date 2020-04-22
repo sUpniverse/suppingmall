@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.common;
 
+import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserVO;
 import org.apache.ibatis.javassist.NotFoundException;
 
@@ -28,5 +29,16 @@ public class SessionUtils {
 
     public static UserVO getSessionUser(HttpSession session) {
         return (UserVO) session.getAttribute("user");
+    }
+
+    public static boolean isAdmin(HttpSession session) {
+        if(isSessionNull(session)) {
+            return false;
+        }
+        UserVO sessionUser = getSessionUser(session);
+        if (sessionUser.getRole().equals(User.Role.MASTER) || sessionUser.getRole().equals(User.Role.MASTER)) {
+            return true;
+        }
+        return false;
     }
 }

@@ -26,7 +26,7 @@ public class CategoryController {
 
     @GetMapping("/list")
     public String getAllCategories(HttpSession session, Model model) {
-        if (!isAdmin(session)) return "redirect:/users/loginform";
+        if (!SessionUtils.isAdmin(session)) return "redirect:/users/loginform";
         model.addAttribute("categories",categoryService.getCategories());
         return "/category/list";
     }
@@ -36,7 +36,7 @@ public class CategoryController {
     public ResponseEntity<Category> getCategories(@PathVariable Long id,
                                                   HttpSession session,
                                                   Model model) {
-        if (!isAdmin(session)) return ResponseEntity.badRequest().build();
+        if (!SessionUtils.isAdmin(session)) return ResponseEntity.badRequest().build();
         Category category = categoryService.getCategory(id);
         return ResponseEntity.ok(category);
     }
@@ -46,7 +46,7 @@ public class CategoryController {
     public ResponseEntity<List<Category>> getChildCategories(@PathVariable Long id,
                                                              HttpSession session,
                                                              Model model) {
-        if (!isAdmin(session)) return ResponseEntity.badRequest().build();
+        if (!SessionUtils.isAdmin(session)) return ResponseEntity.badRequest().build();
         List<Category> category = categoryService.getChildByParent(id);
         return ResponseEntity.ok(category);
     }
@@ -56,7 +56,7 @@ public class CategoryController {
     public ResponseEntity createCategory(@RequestBody Category category,
                                          HttpSession session,
                                          Model model) {
-        if (!isAdmin(session)) return ResponseEntity.badRequest().build();
+        if (!SessionUtils.isAdmin(session)) return ResponseEntity.badRequest().build();
         Long categoryId = categoryService.saveCategory(category);
         URI uri = linkTo(CategoryController.class).slash(categoryId).toUri();
         return ResponseEntity.created(uri).build();
@@ -68,7 +68,7 @@ public class CategoryController {
                                                  @RequestBody Category category,
                                                  HttpSession session,
                                                  Model model) {
-        if (!isAdmin(session)) return ResponseEntity.badRequest().build();
+        if (!SessionUtils.isAdmin(session)) return ResponseEntity.badRequest().build();
         categoryService.updateCategory(id,category);
         return ResponseEntity.ok().build();
     }
@@ -76,19 +76,10 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     @ResponseBody
     public ResponseEntity<String> deleteCategory(@PathVariable Long id, HttpSession session) {
-        if (!isAdmin(session)) return ResponseEntity.badRequest().build();
+        if (!SessionUtils.isAdmin(session)) return ResponseEntity.badRequest().build();
         categoryService.deleteCategory(id);
         return ResponseEntity.ok().build();
     }
 
-    private boolean isAdmin(HttpSession session) {
-        if(SessionUtils.isSessionNull(session)) {
-            return false;
-        }
-        UserVO sessionUser = SessionUtils.getSessionUser(session);
-        if (!sessionUser.getRole().equals(User.Role.MASTER) || !sessionUser.getRole().equals(User.Role.MASTER)) {
-            return true;
-        }
-        return false;
-    }
+
 }
