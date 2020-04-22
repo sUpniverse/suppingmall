@@ -33,7 +33,14 @@ public class BoardService {
         Optional<Board> board = boardMapper.selectBoard(id);
         if(!board.isEmpty()) {
             boardMapper.updateBoardHit(id);
-            board.get().setComments(commentService.getAllComments(id));
+            return board.get();
+        }
+        return null;
+    }
+
+    public Board getBoardByProduct(Long id) {
+        Optional<Board> board = boardMapper.selectBoard(id);
+        if(!board.isEmpty()) {
             return board.get();
         }
         return null;

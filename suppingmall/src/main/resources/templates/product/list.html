@@ -105,9 +105,7 @@
                                         <a class="text-body" th:href="@{'/products/'+${product.productId}}" th:text="${product.name}"></a>
                                     </div>
                                 </div>
-                                <div class="mb-1 font-weight-bold text-center" th:text="">
-                                    [[${#numbers.formatInteger(product.price,3,'COMMA')}]]원
-                                </div>
+                                <div class="mb-1 font-weight-bold text-center" th:text="@{${#numbers.formatInteger(product.price,3,'COMMA')}+'원'}"></div>
                                 <div class="rating font-size-xxs text-dark justify-content-center">
                                     <div class="rating-item">
                                         <i class="fas fa-star">

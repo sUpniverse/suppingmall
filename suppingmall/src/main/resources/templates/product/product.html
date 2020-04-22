@@ -8,6 +8,7 @@
             padding: unset;
         }
     </style>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}" />
 </head>
 <body>
 <div class="container">
@@ -101,8 +102,8 @@
 <div class="container">
     <nav class="nav nav-pills nav-justified sticky-top bg-white">
         <a class="nav-item nav-link text-dark" href="#contents"><h3>상품정보</h3></a>
-        <a class="nav-item nav-link text-dark" href="#review"><h3>상품리뷰</h3></a>
-        <a class="nav-item nav-link text-dark" href="#qna"><h3>Q&A</h3></a>
+        <a class="nav-item nav-link text-dark" href="#review"><h3>상품리뷰 <span class="badge badge-secondary" th:text="${reviews.size()}"></span></h3></a>
+        <a class="nav-item nav-link text-dark" href="#qna"><h3>Q&A <span class="badge badge-secondary" th:text="${qnaList.size()}"></span></h3></a>
         <a class="nav-item nav-link text-dark" href="#sellerInfo"><h3>판매자정보</h3></a>
     </nav>
     <div th:id="contents">
@@ -122,7 +123,7 @@
         <p>구매하시려는 상품에 궁금하신 점이 있으신 경우 문의해 주세요</p>
         <a class="btn btn-dark" href="#" th:href="'javascript:getCreateQnaFom('+${product.productId}+')'" th:if="${session.user}">상품 Q&A 작성하기</a>
         <hr>
-        <table class="mt-3 table">
+        <table class="mt-3 table table-small">
            <thead class="thead-light">
                <tr>
                    <th>답변상태</th>
@@ -132,11 +133,13 @@
                </tr>
            </thead>
            <tbody>
-             <tr th:each="qna : ${qnaList}">
+             <tr th:each="qna : ${qnaList}" th:id="'qna'+${qna.boardId}">
                  <td>
 
                  </td>
-                 <td th:text="${qna.title}"></td>
+                 <td>
+                     <a th:text="${qna.title}" href="#" th:href="'javascript:getQna('+${qna.boardId}+','+${session.user?.userId}+')'"></a>
+                 </td>
                  <td th:text="${qna.creator.nickName}"></td>
                  <td th:text="${qna.createdDate}"></td>
              </tr>
@@ -183,4 +186,5 @@
 <script th:inline="javascript" th:src="@{/js/product/createBuyingList.js}"></script>
 <script th:inline="javascript" th:src="@{/js/product/buyProduct.js}"></script>
 <script th:inline="javascript" th:src="@{/js/product/qna.js}"></script>
+<script th:inline="javascript" th:src="@{/js/product/editQna.js}"></script>
 </html>

@@ -24,6 +24,18 @@
         </association>
         <collection property="comments" ofType="com.supshop.suppingmall.comment.Comment">
             <id property="commentId" column="CommentId" />
+            <result property="level" column="CommentLevel" />
+            <result property="title" column="CommentTitle" />
+            <result property="contents" column="CommentContents" />
+            <result property="delYn" column="CommentDelYn" />
+            <result property="createdDate" column="CommentCreatedDate" />
+            <result property="updatedDate" column="CommentUpdatedDate" />
+            <association property="creator" javaType="com.supshop.suppingmall.user.User">
+                <id property="userId" column="CommentUserId" />
+                <result property="email" column="CommentUserEmail" />
+                <result property="nickName" column="CommentUserNickName" />
+                <result property="createdDate" column="CommentUserCreatedDate" />
+            </association>
         </collection>
     </resultMap>
 
@@ -73,10 +85,16 @@
         SELECT B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents", B.hit AS "BoardHit",
         B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate", U.user_id AS "UserId",
         U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",
-        C.category_id AS "CategoryId", C.name AS "CategoryName"
+        C.category_id AS "CategoryId", C.name AS "CategoryName",
+        CM.comment_id AS "CommentId", CM.title AS "CommentTitle", CM.contents AS "CommentContents", CM.level AS "CommentLevel",
+        CM.created_date AS "CommentCreatedDate", CM.updated_date AS "CommentUpdatedDate",
+        CU.user_id AS "CommentUserId", CU.email AS "CommentUserEmail", CU.nickname AS "CommentUserNickName", CU.created_date AS "UserCreatedDate",
+        CU.role AS "CommentUserRole"
         FROM Board AS B
         LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
         LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
+        LEFT OUTER JOIN comment AS CM on (B.board_id = CM.board_id)
+        LEFT OUTER JOIN user AS CU on (CM.user_id = CU.user_id)
         WHERE B.board_id = #{id}
     </select>
 
@@ -95,6 +113,7 @@
         LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
         LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
         WHERE B.product_id = #{productId} AND B.category_id = #{categoryId}
+        ORDER BY B.board_id desc
     </select>
 
 

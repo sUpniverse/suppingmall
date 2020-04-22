@@ -8,7 +8,10 @@ import javax.servlet.http.HttpSession;
 public class SessionUtils {
 
     public static boolean isSameUser(Long id, HttpSession session) {
-        UserVO user = (UserVO) session.getAttribute("user");
+        if(isSessionNull(session)) {
+            return false;
+        }
+        UserVO user = getSessionUser(session);
         if(user.getUserId().equals(id)) {
             return true;
         }
@@ -24,9 +27,6 @@ public class SessionUtils {
     }
 
     public static UserVO getSessionUser(HttpSession session) {
-        if(isSessionNull(session)) {
-            return null;
-        }
         return (UserVO) session.getAttribute("user");
     }
 }

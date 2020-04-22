@@ -16,15 +16,14 @@
 </nav>
 <div class="container">
     <div class="mt-3">
-        <form role="form" th:method="POST" name="qna">
-            <input type="hidden" th:name="userId" th:value="${session.user.userId}">
+        <form role="form" name="qna">
             <div>
-                <textarea type="text" class="form-control" name="title"></textarea>
+                <textarea type="text" class="form-control" name="title" th:text="${qna.title}"></textarea>
             </div>
         </form>
     </div>
     <div class="mt-3 align-items-center form-inline">
-        <a class="btn btn-success btn-sm form-control" href="#" th:href="'javascript:submit()'">등록하기</a>
+        <a class="btn btn-success btn-sm form-control" href="#" th:href="'javascript:submit()'">수정하기</a>
         <a class="form-control btn-sm text-center" href="#" th:href="'javascript:cancel()'">취소</a>
     </div>
 </div>
@@ -46,20 +45,20 @@
 
     function submit() {
         var qna = $("form[role='form']").serializeObject();
-        var productId = [[${productId}]];
+        var qnaId = [[${qna.boardId}]];
         $.ajax({
-            type: 'POST',
-            url: "/products/"+productId+"/qnas",
+            type: 'PUT',
+            url: "/products/qnas/"+qnaId,
             dataType: 'text',
             data: JSON.stringify(qna),
             contentType: 'application/json',
             success: () => {
-                alert("Q&A가 등록되었습니다.");
+                alert("Q&A가 수정되었습니다.");
                 window.opener.location.reload();
                 window.close();
             },
             error: (response, error) => {
-                alert("Q&A등록에 실패했습니다.")
+                alert("Q&A수정에 실패했습니다.")
             }
         })
     }

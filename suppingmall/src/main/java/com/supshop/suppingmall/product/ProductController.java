@@ -107,6 +107,10 @@ public class ProductController {
     public String getQnaForm(@PathVariable Long productId,
                              HttpSession session,
                              Model model) {
+        UserVO sessionUser = SessionUtils.getSessionUser(session);
+        if(SessionUtils.isSessionNull(session)) {
+            return "redirect:/users/loginform";
+        }
         model.addAttribute("productId",productId);
         return "/product/board/qnaForm";
     }
@@ -117,8 +121,10 @@ public class ProductController {
                                                @PathVariable Long id,
                                                HttpSession session) {
 
-
-        Board board = Board.builder()
+        if(SessionUtils.isSessionNull(session)) {
+            return ResponseEntity.badRequest().build();
+        }
+                Board board = Board.builder()
                 .category(Category.builder().id(30l).build())
                 .title(qna.getTitle())
                 .product(Product.builder().productId(id).build())
@@ -128,25 +134,48 @@ public class ProductController {
     }
 
     @GetMapping("/qnas/{id}")
-    public String getQna(@PathVariable Long id,
-                                       Board board,
-                                       HttpSession session) {
-        return "";
+    @ResponseBody
+    public ResponseEntity getQna(@PathVariable Long id) {
+        Board board = boardService.getBoardByProduct(id);
+        return ResponseEntity.ok(board);
+    }
+
+    @GetMapping("/qnas/{qnaId}/updateForm")
+    public String getQnaUpdateForm(@PathVariable Long qnaId,
+                             HttpSession session,
+                             Model model) {
+        Board board = boardService.getBoard(qnaId);
+        if(!SessionUtils.isSameUser(board.getCreator().getUserId(),session)) {
+            return "redirect:/users/loginform";
+        }
+        model.addAttribute("qna",board);
+        return "/product/board/editQnaForm";
     }
 
     @PutMapping("/qnas/{qnaId}")
     @ResponseBody
     public ResponseEntity updateQna(@PathVariable Long qnaId,
-                                    @RequestBody Board board,
+                                    @RequestBody QnaForm qna,
                                     HttpSession session) {
+        Board oldQnA = boardService.getBoard(qnaId);
+        if(!SessionUtils.isSameUser(oldQnA.getCreator().getUserId(),session)) {
+            return ResponseEntity.badRequest().build();
+        }
+        Board board = Board.builder()
+                .title(qna.getTitle()).build();
         boardService.updateBoard(qnaId, board);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/qnas/{id}")
+    @DeleteMapping("/qnas/{qnaId}")
     @ResponseBody
     public ResponseEntity deleteQna(@PathVariable Long qnaId,
                                        HttpSession session) {
+
+        Board oldQnA = boardService.getBoard(qnaId);
+        if(!SessionUtils.isSameUser(oldQnA.getCreator().getUserId(),session)) {
+            return ResponseEntity.badRequest().build();
+        }
 
         boardService.deleteBoard(qnaId);
         return ResponseEntity.ok().build();

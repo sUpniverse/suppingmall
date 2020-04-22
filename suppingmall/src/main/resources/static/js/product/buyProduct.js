@@ -1,6 +1,5 @@
 $(document).ready(function() {
     var formObj = $("form[role='form']");
-    var productId = [[${product.productId}]];
 
     $().on("click","#basket",function() {
 
