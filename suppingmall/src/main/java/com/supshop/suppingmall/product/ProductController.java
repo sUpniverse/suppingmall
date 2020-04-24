@@ -9,7 +9,7 @@ import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.image.ImageController;
 import com.supshop.suppingmall.image.ImageService;
 import com.supshop.suppingmall.product.Form.QnaForm;
-import com.supshop.suppingmall.user.User;
+import com.supshop.suppingmall.user.Role;
 import com.supshop.suppingmall.user.UserVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +36,7 @@ public class ProductController {
     @GetMapping("/form")
     public String form(HttpSession session,Model model) {
         UserVO user = (UserVO) session.getAttribute("user");
-        if(user == null || !(user.getRole().equals(User.Role.SELLER) || user.getRole().equals(User.Role.MASTER))) {
+        if(user == null || !(user.getRole().equals(Role.SELLER) || user.getRole().equals(Role.MASTER))) {
             return "redirect:/users/loginform";
         }
         model.addAttribute("categories",categoryService.getCategory(2L).getChild());
@@ -66,7 +66,7 @@ public class ProductController {
     @PostMapping("")
     public String createProduct(@Valid Product product, MultipartFile[] thumnails, HttpSession session) {
         UserVO user = (UserVO) session.getAttribute("user");
-        if(user == null || !(user.getRole().equals(User.Role.SELLER) || user.getRole().equals(User.Role.MASTER))) {
+        if(user == null || !(user.getRole().equals(Role.SELLER) || user.getRole().equals(Role.MASTER))) {
             return "redirect:/users/loginform";
         }
         String thumnail = null;

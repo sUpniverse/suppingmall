@@ -4,6 +4,7 @@ target/
 !**/src/main/**
 !**/src/test/**
 src/main/resources/images
+application-oauth.yml
 
 ### STS ###
 .apt_generated

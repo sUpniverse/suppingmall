@@ -86,7 +86,7 @@ public class UserControllerTest {
                 .zipCode("00000")
                 .phoneNumber("01033334444")
                 .delYn("N")
-                .role(User.Role.getCodeString(User.Role.ADMIN.getCode()))
+                .role(Role.getCodeString(Role.ADMIN.getCode()))
                 .type(User.LoginType.getCodeString(User.LoginType.LOCAL.getCode()))
                 .build();
 
@@ -127,7 +127,7 @@ public class UserControllerTest {
                 .zipCode("00000")
                 .phoneNumber("01033334444")
                 .delYn("N")
-                .role(User.Role.getCodeString(User.Role.ADMIN.getCode()))
+                .role(Role.getCodeString(Role.ADMIN.getCode()))
                 .type(User.LoginType.getCodeString(User.LoginType.LOCAL.getCode()))
                 .build();
 
@@ -167,7 +167,7 @@ public class UserControllerTest {
                 .zipCode("00000")
                 .phoneNumber("01033334444")
                 .delYn("N")
-                .role(User.Role.getCodeString(User.Role.ADMIN.getCode()))
+                .role(Role.getCodeString(Role.ADMIN.getCode()))
                 .type(User.LoginType.getCodeString(User.LoginType.LOCAL.getCode()))
                 .build();
 
@@ -207,7 +207,7 @@ public class UserControllerTest {
                 .zipCode("00000")
                 .phoneNumber("0102223333")
                 .delYn("N")
-                .role(User.Role.getCodeString(User.Role.ADMIN.getCode()))
+                .role(Role.getCodeString(Role.ADMIN.getCode()))
                 .type(User.LoginType.getCodeString(User.LoginType.LOCAL.getCode()))
                 .build();
 
@@ -238,7 +238,7 @@ public class UserControllerTest {
     }
 
     private UserVO makeMasterUser() {
-        return UserVO.builder().userId(1l).role(User.Role.MASTER).build();
+        return UserVO.builder().userId(1l).role(Role.MASTER).build();
     }
 
     @Test
@@ -257,7 +257,7 @@ public class UserControllerTest {
                 .addressDetail("그건 엄마집")
                 .zipCode("00000")
                 .phoneNumber("0102223333")
-                .role(User.Role.getCodeString(User.Role.ADMIN.getCode()))
+                .role(Role.getCodeString(Role.ADMIN.getCode()))
                 .type(User.LoginType.getCodeString(User.LoginType.LOCAL.getCode()))
                 .build();
 

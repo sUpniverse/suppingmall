@@ -1,6 +1,8 @@
 package com.supshop.suppingmall.config;
 
+import com.supshop.suppingmall.user.CustomOAuth2UserService;
 import com.supshop.suppingmall.user.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,20 +14,18 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.CustomUserTypesOAuth2UserService;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private UserService userService;
-    private PasswordEncoder passwordEncoder;
-
-    public SecurityConfig(UserService userService, PasswordEncoder passwordEncoder) {
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public TokenStore tokenStore() {
@@ -55,6 +55,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .anonymous()
                 .and()
-            .csrf().disable();
+            .csrf().disable()
+            .logout()
+                .logoutSuccessUrl("/")
+            .and()
+                .oauth2Login()
+                    .userInfoEndpoint()
+                        .userService(customOAuth2UserService);
     }
 }

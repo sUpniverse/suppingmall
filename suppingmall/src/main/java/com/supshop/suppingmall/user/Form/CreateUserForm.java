@@ -1,17 +1,15 @@
-package com.supshop.suppingmall.user;
+package com.supshop.suppingmall.user.Form;
 
-import lombok.*;
+import com.supshop.suppingmall.user.Role;
+import com.supshop.suppingmall.user.StoreVO;
+import com.supshop.suppingmall.user.User;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 
-@Getter @Setter
-@ToString @Builder
-@EqualsAndHashCode(of = "userId")
-@NoArgsConstructor @AllArgsConstructor
-public class User {
+
+public class CreateUserForm {
 
     private final String emailReg = "^[A-Za-z0-9_]+[A-Za-z0-9]*[@]{1}[A-Za-z0-9]+[A-Za-z0-9]*[.]{1}[A-Za-z]{1,3}$";
     private final String passwordReg = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,15}$";
@@ -47,27 +45,7 @@ public class User {
     private LocalDateTime updateDate;
     private String delYn;
     private Role role;
-    private LoginType type;
+    private User.LoginType type;
 
     private StoreVO storeVO;
-
-
-    @Getter
-    @AllArgsConstructor
-    public enum LoginType {
-        LOCAL("일반로그인","000","email"),
-        GOOGLE("구글","001","sub"),
-        KAKAO("카카오","002","kakao");
-
-        private String title;
-        private String code;
-        private String key;
-
-        public static LoginType getCodeString(String code) {
-            return Arrays.stream(LoginType.values())
-                    .filter(v -> v.getCode().equals(code))
-                    .findAny()
-                    .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + code + "]"));
-        }
-    }
 }

@@ -37,7 +37,7 @@ public class UserServiceTest {
                 .zipCode("00000")
                 .phoneNumber("010-0000-0000")
                 .delYn("N")
-                .role(User.Role.getCodeString(User.Role.ADMIN.getCode()))
+                .role(Role.getCodeString(Role.ADMIN.getCode()))
                 .type(User.LoginType.getCodeString(User.LoginType.LOCAL.getCode()))
                 .build();
 

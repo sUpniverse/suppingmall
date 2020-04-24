@@ -2,7 +2,7 @@ package com.supshop.suppingmall.order;
 
 import com.supshop.suppingmall.common.SessionUtils;
 import com.supshop.suppingmall.delivery.Delivery;
-import com.supshop.suppingmall.user.User;
+import com.supshop.suppingmall.user.Role;
 import com.supshop.suppingmall.user.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,9 +70,9 @@ public class OrderController {
         Orders order = orderService.findOrder(id);
         model.addAttribute("order",order);
         UserVO sessionUser = SessionUtils.getSessionUser(session);
-        if(sessionUser.getRole().equals(User.Role.SELLER)) {
+        if(sessionUser.getRole().equals(Role.SELLER)) {
             return "/order/seller/detail";
-        } else if(sessionUser.getRole().equals(User.Role.ADMIN) || sessionUser.getRole().equals(User.Role.MASTER) ) {
+        } else if(sessionUser.getRole().equals(Role.ADMIN) || sessionUser.getRole().equals(Role.MASTER) ) {
             return "/order/seller/detail";
         }
         return "/order/detail";

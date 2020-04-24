@@ -2,6 +2,7 @@ package com.supshop.suppingmall.user;
 
 import com.supshop.suppingmall.mapper.UserMapper;
 import com.supshop.suppingmall.page.BoardCriteria;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,17 +19,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
-    private UserMapper userMapper;
-    private PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
-
-    public UserService(UserMapper userMapper, PasswordEncoder passwordEncoder, ModelMapper modelMapper) {
-        this.userMapper = userMapper;
-        this.passwordEncoder = passwordEncoder;
-        this.modelMapper = modelMapper;
-    }
 
     public List<User> getAllUser(BoardCriteria boardCriteria, String type, String searchValue) {
         return userMapper.selectAllUser(boardCriteria,type,searchValue);
@@ -48,15 +44,11 @@ public class UserService implements UserDetailsService {
         return vo;
     }
 
-    public User getUserByEmail(String email) {
-        User user = userMapper.selectUserByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(email));
-        return user;
-    }
-
     public void createUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userMapper.insertUser(user);
+        if(!isUserAlreadyExistByEmail(user.getEmail())) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            userMapper.insertUser(user);
+        }
     }
 
     public void updateUser(Long id, User user) {
@@ -84,12 +76,12 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userMapper.selectUserByEmail(email)
+        User user = userMapper.findUserByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
         return new org.springframework.security.core.userdetails.User(user.getEmail(),user.getPassword(),authorities(Arrays.asList(user.getRole())));
     }
 
-    private Collection<? extends GrantedAuthority> authorities(List<User.Role> roles) {
+    private Collection<? extends GrantedAuthority> authorities(List<Role> roles) {
         return roles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_"+ role.name()))
                 .collect(Collectors.toSet());
@@ -107,5 +99,21 @@ public class UserService implements UserDetailsService {
             return userVO;
         }
         return null;
+    }
+
+
+    protected User getUserByEmail(String email) {
+        User user = userMapper.findUserByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(email));
+        return user;
+    }
+
+    public boolean isUserAlreadyExistByEmail(String email) {
+        try {
+            getUserByEmail(email);
+        } catch (UsernameNotFoundException e) {
+            return Boolean.FALSE;
+        }
+        return Boolean.TRUE;
     }
 }

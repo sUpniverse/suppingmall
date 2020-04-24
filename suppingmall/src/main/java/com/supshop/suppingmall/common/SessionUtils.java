@@ -1,8 +1,7 @@
 package com.supshop.suppingmall.common;
 
-import com.supshop.suppingmall.user.User;
+import com.supshop.suppingmall.user.Role;
 import com.supshop.suppingmall.user.UserVO;
-import org.apache.ibatis.javassist.NotFoundException;
 
 import javax.servlet.http.HttpSession;
 
@@ -36,7 +35,7 @@ public class SessionUtils {
             return false;
         }
         UserVO sessionUser = getSessionUser(session);
-        if (sessionUser.getRole().equals(User.Role.MASTER) || sessionUser.getRole().equals(User.Role.MASTER)) {
+        if (sessionUser.getRole().equals(Role.MASTER) || sessionUser.getRole().equals(Role.MASTER)) {
             return true;
         }
         return false;

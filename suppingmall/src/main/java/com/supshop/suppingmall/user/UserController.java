@@ -2,6 +2,7 @@ package com.supshop.suppingmall.user;
 
 import com.supshop.suppingmall.page.BoardCriteria;
 import com.supshop.suppingmall.page.BoardPageMaker;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,16 +17,12 @@ import java.util.List;
 
 @RequestMapping("/users")
 @Controller
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
     private final ModelMapper modelMapper;
-    private final String sessionUser = "user";
-
-    public UserController(UserService userService, ModelMapper modelMapper) {
-        this.userService = userService;
-        this.modelMapper = modelMapper;
-    }
+    private static final String sessionUser = "user";
 
     @GetMapping("/signup")
     public String signupform(HttpSession session) {
@@ -63,14 +60,11 @@ public class UserController {
 
     @ResponseBody
     @GetMapping(value = "/emails/{email}",produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<String> getUserByEmail(@PathVariable String email) {
-
-        try {
-            userService.getUserByEmail(email);
-            return ResponseEntity.ok("false");
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.ok("true");
-        }
+    public ResponseEntity<Boolean> getUserByEmail(@PathVariable String email) {
+        boolean userAlreadyExist;
+        userAlreadyExist = userService.isUserAlreadyExistByEmail(email);
+        if(userAlreadyExist) return ResponseEntity.ok(userAlreadyExist);
+        return ResponseEntity.ok(userAlreadyExist);
     }
 
     @PostMapping("/login")
@@ -240,7 +234,7 @@ public class UserController {
     }
 
     private boolean isAdmin(UserVO sessionUser) {
-        return sessionUser != null && (sessionUser.getRole().equals(User.Role.ADMIN) || (sessionUser.getRole().equals(User.Role.MASTER)));
+        return sessionUser != null && (sessionUser.getRole().equals(Role.ADMIN) || (sessionUser.getRole().equals(Role.MASTER)));
     }
 
     private void updateSession(HttpSession session) {

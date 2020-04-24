@@ -12,7 +12,7 @@ public interface UserMapper {
 
     User selectUser(Long id);
 
-    Optional<User> selectUserByEmail(String email);
+    Optional<User> findUserByEmail(String email);
 
     void insertUser(User user);
 
