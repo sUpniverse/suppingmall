@@ -57,7 +57,9 @@ public class User {
     public enum LoginType {
         LOCAL("일반로그인","000","email"),
         GOOGLE("구글","001","sub"),
-        KAKAO("카카오","002","kakao");
+        FACEBOOK("페이스북","002","facebook"),
+        NAVER("네이버","003","naver"),
+        KAKAO("카카오","004","kakao");
 
         private String title;
         private String code;

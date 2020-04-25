@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
 import java.util.Collections;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,8 +44,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private UserVO save(OAuthAttribute authAttribute) {
         User user = userMapper.findUserByEmail(authAttribute.getEmail())
-                .orElse(authAttribute.setUserVo());
-        userMapper.insertUser(user);
+                .orElseGet(() -> {
+                    User newUser = authAttribute.setUserVo();
+                    userMapper.insertUser(newUser);
+                    return newUser;
+                });
         return modelMapper.map(user, UserVO.class);
     }
 
