@@ -24,7 +24,7 @@
                         <a href="/users/signup" class="mt-1 mb-1 text-muted" >아이디가 없으세요? 새로 등록 할 수 있습니다.</a>
                     </span>
                     <div class="form-group socialimage mt-3" id="kakaoBtn">
-                        <a href="#">
+                        <a th:href="@{/oauth2/authorization/kakao}">
                             <img src="/logo/kakao.png" height="49" width="222"/>
                         </a>
                         <a th:href="@{/oauth2/authorization/naver}">
