@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,38 +19,21 @@ import static org.assertj.core.api.Assertions.fail;
 @SpringBootTest
 public class UserServiceTest {
 
-    @Autowired
-    UserService userService;
+    @Autowired UserService userService;
+    @Autowired UserFactory userFactory;
 
     @Test
     @Transactional
     public void findByUsername() throws Exception {
         //given
-        String username = "kmsup2@gmail.com";
-        String userpassword = "sup2";
-        User user = User.builder()
-                .email(username)
-                .password(userpassword)
-                .name("운영자")
-                .nickName("운영자")
-                .address("운영자의 집")
-                .addressDetail("그건 엄마집")
-                .zipCode("00000")
-                .phoneNumber("010-0000-0000")
-                .delYn("N")
-                .role(Role.getCodeString(Role.ADMIN.getCode()))
-                .type(User.LoginType.getCodeString(User.LoginType.LOCAL.getCode()))
-                .build();
-
-        userService.createUser(user);
+        User james = userFactory.createUser("james");
 
         //when
         UserDetailsService userDetailsService = (UserDetailsService) userService;
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
+        UserDetails userDetails = userDetailsService.loadUserByUsername(james.getEmail());
 
         //then
-        assertThat(userDetails.getPassword()).isEqualTo(userpassword);
+        assertThat(userDetails.getPassword()).isEqualTo(james.getPassword());
     }
 
     @Test

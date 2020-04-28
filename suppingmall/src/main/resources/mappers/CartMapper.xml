@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.supshop.suppingmall.mapper.CartMapper">
+    <resultMap id="cart" type="com.supshop.suppingmall.cart.Cart" autoMapping="true">
+        <id property="cartId" column="CartId" />
+        <collection property="cartItemList" column="CartItemId" ofType="com.supshop.suppingmall.cart.CartItem">
+            <id property="cartItemId" column="CartItemId" />
+            <result property="price" column="CartItemPrice" />
+            <result property="quantity" column="CartItemQuantity" />
+            <association property="product" javaType="com.supshop.suppingmall.product.Product">
+                <id property="productId" column="ProductId" />
+                <result property="name" column="ProductName" />
+                <result property="price" column="ProductPrice" />
+                <result property="thumbnail" column="ProductThumbnail" />
+                <result property="deliveryPrice" column="ProductDeliveryPrice" />
+                <result property="deliveryVendor" column="ProductDeliveryVendor" typeHandler="com.supshop.suppingmall.delivery.DeliveryVendorHandler"/>
+                <association property="seller" javaType="com.supshop.suppingmall.user.User" >
+                    <id property="userId" column="SellerId" />
+                    <association property="storeVO" javaType="com.supshop.suppingmall.user.StoreVO">
+                        <result property="storeName" column="StoreName" />
+                        <result property="storePhoneNumber" column="StorePhoneNumber" />
+                        <result property="storeZipCode" column="StoreZipCode" />
+                        <result property="storeAddress" column="StoreAddress" />
+                        <result property="storeAddressDetail" column="StoreAddressDetail" />
+                    </association>
+                </association>
+            </association>
+            <association property="productOption" javaType="com.supshop.suppingmall.product.ProductOption">
+                <id property="productId" column="ProductId" />
+                <id property="optionId" column="ProductOptionId" />
+                <result property="optionName" column="ProductOptionName" />
+                <result property="price" column="ProductOptionPrice" />
+                <result property="quantity" column="ProductOptionQuantity" />
+            </association>
+        </collection>
+    </resultMap>
+
+    <select id="findByBuyerId" resultMap="cart">
+        SELECT C.cart_id AS "CartId", CI.cartItem_id AS "CartItemId", CI.price AS "CartItemPrice", CI.quantity AS "CartItemQuantity",
+        P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
+        S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode", S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
+        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity"
+        FROM Cart AS C
+        LEFT OUTER JOIN CartItem AS CI on (C.cart_id = CI.cart_id)
+        LEFT OUTER JOIN Product AS P on (CI.product_id = P.product_id)
+        LEFT OUTER JOIN User AS S on (P.seller_id = S.user_id)
+        LEFT OUTER JOIN Product_option AS PO on (CI.product_id = PO.product_id) and (CI.product_option_id = PO.product_option_id)
+        WHERE C.buyer_id = #{Id}
+    </select>
+
+
+    <insert id="save" parameterType="com.supshop.suppingmall.cart.Cart" useGeneratedKeys="true" keyProperty="cartId">
+        INSERT INTO Cart (
+        buyer_id
+        )
+        VALUES (
+        #{buyer.userId}
+        )
+    </insert>
+</mapper>

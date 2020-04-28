@@ -23,18 +23,15 @@
                         <a href="/users" class="mt-1 mb-1 text-muted" >아이디나 비밀번호를 잊어버리셨나요? <br></a>
                         <a href="/users/signup" class="mt-1 mb-1 text-muted" >아이디가 없으세요? 새로 등록 할 수 있습니다.</a>
                     </span>
-                    <div class="form-group socialimage mt-3" id="kakaoBtn">
+                    <div class="form-group text-center mt-3">
                         <a th:href="@{/oauth2/authorization/kakao}">
                             <img src="/logo/kakao.png" height="49" width="222"/>
                         </a>
                         <a th:href="@{/oauth2/authorization/naver}">
-                            <img src="/logo/naver.png" height="49" width="222"/>
+                            <img src="/logo/naver.png" height="49" width="222" class="my-1"/>
                         </a>
                         <a th:href="@{/oauth2/authorization/google}">
                             <img src="/logo/google.png" height="49" width="222"/>
-                        </a>
-                        <a href="#">
-                            <img src="/logo/facebook.png" height="49" width="222"/>
                         </a>
                     </div>
                     <p class="mt-1 mb-1 text-muted" align="center">&copy; 2019-2020</p>

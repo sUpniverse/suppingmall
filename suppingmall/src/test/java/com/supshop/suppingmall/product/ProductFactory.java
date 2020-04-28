@@ -2,42 +2,23 @@ package com.supshop.suppingmall.product;
 
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryFactory;
+import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserFactory;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+@Component
+@RequiredArgsConstructor
+public class ProductFactory {
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
-public class ProductServiceTest {
-
-    @Autowired MockMvc mockMvc;
     @Autowired ProductService productService;
-    @Autowired UserFactory userFactory;
-    @Autowired ProductFactory productFactory;
-    @Autowired CategoryFactory categoryFactory;
 
-    @Test
-    @Transactional
-    public void createProduct() throws Exception {
-        //given
-        User examUser = userFactory.createUser("exam");
-        Category examCategory = categoryFactory.createCategory("exam");
-
+    public Product createProduct(String productName,User seller,Category category) {
 
         ProductDetail productDetail = ProductDetail.builder()
                 .detailId(1)
@@ -66,19 +47,17 @@ public class ProductServiceTest {
         productOptions.add(productOption2);
 
         Product product = Product.builder()
-                .category(examCategory)
-                .name("맥북프로")
+                .category(category)
+                .name(productName)
                 .price(2000000)
                 .detail(productDetail)
                 .options(productOptions)
-                .seller(examUser)
+                .seller(seller)
+                .deliveryVendor(Delivery.DeliveryVendor.CJ)
+                .deliveryPrice(3000)
                 .build();
 
-        //when
         productService.createProduct(product);
-        Product product1 = productService.findProduct(product.getProductId());
-
-        //then
-        assertThat(product1.getName()).isEqualTo(product.getName());
+        return product;
     }
 }

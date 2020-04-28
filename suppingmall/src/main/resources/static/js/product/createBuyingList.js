@@ -123,3 +123,8 @@ $(document).on('click',"#cancelProduct",(e) =>{
         document.getElementById("total_pr").innerText = '';
     }
 });
+
+// 가격 표시를 위한 3자리마다 콤마추가
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}

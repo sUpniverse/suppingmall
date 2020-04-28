@@ -8,10 +8,12 @@ import com.supshop.suppingmall.common.SessionUtils;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.image.ImageController;
 import com.supshop.suppingmall.image.ImageService;
+import com.supshop.suppingmall.product.Form.ProductForm;
 import com.supshop.suppingmall.product.Form.QnaForm;
 import com.supshop.suppingmall.user.Role;
 import com.supshop.suppingmall.user.UserVO;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,6 +34,11 @@ public class ProductController {
     private final CategoryService categoryService;
     private final ImageService imageService;
     private final BoardService boardService;
+    private final ModelMapper modelMapper;
+
+    private static final Long qnaCategoryId = 30l;
+    private static final Long reviewCategoryId = 29l;
+    private static final Long productCategoryId = 2L;
 
     @GetMapping("/form")
     public String form(HttpSession session,Model model) {
@@ -39,7 +46,7 @@ public class ProductController {
         if(user == null || !(user.getRole().equals(Role.SELLER) || user.getRole().equals(Role.MASTER))) {
             return "redirect:/users/loginform";
         }
-        model.addAttribute("categories",categoryService.getCategory(2L).getChild());
+        model.addAttribute("categories",categoryService.getCategory(productCategoryId).getChild());
         model.addAttribute("vendors", Delivery.DeliveryVendor.values());
         return "/product/form";
     }
@@ -54,8 +61,8 @@ public class ProductController {
     @GetMapping("/{id}")
     public String getProduct(@PathVariable Long id, Model model) {
         Product product = productService.findProduct(id);
-        List<Board> qnaList = boardService.getBoardsByProduct(id,30l);
-        List<Board> reviews = boardService.getBoardsByProduct(id,29l);
+        List<Board> qnaList = boardService.getBoardsByProduct(id,qnaCategoryId);
+        List<Board> reviews = boardService.getBoardsByProduct(id,reviewCategoryId);
 
         model.addAttribute("product",product);
         model.addAttribute("qnaList",qnaList);
@@ -64,11 +71,12 @@ public class ProductController {
     }
 
     @PostMapping("")
-    public String createProduct(@Valid Product product, MultipartFile[] thumnails, HttpSession session) {
+    public String createProduct(@Valid ProductForm productForm, MultipartFile[] thumnails, HttpSession session) {
         UserVO user = (UserVO) session.getAttribute("user");
         if(user == null || !(user.getRole().equals(Role.SELLER) || user.getRole().equals(Role.MASTER))) {
             return "redirect:/users/loginform";
         }
+        Product product = modelMapper.map(productForm, Product.class);
         String thumnail = null;
         if(thumnails != null) {
             for(MultipartFile file : thumnails) {

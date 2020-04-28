@@ -55,7 +55,7 @@ public class Orders {
 
     }
 
-    //주문아이디 생성 (결제 시스템의 식별)
+    // 임시주문 생성 (결제 시스템의 식별)
     public static Orders createTempOrder(List<OrderItem> orderItemList, UserVO buyer, UserVO seller) {
         Orders orders = Orders.builder()
                             .buyer(buyer)

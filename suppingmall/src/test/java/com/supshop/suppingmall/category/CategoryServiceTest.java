@@ -13,8 +13,8 @@ import static org.junit.Assert.*;
 @SpringBootTest
 public class CategoryServiceTest {
 
-    @Autowired
-    private CategoryService categoryService;
+    @Autowired private CategoryService categoryService;
+    @Autowired private CategoryFactory categoryFactory;
 
     @Test
     public void getCategory() throws Exception {
@@ -33,7 +33,7 @@ public class CategoryServiceTest {
     @Transactional
     public void saveCategory() throws Exception{
         //given
-        Category category = buildCategory();
+        Category category = categoryFactory.createCategory("청소기");
 
         //when
         Long categoryId = categoryService.saveCategory(category);
@@ -42,10 +42,6 @@ public class CategoryServiceTest {
         //then
         assertEquals(category.getName(), newCategory.getName());
         assertEquals(category.getMemo(), newCategory.getMemo());
-    }
-
-    private Category buildCategory() {
-        return Category.builder().name("청소기").build();
     }
 
 

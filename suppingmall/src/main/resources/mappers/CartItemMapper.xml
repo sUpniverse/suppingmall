@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.supshop.suppingmall.mapper.CartItemMapper">
+    <resultMap id="CartItem" type="com.supshop.suppingmall.cart.CartItem" autoMapping="true">
+        <id property="cartItemId" column="CartItemId" />
+        <result property="count" column="CartItemCount" />
+        <result property="price" column="CartItemPrice" />
+    </resultMap>
+
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="cartItemId">
+        insert into cartItem (
+        cart_id,
+        product_id,
+        product_option_id,
+        price,
+        quantity
+        )
+        values
+        <foreach item="cartItem" collection="list" separator=",">
+            (
+            #{cartItem.cart.cartId},
+            #{cartItem.product.productId},
+            #{cartItem.productOption.optionId},
+            #{cartItem.price},
+            #{cartItem.quantity}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

@@ -1,36 +1,43 @@
-package com.supshop.suppingmall.product;
+package com.supshop.suppingmall.product.Form;
 
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.delivery.Delivery;
+import com.supshop.suppingmall.product.ProductDetail;
+import com.supshop.suppingmall.product.ProductOption;
 import com.supshop.suppingmall.user.User;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
-import java.time.LocalDateTime;
 import java.util.List;
 
-@Builder
 @Getter @Setter
-@AllArgsConstructor @NoArgsConstructor
-@ToString
-public class Product {
+public class ProductForm {
 
-    private Long productId;
+    @NotEmpty
     private String name;
+
+    @Min(0)
+    @Max(1000000000)
     private int price;
+
+    @Min(0)
+    @Max(1000000000)
     private int deliveryPrice;
+
     private Delivery.DeliveryVendor deliveryVendor;
+
+    @Valid
     private ProductDetail detail;
+    @Valid
     private List<ProductOption> options;
-    private int rating;
+
     private String contents;
-    private LocalDateTime registeredDate;
     private User seller;
     private Category category;
-    private String saleYn;
     private String thumbnail;
     private String picture;
 }

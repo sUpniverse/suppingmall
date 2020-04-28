@@ -1,4 +1,4 @@
-package com.supshop.suppingmall.order;
+package com.supshop.suppingmall.order.Form;
 
 import lombok.Getter;
 import lombok.Setter;

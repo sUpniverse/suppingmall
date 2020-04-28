@@ -9,7 +9,7 @@ import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 
 
-public class CreateUserForm {
+public class SignUpForm {
 
     private final String emailReg = "^[A-Za-z0-9_]+[A-Za-z0-9]*[@]{1}[A-Za-z0-9]+[A-Za-z0-9]*[.]{1}[A-Za-z]{1,3}$";
     private final String passwordReg = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,15}$";

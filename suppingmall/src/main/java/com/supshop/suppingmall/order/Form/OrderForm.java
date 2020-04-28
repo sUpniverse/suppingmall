@@ -1,4 +1,4 @@
-package com.supshop.suppingmall.order;
+package com.supshop.suppingmall.order.Form;
 
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.payment.Payment;
