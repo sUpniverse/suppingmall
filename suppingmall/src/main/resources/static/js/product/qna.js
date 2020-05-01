@@ -23,7 +23,7 @@ function getQna(boardId,userId) {
         contentType: "application/json",
         success: (data) => {
             title  = data.title;
-            comment;
+            comment ="";
             var isCreator = false;
 
             if(userId !== undefined || userId !== null) {

@@ -48,7 +48,8 @@ public class CartServiceTest {
                 .build();
 
         Cart cart = cartService.save(cartForm);
-        Cart findCartByBuyerId = cartService.findCartByBuyerId(cart.getBuyer().getUserId());
+        List<Cart> findCarts = cartService.findCartByBuyerId(cart.getBuyer().getUserId());
+        Cart findCartByBuyerId = findCarts.get(0);
 
         //then
         assertThat(findCartByBuyerId.getCartId()).isEqualTo(cart.getCartId());

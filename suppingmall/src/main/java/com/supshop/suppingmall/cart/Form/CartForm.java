@@ -2,12 +2,13 @@ package com.supshop.suppingmall.cart.Form;
 
 
 import com.supshop.suppingmall.cart.CartItem;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter @Builder
+@ToString
+@AllArgsConstructor @NoArgsConstructor
 public class CartForm {
 
     private Long productId;

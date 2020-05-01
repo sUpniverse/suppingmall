@@ -42,10 +42,11 @@ public class BoardController {
     @GetMapping("")
     public String getAllBoard(Model model,
                               BoardCriteria boardCriteria,
+                              @RequestParam(required = false) String category,
                               @RequestParam(required = false) String type,
                               @RequestParam(required = false) String searchValue) {
         log.debug("'getAllBoard'가 실행됨");
-        model.addAttribute(boardService.getBoardByCondition(boardCriteria,type,searchValue));
+        model.addAttribute(boardService.getBoardByCondition(boardCriteria,category,type,searchValue));
         BoardPageMaker boardPageMaker = new BoardPageMaker();
         boardPageMaker.setBoardCriteria(boardCriteria);
         boardPageMaker.setTotalCount(boardService.getBoardCount());

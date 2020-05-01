@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <div th:include="fragments/header :: header" />
+</head>
+<body>
+<header th:replace="product/product-nav-dark :: product-nav-dark" />
+<div class="container mt-5">
+    <h2>장바구니</h2>
+    <ul class="bg-light border">
+        <li class="text-success">장바구니 상품은 최대 30일간 저장됩니다.</li>
+        <li>가격, 옵션 등 정보가 변경된 경우 주문이 불가할 수 있습니다.</li>
+    </ul>
+    <table class="table table-default">
+        <colgroup>
+            <col style="width:35px">
+            <col style="width:474px">
+            <col style="width:340px">
+            <col style="width:148px">
+            <col style="width:154px">
+        </colgroup>
+        <thead>
+            <tr class="text-center">
+                <th><input type="checkbox" name="checkAll" id="th_checkAll" checked></th>
+                <th>상품정보</th>
+                <th>옵션</th>
+                <th>상품금액</th>
+                <th>배송비</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="cart,iter : ${carts}" class="border-bottom">
+                <td class="text-center align-middle">
+                    <input type="checkbox" name="checkRow" th:value="${iter.index}" checked>
+                </td>
+                <td class="border-right">
+                    <div class="media">
+                        <img th:src="${cart.cartItemList.get(0).product.thumbnail}" class="align-self-center mr-3" width="100" height="100">
+                        <div class="media-body">
+                            <div th:text="${cart.cartItemList.get(0).product.seller.storeVO.storeName}"></div>
+                            <strong class="mt-0" th:text="${cart.cartItemList.get(0).product.name}"></strong>
+                            <div class="mb-0" th:text="@{${#numbers.formatInteger(cart.cartItemList.get(0).product.price,3,'COMMA')}+'원'}"></div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div th:each="item : ${cart.cartItemList}">
+                        <div class="border-bottom py-2" th:text="@{${item.productOption.optionName} + ' / ' + ${item.quantity} + '개'}" style="font-size: 12px;"> </div>
+                    </div>
+                </td>
+                <td class="align-middle text-center border-left border-right">
+                    <strong th:text="@{${#numbers.formatInteger(cart.getAmountPrice(),3,'COMMA')}+'원'}"></strong>
+                </td>
+                <td class="align-middle text-center">
+                    <strong th:text="@{${#numbers.formatInteger(cart.getDeliveryPrice(),3,'COMMA')}+'원'}"></strong>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="py-3">
+        <button type="button" id="removeProduct" class="btn btn-default border">선택상품 삭제</button>
+    </div>
+    <div class="row border py-3">
+        <div class="row text-center col justify-content-md-center border-right">
+            <div>
+                <strong>총 상품금액</strong>
+                <span>
+                    <h6 class="mt-2" id="productPrice" th:text="@{${#numbers.formatInteger(totalProductPrice,3,'COMMA')}+'원'}"></h6>
+                </span>
+            </div>
+            <div class="px-3 pt-4">
+                <img src="/images/cart/plus.png" height="14"/>
+            </div>
+            <div>
+                <strong>배송비</strong>
+                <span>
+                    <h6 class="mt-2" id="deliveryPrice" th:text="@{${#numbers.formatInteger(totalDeliveryPrice,3,'COMMA')}+'원'}"></h6>
+                </span>
+            </div>
+            <div class="px-3 pt-4">
+                <img src="/images/cart/minus.png" height="14"/>
+            </div>
+            <div class="sale-price">
+                <strong>할인금액</strong>
+                <span>
+                    <h6 class="mt-2" th:text="@{'0원'}"></h6>
+                </span>
+            </div>
+        </div>
+        <strong class="col text-center align-self-center" style="font-size: 21px">
+            총 주문금액
+            <span  style="font-size: 24px" id="totalPrice" class="text-success mt-2" th:text="@{${#numbers.formatInteger(totalPrice,3,'COMMA')}+'원'}"></span>
+        </strong>
+    </div>
+    <div class="py-3 text-center">
+        <button class="btn btn-default border" type="button">쇼핑 홈 가기</button>
+        <button class="btn btn-success" type="button">주문하기</button>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+
+    $(document).ready(() => {
+
+        var cartList = [[${carts}]];
+        $(document).on('change',"#th_checkAll", () => {
+            if( $("#th_checkAll").is(':checked') ){
+                $("input[name=checkRow]").prop("checked", true);
+            }else{
+                $("input[name=checkRow]").prop("checked", false);
+            }
+            setAllPrice();
+        });
+
+        $('.table').find('input:checkbox').not('#th_checkAll').on('change', function () {
+            setCheckAll();
+            setAllPrice();
+        });
+
+        function setCheckAll() {
+            var checkTotal = $('.table').find('input:checkbox').not('#th_checkAll').length;
+            var checkCount = 0;
+            $('.table').find('input:checkbox').not('#th_checkAll').each(function () {
+                if ($(this).prop('checked')) {
+                    checkCount++;
+                }
+            });
+
+            $('#th_checkAll').prop('checked', checkTotal == checkCount);
+        }
+
+
+        function setAllPrice() {
+            var productPrice = 0;
+            var deliveryPrice = 0;
+            var totalPrice = 0;
+
+            $('.table').find('input:checkbox').not('#th_checkAll').each(function() {
+                if($(this).prop('checked') === true) {
+                    var idx = $(this).prop('value');
+                    productPrice += cartList[idx].amountProductPrice;
+                    deliveryPrice += cartList[idx].deliveryPrice;
+                }
+            });
+
+            totalPrice = productPrice + deliveryPrice;
+
+
+            document.getElementById("productPrice").textContent = numberWithCommas(productPrice)+'원';
+            document.getElementById("deliveryPrice").textContent = numberWithCommas(deliveryPrice)+'원';
+            document.getElementById("totalPrice").textContent = numberWithCommas(totalPrice)+'원';
+        }
+
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        $(document).on('click','#removeProduct',function () {
+
+            $('.table').find('input:checkbox').not('#th_checkAll').each(function() {
+                if($(this).prop('checked') === true) {
+                    var idx = $(this).prop('value');
+                    console.log(idx);
+                    // $.ajax({
+                    //     url: '/cart/'+idx,
+                    //     type: 'delete',
+                    //     contentType: 'application/json',
+                    //     success: ()=> {
+                    //         $('.table').find('body > div.container.mt-5 > table > tbody > tr:nth-child(idx+1)').remove();
+                    //     },
+                    //     error: ()=> {
+                    //
+                    //     }
+                    // });
+
+                }
+            });
+
+        });
+
+    });
+</script>
+</html>

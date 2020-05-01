@@ -12,7 +12,8 @@ public class Category {
 
     private Long id;
     private Category parent;
-    private String name;
+    private String name;        // 한글이름
+    private String enName;      // 영문이름
     private List<Category> child;
     private LocalDateTime createDate;
     private String memo;

@@ -11,13 +11,14 @@
             <div class="col-12 col-md-8">
                 <div class="position-relative overflow-hidden p-1 mb-5 text-center bg-light">
                     <div class="p-lg-5 mx-auto my-2">
-                        <h1 class="display-3 font-weight-small">Farm을 운영중인 유저의 공간</h1>
+                        <h1 class="display-4 font-weight-small">Farm을 운영중인 유저의 공간</h1>
                     </div>
                 </div>
 
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
+                            <th>카테고리</th>
                             <th>제목</th>
                             <th>작성자</th>
                             <th class="text-center">조회수</th>
@@ -26,6 +27,7 @@
                     </thead>
                     <tbody>
                         <tr th:each="board : ${boardList}">
+                            <td class="text-center" th:text="${board?.category.name}"></td>
                             <td>
                                 <a class="text-dark" th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}}" ></a>
                             </td>

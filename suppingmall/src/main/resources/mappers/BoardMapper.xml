@@ -30,7 +30,7 @@
             <result property="delYn" column="CommentDelYn" />
             <result property="createdDate" column="CommentCreatedDate" />
             <result property="updatedDate" column="CommentUpdatedDate" />
-            <association property="creator" javaType="com.supshop.suppingmall.user.User">
+            <association property="creator" javaType="com.supshop.suppingmall.user.UserVO">
                 <id property="userId" column="CommentUserId" />
                 <result property="email" column="CommentUserEmail" />
                 <result property="nickName" column="CommentUserNickName" />
@@ -58,27 +58,26 @@
         FROM Board AS B
         LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
         LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
+        WHERE B.category_id = #{categoryId}
         <include refid="conditionalSearch"></include>
         ORDER BY B.board_id desc
         limit #{boardCriteria.pageStart}, #{boardCriteria.perPageNum}
     </select>
 
     <sql id="conditionalSearch">
-        <trim prefix="WHERE" prefixOverrides="AND|OR">
-            <if test="type != null and searchValue != null">
-                <if test='type.equals("title")'>
-                    <bind name="searchValue" value="'%'+searchValue+'%'"/>
-                    AND B.title LIKE #{searchValue}
-                </if>
-                <if test='type.equals("contents")'>
-                    <bind name="searchValue" value="'%'+searchValue+'%'"/>
-                    AND B.contents LIKE #{searchValue}
-                </if>
-                <if test='type.equals("creator")'>
-                    AND U.nickName = #{searchValue}
-                </if>
+        <if test="type != null and searchValue != null">
+            <if test='type.equals("title")'>
+                <bind name="searchValue" value="'%'+searchValue+'%'"/>
+                AND B.title LIKE #{searchValue}
             </if>
-        </trim>
+            <if test='type.equals("contents")'>
+                <bind name="searchValue" value="'%'+searchValue+'%'"/>
+                AND B.contents LIKE #{searchValue}
+            </if>
+            <if test='type.equals("creator")'>
+                AND U.nickName = #{searchValue}
+            </if>
+        </if>
     </sql>
 
     <select id="selectBoard" resultMap="Board">

@@ -1,5 +1,7 @@
 package com.supshop.suppingmall.board;
 
+import com.supshop.suppingmall.category.Category;
+import com.supshop.suppingmall.category.CategoryService;
 import com.supshop.suppingmall.comment.CommentService;
 import com.supshop.suppingmall.mapper.BoardMapper;
 import com.supshop.suppingmall.page.BoardCriteria;
@@ -18,11 +20,18 @@ public class BoardService {
 
     private final BoardMapper boardMapper;
     private final CommentService commentService;
+    private final CategoryService categoryService;
+    private static final String boardName = "board";
 
     public List<Board> getAllBoard() { return boardMapper.selectAllBoard(); }
 
-    public List<Board> getBoardByCondition(BoardCriteria boardCriteria, String type, String searchValue) {
-        return boardMapper.selectBoardByCondition(boardCriteria, type, searchValue);
+    public List<Board> getBoardByCondition(BoardCriteria boardCriteria, String category, String type, String searchValue) {
+        if(category == null) {
+            Category categoryByEnName = categoryService.getCategoryByEnName(boardName);
+            return boardMapper.selectBoardByCondition(boardCriteria,categoryByEnName.getId(), type, searchValue);
+        }
+        Category categoryByEnName = categoryService.getCategoryByEnName(category);
+        return boardMapper.selectBoardByCondition(boardCriteria,categoryByEnName.getId(), type, searchValue);
     }
 
     public int getBoardCount() {

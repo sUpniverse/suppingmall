@@ -23,18 +23,15 @@ public class CartService {
     private final ProductService productService;
     private final UserService userService;
 
-    public Cart findCartByBuyerId(Long id) {
-        return cartMapper.findByBuyerId(id).orElse(null);
+    public List<Cart> findCartByBuyerId(Long id) {
+        return cartMapper.findByBuyerId(id);
     }
 
     @Transactional
     public Cart save(CartForm cartForm) {
 
-        Cart cart = cartMapper.findByBuyerId(cartForm.getBuyerId()).orElseGet(() -> {
-            Cart newCart = this.buildCartByForm(cartForm);
-            cartMapper.save(newCart);
-            return newCart;
-        });
+        Cart cart = this.buildCartByForm(cartForm);
+        cartMapper.save(cart);
 
         for (CartItem cartItem : cartForm.getCartItemList()) {
             cartItem.setCart(cart);

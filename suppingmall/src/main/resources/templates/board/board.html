@@ -6,84 +6,73 @@
     <div class="container">
         <form role="form" th:method="post">
         </form>
-        <div class="container">
+        <div class="pt-5 pd-3 border-bottom">
             <!-- Category -->
-            <h3 class="mt-4">카테고리</h3>
-            <hr>
+            <h4 th:text="${board.category.name}"></h4>
+        </div>
+        <div>
             <!-- Title -->
-            <h1 class="mt-4" th:text="${board.title}"></h1>
+            <h3 class="pt-3 pb-3" th:text="${board.title}"></h3>
+        </div>
+        <div class="bg-light border-top border-dark py-2" style="display: flex">
             <!-- Author -->
-            <div class="row  bg-light">
-                <span class="col-6 lead" th:text="${board.creator.nickName}"></span>
-                <span class="col-6 d-flex justify-content-end align-items-center" th:text="${board.hit}"></span>
+            <span class="col-6 lead" th:text="@{${board.creator.nickName} +'님'}"></span>
+            <!-- Hit -->
+            <div class="col-6 d-flex justify-content-end align-items-center">
+                <img src="/logo/board/eyes.jpg" height="16">
+                <span th:text="@{' '+${board.hit}}"></span>
             </div>
-            <hr class="mb-4 ">
+        </div>
+        <div class="border">
             <!-- Date/Time -->
-            <div class="row">
-                <span class="text-muted text-sm" th:text="${board.createdDate}"></span>
-                <span class="text-muted text-sm"  th:text="${board.updatedDate}"></span>
+            <div class="mb-3 ml-2">
+                <img src="/logo/board/clock.png" height="12">
+                <span class="text-muted" style="font-size: 0.8rem" th:text="${board.createdDate}"></span>
             </div>
             <!-- Post Content -->
-            <p class="lead" th:id="contents" th:utext="${board.contents}"></p>
-            <hr>
-            <div class="box-footer">
+            <div class="pd-5 ml-2">
+                <p class="lead" th:id="contents" th:utext="${board.contents}"></p>
+            </div>
+            <div class="box-footer text-center mb-3">
                 <button th:if="${not #strings.isEmpty(session.user?.userId) && board.creator.userId.equals(session.user?.userId)}" type="submit" class="btn btn-warning">수정</button>
                 <button th:if="${not #strings.isEmpty(session.user?.userId) && board.creator.userId.equals(session.user?.userId)}" type="submit" class="btn btn-danger">삭제</button>
                 <button type="submit" class="btn btn-primary">목록</button>
             </div>
-            <hr>
         </div>
+
+
+        <!-- Comments List -->
+        <div class="mt-5">
+            <div class="border-bottom border-gray pb-2 mb-3" th:text="@{'댓글 ['+${board.comments.size()}+']'}"></div>
+            <div id="comments">
+                <!-- Single Comment -->
+                <div class="media pb-3" th:each="comment : ${board.comments}" th:data-no="${comment.commentId}">
+                    <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                    <div class="media-body">
+                        <h5 class="mt-0" th:text="${comment.creator.nickName}" th:value="${comment.creator.userId}"></h5>
+                        <div class="btn-group float-right"  th:if="${not #strings.isEmpty(session.user?.userId) && comment.creator.userId.equals(session.user?.userId)}">
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                수정 / 삭제 / 신고
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" th:id="comment-update-button">수정</a>
+                                <a class="dropdown-item" th:id="comment-delete-button">삭제</a>
+                            </div>
+                        </div>
+                        <p th:text="${comment.contents}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Comments Form -->
         <div class="card my-4" th:id="comment-form">
-            <h5 class="card-header">댓글</h5>
+            <h5 class="card-header">댓글입력</h5>
             <div class="card-body">
                 <div class="form-group">
                     <textarea class="form-control" th:id="comment-text" rows="3"></textarea>
                 </div>
                 <button class="btn btn-light" th:id="comment-button">댓글달기</button>
-            </div>
-        </div>
-
-        <div th:each="comment : ${board.comments}" id="comments">
-            <!-- Single Comment -->
-            <div class="media mb-4" th:value="${comment.commentId}">
-                <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-                <div class="media-body">
-                    <h5 class="mt-0" th:text="${comment.creator.nickName}" th:value="${comment.creator.userId}"></h5>
-                    <div class="btn-group float-right"  th:if="${not #strings.isEmpty(session.user?.userId) && comment.creator.userId.equals(session.user?.userId)}">
-                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            수정 / 삭제 / 신고
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" th:id="comment-update-button">수정</a>
-                            <a class="dropdown-item" th:id="comment-delete-button">삭제</a>
-                        </div>
-                    </div>
-                    <p th:text="${comment.contents}"></p>
-                </div>
-            </div>
-        </div>
-        <!-- Comment with nested comments -->
-        <div class="media mb-4">
-            <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-            <div class="media-body">
-                <h5 class="mt-0">Commenter Name</h5>
-                <p>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</p>
-
-                <div class="media mt-4">
-                    <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-                    <div class="media-body">
-                        <h5 class="mt-0">Commenter Name</h5>
-                        Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-                    </div>
-                </div>
-                <div class="media mt-4">
-                    <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-                    <div class="media-body">
-                        <h5 class="mt-0">Commenter Name</h5>
-                        Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -116,6 +105,7 @@
 <script th:inline="javascript">
 
     $(document).ready(function (){
+
         $("#comment-button").on('click',() => {
             var boardId = [[${board.boardId}]];
             var contents = $('#comment-text').val();
@@ -124,7 +114,9 @@
                 url:"/comments",
                 dataType: 'text',
                 data: JSON.stringify({
-                    "boardId": boardId,
+                    "board" : {
+                        "boardId": boardId
+                    },
                     "contents": contents
                 }),
                 contentType: 'application/json',
@@ -134,22 +126,31 @@
                     var comment_contents = response.contents;
                     var comment_user_name = response.creator.nickName;
                     var comment =
-                        '<div class="media mb-4">\n' +
+                        '<div class="media pb-3" data-no="'+response.commentId+'">\n' +
                         '<img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">\n' +
                         '<div class="media-body">\n' +
                         '<h5 class="mt-0">'+comment_user_name+'</h5>\n' +
+                        '<div class="btn-group float-right">\n' +
+                        '<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n' +
+                        '수정 / 삭제 / 신고\n' +
+                        '</button>\n' +
+                        '<div class="dropdown-menu">\n' +
+                        '<a class="dropdown-item" id="comment-update-button">수정</a>\n' +
+                        '<a class="dropdown-item" id="comment-delete-button">삭제</a>\n' +
+                        '</div>\n' +
+                        '</div>' +
                         '<p>'+comment_contents+'</p>\n' +
                         '</div>\n' +
                         '</div>';
 
 
-                    if($("#comments").length > 0) {
-                        $("#comments").append(comment);
-                    } else {
-                        $("#comment-form").after(comment_div);
-                        $("#comments").append(comment);
-                    }
+                    $("#comments").append(comment);
+
+                },
+                error: () => {
+                    alert('댓글 생성오류');
                 }
+
             });
         });
 
@@ -182,13 +183,12 @@
 
         $(document).on('click',"#comment-delete-button",(e)=> {
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;
-            var comment_id = comment.getAttribute('value');
+            var comment_id = comment.getAttribute('data-no');
             var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
 
             $.ajax({
                 type:"DELETE",
                 url:"/comments/"+comment_id,
-                dataType: 'text',
                 contentType: 'application/json',
                 success: (data) => {
                     comment.remove();

@@ -48,15 +48,18 @@
         LEFT OUTER JOIN User AS S on (P.seller_id = S.user_id)
         LEFT OUTER JOIN Product_option AS PO on (CI.product_id = PO.product_id) and (CI.product_option_id = PO.product_option_id)
         WHERE C.buyer_id = #{Id}
+        ORDER BY C.create_date
     </select>
 
 
     <insert id="save" parameterType="com.supshop.suppingmall.cart.Cart" useGeneratedKeys="true" keyProperty="cartId">
         INSERT INTO Cart (
-        buyer_id
+        buyer_id,
+        create_date
         )
         VALUES (
-        #{buyer.userId}
+        #{buyer.userId},
+        now()
         )
     </insert>
 </mapper>

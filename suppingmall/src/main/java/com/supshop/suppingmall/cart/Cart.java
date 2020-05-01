@@ -3,6 +3,7 @@ package com.supshop.suppingmall.cart;
 import com.supshop.suppingmall.user.User;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter @Builder @ToString
@@ -11,6 +12,7 @@ public class Cart {
 
     private Long cartId;
     private User buyer;
+    private LocalDateTime createDate;
     private List<CartItem> cartItemList;
 
 

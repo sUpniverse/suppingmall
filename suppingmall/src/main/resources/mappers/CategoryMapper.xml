@@ -63,6 +63,14 @@
         WHERE C.category_id = #{id}
     </select>
 
+    <select id="findOneByEnName" resultMap="Category">
+        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName",  C.memo AS "CategoryMemo",
+        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName"
+        FROM category AS C
+        LEFT OUTER JOIN category AS CH on (C.category_id = CH.parent_id)
+        WHERE C.en_name = #{name}
+    </select>
+
     <insert id="save" useGeneratedKeys="true" keyProperty="id" parameterType="com.supshop.suppingmall.category.Category">
         INSERT INTO Category (
         parent_id,

@@ -17,6 +17,9 @@ public class CategoryService {
     public Category getCategory(Long id) {
         return categoryMapper.findOne(id);
     }
+    public Category getCategoryByEnName(String enName) {
+        return categoryMapper.findOneByEnName(enName);
+    }
 
     public List<Category> getCategories() {
         return categoryMapper.findAllByTop();

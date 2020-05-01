@@ -1,31 +1,44 @@
 $(document).ready(function() {
 
-    $().on("click","#cart",function() {
+    $(document).on('click',"#cart",function() {
+        isSingIn();
+
         var cartFrom = setCartForm();
-        console.log(cartFrom);
+        if(cartFrom === undefined) {
+            return;
+        }
+
+        console.log(cartFrom)
 
         $.ajax({
-            url: "/basket",
-            action: 'POST',
+            url: "/cart",
+            type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(cartFrom) ,
             success: () => {
-
+                var isMove = confirm('장바구니로 이동하시겠습니까?');
+                if(isMove) {
+                    location.href ="/cart";
+                }
             },
             error: () => {
 
             }
-        })
+        });
 
     });
 
-    $(document).on("click","#purchase",function(e) {
+    $(document).on('click',"#purchase",function() {
+        isSingIn();
 
         var formObj = $("form[role='form']");
 
         var orderItemJson = setOrderItemJsonInOrderForm();
+        if(orderItemJson == undefined) {
+            return;
+        }
+
         document.getElementById("orderItemJson").setAttribute('value',JSON.stringify(orderItemJson));
-        console.log(orderItemJson);
         formObj.attr("action","/orders/orderSheet");
         formObj.attr("method","post");
         formObj.submit();
@@ -35,10 +48,15 @@ $(document).ready(function() {
 
 function setOrderItemJsonInOrderForm() {
     var optionItems = document.getElementById('add_option_area').getElementsByTagName('li');
-    var Optionlength = optionItems.length;
+    var optionLength = optionItems.length;
+
+    if(optionLength === 0) {
+        return ;
+    }
+
     var orderItems = [];
     var temp = new Array();
-    for(var i = 0; i < Optionlength; i++) {
+    for(var i = 0; i < optionLength; i++) {
         var id = getOptionIdInList(optionItems,i);
         var price = getPriceInList(optionItems,i);
         var count = getCountInList(optionItems,i);
@@ -60,14 +78,19 @@ function setOrderItemJsonInOrderForm() {
 }
 
 function setCartForm() {
-    var productId = [[${product.productId}]];
-    var userId = [[${session.user?.userId}]];
     var cartItems = document.getElementById('add_option_area').getElementsByTagName('li');
     var optionLength = cartItems.length;
+    var productId = document.getElementById('productId').value;
+    var userId = document.getElementById('userId').value;
+
+    if(optionLength == 0) {
+        return ;
+    }
+
     var cartForm = {
         productId : productId,
-        userId : userId,
-        basketItems : []
+        buyerId : userId,
+        cartItemList : []
     };
     var temp = new Array();
 
@@ -80,19 +103,28 @@ function setCartForm() {
                 optionId : id,
             },
             price : price,
-            count : count
+            quantity : count
         };
         temp[id] = cartItem;
     }
     for(var i = 0; i < temp.length; i++) {
         if(temp[i] !== undefined) {
-            cartForm.basketItems.push(temp[i]);
+            cartForm.cartItemList.push(temp[i]);
         }
     }
     return cartForm;
-
-
 }
+
+function isSingIn() {
+    var userId = document.getElementById("userId").value;
+    if(userId === "") {
+        var Login = confirm('로그인 하시겠습니까?');
+        if(Login) {
+            location.href = "/users/loginform";
+        }
+    }
+}
+
 
 // list형태로 된 구매 목록에서 개별 optionId를 가지고 옴
 function getOptionIdInList(cartItems,index) {

@@ -128,3 +128,21 @@ $(document).on('click',"#cancelProduct",(e) =>{
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+// 콤마를 제거후 물품의 가격 구해오기
+function RemoveCommas(x) {
+    return x.toString().replace(/,/gi,"")
+}
+
+function getWholePrice() {
+    var optionItems = document.getElementById("add_option_area").getElementsByTagName("li");
+    var length = optionItems.length;
+    var whole_price = 0;
+    for(var i = 0; i < length; i++) {
+        if(optionItems[i] !== null) {
+            var price = parseInt(RemoveCommas(optionItems[i].getElementsByTagName('strong').item(0).textContent));
+            whole_price += price;
+        }
+    }
+    return whole_price;
+}

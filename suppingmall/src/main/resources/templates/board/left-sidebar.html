@@ -5,28 +5,36 @@
             <!-- Nav -->
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link text-dark" data-toggle="collapse" href="#sidenavHome" aria-expanded="true">
+                    <a class="nav-link text-dark" th:href="@{'/boards'}">
+                        전체농장
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" th:href="@{'/boards?category=appleFarm'}">
+                        <img src="/logo/board/apple.png" height="16">
                         사과농장
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" data-toggle="collapse" href="#sidenavCatalog" aria-expanded="false">
+                    <a class="nav-link text-dark" th:href="@{'/boards?category=samsungFarm'}">
+                        <img src="/logo/board/samsung.png" height="16">
                         별세개농장
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" data-toggle="collapse" href="#sidenavShop" aria-expanded="false">
+                    <a class="nav-link text-dark" th:href="@{'/boards?category=lgFarm'}">
+                        <img src="/logo/board/lg.png" height="16">
                         가전은역시농장
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link text-dark" data-toggle="collapse" href="#sidenavPages">
+                    <a class="nav-link text-dark" th:href="@{'/boards?category=foreignFarm'}">
                         외노기농장
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" data-toggle="collapse" href="#sidenavBlog">
+                    <a class="nav-link text-dark" th:href="@{'/boards?category=chinaFarm'}">
                         대륙의실수농장
                     </a>
                 </li>

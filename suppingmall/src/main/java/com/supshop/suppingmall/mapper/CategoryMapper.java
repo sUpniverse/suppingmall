@@ -7,7 +7,7 @@ import java.util.List;
 public interface CategoryMapper {
 
     Category findOne(Long id);
-
+    Category findOneByEnName(String enName);
     List<Category> findAll();
 
     List<Category> findAllByTop();

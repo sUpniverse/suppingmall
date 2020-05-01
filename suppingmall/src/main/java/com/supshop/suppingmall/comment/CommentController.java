@@ -1,6 +1,8 @@
 package com.supshop.suppingmall.comment;
 
+import com.supshop.suppingmall.common.SessionUtils;
 import com.supshop.suppingmall.user.User;
+import com.supshop.suppingmall.user.UserVO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +21,8 @@ public class CommentController {
 
     @PostMapping("")
     public ResponseEntity createComment(@RequestBody Comment comment, HttpSession session, Errors errors) {
-        User user = (User)session.getAttribute("user");
-        comment.setCreator(user);
+        UserVO sessionUser = SessionUtils.getSessionUser(session);
+        comment.setCreator(sessionUser);
         int result = commentService.insertComment(comment);
 
         if(result != 1) {
@@ -30,9 +32,9 @@ public class CommentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteComment(@PathVariable String id) {
+    public ResponseEntity deleteComment(@PathVariable Long id) {
         if(id != null) {
-            System.out.println(id);
+            commentService.deleteComment(id);
             return ResponseEntity.ok().build();
         }
             return ResponseEntity.notFound().build();
@@ -43,20 +45,9 @@ public class CommentController {
         if(id != null) {
             int i = commentService.updateComment(id, comment);
             if(i == 1) {
-                System.out.println(comment.toString());
                 return ResponseEntity.ok().build();
             }
         }
         return ResponseEntity.notFound().build();
     }
-
-    @DeleteMapping("/{id]")
-    public ResponseEntity deleteComment(@PathVariable Long id) {
-        if(id != null) {
-            commentService.deleteComment(id);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
-    }
-
 }
