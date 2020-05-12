@@ -14,6 +14,8 @@ public interface UserMapper {
 
     Optional<User> findUserByEmail(String email);
 
+    List<User> findUserByApplySellerYn(BoardCriteria boardCriteria);
+
     void insertUser(User user);
 
     void updateUser(Long id, User user);

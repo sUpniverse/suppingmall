@@ -89,19 +89,25 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <div th:each="product : ${products}">
-                            <tr th:each="option : ${product?.options}">
-                                <td th:text="${product?.productId}"></td>
-                                <td th:text="${product?.category.name}"></td>
-                                <td>
-                                    <a th:href="@{'/products/'+${product.productId}}" style="color: #333333" th:text="${product?.name}"></a>
-                                </td>
-                                <td th:text="${option?.optionName}"></td>
-                                <td th:text="${option?.quantity}"></td>
-                                <td th:text="${product?.deliveryPrice}"></td>
-                                <td th:text="${product?.registeredDate}"></td>
-                            </tr>
-                        </div>
+                        <tr th:each="product : ${products}" class="border-bottom">
+                            <td th:text="${product?.productId}"></td>
+                            <td th:text="${product?.category.name}"></td>
+                            <td>
+                                <a th:href="@{'/products/'+${product.productId}}" style="color: #333333" th:text="${product?.name}"></a>
+                            </td>
+                            <td>
+                                <div th:each="option : ${product?.options}">
+                                    <span th:text="${option?.optionName}"></span>
+                                </div>
+                            </td>
+                            <td>
+                                <div th:each="option : ${product?.options}">
+                                    <span th:text="${option?.quantity}"></span>
+                                </div>
+                            </td>
+                            <td th:text="${product?.deliveryPrice}"></td>
+                            <td th:text="${product?.registeredDate}"></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

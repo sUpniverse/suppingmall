@@ -1,26 +1,10 @@
 <div class="dropdown-menu" th:fragment="product-category" th:id="category"  style="display: none">
-    <li class="dropdown-submenu">
-        <a class="dropdown-item" href="#">category-1</a>
+    <li class="dropdown-submenu" th:each="category : ${categories}">
+        <a class="dropdown-item text-center" href="#" th:text="${category.name}"></a>
         <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">category-1-1</a></li>
-            <li><a class="dropdown-item" href="#">category-1-2</a></li>
-            <li><a class="dropdown-item" href="#">category-1-3</a></li>
-        </ul>
-    </li>
-    <li class="dropdown-submenu">
-        <a class="dropdown-item" href="#">category-2</a>
-        <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">category-2-1</a></li>
-            <li><a class="dropdown-item" href="#">category-2-2</a></li>
-            <li><a class="dropdown-item" href="#">category-2-3</a></li>
-        </ul>
-    </li>
-    <li class="dropdown-submenu">
-        <a class="dropdown-item" href="#">category-3</a>
-        <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">category-3-1</a></li>
-            <li><a class="dropdown-item" href="#">category-3-2</a></li>
-            <li><a class="dropdown-item" href="#">category-3-3</a></li>
+            <li th:each="child : ${category.child}">
+                <a class="dropdown-item" href="#" th:text="${child.name}"></a>
+            </li>
         </ul>
     </li>
 </div>

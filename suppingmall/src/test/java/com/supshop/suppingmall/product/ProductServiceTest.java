@@ -35,7 +35,7 @@ public class ProductServiceTest {
     @Transactional
     public void createProduct() throws Exception {
         //given
-        User examUser = userFactory.createUser("exam");
+        User examUser = userFactory.createAdmin("exam");
         Category examCategory = categoryFactory.createCategory("exam");
 
 

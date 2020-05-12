@@ -1,7 +1,10 @@
 package com.supshop.suppingmall.user;
 
+import com.supshop.suppingmall.common.SessionUtils;
 import com.supshop.suppingmall.page.BoardCriteria;
 import com.supshop.suppingmall.page.BoardPageMaker;
+import com.supshop.suppingmall.user.Form.ApplySellerForm;
+import com.supshop.suppingmall.user.Form.SignUpForm;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
@@ -23,10 +26,12 @@ public class UserController {
     private final UserService userService;
     private final ModelMapper modelMapper;
     private static final String sessionUser = "user";
+    private static final String redirectLoginUrl = "redirect:/users/loginform";
+    private static final String redirectMainUrl = "redirect:/";
 
     @GetMapping("/signup")
     public String signupform(HttpSession session) {
-        if (isLoginUser(session)) return "redirect:/";
+        if (isLoginUser(session)) return redirectMainUrl;
         return "/user/signup";
     }
 
@@ -42,7 +47,7 @@ public class UserController {
                              BoardCriteria boardCriteria,
                              @RequestParam(required = false) String type,
                              @RequestParam(required = false) String searchValue) {
-        if(!isLoginUser(session)) return "/user/login";
+        if(!isLoginUser(session)) return redirectLoginUrl;
         model.addAttribute(userService.getAllUser(boardCriteria,type,searchValue));
         BoardPageMaker boardPageMaker = new BoardPageMaker();
         boardPageMaker.setBoardCriteria(boardCriteria);
@@ -71,25 +76,26 @@ public class UserController {
     public String login(String email, String password, HttpSession session) {
         UserVO user = userService.isSignedInUser(email,password);
         if(user == null) {
-            return "redirect:/users/loginform";
+            return redirectLoginUrl;
         }
         session.setAttribute("user", user);
-        return "redirect:/";
+        return redirectMainUrl;
     }
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.removeAttribute("user");
-        return "redirect:/";
+        return redirectMainUrl;
     }
 
     @PostMapping("")
-    public String createUser(@Valid User user, HttpSession session) {
+    public String createUser(@Valid SignUpForm signUpForm, HttpSession session) {
         if(isLoginUser(session)) {
-            return "redirect:/";
+            return redirectMainUrl;
         }
+        User user = modelMapper.map(signUpForm, User.class);
         userService.createUser(user);
-        return "redirect:/users/loginform";
+        return redirectLoginUrl;
     }
 
     @PutMapping("/{id}")
@@ -98,9 +104,9 @@ public class UserController {
         if(isOwner(id, sessionUser) || isAdmin(sessionUser)) {
             userService.updateUser(id, user);
             updateSession(session);
-            return "redirect:/";
+            return redirectMainUrl;
         }
-        return "redirect:/users/loginform";
+        return redirectLoginUrl;
     }
 
     @PatchMapping("/{id}")
@@ -132,7 +138,7 @@ public class UserController {
     public String getUserPage(@PathVariable Long id, Model model, HttpSession session) {
         UserVO sessionUser = getSessionUser(session);
         if(!isLoginUser(session)) {
-            return "redirect:/users/loginform";
+            return redirectLoginUrl;
         }
 
         // 관리자 일 경우 관리자 메인페이지로
@@ -161,19 +167,8 @@ public class UserController {
             return "/user/updateForm";
         }
 
-        return "redirect:/users/loginform";
+        return redirectLoginUrl;
     }
-
-    @GetMapping("/{id}/applySellerForm")
-    public String getApplySellerRoleForm(@PathVariable Long id, Model model, HttpSession session) {
-        UserVO sessionUser = getSessionUser(session);
-        if(isOwner(id, sessionUser)) {
-            model.addAttribute("user", sessionUser);
-            return "/user/applySellerForm";
-        }
-        return "redirect:/users/loginform";
-    }
-
 
     @GetMapping("/seller")
     @ResponseBody
@@ -196,25 +191,64 @@ public class UserController {
             model.addAttribute("user", sessionUser);
             return "redirect:/user/"+id+"/form";
         }
-        return "redirect:/users/loginform";
+        return redirectLoginUrl;
     }
 
-    @PutMapping("/seller/{id}")
-    public String applySellerRole(@PathVariable Long id,@Valid StoreVO store, HttpSession session) {
+    @GetMapping("/seller/applyForm")
+    public String getApplySellerRoleForm(Model model, HttpSession session) {
+        UserVO sessionUser = getSessionUser(session);
+        if(sessionUser.getRole().equals(Role.USER) && sessionUser.getStoreVO().getStoreApplyYn().equals("N")) {
+            model.addAttribute("user", sessionUser);
+            return "/user/applySellerForm";
+        }
+        return redirectLoginUrl;
+    }
+
+    @PostMapping("/seller/{id}/apply")
+    public String applySellerRole(@PathVariable Long id,
+                                  @Valid ApplySellerForm applyForm,
+                                  HttpSession session) {
         if(isOwner(id, getSessionUser(session))) {
+            StoreVO store = modelMapper.map(applyForm, StoreVO.class);
             userService.patchUser(id,User.builder().storeVO(store).build());
             updateSession(session);
             return "redirect:/users/"+id+"/form";
         }
-        return "redirect:/users/loginform";
+        return redirectLoginUrl;
+    }
+
+    @GetMapping("/seller/apply")
+    public String getApplySeller(BoardCriteria boardCriteria,
+                                 Model model,
+                                 HttpSession session) {
+
+        UserVO sessionUser = SessionUtils.getSessionUser(session);
+        if(isAdmin(sessionUser)) {
+            List<User> applySellerUsers = userService.getApplySellerUsers(boardCriteria);
+
+            BoardPageMaker boardPageMaker = new BoardPageMaker();
+            boardPageMaker.setBoardCriteria(boardCriteria);
+            boardPageMaker.setTotalCount(applySellerUsers.size());
+
+            model.addAttribute("userList",applySellerUsers);
+            model.addAttribute("boardPageMaker", boardPageMaker);
+            return "/user/admin/applySellerList";
+        }
+        return redirectLoginUrl;
     }
 
     @PatchMapping("/seller/{id}")
-    public String grantSellerRole(@PathVariable Long id,StoreVO store, HttpSession session) {
+    @ResponseBody
+    public ResponseEntity grantSellerRole(@PathVariable Long id, HttpSession session) {
         if(isOwner(id, getSessionUser(session))) {
-
+            User user = userService.getUser(id);
+            StoreVO storeVO = user.getStoreVO();
+            storeVO.setStoreApplyYn("N");
+            user.setStoreVO(storeVO);
+            user.setRole(Role.SELLER);
+            userService.patchUser(user.getUserId(), user);
         }
-        return "";
+        return ResponseEntity.ok().build();
     }
 
 

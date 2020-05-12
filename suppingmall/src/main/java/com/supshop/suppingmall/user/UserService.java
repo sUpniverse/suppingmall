@@ -30,6 +30,11 @@ public class UserService implements UserDetailsService {
         return userMapper.selectAllUser(boardCriteria,type,searchValue);
     }
 
+    public List<User> getApplySellerUsers(BoardCriteria boardCriteria) {
+        return userMapper.findUserByApplySellerYn(boardCriteria);
+    }
+
+
     public int getBoardCount() {
         return userMapper.selectUserCount();
     }

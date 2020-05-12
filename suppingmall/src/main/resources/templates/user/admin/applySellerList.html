@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:include="fragments/header :: header" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}" />
+</head>
+<body>
+    <nav th:replace="fragments/navigation :: navigation" />
+    <div class="container-fluid mt-5">
+        <h3>회원관리</h3>
+        <table class="table table-default table-small">
+            <thead>
+                <tr>
+                    <th>선택</th>
+                    <th>아이디</th>
+                    <th>이메일</th>
+                    <th>이름</th>
+                    <th>권한</th>
+                    <th>스토어 이름</th>
+                    <th>스토어 개인사업번호</th>
+                    <th>스토어 주소</th>
+                    <th>스토어 주소 상세</th>
+                    <th>스토어 우편번호</th>
+                    <th>스토어 전화번호</th>
+                    <th>지원승인</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${userList}">
+                <th></th>
+                <td th:text="${user.userId}" >
+                <td th:text="${user.email}" />
+                <td th:text="${user.name}" />
+                <td th:text="${user.role.title}" />
+                <td th:text="${user.storeVO.storeName}" />
+                <td th:text="${user.storeVO.storePrivateNumber}" />
+                <td th:text="${user.storeVO.storeAddress}" />
+                <td th:text="${user.storeVO.storeAddressDetail}" />
+                <td th:text="${user.storeVO.storeZipCode}" />
+                <td th:text="${user.storeVO.storePhoneNumber}" />
+                <td>
+                    <input th:id="acceptButton" type="button" class="btn btn-primary">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="container d-flex justify-content-center mb-3">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination mx-auto">
+                <li class="page-item">
+                    <a class="page-link" th:if="${boardPageMaker.prev}" th:href="@{'/users/seller/apply?page='+${boardPageMaker.startPage - 1}}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:each="idx : ${#numbers.sequence(boardPageMaker.startPage,boardPageMaker.endPage)}" th:if="${boardPageMaker.boardCriteria.page.equals(idx) ? 'class = active': ''}"><a class="page-link" th:href="@{'/users/seller/apply?page='+${idx}}" th:text="${idx}"></a></li>
+                <li class="page-item" th:if="${boardPageMaker.next && boardPageMaker.endPage > 0}">
+                    <a class="page-link" th:href="@{'/users/seller/apply?page='+${boardPageMaker.endPage + 1}}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="container d-flex justify-content-center">
+        <form method="get" th:action="@{/users/seller/apply}">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <select class="btn btn-outline-secondary dropdown-toggle" th:name="type">
+                        <option class="dropdown-item" th:value="id">아이디로 검색</option>
+                        <option class="dropdown-item" th:value="email">email로 검색</option>
+                        <option class="dropdown-item" th:value="name">회원명으로 검색</option>
+                        <option class="dropdown-item" th:value="nickName">스토어명으로 검색</option>
+                    </select>
+                </div>
+                <input type="text" class="form-control" th:name="searchValue" aria-label="Text input with dropdown button">
+                <div class="input-group-append">
+                    <button class="input-group-text" type="submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img" viewBox="0 0 24 24" focusable="false"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"/><path d="M21 21l-5.2-5.2"/></svg>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+<footer th:include="fragments/footer :: footer" />
+<script>
+    $(document).ready(function() {
+
+        $(document).on("click","#acceptButton",function(e) {
+            var userId = e.target.parentElement.parentElement.firstElementChild.textContent;
+            $.ajax({
+                type: "POST",
+                url: "/users//seller/"+userId+"/apply" ,
+                contentType: 'application/json',
+                success: () => {
+                    document.getElementById('acceptButton').remove();
+                },
+                error: () => {
+
+                }
+            });
+
+        });
+
+    });
+</script>
+</html>

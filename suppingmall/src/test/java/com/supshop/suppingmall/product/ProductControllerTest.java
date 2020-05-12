@@ -1,17 +1,25 @@
 package com.supshop.suppingmall.product;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.supshop.suppingmall.category.Category;
+import com.supshop.suppingmall.product.Form.DetailForm;
+import com.supshop.suppingmall.product.Form.OptionForm;
+import com.supshop.suppingmall.product.Form.ProductForm;
 import com.supshop.suppingmall.user.Role;
 import com.supshop.suppingmall.user.User;
+import com.supshop.suppingmall.user.UserFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,20 +31,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class ProductControllerTest {
 
-    @Autowired
-    MockMvc mockMvc;
+    @Autowired MockMvc mockMvc;
+    @Autowired ObjectMapper objectMapper;
+    @Autowired UserFactory userFactory;
 
     private MockHttpSession session;
 
-    private User addUser() {
-
-        return User.builder()
-                .userId(1l)
-                .role(Role.SELLER)
-                .build();
-    }
 
     private void addUserInSession(User user) {
         session = new MockHttpSession();
@@ -50,7 +53,7 @@ public class ProductControllerTest {
         //given
         Category category = Category.builder().id(3l).build();
 
-        ProductDetail productDetail = ProductDetail.builder()
+        DetailForm productDetail = DetailForm.builder()
                                             .detailId(1)
                                             .manufacturer("apple")
                                             .origin("베트남")
@@ -63,13 +66,13 @@ public class ProductControllerTest {
                                             .build();
 
 
-        List<ProductOption> productOptions = new ArrayList<>();
-        ProductOption productOption1 = new ProductOption();
+        List<OptionForm> productOptions = new ArrayList<>();
+        OptionForm productOption1 = new OptionForm();
         productOption1.setOptionId(1);
         productOption1.setOptionName("256");
         productOption1.setPrice(0);
         productOption1.setQuantity(50);
-        ProductOption productOption2 = new ProductOption();
+        OptionForm productOption2 = new OptionForm();
         productOption2.setOptionId(2);
         productOption2.setOptionName("512");
         productOption2.setPrice(300000);
@@ -78,24 +81,28 @@ public class ProductControllerTest {
         productOptions.add(productOption2);
 
 
-        User user = addUser();
+        User user = userFactory.createSeller("seller");
         addUserInSession(user);
 
-        Product product = Product.builder()
+        ProductForm product = ProductForm.builder()
                 .category(category)
                 .name("맥북프로")
                 .price(2000000)
+                .deliveryPrice(3000)
                 .detail(productDetail)
                 .options(productOptions)
                 .seller(user)
                 .build();
 
+        MultiValueMap<String,String> map = new LinkedMultiValueMap<>();
+        map.add("name","맥북프로");
+        map.add("price","2000000");
+        map.add("deliveryPrice","3000");
+
         //when
         mockMvc.perform(post("/products")
                 .session(session)
-                .requestAttr("product",product)
-                .characterEncoding("UTF-8")
-                .contentType("application/json"))
+                .params(map))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"))
                 .andDo(print());
@@ -139,13 +146,14 @@ public class ProductControllerTest {
         productOptions.add(productOption2);
 
 
-        User user = addUser();
+        User user = userFactory.createSeller("seller");
         addUserInSession(user);
 
         Product product = Product.builder()
                 .category(category)
                 .name("맥북프로")
                 .price(2000000)
+                .deliveryPrice(3000)
                 .detail(productDetail)
                 .options(productOptions)
                 .seller(user)
@@ -154,8 +162,9 @@ public class ProductControllerTest {
         //when
         mockMvc.perform(post("/products")
                 .session(session)
-                .requestAttr("product",product)
-                .characterEncoding("UTF-8"))
+                .contentType("application/json")
+                .characterEncoding("UTF-8")
+                .content(objectMapper.writeValueAsString(product)))
                 .andExpect(status().isBadRequest())
                 .andExpect(model().attribute("user",user))
                 .andDo(print());

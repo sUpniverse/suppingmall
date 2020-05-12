@@ -34,8 +34,8 @@ public class CartServiceTest {
     @Transactional
     public void saveCart() throws Exception {
         //given
-        User buyer = userFactory.createUser("buyer");
-        User seller = userFactory.createUser("seller");
+        User buyer = userFactory.createAdmin("buyer");
+        User seller = userFactory.createAdmin("seller");
         Category exam = categoryFactory.createCategory("exam");
         Product product = productFactory.createProduct("macbookPro",seller,exam);
         List<CartItem> itemList = cartItemFactory.createItemList(product);

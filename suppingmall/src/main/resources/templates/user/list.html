@@ -37,7 +37,7 @@
                 <td th:text="${user.zipCode}" />
                 <td th:text="${user.phoneNumber}" />
                 <td th:text="${user.createdDate}" />
-                <td th:text="${user.role}" />
+                <td th:text="${user.role.title}" />
                 <td th:text="${user.delYn}" />
                 <td>
                     <input type="button" th:id="manageButton" class="btn btn-warning" value="수정하기">

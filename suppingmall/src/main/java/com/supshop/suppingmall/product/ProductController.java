@@ -55,6 +55,7 @@ public class ProductController {
     public String getAllProduct(Model model) {
         List<Product> products = productService.retrieveAllProduct();
         model.addAttribute("products",products);
+        model.addAttribute("categories",categoryService.getCategory(productCategoryId).getChild());
         return "/product/list";
     }
 

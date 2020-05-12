@@ -5,8 +5,7 @@ import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.product.ProductDetail;
 import com.supshop.suppingmall.product.ProductOption;
 import com.supshop.suppingmall.user.User;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -15,6 +14,8 @@ import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @Getter @Setter
+@AllArgsConstructor @NoArgsConstructor
+@ToString @Builder
 public class ProductForm {
 
     @NotEmpty
@@ -31,9 +32,9 @@ public class ProductForm {
     private Delivery.DeliveryVendor deliveryVendor;
 
     @Valid
-    private ProductDetail detail;
+    private DetailForm detail;
     @Valid
-    private List<ProductOption> options;
+    private List<OptionForm> options;
 
     private String contents;
     private User seller;

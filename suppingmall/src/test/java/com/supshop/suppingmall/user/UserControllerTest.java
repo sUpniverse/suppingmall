@@ -3,11 +3,13 @@ package com.supshop.suppingmall.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,12 +21,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class UserControllerTest {
 
-    @Autowired
-    MockMvc mockMvc;
-
+    @Autowired MockMvc mockMvc;
+    @Autowired UserFactory userFactory;
+    @Autowired ModelMapper modelMapper;
     private MockHttpSession session;
+
+
 
 
     @Test
@@ -74,7 +79,7 @@ public class UserControllerTest {
     @Transactional
     public void UserValidation() throws Exception {
         //given
-        String username = "kmsup2@gmail.com";
+        String username = "test@gmail.com";
         String userpassword = "kms9109111!";
         User user = User.builder()
                 .email(username)
@@ -115,7 +120,7 @@ public class UserControllerTest {
     @Transactional
     public void UserValidationWrongEmail() throws Exception {
         //given
-        String username = "kmsup2@gmai";
+        String username = "test@gmai";
         String userpassword = "kms9109111!";
         User user = User.builder()
                 .email(username)
@@ -155,7 +160,7 @@ public class UserControllerTest {
     @Transactional
     public void UserValidationWrongPassword() throws Exception {
         //given
-        String username = "kmsup2@gmail.com";
+        String username = "test@gmail.com";
         String userpassword = "kms910911"; //특수 문자가 없는 경우
         User user = User.builder()
                 .email(username)
@@ -195,7 +200,7 @@ public class UserControllerTest {
     @Transactional
     public void UserValidationWrongPhone() throws Exception {
         //given
-        String username = "kmsup2@gmail.com";
+        String username = "test@gmail.com";
         String userpassword = "kms910911"; //특수 문자가 없는 경우
         User user = User.builder()
                 .email(username)
@@ -231,21 +236,19 @@ public class UserControllerTest {
 
     }
 
-    private void addUserInSession(UserVO user) {
+    private void addUserInSession(User user) {
+        UserVO needUser = modelMapper.map(user, UserVO.class);
         session = new MockHttpSession();
-        session.setAttribute("user",user);
+        session.setAttribute("user",needUser);
 
     }
 
-    private UserVO makeMasterUser() {
-        return UserVO.builder().userId(1l).role(Role.MASTER).build();
-    }
 
     @Test
     @Transactional
     public void pathchUserWithOutDelYn() throws Exception {
         //given
-        addUserInSession(makeMasterUser());
+        addUserInSession(userFactory.createUser("test"));
         ObjectMapper objectMapper = new ObjectMapper();
         Long userId = 1l;
         String username = "kmsup2@gmail.com";
@@ -277,7 +280,7 @@ public class UserControllerTest {
     @Transactional
     public void patchUserWithDelYn() throws Exception {
         //given
-        addUserInSession(makeMasterUser());
+        addUserInSession(userFactory.createUser("test"));
         ObjectMapper objectMapper = new ObjectMapper();
         Long userId = 1l;
 
@@ -292,32 +295,36 @@ public class UserControllerTest {
         )
                     .andExpect(status().isOk())
                     .andDo(print());
-
-
         //then
-
     }
 
     @Test
     @Transactional
-    public void putSellerApply() throws Exception {
+    public void SellerApply() throws Exception {
         //given
-        addUserInSession(makeMasterUser());
+        User testUser = userFactory.createUser("test");
+        addUserInSession(testUser);
         StoreVO store = StoreVO.builder()
+                .storeName("섭프라이즈스토어")
                 .storePrivateNumber("000-000-000")
                 .storeAddress("서울시 중구 신당동 432")
                 .storeAddressDetail("서프라이즈빌딩 502호")
                 .storeZipCode("347532")
                 .storeApplyYn("Y")
                 .build();
-        Long userId = 1l;
 
         //when
-        mockMvc.perform(put("/users/seller/{id}",userId)
+        mockMvc.perform(post("/users/seller/{id}/apply",testUser.getUserId())
                                 .session(session)
-                                .requestAttr("store",store))
+                        .param("storeName",store.getStoreName())
+                        .param("storePrivateNumber",store.getStorePhoneNumber())
+                        .param("storeAddress",store.getStoreAddress())
+                        .param("storeAddressDetail",store.getStoreAddressDetail())
+                        .param("storeZipCode",store.getStoreZipCode())
+                        .param("storeApplyYn", store.getStoreApplyYn())
+                )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/user/"+userId+"/form"))
+                .andExpect(redirectedUrl("/users/"+testUser.getUserId()+"/form"))
                 .andDo(print())
         ;
 
@@ -326,10 +333,27 @@ public class UserControllerTest {
     }
 
     @Test
+    @Transactional
+    public void getSellerApplyPage() throws Exception {
+        //given
+        User user = userFactory.createAdmin("test");
+        addUserInSession(user);
+
+        //when
+        mockMvc.perform(get("/users/seller/apply")
+                .session(session))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/user/admin/applySellerList"));
+
+        //then
+
+    }
+
+
+    @Test
     public void getStore() throws Exception {
         //given
-        addUserInSession(makeMasterUser());
-
+        addUserInSession(userFactory.createUser("test"));
 
         //when
         mockMvc.perform(get("/users/seller")

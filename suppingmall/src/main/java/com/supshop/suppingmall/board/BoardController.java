@@ -46,10 +46,10 @@ public class BoardController {
                               @RequestParam(required = false) String type,
                               @RequestParam(required = false) String searchValue) {
         log.debug("'getAllBoard'가 실행됨");
-        model.addAttribute(boardService.getBoardByCondition(boardCriteria,category,type,searchValue));
         BoardPageMaker boardPageMaker = new BoardPageMaker();
         boardPageMaker.setBoardCriteria(boardCriteria);
         boardPageMaker.setTotalCount(boardService.getBoardCount());
+        model.addAttribute(boardService.getBoardByCondition(boardCriteria,category,type,searchValue));
         model.addAttribute("boardPageMaker", boardPageMaker);
         return "/board/list";
     }

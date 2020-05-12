@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +25,7 @@ public class UserServiceTest {
     @Transactional
     public void findByUsername() throws Exception {
         //given
-        User james = userFactory.createUser("james");
+        User james = userFactory.createAdmin("james");
 
         //when
         UserDetailsService userDetailsService = (UserDetailsService) userService;
