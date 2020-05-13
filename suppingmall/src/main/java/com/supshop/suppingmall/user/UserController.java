@@ -25,7 +25,7 @@ public class UserController {
 
     private final UserService userService;
     private final ModelMapper modelMapper;
-    private static final String sessionUser = "user";
+    private static final String sessionUserName = "user";
     private static final String redirectLoginUrl = "redirect:/users/loginform";
     private static final String redirectMainUrl = "redirect:/";
 
@@ -187,6 +187,7 @@ public class UserController {
 
     @GetMapping("/seller/{id}")
     public String getSeller(@PathVariable Long id, Model model, HttpSession session) {
+        UserVO sessionUser = getSessionUser(session);
         if(isOwner(id, getSessionUser(session))) {
             model.addAttribute("user", sessionUser);
             return "redirect:/user/"+id+"/form";
@@ -217,7 +218,7 @@ public class UserController {
         return redirectLoginUrl;
     }
 
-    @GetMapping("/seller/apply")
+    @GetMapping("/seller/applicants")
     public String getApplySeller(BoardCriteria boardCriteria,
                                  Model model,
                                  HttpSession session) {
@@ -237,29 +238,35 @@ public class UserController {
         return redirectLoginUrl;
     }
 
-    @PatchMapping("/seller/{id}")
+    @PatchMapping("/seller/{id}/apply")
     @ResponseBody
     public ResponseEntity grantSellerRole(@PathVariable Long id, HttpSession session) {
-        if(isOwner(id, getSessionUser(session))) {
+        UserVO sessionUser = SessionUtils.getSessionUser(session);
+        if(isAdmin(sessionUser)) {
             User user = userService.getUser(id);
             StoreVO storeVO = user.getStoreVO();
             storeVO.setStoreApplyYn("N");
             user.setStoreVO(storeVO);
             user.setRole(Role.SELLER);
-            userService.patchUser(user.getUserId(), user);
+            try {
+                userService.patchUser(user.getUserId(), user);
+            } catch (Exception e){
+                return ResponseEntity.badRequest().build();
+            }
+            return ResponseEntity.ok().build();
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.badRequest().build();
     }
 
 
     private boolean isLoginUser(HttpSession session) {
-        UserVO user = (UserVO) session.getAttribute("user");
+        UserVO user = (UserVO) session.getAttribute(sessionUserName);
         if (user == null) return false;
         return true;
     }
 
     private UserVO getSessionUser(HttpSession session) {
-        return (UserVO) session.getAttribute(sessionUser);
+        return (UserVO) session.getAttribute(sessionUserName);
     }
 
     //세션의 유저와 주인의 아이디가 같은지 확인

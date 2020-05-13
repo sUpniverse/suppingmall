@@ -300,7 +300,7 @@ public class UserControllerTest {
 
     @Test
     @Transactional
-    public void SellerApply() throws Exception {
+    public void sellerApply() throws Exception {
         //given
         User testUser = userFactory.createUser("test");
         addUserInSession(testUser);
@@ -340,7 +340,7 @@ public class UserControllerTest {
         addUserInSession(user);
 
         //when
-        mockMvc.perform(get("/users/seller/apply")
+        mockMvc.perform(get("/users/seller/applicant")
                 .session(session))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/user/admin/applySellerList"));
@@ -351,19 +351,45 @@ public class UserControllerTest {
 
 
     @Test
-    public void getStore() throws Exception {
+    @Transactional
+    public void getApplicant() throws Exception {
         //given
-        addUserInSession(userFactory.createUser("test"));
+        User applicant = userFactory.createApplicant("applicant");
+        addUserInSession(applicant);
+
+        User admin = userFactory.createAdmin("admin");
+        addUserInSession(admin);
 
         //when
-        mockMvc.perform(get("/users/seller")
+        mockMvc.perform(get("/users/seller/apply")
                 .session(session)
-                .contentType(MediaType.APPLICATION_JSON)
-                .param("type","name")
-                .param("value","뚱뚱")
         )
                 .andDo(print())
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(view().name("/user/admin/applySellerList"))
+                .andExpect(model().attributeExists("userList"))
+//                .andExpect(model().attribute("userList.storeVO",hasProperty("storeVO",hasProperty("storeName",is(applySeller.store.getStoreName())))))    이거 방법을 찾고 싶다.
+        ;
+
+        //then
+
+    }
+
+    @Test
+    @Transactional
+    public void grantSellerRole () throws Exception {
+        //given
+        User applicant = userFactory.createApplicant("applicant");
+        addUserInSession(applicant);
+
+        User admin = userFactory.createAdmin("admin");
+        addUserInSession(admin);
+
+        //when
+        mockMvc.perform(patch("/users/seller/{id}/apply",applicant.getUserId())
+                .session(session))
+                .andDo(print())
+                .andExpect(status().isOk());
 
         //then
 

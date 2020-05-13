@@ -66,8 +66,7 @@
                         <div class="mt-5">
                             <h3 class="h2 mr-3">추가정보입력</h3>
                             거짓정보 입력 시 심사에 탈락할 수 있습니다.
-                            <form th:action="@{/users/seller/{id}(id=${user.userId})}" method="post" name="store" onsubmit="return checkAllValidation()">
-                                <input type="hidden" name="_method" value="put">
+                            <form th:action="@{'/users/seller/'+${user.userId}+'/apply'}" method="post" name="store" onsubmit="return checkAllValidation()">
                                 <input type="hidden" name="storeApplyYn" value="Y">
                                 <table class="table table-default mt-1">
                                     <tbody>
@@ -198,7 +197,7 @@
 <footer th:include="fragments/footer :: footer" />
 <script>
 
-    var emptyReg = /^\s+|\s+$/g;
+    var emptyReg = /\s/g;
     var checkName = false;
 
     var checkPrivateNumber = true;
@@ -241,9 +240,8 @@
     });
 
     $(document).on('click',"#nameCheck",() => {
-        let name = getElement("storeName");
-        if(!check(emptyReg,name)) {
-            checkName = true;
+        let name = getElement("storeName").value.replace(/(\s*)/g,"");
+        if(!check(emptyReg,name) && name !== "") {
             $.ajax({
                 type:"GET",
                 url:"/users/seller",

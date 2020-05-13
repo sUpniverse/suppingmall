@@ -98,7 +98,7 @@
         U.store_phone_number AS "StorePhoneNumber", U.store_address AS "StoreAddress", U.store_address_detail AS "StoreAddressDetail",
         U.store_zipcode AS "StoreZipCode", U.store_apply_yes_or_no AS "StoreApplyYn"
         FROM User AS U
-        WHERE U.store_apply_yes_or_no = 'N'
+        WHERE U.store_apply_yes_or_no = 'Y'
         ORDER BY U.updated_date asc
         limit #{pageStart}, #{perPageNum}
     </select>

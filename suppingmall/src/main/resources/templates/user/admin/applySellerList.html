@@ -6,12 +6,11 @@
 </head>
 <body>
     <nav th:replace="fragments/navigation :: navigation" />
-    <div class="container-fluid mt-5">
-        <h3>회원관리</h3>
+    <div class="container-fluid my-5">
+        <h3 class="mb-5">회원관리</h3>
         <table class="table table-default table-small">
             <thead>
                 <tr>
-                    <th>선택</th>
                     <th>아이디</th>
                     <th>이메일</th>
                     <th>이름</th>
@@ -27,7 +26,6 @@
             </thead>
             <tbody>
             <tr th:each="user : ${userList}">
-                <th></th>
                 <td th:text="${user.userId}" >
                 <td th:text="${user.email}" />
                 <td th:text="${user.name}" />
@@ -39,7 +37,7 @@
                 <td th:text="${user.storeVO.storeZipCode}" />
                 <td th:text="${user.storeVO.storePhoneNumber}" />
                 <td>
-                    <input th:id="acceptButton" type="button" class="btn btn-primary">
+                    <input th:id="acceptButton" type="button" class="btn btn-primary" value="승인">
                 </td>
             </tr>
             </tbody>
@@ -90,11 +88,11 @@
         $(document).on("click","#acceptButton",function(e) {
             var userId = e.target.parentElement.parentElement.firstElementChild.textContent;
             $.ajax({
-                type: "POST",
-                url: "/users//seller/"+userId+"/apply" ,
+                type: "patch",
+                url: "/users/seller/"+userId+"/apply" ,
                 contentType: 'application/json',
                 success: () => {
-                    document.getElementById('acceptButton').remove();
+                    e.target().remove();
                 },
                 error: () => {
 
