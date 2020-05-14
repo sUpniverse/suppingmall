@@ -8,7 +8,7 @@
     <nav th:replace="fragments/navigation :: navigation" />
     <div class="container-fluid my-5">
         <h3 class="mb-5">회원관리</h3>
-        <table class="table table-default table-small">
+        <table class="table table-default text-small">
             <thead>
                 <tr>
                     <th>아이디</th>
@@ -37,7 +37,7 @@
                 <td th:text="${user.storeVO.storeZipCode}" />
                 <td th:text="${user.storeVO.storePhoneNumber}" />
                 <td>
-                    <input th:id="acceptButton" type="button" class="btn btn-primary" value="승인">
+                    <input th:id="acceptButton" type="button" class="btn btn-primary btn-sm" value="승인">
                 </td>
             </tr>
             </tbody>
@@ -80,8 +80,8 @@
             </div>
         </form>
     </div>
+<footer th:replace="fragments/footer :: footer" />
 </body>
-<footer th:include="fragments/footer :: footer" />
 <script>
     $(document).ready(function() {
 

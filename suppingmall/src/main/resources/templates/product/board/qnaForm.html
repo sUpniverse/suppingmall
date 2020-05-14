@@ -40,10 +40,9 @@
         <li class="notice_item">상품에 대한 이용 후기는 리뷰에 남겨 주세요.</li>
     </ul>
 </div>
-
+<footer th:replace="fragments/footer :: footer" />
 </body>
 <script>
-
     function submit() {
         var qna = $("form[role='form']").serializeObject();
         var productId = [[${productId}]];

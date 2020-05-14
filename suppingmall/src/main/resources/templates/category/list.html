@@ -21,7 +21,9 @@
 <div th:replace="fragments/navigation-fix :: navigation-fix" />
 <div class="container-fluid">
     <div class="row">
-        <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
+        <div class="col-md-2 d-none d-md-block bg-light sidebar">
+            <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
+        </div>
         <div class="col-md-6 ml-sm-auto col-lg-8 pl-5 pt-5">
             <div>
                 <h3>카테고리 관리</h3>
@@ -119,8 +121,8 @@
         </div>
     </div>
 </div>
+<footer th:replace="fragments/footer :: footer" />
 </body>
-<footer th:include="fragments/footer :: footer" />
 <script th:inline="javascript" th:src="@{/js/category/getCategoryByOnClick.js}"></script>
 <script th:inline="javascript" th:src="@{/js/category/getCategoryBySelectedOption.js}"></script>
 <script th:inline="javascript" th:src="@{/js/category/addNewCategory.js}"></script>

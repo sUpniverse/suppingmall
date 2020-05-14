@@ -8,10 +8,10 @@
 <div th:replace="fragments/navigation-fix :: navigation-fix" />
 <div class="container-fluid">
     <div class="row">
-        <div th:if="${#strings.equals(session.user.getRole(),'USER') || #strings.equals(session.user.getRole(),'SELLER')}">
+        <div class="col-md-2 d-none d-md-block bg-light sidebar" th:if="${#strings.equals(session.user.getRole(),'USER') || #strings.equals(session.user.getRole(),'SELLER')}">
             <nav th:replace="user/user-left-bar :: user-left-bar" />
         </div>
-        <div th:if="${#strings.equals(session.user.getRole(),'ADMIN') || #strings.equals(session.user.getRole(),'MASTER')}">
+        <div class="col-md-2 d-none d-md-block bg-light sidebar" th:if="${#strings.equals(session.user.getRole(),'ADMIN') || #strings.equals(session.user.getRole(),'MASTER')}">
             <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
         </div>
         <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
@@ -23,6 +23,6 @@
     </div>
 </div>
 
+<footer th:replace="fragments/footer :: footer" />
 </body>
-<footer th:include="fragments/footer :: footer" />
 </html>

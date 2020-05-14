@@ -17,10 +17,10 @@
 <div th:replace="fragments/navigation-fix :: navigation-fix" />
 <div class="container-fluid">
     <div class="row">
-        <div th:if="${#strings.equals(session.user.getRole(),'SELLER')}">
+        <div class="col-md-2 d-none d-md-block bg-light sidebar" th:if="${#strings.equals(session.user.getRole(),'SELLER')}">
             <nav th:replace="user/user-left-bar :: user-left-bar" />
         </div>
-        <div th:if="${#strings.equals(session.user.getRole(),'ADMIN') || #strings.equals(session.user.getRole(),'MASTER')}">
+        <div class="col-md-2 d-none d-md-block bg-light sidebar" th:if="${#strings.equals(session.user.getRole(),'ADMIN') || #strings.equals(session.user.getRole(),'MASTER')}">
             <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
         </div>
         <div class="col-md-6 ml-sm-auto col-lg-10 p-5">
@@ -76,44 +76,46 @@
             <div class="mt-5">
                 <h3>판매목록</h3>
                 <span th:text="@{'등록된 상품 개수 : ' + ${products.size()}}"></span>
-                <table class="table table-default mt-3 text-sm">
+                <table class="table table-default mt-3 text-small">
                     <thead class="table-secondary">
-                        <tr>
-                            <th>상품번호</th>
-                            <th>상품카테고리</th>
-                            <th>상품명</th>
-                            <th>옵션명</th>
-                            <th>재고</th>
-                            <th>배송비</th>
-                            <th>등록일</th>
-                        </tr>
+                    <tr>
+                        <th>상품번호</th>
+                        <th>상품카테고리</th>
+                        <th>상품명</th>
+                        <th>옵션명</th>
+                        <th>재고</th>
+                        <th>배송비</th>
+                        <th>등록일</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="product : ${products}" class="border-bottom">
-                            <td th:text="${product?.productId}"></td>
-                            <td th:text="${product?.category.name}"></td>
-                            <td>
-                                <a th:href="@{'/products/'+${product.productId}}" style="color: #333333" th:text="${product?.name}"></a>
-                            </td>
-                            <td>
-                                <div th:each="option : ${product?.options}">
-                                    <span th:text="${option?.optionName}"></span>
-                                </div>
-                            </td>
-                            <td>
-                                <div th:each="option : ${product?.options}">
-                                    <span th:text="${option?.quantity}"></span>
-                                </div>
-                            </td>
-                            <td th:text="${product?.deliveryPrice}"></td>
-                            <td th:text="${product?.registeredDate}"></td>
-                        </tr>
+                    <tr th:each="product : ${products}" class="border-bottom">
+                        <td th:text="${product?.productId}"></td>
+                        <td th:text="${product?.category.name}"></td>
+                        <td>
+                            <a th:href="@{'/products/'+${product.productId}}" style="color: #333333" th:text="${product?.name}"></a>
+                        </td>
+                        <td>
+                            <div th:each="option : ${product?.options}">
+                                <span th:text="${option?.optionName}"></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div th:each="option : ${product?.options}">
+                                <span th:text="${option?.quantity}"></span>
+                            </div>
+                        </td>
+                        <td th:text="${product?.deliveryPrice}"></td>
+                        <td th:text="${product?.registeredDate}"></td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+<footer th:replace="fragments/footer :: footer" />
+</body>
 <script>
 
     function search() {
@@ -124,5 +126,4 @@
         $(location).attr('href','/orders/main?fromDate=' + fromDate + '&toDate=' + toDate + '&type=order&status=' + status);
     }
 </script>
-</body>
 </html>

@@ -161,9 +161,8 @@
             </form>
         </div>
     </div>
-    <footer th:include="fragments/footer :: footer" />
+<footer th:replace="fragments/footer :: footer" />
 </body>
-<footer th:include="fragments/footer :: footer" />
 <script type="text/javascript">
     // 옵션 추가 스크립트
     $(document).on('click',"#addOptionButton", () => {

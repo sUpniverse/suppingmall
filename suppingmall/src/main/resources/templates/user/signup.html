@@ -9,138 +9,137 @@
         }
     </style>
 </head>
-    <body>
-    <div th:replace="fragments/navigation :: navigation" />
-        <div class="container">
-            <div class="position-relative overflow-hidden p-1 mb-5 text-center bg-light">
-                <div class="p-lg-5 mx-auto my-2">
-                    <h1 class="display-4 font-weight-normal">회원가입</h1>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col-md-8 orders-md-1  mx-auto">
-                        <div>
-                            <p class="lead">이미 아이디를 가지고 계시다구요?</p>
-                        </div>
-                        <div>
-                            <p class="lead">그렇다면 <a href="#" class="lead">이 곳에서 찾으세요</a></p>
-                        </div>
-
-
-                    <form class="needs-validation mt-5"  novalidate="" th:action="@{/users}" method="post" name="user" onsubmit="return checkAllValidation()">
-                        <input type="hidden" name="role" value="USER">
-                        <input type="hidden" name="type" value="LOCAL">
-                        <div class="row">
-                            <div class="col-md-8 mb-3">
-                                <label for="email">Email <span class="text-muted">(이 것이 아이디가 될겁니다.)</span></label>
-                                <input type="email" class="form-control is-invalid" id="email" name="email" placeholder="you@example.com">
-                                <div class="invalid-feedback" id="validEmail">
-                                    유효한 이메일 주소를 입력해야합니다.
-                                </div>
-                                <div class="invalid-feedback" id="duplicateEmail">
-                                    중복 확인이 필요합니다.
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <input type="button" class="btn btn-outline-secondary mt-4" id="emailCheck" value="중복확인">
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="password">비밀번호</label>
-                                <input type="password" class="form-control is-invalid" id="password" placeholder="비밀번호를 입력하세요" name="password">
-                                <div class="invalid-feedback">
-                                    영문,숫자,특수문자를 조합한 8자리 이상을 입력하세요
-                                </div>
-                                <div class="valid-feedback">
-                                    적합한 비밀번호입니다.
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="passwordcheck">비밀번호확인</label>
-                                <input type="password" class="form-control is-invalid" placeholder="비밀번호를 한번 더 입력하세요" id="passwordcheck">
-                                <div class="invalid-feedback">
-                                    입력한 비밀번호와 일치하지 않습니다.
-                                </div>
-                                <div class="valid-feedback">
-                                    입력한 비밀번호와 일치합니다.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="name">이 름</label>
-                                <input type="text" class="form-control" id="name" placeholder="고객님의 이름을 입력해주세요" name="name">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="nickName">별 명</label>
-                                <input type="text" class="form-control" id="nickName" placeholder="사용하실 별명을 입력해주세요" name="nickName">
-                            </div>
-                        </div>
-
-                        <hr class="mb-4">
-
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="phoneFirst">핸드폰 번호</label>
-                                <div class="input-group mb-3">
-                                    <select id="phoneFirst" class="custom-select">
-                                        <option selected value="010">010</option>
-                                        <option value="011">011</option>
-                                        <option value="018">018</option>
-                                        <option value="019">019</option>
-                                    </select>
-                                    <input type="text" class="form-control" id="phoneMiddle">
-                                    <input type="text" class="form-control" id="phoneLast">
-                                    <input type="hidden" id="phone" name="phoneNumber">
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <input type="button" class="btn btn-outline-secondary mt-4" id="verifyPhone" value="핸드폰 인증">
-                            </div>
-                        </div>
-
-
-                        <div class="row">
-                            <div class="col-md-3 mb-3">
-                                <label for="zip">Zip</label>
-                                <input type="text" class="form-control" id="zip" placeholder="" name="zipCode" readonly>
-                                <div class="invalid-feedback">
-                                    Zip code required.
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <input type="button" class="btn btn-outline-secondary mt-4" id="search_address" value="우편번호 찾기">
-                            </div>
-                        </div>
-
-
-                        <div class="mb-3">
-                            <label for="address">주소</label>
-                            <input type="text" class="form-control" id="address" name="address" readonly>
-                            <div class="invalid-feedback">
-                                Please enter your shipping address.
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="address2">상세주소 </label>
-                            <input type="text" class="form-control" id="address2" placeholder="상세주소를 기입해주세요" name="addressDetail">
-                        </div>
-
-
-                        <hr class="mb-4">
-                        <input class="btn btn-primary btn-block" type="submit" value="회원가입"/>
-                    </form>
-                </div>
+<body>
+<div th:replace="fragments/navigation :: navigation" />
+    <div class="container">
+        <div class="position-relative overflow-hidden p-1 mb-5 text-center bg-light">
+            <div class="p-lg-5 mx-auto my-2">
+                <h1 class="display-4 font-weight-normal">회원가입</h1>
             </div>
         </div>
-    </body>
-<footer th:include="fragments/footer :: footer" />
+        <div class="row mb-3">
+            <div class="col-md-8 orders-md-1  mx-auto">
+                    <div>
+                        <p class="lead">이미 아이디를 가지고 계시다구요?</p>
+                    </div>
+                    <div>
+                        <p class="lead">그렇다면 <a href="#" class="lead">이 곳에서 찾으세요</a></p>
+                    </div>
 
+
+                <form class="needs-validation mt-5"  novalidate="" th:action="@{/users}" method="post" name="user" onsubmit="return checkAllValidation()">
+                    <input type="hidden" name="role" value="USER">
+                    <input type="hidden" name="type" value="LOCAL">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label for="email">Email <span class="text-muted">(이 것이 아이디가 될겁니다.)</span></label>
+                            <input type="email" class="form-control is-invalid" id="email" name="email" placeholder="you@example.com">
+                            <div class="invalid-feedback" id="validEmail">
+                                유효한 이메일 주소를 입력해야합니다.
+                            </div>
+                            <div class="invalid-feedback" id="duplicateEmail">
+                                중복 확인이 필요합니다.
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <input type="button" class="btn btn-outline-secondary mt-4" id="emailCheck" value="중복확인">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="password">비밀번호</label>
+                            <input type="password" class="form-control is-invalid" id="password" placeholder="비밀번호를 입력하세요" name="password">
+                            <div class="invalid-feedback">
+                                영문,숫자,특수문자를 조합한 8자리 이상을 입력하세요
+                            </div>
+                            <div class="valid-feedback">
+                                적합한 비밀번호입니다.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="passwordcheck">비밀번호확인</label>
+                            <input type="password" class="form-control is-invalid" placeholder="비밀번호를 한번 더 입력하세요" id="passwordcheck">
+                            <div class="invalid-feedback">
+                                입력한 비밀번호와 일치하지 않습니다.
+                            </div>
+                            <div class="valid-feedback">
+                                입력한 비밀번호와 일치합니다.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name">이 름</label>
+                            <input type="text" class="form-control" id="name" placeholder="고객님의 이름을 입력해주세요" name="name">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="nickName">별 명</label>
+                            <input type="text" class="form-control" id="nickName" placeholder="사용하실 별명을 입력해주세요" name="nickName">
+                        </div>
+                    </div>
+
+                    <hr class="mb-4">
+
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="phoneFirst">핸드폰 번호</label>
+                            <div class="input-group mb-3">
+                                <select id="phoneFirst" class="custom-select">
+                                    <option selected value="010">010</option>
+                                    <option value="011">011</option>
+                                    <option value="018">018</option>
+                                    <option value="019">019</option>
+                                </select>
+                                <input type="text" class="form-control" id="phoneMiddle">
+                                <input type="text" class="form-control" id="phoneLast">
+                                <input type="hidden" id="phone" name="phoneNumber">
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <input type="button" class="btn btn-outline-secondary mt-4" id="verifyPhone" value="핸드폰 인증">
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="zip">Zip</label>
+                            <input type="text" class="form-control" id="zip" placeholder="" name="zipCode" readonly>
+                            <div class="invalid-feedback">
+                                Zip code required.
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <input type="button" class="btn btn-outline-secondary mt-4" id="search_address" value="우편번호 찾기">
+                        </div>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label for="address">주소</label>
+                        <input type="text" class="form-control" id="address" name="address" readonly>
+                        <div class="invalid-feedback">
+                            Please enter your shipping address.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="address2">상세주소 </label>
+                        <input type="text" class="form-control" id="address2" placeholder="상세주소를 기입해주세요" name="addressDetail">
+                    </div>
+
+
+                    <hr class="mb-4">
+                    <input class="btn btn-primary btn-block" type="submit" value="회원가입"/>
+                </form>
+            </div>
+        </div>
+    </div>
+<footer th:replace="fragments/footer :: footer" />
+</body>
 <script>
 
     let checkEmailResult = false;
