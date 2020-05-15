@@ -5,6 +5,7 @@ target/
 !**/src/test/**
 src/main/resources/images
 application-oauth.yml
+application-email.yml
 
 ### STS ###
 .apt_generated

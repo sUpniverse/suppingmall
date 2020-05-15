@@ -3,80 +3,85 @@
 <head th:include="fragments/header :: header" />
 <body>
 <nav th:replace="fragments/navigation :: navigation" />
-    <div class="container">
-        <form role="form" th:method="post">
-        </form>
-        <div class="pt-5 pd-3 border-bottom">
-            <!-- Category -->
-            <h4 th:text="${board.category.name}"></h4>
-        </div>
-        <div>
-            <!-- Title -->
-            <h3 class="pt-3 pb-3" th:text="${board.title}"></h3>
-        </div>
-        <div class="bg-light border-top border-dark py-2" style="display: flex">
-            <!-- Author -->
-            <span class="col-6 lead" th:text="@{${board.creator.nickName} +'님'}"></span>
-            <!-- Hit -->
-            <div class="col-6 d-flex justify-content-end align-items-center">
-                <img src="/logo/board/eyes.jpg" height="16">
-                <span th:text="@{' '+${board.hit}}"></span>
+<div class="container-fluid">
+    <div class="row">
+        <div th:replace="board/left-sidebar :: left-sidebar" />
+        <div class="col-md-5">
+            <form role="form" th:method="post">
+            </form>
+            <div class="pt-5 pd-3 border-bottom">
+                <!-- Category -->
+                <h4 th:text="${board.category.name}"></h4>
             </div>
-        </div>
-        <div class="border">
-            <!-- Date/Time -->
-            <div class="mb-3 ml-2">
-                <img src="/logo/board/clock.png" height="12">
-                <span class="text-muted" style="font-size: 0.8rem" th:text="${board.createdDate}"></span>
+            <div>
+                <!-- Title -->
+                <h3 class="pt-3 pb-3" th:text="${board.title}"></h3>
             </div>
-            <!-- Post Content -->
-            <div class="pd-5 ml-2">
-                <p class="lead" th:id="contents" th:utext="${board.contents}"></p>
+            <div class="bg-light border-top border-dark py-2" style="display: flex">
+                <!-- Author -->
+                <span class="col-6 lead" th:text="@{${board.creator.nickName} +'님'}"></span>
+                <!-- Hit -->
+                <div class="col-6 d-flex justify-content-end align-items-center">
+                    <img src="/logo/board/eyes.jpg" height="16">
+                    <span th:text="@{' '+${board.hit}}"></span>
+                </div>
             </div>
-            <div class="box-footer text-center mb-3">
-                <button th:if="${not #strings.isEmpty(session.user?.userId) && board.creator.userId.equals(session.user?.userId)}" type="submit" class="btn btn-warning">수정</button>
-                <button th:if="${not #strings.isEmpty(session.user?.userId) && board.creator.userId.equals(session.user?.userId)}" type="submit" class="btn btn-danger">삭제</button>
-                <button type="submit" class="btn btn-primary">목록</button>
+            <div class="border">
+                <!-- Date/Time -->
+                <div class="mb-3 ml-2">
+                    <img src="/logo/board/clock.png" height="12">
+                    <span class="text-muted" style="font-size: 0.8rem" th:text="${board.createdDate}"></span>
+                </div>
+                <!-- Post Content -->
+                <div class="pd-5 ml-2">
+                    <p class="lead" th:id="contents" th:utext="${board.contents}"></p>
+                </div>
+                <div class="box-footer text-center mb-3">
+                    <button th:if="${not #strings.isEmpty(session.user?.userId) && board.creator.userId.equals(session.user?.userId)}" type="submit" class="btn btn-warning">수정</button>
+                    <button th:if="${not #strings.isEmpty(session.user?.userId) && board.creator.userId.equals(session.user?.userId)}" type="submit" class="btn btn-danger">삭제</button>
+                    <button type="submit" class="btn btn-primary">목록</button>
+                </div>
             </div>
-        </div>
 
 
-        <!-- Comments List -->
-        <div class="mt-5">
-            <div class="border-bottom border-gray pb-2 mb-3" th:text="@{'댓글 ['+${board.comments.size()}+']'}"></div>
-            <div id="comments">
-                <!-- Single Comment -->
-                <div class="media pb-3" th:each="comment : ${board.comments}" th:data-no="${comment.commentId}">
-                    <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-                    <div class="media-body">
-                        <h5 class="mt-0" th:text="${comment.creator.nickName}" th:value="${comment.creator.userId}"></h5>
-                        <div class="btn-group float-right"  th:if="${not #strings.isEmpty(session.user?.userId) && comment.creator.userId.equals(session.user?.userId)}">
-                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                수정 / 삭제 / 신고
-                            </button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" th:id="comment-update-button">수정</a>
-                                <a class="dropdown-item" th:id="comment-delete-button">삭제</a>
+            <!-- Comments List -->
+            <div class="mt-5">
+                <div class="border-bottom border-gray pb-2 mb-3" th:text="@{'댓글 ['+${board.comments.size()}+']'}"></div>
+                <div id="comments">
+                    <!-- Single Comment -->
+                    <div class="media pb-3" th:each="comment : ${board.comments}" th:data-no="${comment.commentId}">
+                        <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                        <div class="media-body">
+                            <h5 class="mt-0" th:text="${comment.creator.nickName}" th:value="${comment.creator.userId}"></h5>
+                            <div class="btn-group float-right"  th:if="${not #strings.isEmpty(session.user?.userId) && comment.creator.userId.equals(session.user?.userId)}">
+                                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    수정 / 삭제 / 신고
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" th:id="comment-update-button">수정</a>
+                                    <a class="dropdown-item" th:id="comment-delete-button">삭제</a>
+                                </div>
                             </div>
+                            <p th:text="${comment.contents}"></p>
                         </div>
-                        <p th:text="${comment.contents}"></p>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Comments Form -->
-        <div class="card my-4" th:id="comment-form">
-            <h5 class="card-header">댓글입력</h5>
-            <div class="card-body">
-                <div class="form-group">
-                    <textarea class="form-control" th:id="comment-text" rows="3"></textarea>
+            <!-- Comments Form -->
+            <div class="card my-4" th:id="comment-form">
+                <h5 class="card-header">댓글입력</h5>
+                <div class="card-body">
+                    <div class="form-group">
+                        <textarea class="form-control" th:id="comment-text" rows="3"></textarea>
+                    </div>
+                    <button class="btn btn-light" th:id="comment-button">댓글달기</button>
                 </div>
-                <button class="btn btn-light" th:id="comment-button">댓글달기</button>
             </div>
         </div>
     </div>
-<footer th:replace="fragments/footer :: footer" />
+</div>
+<footer class="cusFooter" th:include="fragments/footer :: footer" />
 </body>
 <script th:inline="javascript">
     $(document).ready(function() {
