@@ -1,9 +1,9 @@
 package com.supshop.suppingmall.user;
 
-import com.supshop.suppingmall.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -20,7 +20,7 @@ import java.util.Collections;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
 
-    private final UserMapper userMapper;
+    private final UserService userService;
     private final HttpSession httpSession;
     private final ModelMapper modelMapper;
 
@@ -42,14 +42,17 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private UserVO save(OAuthAttribute authAttribute) {
-        User user = userMapper.findUserByEmail(authAttribute.getEmail())
-                .orElseGet(() -> {
-                    User newUser = authAttribute.setUserVo();
-                    userMapper.insertUser(newUser);
-                    return newUser;
-                });
+        User user;
+        try {
+            user = userService.getUserByEmail(authAttribute.getEmail());
+
+        } catch (UsernameNotFoundException e) {
+            User newUser = authAttribute.setUserVo();
+            userService.createUser(newUser);
+            user = newUser;
+        }
+
         return modelMapper.map(user, UserVO.class);
     }
-
 
 }

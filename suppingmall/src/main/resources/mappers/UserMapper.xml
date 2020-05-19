@@ -27,6 +27,12 @@
             <result property="storeZipCode" column="StoreZipCode" />
             <result property="storeApplyYn" column="StoreApplyYn" />
         </association>
+        <association property="userConfirmation" javaType="com.supshop.suppingmall.user.UserConfirmation">
+            <result property="confirmYn" column="UserConfirmationYn" />
+            <result property="confirmToken" column="UserConfirmationToken" />
+            <result property="sendDate" column="UserConfirmationSendDate" />
+            <result property="confirmDate" column="UserConfirmationDate" />
+        </association>
     </resultMap>
 
     <select id="selectAllUser" resultMap="User">
@@ -85,8 +91,10 @@
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.store_private_number AS "StorePrivateNumber", U.store_name AS "StoreName",
         U.store_phone_number AS "StorePhoneNumber", U.store_address AS "StoreAddress", U.store_address_detail AS "StoreAddressDetail",
-        U.store_zipcode AS "StoreZipCode", U.store_apply_yes_or_no AS "StoreApplyYn"
+        U.store_zipcode AS "StoreZipCode", U.store_apply_yes_or_no AS "StoreApplyYn",
+        UC.confirm_yn
         FROM User AS U
+        LEFT OUTER JOIN User_confirmation AS UC on (U.user_id = UC.user_id)
         WHERE U.email = #{email}
     </select>
 
@@ -232,4 +240,28 @@
         </trim>
     </sql>
 
+    <insert id="saveConfirmation" parameterType="com.supshop.suppingmall.user.UserConfirmation" useGeneratedKeys="true" keyProperty="confirmId">
+        INSERT INTO user_confirmation (
+        user_id,
+        confirm_yn,
+        send_date,
+        confirm_token
+        )
+        VALUES (
+        #{userId},
+        #{confirmYn},
+        now(),
+        #{confirmToken}
+        )
+    </insert>
+
+    <select id="findUserConfirmationById" resultMap="User">
+        SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
+        U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.zipcode AS "UserZipCode",
+        U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
+        UC.confirm_yn AS "UserConfirmationYn", UC.confirm_token AS "UserConfirmationToken", UC.send_date AS "UserConfirmationSendDate"
+        FROM User AS U
+        LEFT OUTER JOIN User_confirmation AS UC on (U.user_id = UC.user_id)
+        WHERE U.email = #{email}
+    </select>
 </mapper>

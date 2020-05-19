@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.user;
 
+import com.supshop.suppingmall.common.TokenGenerator;
 import com.supshop.suppingmall.mapper.UserMapper;
 import com.supshop.suppingmall.page.BoardCriteria;
 import lombok.RequiredArgsConstructor;
@@ -11,20 +12,20 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService implements UserDetailsService {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
+    private final String rolePrefix = "ROLE_";
 
     public List<User> getAllUser(BoardCriteria boardCriteria, String type, String searchValue) {
         return userMapper.selectAllUser(boardCriteria,type,searchValue);
@@ -49,22 +50,40 @@ public class UserService implements UserDetailsService {
         return vo;
     }
 
-    public void createUser(User user) {
-        if(!isUserAlreadyExistByEmail(user.getEmail())) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            userMapper.insertUser(user);
-        }
+    public Optional<User> getUserWithConfirmationByEmail(String email) {
+        return userMapper.findUserConfirmationById(email);
     }
 
+    @Transactional
+    public User createUser(User user) throws RuntimeException {
+        if(isUserAlreadyExistByEmail(user.getEmail())) {
+            new RuntimeException();
+        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userMapper.insertUser(user);
+        String token = TokenGenerator.issueToken();
+        UserConfirmation userConfirmation = UserConfirmation.builder()
+                .userId(user.getUserId())
+                .confirmYn("N")
+                .confirmToken(token)
+                .build();
+        userMapper.saveConfirmation(userConfirmation);
+        user.setUserConfirmation(userConfirmation);
+        return user;
+    }
+
+    @Transactional
     public void updateUser(Long id, User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userMapper.updateUser(id, user);
     }
 
+    @Transactional
     public void patchUser(Long id, User user) {
         userMapper.patchUser(id, user);
     }
 
+    @Transactional
     public void deleteUser(Long id) {
         userMapper.deleteUSer(id);
     }
@@ -88,7 +107,7 @@ public class UserService implements UserDetailsService {
 
     private Collection<? extends GrantedAuthority> authorities(List<Role> roles) {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_"+ role.name()))
+                .map(role -> new SimpleGrantedAuthority(rolePrefix+ role.name()))
                 .collect(Collectors.toSet());
     }
 

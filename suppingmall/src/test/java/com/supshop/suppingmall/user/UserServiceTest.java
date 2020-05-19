@@ -10,8 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 
 
 @RunWith(SpringRunner.class)
@@ -102,5 +101,39 @@ public class UserServiceTest {
         assertThat(user.getStoreVO().getStoreAddressDetail()).isEqualTo(store.getStoreAddressDetail());
         assertThat(user.getStoreVO().getStorePhoneNumber()).isEqualTo(store.getStorePhoneNumber());
         assertThat(user.getStoreVO().getStoreApplyYn()).isEqualTo(store.getStoreApplyYn());
+    }
+    
+    @Test
+    @Transactional
+    public void createUserConfirmation() throws Exception {
+        //given
+        String name = "test";
+        String username = name+"@email.com";
+        String userpassword = "sup2";
+        User testUser = User.builder()
+                .email(username)
+                .password(userpassword)
+                .name(name)
+                .nickName(name)
+                .address("운영자의 집")
+                .addressDetail("그건 엄마집")
+                .zipCode("00000")
+                .phoneNumber("010-0000-0000")
+                .delYn("N")
+                .role(Role.getCodeString(Role.USER.getCode()))
+                .type(User.LoginType.getCodeString(User.LoginType.LOCAL.getCode()))
+                .build();
+
+        //when
+        userService.createUser(testUser);
+        User user = userService.getUserWithConfirmationByEmail(testUser.getEmail()).get();
+
+
+        //then
+        UserConfirmation testUserConfirmation = testUser.getUserConfirmation();
+        UserConfirmation userConfirmation = user.getUserConfirmation();
+
+        assertThat(testUserConfirmation.getConfirmYn()).isEqualTo(userConfirmation.getConfirmYn());
+        assertThat(testUserConfirmation.getConfirmToken()).isEqualTo(userConfirmation.getConfirmToken());
     }
 }

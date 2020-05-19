@@ -2,6 +2,7 @@ package com.supshop.suppingmall.mapper;
 
 import com.supshop.suppingmall.page.BoardCriteria;
 import com.supshop.suppingmall.user.User;
+import com.supshop.suppingmall.user.UserConfirmation;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,4 +28,8 @@ public interface UserMapper {
     void patchUser(Long id, User user);
 
     List<User> selectAllStore(BoardCriteria boardCriteria, String type, String searchValue);
+
+    void saveConfirmation(UserConfirmation userConfirmation);
+
+    Optional<User> findUserConfirmationById(String email);
 }

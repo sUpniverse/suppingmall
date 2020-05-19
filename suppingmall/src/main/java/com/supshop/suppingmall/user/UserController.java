@@ -95,6 +95,7 @@ public class UserController {
         }
         User user = modelMapper.map(signUpForm, User.class);
         userService.createUser(user);
+
         return redirectLoginUrl;
     }
 
@@ -269,7 +270,7 @@ public class UserController {
         return (UserVO) session.getAttribute(sessionUserName);
     }
 
-    //세션의 유저와 주인의 아이디가 같은지 확인
+    //세션의 유저와 해당 목표물의 주인의 아이디가 같은지 확인
     private boolean isOwner(Long id, UserVO sessionUser) {
         return sessionUser != null && sessionUser.getUserId().equals(id);
     }

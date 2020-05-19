@@ -27,6 +27,7 @@ public class User {
     private String delYn;
     private Role role;
     private LoginType type;
+    private UserConfirmation userConfirmation;
     private StoreVO storeVO;
 
 
