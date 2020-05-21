@@ -99,6 +99,7 @@ public class UserFactory {
                 .zipCode("00000")
                 .phoneNumber("010-0000-0000")
                 .delYn("N")
+                .emailConfirmYn("N")
                 .role(Role.getCodeString(Role.USER.getCode()))
                 .type(User.LoginType.getCodeString(User.LoginType.LOCAL.getCode()))
                 .build();

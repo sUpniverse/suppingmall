@@ -58,7 +58,7 @@
 			return this.filter(":has(>ul)");
 		},
 		applyClasses: function(settings, toggler) {
-			// TODO use event delegation
+			// TODO use com.supshop.suppingmall.event delegation
 			this.filter(":has(>ul):not(:has(>a))").find(">span").unbind("click.treeview").bind("click.treeview", function(event) {
 				// don't handle click events on children, eg. checkboxes
 				if ( this == event.target )
@@ -89,7 +89,7 @@
 				})
 			}
 
-			// apply event to hitarea
+			// apply com.supshop.suppingmall.event to hitarea
 			this.find("div." + CLASSES.hitarea).click( toggler );
 		},
 		treeview: function(settings) {
@@ -110,7 +110,7 @@
 				// factory for click handlers
 				function handler(filter) {
 					return function() {
-						// reuse toggle event handler, applying the elements to toggle
+						// reuse toggle com.supshop.suppingmall.event handler, applying the elements to toggle
 						// start searching for all hitareas
 						toggler.apply( $("div." + CLASSES.hitarea, tree).filter(function() {
 							// for plain toggle, no filter is provided, otherwise we need to check the parent element
@@ -127,7 +127,7 @@
 				$("a:eq(2)", control).click( handler() );
 			}
 
-			// handle toggle event
+			// handle toggle com.supshop.suppingmall.event
 			function toggler() {
 				$(this)
 					.parent()

@@ -3,8 +3,10 @@ package com.supshop.suppingmall.user;
 import com.supshop.suppingmall.common.TokenGenerator;
 import com.supshop.suppingmall.mapper.UserMapper;
 import com.supshop.suppingmall.page.BoardCriteria;
+import com.supshop.suppingmall.event.UserCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,8 @@ public class UserService implements UserDetailsService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
+    private final ApplicationEventPublisher eventPublisher;
+
     private final String rolePrefix = "ROLE_";
 
     public List<User> getAllUser(BoardCriteria boardCriteria, String type, String searchValue) {
@@ -59,16 +64,24 @@ public class UserService implements UserDetailsService {
         if(isUserAlreadyExistByEmail(user.getEmail())) {
             new RuntimeException();
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        if(user.getType().equals(User.LoginType.LOCAL)) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+
         userMapper.insertUser(user);
         String token = TokenGenerator.issueToken();
         UserConfirmation userConfirmation = UserConfirmation.builder()
                 .userId(user.getUserId())
-                .confirmYn("N")
                 .confirmToken(token)
                 .build();
-        userMapper.saveConfirmation(userConfirmation);
+        int result = userMapper.saveConfirmation(userConfirmation);
         user.setUserConfirmation(userConfirmation);
+
+        if(result == 1) {
+            eventPublisher.publishEvent(new UserCreatedEvent(user, LocalDateTime.now()));
+        }
+
         return user;
     }
 

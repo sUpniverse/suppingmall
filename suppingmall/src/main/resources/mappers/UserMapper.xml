@@ -17,6 +17,7 @@
         <result property="updatedDate" column="UserUpdatedDate" />
         <result property="role" column="UserRole" typeHandler="com.supshop.suppingmall.user.RoleTypeHandler" />
         <result property="delYn" column="UserDelYn" />
+        <result property="emailConfirmYn" column="UserEmailConfirmationYn" />
         <result property="type" column="UserType" typeHandler="com.supshop.suppingmall.user.LoginTypeHandler" />
         <association property="storeVO" javaType="com.supshop.suppingmall.user.StoreVO">
             <result property="storePrivateNumber" column="StorePrivateNumber" />
@@ -28,7 +29,6 @@
             <result property="storeApplyYn" column="StoreApplyYn" />
         </association>
         <association property="userConfirmation" javaType="com.supshop.suppingmall.user.UserConfirmation">
-            <result property="confirmYn" column="UserConfirmationYn" />
             <result property="confirmToken" column="UserConfirmationToken" />
             <result property="sendDate" column="UserConfirmationSendDate" />
             <result property="confirmDate" column="UserConfirmationDate" />
@@ -91,10 +91,8 @@
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.store_private_number AS "StorePrivateNumber", U.store_name AS "StoreName",
         U.store_phone_number AS "StorePhoneNumber", U.store_address AS "StoreAddress", U.store_address_detail AS "StoreAddressDetail",
-        U.store_zipcode AS "StoreZipCode", U.store_apply_yes_or_no AS "StoreApplyYn",
-        UC.confirm_yn
+        U.store_zipcode AS "StoreZipCode", U.store_apply_yes_or_no AS "StoreApplyYn", U.email_confirm_yes_or_no
         FROM User AS U
-        LEFT OUTER JOIN User_confirmation AS UC on (U.user_id = UC.user_id)
         WHERE U.email = #{email}
     </select>
 
@@ -124,6 +122,7 @@
         created_date,
         updated_date,
         delete_yes_or_no,
+        email_confirm_yes_or_no,
         role,
         type,
         store_apply_yes_or_no
@@ -139,6 +138,7 @@
         #{phoneNumber},
         now(),
         now(),
+        'N',
         'N',
         #{role, typeHandler=com.supshop.suppingmall.user.RoleTypeHandler},
         #{type, typeHandler=com.supshop.suppingmall.user.LoginTypeHandler},
@@ -243,13 +243,11 @@
     <insert id="saveConfirmation" parameterType="com.supshop.suppingmall.user.UserConfirmation" useGeneratedKeys="true" keyProperty="confirmId">
         INSERT INTO user_confirmation (
         user_id,
-        confirm_yn,
         send_date,
         confirm_token
         )
         VALUES (
         #{userId},
-        #{confirmYn},
         now(),
         #{confirmToken}
         )
@@ -259,7 +257,7 @@
         SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
         U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
-        UC.confirm_yn AS "UserConfirmationYn", UC.confirm_token AS "UserConfirmationToken", UC.send_date AS "UserConfirmationSendDate"
+        U.email_confirm_yes_or_no AS "UserConfirmationYn", UC.confirm_token AS "UserConfirmationToken", UC.send_date AS "UserConfirmationSendDate"
         FROM User AS U
         LEFT OUTER JOIN User_confirmation AS UC on (U.user_id = UC.user_id)
         WHERE U.email = #{email}

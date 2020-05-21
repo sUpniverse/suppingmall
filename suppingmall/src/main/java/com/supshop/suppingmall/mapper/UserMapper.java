@@ -29,7 +29,7 @@ public interface UserMapper {
 
     List<User> selectAllStore(BoardCriteria boardCriteria, String type, String searchValue);
 
-    void saveConfirmation(UserConfirmation userConfirmation);
+    int saveConfirmation(UserConfirmation userConfirmation);
 
     Optional<User> findUserConfirmationById(String email);
 }

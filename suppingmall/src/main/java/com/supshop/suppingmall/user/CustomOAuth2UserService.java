@@ -19,7 +19,6 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-
     private final UserService userService;
     private final HttpSession httpSession;
     private final ModelMapper modelMapper;
@@ -44,12 +43,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private UserVO save(OAuthAttribute authAttribute) {
         User user;
         try {
-            user = userService.getUserByEmail(authAttribute.getEmail());
-
-        } catch (UsernameNotFoundException e) {
-            User newUser = authAttribute.setUserVo();
-            userService.createUser(newUser);
-            user = newUser;
+            user = authAttribute.setUserVo();
+            userService.createUser(user);
+        } catch (RuntimeException e) {
+            return null;
         }
 
         return modelMapper.map(user, UserVO.class);

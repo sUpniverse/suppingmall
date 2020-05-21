@@ -10,7 +10,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 
 @RunWith(SpringRunner.class)
@@ -133,7 +134,7 @@ public class UserServiceTest {
         UserConfirmation testUserConfirmation = testUser.getUserConfirmation();
         UserConfirmation userConfirmation = user.getUserConfirmation();
 
-        assertThat(testUserConfirmation.getConfirmYn()).isEqualTo(userConfirmation.getConfirmYn());
+        assertThat(testUser.getEmailConfirmYn()).isEqualTo(user.getEmailConfirmYn());
         assertThat(testUserConfirmation.getConfirmToken()).isEqualTo(userConfirmation.getConfirmToken());
     }
 }

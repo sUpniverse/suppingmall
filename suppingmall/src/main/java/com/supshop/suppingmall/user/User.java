@@ -25,6 +25,7 @@ public class User {
     private LocalDateTime createdDate;
     private LocalDateTime updateDate;
     private String delYn;
+    private String emailConfirmYn;
     private Role role;
     private LoginType type;
     private UserConfirmation userConfirmation;
