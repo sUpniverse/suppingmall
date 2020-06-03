@@ -5,10 +5,11 @@ import com.supshop.suppingmall.category.CategoryService;
 import com.supshop.suppingmall.common.SessionUtils;
 import com.supshop.suppingmall.page.BoardCriteria;
 import com.supshop.suppingmall.page.BoardPageMaker;
-import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,19 +25,21 @@ public class BoardController {
 
     private final BoardService boardService;
     private final CategoryService categoryService;
+    private final Long boardCategoryId = 21l;
 
 
 
     @GetMapping("/form")
     public String form(@RequestParam(required = false) Long categoryId,
-                       Model model,
-                       HttpSession session) {
+                       Model model) {
         log.debug("'form'가 실행됨");
-        UserVO user = SessionUtils.getSessionUser(session);
-        if(user == null) {
-            return "redirect:/users/loginform";
-        }
-                return "/board/form";
+        List<Category> child = categoryService.getCategory(boardCategoryId).getChild();
+        model.addAttribute("categories",child);
+//        UserVO user = SessionUtils.getSessionUser(session);
+//        if(user == null) {
+//            return "redirect:/users/loginform";
+//        }
+          return "/board/form";
     }
 
     @GetMapping("")
@@ -69,11 +72,7 @@ public class BoardController {
     public String createBoard(Board board, HttpSession session) {
         log.debug("'createBoard'가 실행됨");
         UserVO user = SessionUtils.getSessionUser(session);
-
-        if(user != null && user.getUserId().equals(board.getCreator().getUserId())) {
-            boardService.createBoard(board);
-            return "redirect:/boards";
-        }
+        if(user.getUserId().equals(board.getCreator().getUserId())) boardService.createBoard(board);
         return "redirect:/boards";
     }
 
@@ -82,9 +81,8 @@ public class BoardController {
         log.debug("'modifyBoard'가 실행됨");
         Board board = boardService.getBoard(id);
         UserVO user = SessionUtils.getSessionUser(session);
-        if(user == null || !user.getUserId().equals(board.getCreator().getUserId())) {
-            return "redirect:/boards";
-        }
+        if(!user.getUserId().equals(board.getCreator().getUserId())) return "redirect:/boards";
+
         model.addAttribute("board",board);
         return "/board/updateform";
     }
@@ -101,10 +99,12 @@ public class BoardController {
     @DeleteMapping("/{id}")
     public String deleteBoard(@PathVariable Long id, HttpSession session) {
         log.debug("'deleteBoard'가 실행됨");
+
+        Board board = boardService.getBoard(id);
         UserVO user = SessionUtils.getSessionUser(session);
-//        if(user.getUserId() != userId) {
-//            return "redirect:/boards";
-//        }
+        if(user.getUserId() != board.getCreator().getUserId()) {
+            return "redirect:/boards";
+        }
         boardService.deleteBoard(id);
         return "redirect:/boards";
     }
