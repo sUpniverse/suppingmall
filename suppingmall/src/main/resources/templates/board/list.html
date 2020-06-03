@@ -15,7 +15,7 @@
                     </div>
                 </div>
 
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover text-small">
                     <thead>
                         <tr>
                             <th class="text-center">카테고리</th>
@@ -37,9 +37,9 @@
                         </tr>
                     </tbody>
                 </table>
-                <a href="/boards/form" class="btn btn-primary float-right">글쓰기</a>
+                <a href="/boards/form" class="btn btn-primary float-right text-small">글쓰기</a>
 
-                <div class="container d-flex justify-content-center mb-3">
+                <div class="container d-flex justify-content-center mb-3 text-small">
                     <nav aria-label="Page navigation example">
                         <ul class="pagination mx-auto">
                             <li class="page-item">
@@ -79,7 +79,7 @@
             </div>
         </div>
     </div>
-<footer class="cusFooter" th:include="fragments/footer :: footer" />
+<footer th:include="fragments/footer :: footer" />
 </body>
 <script>
     $(document).on('onscroll','.dropdown-toggle',(e) => {

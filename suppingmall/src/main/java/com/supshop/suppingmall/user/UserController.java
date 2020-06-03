@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -257,6 +258,27 @@ public class UserController {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping("/confirm")
+    public String confirmUser(@PathVariable String token,
+                              RedirectAttributes redirAttrs,
+                              HttpSession session) {
+        if(SessionUtils.isSessionNull(session)) {
+            return "/users/login";
+        }
+
+        UserVO sessionUser = SessionUtils.getSessionUser(session);
+        User user = userService.getUserWithConfirmationByEmail(sessionUser.getEmail()).get();
+        if(user.getEmailConfirmYn().equals("Y")) {
+            redirAttrs.addFlashAttribute("message","이미 인증된 회원입니다.");
+        } else {
+            redirAttrs.addFlashAttribute("message","인증 되었습니다.");
+            user.setEmailConfirmYn("Y");
+            userService.patchUser(user.getUserId(), user);
+        }
+
+        return "";
     }
 
 

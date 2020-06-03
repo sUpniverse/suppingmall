@@ -14,7 +14,6 @@ import java.util.Arrays;
 public class UserVO {
 
     //password가 없는 객체 session에서 사용하기 위함
-
     private Long userId;
     private String email;
     private String name;

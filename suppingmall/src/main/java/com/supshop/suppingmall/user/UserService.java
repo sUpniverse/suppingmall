@@ -61,8 +61,9 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User createUser(User user) throws RuntimeException {
-        if(isUserAlreadyExistByEmail(user.getEmail())) {
-            new RuntimeException();
+        User existUser = getUserByEmail(user.getEmail());
+        if(existUser != null) {
+            return existUser;
         }
 
         if(user.getType().equals(User.LoginType.LOCAL)) {

@@ -41,14 +41,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private UserVO save(OAuthAttribute authAttribute) {
-        User user;
-        try {
-            user = authAttribute.setUserVo();
-            userService.createUser(user);
-        } catch (RuntimeException e) {
-            return null;
-        }
-
+        User user = authAttribute.setUserVo();
+        user = userService.createUser(user);
         return modelMapper.map(user, UserVO.class);
     }
 
