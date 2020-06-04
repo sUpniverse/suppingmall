@@ -79,21 +79,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .authorizeRequests()
                 .antMatchers(HttpMethod.GET,"/users").hasAnyRole("ROLE_MASTER","ROLE_ADMIN")
-                .antMatchers(HttpMethod.GET,"/users/signup").permitAll()
-                .antMatchers(HttpMethod.POST,"/users").anonymous()
+                .antMatchers(HttpMethod.GET,"/users/signup").anonymous()
+                .antMatchers(HttpMethod.POST,"/users").permitAll()
                 .antMatchers(HttpMethod.GET,"/users/{id}/**").authenticated()
                 .antMatchers(HttpMethod.PUT,"/users/{id}/**").authenticated()
                 .antMatchers(HttpMethod.DELETE,"/users/{id}/**").hasAnyRole("ROLE_MASTER","ROLE_ADMIN")
                 .antMatchers(HttpMethod.PATCH,"/users/{id}/**").hasAnyRole("ROLE_MASTER","ROLE_ADMIN")
                 .antMatchers("/users/seller/**").authenticated()
                 .antMatchers(HttpMethod.GET,"/boards/form").authenticated()
-                .antMatchers(HttpMethod.GET,"/boards").anonymous()
-                .antMatchers(HttpMethod.GET,"/boards/{id}").anonymous()
+                .antMatchers(HttpMethod.GET,"/boards").permitAll()
+                .antMatchers(HttpMethod.GET,"/boards/{id}").permitAll()
                 .antMatchers(HttpMethod.POST,"/boards").authenticated()
-                .antMatchers(HttpMethod.GET,"/boards/{id}").anonymous()
+                .antMatchers(HttpMethod.GET,"/boards/{id}").permitAll()
                 .antMatchers(HttpMethod.POST,"/boards/form").authenticated()
                 .antMatchers(HttpMethod.PUT,"/boards/{id}").authenticated()
                 .antMatchers(HttpMethod.DELETE,"/boards/{id}").authenticated()
+                .antMatchers("/comments/**").authenticated()
 
         ;
     }

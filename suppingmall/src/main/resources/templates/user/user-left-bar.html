@@ -7,12 +7,12 @@
             </h4>
             <ul class="nav flex-column mb-2">
                 <li class="nav-item">
-                    <a class="nav-link sidebar-heading" th:href="@{'/users/' + ${session.user.userId} + '/updateForm'}">회원정보 변경</a>
+                    <a class="nav-link sidebar-heading" th:href="@{'/users/' + ${#authentication?.principal.userId} + '/updateForm'}">회원정보 변경</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link sidebar-heading" href="#">내 게시글 내역</a>
                 </li>
-                <li class="nav-item" th:if="${#strings.equals(session.user.role,'USER')} and ${#strings.equals(session.user.storeVO?.storeApplyYn,'N')}">
+                <li class="nav-item" th:if="${#strings.equals(#authentication?.principal.role,'USER')} and ${#strings.equals(#authentication?.principal.storeVO.storeApplyYn,'N')}">
                     <a class="nav-link sidebar-heading" th:href="@{'/users/seller/applyForm'}">회원전환/판매자전환</a>
                 </li>
                 <li class="nav-item">
@@ -37,14 +37,14 @@
                 </li>
             </ul>
         </div>
-        <div th:if="${#strings.equals(session.user.role,'SELLER')}">
+        <div th:if="${#strings.equals(#authentication?.principal.role,'SELLER')}">
             <h4 class="d-flex align-items-center px-3 mt-4 mb-1 text-dark nav-link">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                 판매관리
             </h4>
             <ul class="nav flex-column mb-2">
                 <li class="nav-item">
-                    <a class="nav-link sidebar-heading" th:href="@{'/users/seller/'+${session.user.userId}}">기본정보</a>
+                    <a class="nav-link sidebar-heading" th:href="@{'/users/seller/'+${#authentication?.principal.userId}}">기본정보</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link sidebar-heading" th:href="@{'/products/seller'}">상품관리</a>

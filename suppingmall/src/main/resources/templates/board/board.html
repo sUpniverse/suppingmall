@@ -6,7 +6,7 @@
 <div class="container-fluid">
     <div class="row">
         <div th:replace="board/left-sidebar :: left-sidebar" />
-        <div class="col-md-5">
+        <div class="col-md-6">
             <form role="form" th:method="post">
             </form>
             <div class="pt-5 pd-3 border-bottom">
@@ -37,8 +37,8 @@
                     <p class="lead" th:id="contents" th:utext="${board.contents}"></p>
                 </div>
                 <div class="box-footer text-center mb-3">
-                    <button th:if="${not #strings.isEmpty(session.user?.userId) && board.creator.userId.equals(session.user?.userId)}" type="submit" class="btn btn-warning">수정</button>
-                    <button th:if="${not #strings.isEmpty(session.user?.userId) && board.creator.userId.equals(session.user?.userId)}" type="submit" class="btn btn-danger">삭제</button>
+                    <button sec:authorize="isAuthenticated()"  th:if="${board.creator.userId.equals(#authentication.principal.userId)}" type="submit" class="btn btn-warning">수정</button>
+                    <button sec:authorize="isAuthenticated()"  th:if="${board.creator.userId.equals(#authentication.principal.userId)}" type="submit" class="btn btn-danger">삭제</button>
                     <button type="submit" class="btn btn-primary">목록</button>
                 </div>
             </div>
@@ -53,13 +53,13 @@
                         <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
                         <div class="media-body">
                             <h5 class="mt-0" th:text="${comment.creator.nickName}" th:value="${comment.creator.userId}"></h5>
-                            <div class="btn-group float-right"  th:if="${not #strings.isEmpty(session.user?.userId) && comment.creator.userId.equals(session.user?.userId)}">
-                                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div class="btn-group float-right" sec:authorize="isAuthenticated()"  th:if="${comment.creator.userId.equals(#authentication.principal?.userId)}">
+                                <button type="button" class="btn btn-secondary btn-sm dropdown-toggle"data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     수정 / 삭제 / 신고
                                 </button>
                                 <div class="dropdown-menu">
-                                    <a class="dropdown-item" th:id="comment-update-button">수정</a>
-                                    <a class="dropdown-item" th:id="comment-delete-button">삭제</a>
+                                    <button type="button" class="dropdown-item" th:id="comment-update-button">수정</button>
+                                    <button type="button" class="dropdown-item" th:id="comment-delete-button">삭제</button>
                                 </div>
                             </div>
                             <p th:text="${comment.contents}"></p>
@@ -140,17 +140,15 @@
                         '수정 / 삭제 / 신고\n' +
                         '</button>\n' +
                         '<div class="dropdown-menu">\n' +
-                        '<a class="dropdown-item" id="comment-update-button">수정</a>\n' +
-                        '<a class="dropdown-item" id="comment-delete-button">삭제</a>\n' +
+                        '<button type="button" class="dropdown-item" id="comment-update-button">수정</button>\n' +
+                        '<button type="button" class="dropdown-item" id="comment-delete-button">삭제</button>\n' +
                         '</div>\n' +
                         '</div>' +
                         '<p>'+comment_contents+'</p>\n' +
                         '</div>\n' +
                         '</div>';
 
-
                     $("#comments").append(comment);
-
                 },
                 error: () => {
                     alert('댓글 생성오류');
@@ -159,29 +157,29 @@
             });
         });
 
-        $(document).ready(function () {
-            $("#comment-text").on('click', () => {
-                if([[${#strings.isEmpty(session.user?.userId)}]]) {
-                    var check = confirm("로그인 하시겠습니까?");
-                    if(check == true) {
-                        window.location.href='/users/loginform';
-                    }
+
+        $(document).on('click',"#comment-text",() => {
+            if([[${#authentication.principal}]] == "anonymousUser") {
+                var check = confirm("로그인 하시겠습니까?");
+                if(check == true) {
+                    window.location.href='/users/loginform';
                 }
-            });
+            }
         });
+
 
         var text = 0;
 
         $(document).on('click',"#comment-update-button",(e)=> {
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;
-            var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
+            // var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
             var comment_text = comment.getElementsByTagName("p").item(0);
             text = comment_text.innerText;
             comment_text.innerHTML =
                 '<div class="form-group">' +
                 '<textarea class="form-control" id="update-comment-text" rows="3" >'+text+'</textarea>' +
-                '<button class="btn btn-primary btn-sm mr-1" id="update-comment-button">수정하기</button>' +
-                '<button class="btn btn-light btn-sm" id="cancel-comment-button">취소하기</button>'
+                '<button type="button" class="btn btn-success btn-sm mr-1" id="update-comment-button">수정하기</button>' +
+                '<button type="button" class="btn btn-light btn-sm" id="cancel-comment-button">취소하기</button>'
                 '</div>';
         });
 
@@ -189,13 +187,13 @@
         $(document).on('click',"#comment-delete-button",(e)=> {
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;
             var comment_id = comment.getAttribute('data-no');
-            var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
+            // var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
 
             $.ajax({
                 type:"DELETE",
                 url:"/comments/"+comment_id,
                 contentType: 'application/json',
-                success: (data) => {
+                success: () => {
                     comment.remove();
                 }
             });
@@ -203,8 +201,7 @@
 
         $(document).on('click',"#update-comment-button",(e)=> {
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;
-            var comment_id = comment.getAttribute('value');
-
+            var comment_id = comment.getAttribute('data-no');
             var comment_text = comment.getElementsByTagName("p").item(0);
             var message = e.target.parentElement.getElementsByTagName("textarea").item(0).value;
 
@@ -216,7 +213,7 @@
                     "contents": message
                 }),
                 contentType: 'application/json',
-                success: (data) => {
+                success: () => {
                     comment_text.innerText = message;
                 }
             });
@@ -226,24 +223,10 @@
         $(document).on('click',"#cancel-comment-button",(e)=> {
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;
             var comment_text = comment.getElementsByTagName("p").item(0);
-
             comment_text.innerText = text;
-
+            text = "";
         });
 
     });
-
-    function isCreator(creator) {
-        var sessionId;
-
-        if([[${not #strings.isEmpty(session.user?.userId)}]]) {
-            // sessionId = [[${session.user?.userId}]];
-        }
-
-        if( sessionId != null && sessionId == creator) {
-            return true;
-        }
-        return false;
-    }
 </script>
 </html>

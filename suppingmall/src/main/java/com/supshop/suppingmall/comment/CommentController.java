@@ -4,6 +4,7 @@ import com.supshop.suppingmall.common.SessionUtils;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserVO;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +21,7 @@ public class CommentController {
     }
 
     @PostMapping("")
-    public ResponseEntity createComment(@RequestBody Comment comment, HttpSession session, Errors errors) {
-        UserVO sessionUser = SessionUtils.getSessionUser(session);
+    public ResponseEntity createComment(@RequestBody Comment comment, @AuthenticationPrincipal UserVO sessionUser, Errors errors) {
         comment.setCreator(sessionUser);
         int result = commentService.insertComment(comment);
 
