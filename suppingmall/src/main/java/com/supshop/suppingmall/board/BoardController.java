@@ -2,14 +2,12 @@ package com.supshop.suppingmall.board;
 
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryService;
-import com.supshop.suppingmall.common.SessionUtils;
+import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.page.BoardCriteria;
 import com.supshop.suppingmall.page.BoardPageMaker;
 import com.supshop.suppingmall.user.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -71,7 +69,7 @@ public class BoardController {
     @PostMapping("")
     public String createBoard(Board board, HttpSession session) {
         log.debug("'createBoard'가 실행됨");
-        UserVO user = SessionUtils.getSessionUser(session);
+        UserVO user = UserUtils.getSessionUser(session);
         if(user.getUserId().equals(board.getCreator().getUserId())) boardService.createBoard(board);
         return "redirect:/boards";
     }
@@ -80,7 +78,7 @@ public class BoardController {
     public String modifyBoard(@PathVariable Long id, Model model, HttpSession session) {
         log.debug("'modifyBoard'가 실행됨");
         Board board = boardService.getBoard(id);
-        UserVO user = SessionUtils.getSessionUser(session);
+        UserVO user = UserUtils.getSessionUser(session);
         if(!user.getUserId().equals(board.getCreator().getUserId())) return "redirect:/boards";
 
         model.addAttribute("board",board);
@@ -90,7 +88,7 @@ public class BoardController {
     @PutMapping("/{id}")
     public String updateBoard(@PathVariable Long id, Board board, HttpSession session) {
         log.debug("'updateBoard'가 실행됨");
-        UserVO user = SessionUtils.getSessionUser(session);
+        UserVO user = UserUtils.getSessionUser(session);
         board.setCreator(user);
         boardService.updateBoard(id, board);
         return "redirect:/boards/"+id;
@@ -101,7 +99,7 @@ public class BoardController {
         log.debug("'deleteBoard'가 실행됨");
 
         Board board = boardService.getBoard(id);
-        UserVO user = SessionUtils.getSessionUser(session);
+        UserVO user = UserUtils.getSessionUser(session);
         if(user.getUserId() != board.getCreator().getUserId()) {
             return "redirect:/boards";
         }

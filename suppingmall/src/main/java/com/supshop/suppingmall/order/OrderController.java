@@ -1,6 +1,6 @@
 package com.supshop.suppingmall.order;
 
-import com.supshop.suppingmall.common.SessionUtils;
+import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.order.Form.OrderForm;
 import com.supshop.suppingmall.order.Form.TempOrderForm;
@@ -41,7 +41,7 @@ public class OrderController {
         model.addAttribute("product",tempOrder.getOrderItems().get(0).getProduct());
         model.addAttribute("tempOrder",tempOrder);
 
-        if(SessionUtils.isSessionNull(session)) {
+        if(UserUtils.isSessionNull(session)) {
         }
         return "/order/form";
     }
@@ -71,7 +71,7 @@ public class OrderController {
     public String getOrder(@PathVariable Long id, HttpSession session, Model model) {
         Orders order = orderService.findOrder(id);
         model.addAttribute("order",order);
-        UserVO sessionUser = SessionUtils.getSessionUser(session);
+        UserVO sessionUser = UserUtils.getSessionUser(session);
         if(sessionUser.getRole().equals(Role.SELLER)) {
             return "/order/seller/detail";
         } else if(sessionUser.getRole().equals(Role.ADMIN) || sessionUser.getRole().equals(Role.MASTER) ) {
@@ -88,7 +88,7 @@ public class OrderController {
                                     HttpSession session,
                                     Model model) {
 
-        UserVO sessionUser = SessionUtils.getSessionUser(session);
+        UserVO sessionUser = UserUtils.getSessionUser(session);
 
 //        if(sessionUser.getRole().equals(User.Role.SELLER)) {
 //            List<Orders> sellerOrders = orderService.findOrderBySellerId(sessionUser.getUserId(),fromDate,toDate,type,status);
@@ -114,7 +114,7 @@ public class OrderController {
                                      HttpSession session,
                                      Model model) {
 
-        Long userId = SessionUtils.getSessionUser(session).getUserId();
+        Long userId = UserUtils.getSessionUser(session).getUserId();
         List<Orders> orders = orderService.findOrderBySellerId(userId,fromDate,toDate,type,deliveryStatus,orderStatus);
         model.addAttribute("orders",orders);
         if(type != null && type.equals("order")) {

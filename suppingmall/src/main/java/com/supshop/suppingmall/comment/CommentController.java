@@ -1,14 +1,10 @@
 package com.supshop.suppingmall.comment;
 
-import com.supshop.suppingmall.common.SessionUtils;
-import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserVO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/comments")

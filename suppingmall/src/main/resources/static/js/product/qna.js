@@ -48,6 +48,7 @@ function getQna(boardId,userId) {
 function setQnaDetail(title,comment,boardId,isCreator) {
     var answer;
 
+
     var edit = '<div class="col-md-6 offset-md-1 text-muted text-sm">' +
                 '<a href="javascript:updateQna('+boardId+')">수정</a>' +
                 '<span class="mx-3">|</span>' +
@@ -57,9 +58,12 @@ function setQnaDetail(title,comment,boardId,isCreator) {
     var question = '<div class="question border-bottom">' +
                       '<p class="col-md-6 offset-md-1">'+title+'</p>'
 
+    console.log(isCreator);
+
     if(isCreator) {
         question += edit;
     }
+
 
     question +='</div>';
 
@@ -72,11 +76,12 @@ function setQnaDetail(title,comment,boardId,isCreator) {
     } else {
 
         answer = '<div class="answer">' +
-                  '<p class="col-md-6 offset-md-1">'+comment+'</p>' + edit +
+                  '<p class="col-md-6 offset-md-1">'+comment+'</p>'
                  '</div>';
 
         qna +=    answer + '</td></tr>';
     }
 
+    console.log(question)
     $('#qna'+boardId+'').after(qna);
 }

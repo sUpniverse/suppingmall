@@ -1,7 +1,7 @@
 package com.supshop.suppingmall.cart;
 
 import com.supshop.suppingmall.cart.Form.CartForm;
-import com.supshop.suppingmall.common.SessionUtils;
+import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.user.UserVO;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -27,10 +27,10 @@ public class CartController {
 
     @GetMapping("")
     public String getCart(HttpSession session, Model model) {
-        if(SessionUtils.isSessionNull(session)) {
+        if(UserUtils.isSessionNull(session)) {
             return "redirect:/users/loginform";
         }
-        UserVO sessionUser = SessionUtils.getSessionUser(session);
+        UserVO sessionUser = UserUtils.getSessionUser(session);
         List<Cart> carts = cartService.findCartByBuyerId(sessionUser.getUserId());
         model.addAttribute("carts",carts);
 
