@@ -143,7 +143,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/form")
-    public String getUserPage(@PathVariable Long id, Model model, HttpSession session, @AuthenticationPrincipal UserVO sessionUser) {
+    public String getUserPage(@PathVariable Long id, Model model,@AuthenticationPrincipal UserVO sessionUser) {
 
         // 관리자 일 경우 관리자 메인페이지로
         if(isAdmin(sessionUser)) {

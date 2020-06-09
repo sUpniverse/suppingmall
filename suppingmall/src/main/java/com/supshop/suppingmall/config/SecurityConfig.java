@@ -100,6 +100,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PUT,"/boards/{id}").authenticated()
                 .antMatchers(HttpMethod.DELETE,"/boards/{id}").authenticated()
                 .antMatchers("/comments/**").authenticated()
+                .antMatchers(HttpMethod.GET,"/images/**").permitAll()
+                .antMatchers(HttpMethod.POST,"/images/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/products").permitAll()
                 .antMatchers(HttpMethod.GET,"/products/{id}").permitAll()
                 .antMatchers(HttpMethod.GET,"/products/form").hasAnyRole("ROLE_MASTER","ROLE_ADMIN","ROLE_SELLER")
@@ -113,6 +115,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET,"/products/qnas/{qnaId}/updateForm").authenticated()
                 .antMatchers(HttpMethod.PUT,"/products/qnas/{qnaId}").authenticated()
                 .antMatchers(HttpMethod.DELETE,"/products/qnas/{qnaId}").authenticated()
+                .antMatchers("/orders/**").authenticated()
+                .antMatchers("/carts/**").authenticated()
+                .antMatchers("/payments/**").authenticated()
+                .antMatchers("/delivery/**").authenticated()
 
         ;
     }

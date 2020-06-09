@@ -10,6 +10,6 @@
     <a sec:authorize="!isAuthenticated()" class="btn btn-outline-dark" href="/users/loginform">Login</a>
     <a sec:authorize="isAuthenticated()" class="btn btn-outline-dark" href="/users/logout">LogOut</a>
     <div class="py-2" sec:authorize="isAuthenticated()">
-        <a th:text="${#authentication?.principal.nickName} + 님 " th:href="@{'/users/' +${#authentication?.principal.userId}+ '/form'}"></a>
+        <a th:text="${#authentication?.principal.nickName} + 님 " th:href="@{'/users/' +${#authentication.principal.userId}+ '/form'}"></a>
     </div>
 </div>

@@ -9,6 +9,7 @@ import com.supshop.suppingmall.user.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -40,9 +41,6 @@ public class OrderController {
         model.addAttribute("orderItems", tempOrder.getOrderItems());
         model.addAttribute("product",tempOrder.getOrderItems().get(0).getProduct());
         model.addAttribute("tempOrder",tempOrder);
-
-        if(UserUtils.isSessionNull(session)) {
-        }
         return "/order/form";
     }
 
@@ -60,7 +58,6 @@ public class OrderController {
     public String getOrders(@RequestParam(required = false) @DateTimeFormat(pattern = "YYYY-MM-dd") LocalDate fromDate,
                             @RequestParam(required = false) @DateTimeFormat(pattern = "YYYY-MM-dd") LocalDate toDate,
                             @RequestParam(required = false) String type,
-                            HttpSession session,
                             Model model) {
         List<Orders> orders = orderService.findOrders(fromDate,toDate);
         model.addAttribute("orders",orders);
@@ -68,13 +65,14 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public String getOrder(@PathVariable Long id, HttpSession session, Model model) {
+    public String getOrder(@PathVariable Long id,
+                           @AuthenticationPrincipal UserVO user,
+                           Model model) {
         Orders order = orderService.findOrder(id);
         model.addAttribute("order",order);
-        UserVO sessionUser = UserUtils.getSessionUser(session);
-        if(sessionUser.getRole().equals(Role.SELLER)) {
+        if(user.getRole().equals(Role.SELLER)) {
             return "/order/seller/detail";
-        } else if(sessionUser.getRole().equals(Role.ADMIN) || sessionUser.getRole().equals(Role.MASTER) ) {
+        } else if(user.getRole().equals(Role.ADMIN) || user.getRole().equals(Role.MASTER) ) {
             return "/order/seller/detail";
         }
         return "/order/detail";
@@ -85,10 +83,8 @@ public class OrderController {
                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
                                     @RequestParam(required = false) String type,
                                     @RequestParam(required = false) Orders.OrderStatus status,
-                                    HttpSession session,
+                                    @AuthenticationPrincipal UserVO user,
                                     Model model) {
-
-        UserVO sessionUser = UserUtils.getSessionUser(session);
 
 //        if(sessionUser.getRole().equals(User.Role.SELLER)) {
 //            List<Orders> sellerOrders = orderService.findOrderBySellerId(sessionUser.getUserId(),fromDate,toDate,type,status);
@@ -98,7 +94,7 @@ public class OrderController {
 //        } else if(sessionUser.getRole().equals(User.Role.ADMIN) || sessionUser.getRole().equals(User.Role.MASTER) ) {
 //            return "/order/seller/list";
 //        }
-        List<Orders> orders = orderService.findOrderByBuyerId(sessionUser.getUserId(),fromDate,toDate,type,status);
+        List<Orders> orders = orderService.findOrderByBuyerId(user.getUserId(),fromDate,toDate,type,status);
         model.addAttribute("orders",orders);
         model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.values()));
 
@@ -111,11 +107,10 @@ public class OrderController {
                                      @RequestParam(required = false) String type,
                                      @RequestParam(required = false) Delivery.DeliveryStatus deliveryStatus,
                                      @RequestParam(required = false) Orders.OrderStatus orderStatus,
-                                     HttpSession session,
+                                     @AuthenticationPrincipal UserVO user,
                                      Model model) {
 
-        Long userId = UserUtils.getSessionUser(session).getUserId();
-        List<Orders> orders = orderService.findOrderBySellerId(userId,fromDate,toDate,type,deliveryStatus,orderStatus);
+        List<Orders> orders = orderService.findOrderBySellerId(user.getUserId(),fromDate,toDate,type,deliveryStatus,orderStatus);
         model.addAttribute("orders",orders);
         if(type != null && type.equals("order")) {
             model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.CANCEL,Orders.OrderStatus.REFUND,Orders.OrderStatus.CHANGE));
@@ -126,21 +121,21 @@ public class OrderController {
     }
 
     @GetMapping("/{id}/seller")
-    public String getOrderBySellerId(@PathVariable Long id, HttpSession session, Model model) {
+    public String getOrderBySellerId(@PathVariable Long id, Model model) {
         Orders order = orderService.findOrder(id);
         model.addAttribute("order",order);
         return "/order/seller/detail";
     }
 
     @GetMapping("/{id}/cancelForm")
-    public String getCancelForm(@PathVariable Long id, HttpSession session, Model model) {
+    public String getCancelForm(@PathVariable Long id, Model model) {
         Orders order = orderService.findOrder(id);
         model.addAttribute("order",order);
         return "/order/cancel-form";
     }
 
     @PostMapping("/{id}/cancel")
-    public String cancelOrder(@PathVariable Long id, HttpSession session, Model model) {
+    public String cancelOrder(@PathVariable Long id, Model model) {
         orderService.cancelOrder(id);
         Orders order = orderService.findOrder(id);
         model.addAttribute("order",order);
@@ -148,14 +143,14 @@ public class OrderController {
     }
 
     @GetMapping("/{id}/refundForm")
-    public String getRefundForm(@PathVariable Long id, HttpSession session, Model model) {
+    public String getRefundForm(@PathVariable Long id, Model model) {
         Orders order = orderService.findOrder(id);
         model.addAttribute("order",order);
         return "/order/refund-form";
     }
 
     @PostMapping("/{id}/refund")
-    public String refundOrder(@PathVariable Long id, HttpSession session, Model model) {
+    public String refundOrder(@PathVariable Long id, Model model) {
         orderService.updateOrderStatus(id, Orders.OrderStatus.REFUND);
         Orders order = orderService.findOrder(id);
         model.addAttribute("order",order);

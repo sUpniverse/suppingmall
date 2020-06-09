@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,12 +27,8 @@ public class CartController {
     private final ModelMapper modelMapper;
 
     @GetMapping("")
-    public String getCart(HttpSession session, Model model) {
-        if(UserUtils.isSessionNull(session)) {
-            return "redirect:/users/loginform";
-        }
-        UserVO sessionUser = UserUtils.getSessionUser(session);
-        List<Cart> carts = cartService.findCartByBuyerId(sessionUser.getUserId());
+    public String getCart(@AuthenticationPrincipal UserVO user, Model model) {
+        List<Cart> carts = cartService.findCartByBuyerId(user.getUserId());
         model.addAttribute("carts",carts);
 
         int totalPrice = 0;

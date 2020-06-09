@@ -16,7 +16,7 @@ public class DeliveryController {
     private final DeliveryService deliveryService;
 
     @GetMapping("/{id}/form")
-    public String getDeliveryForm(@PathVariable Long id, HttpSession session, Model model) {
+    public String getDeliveryForm(@PathVariable Long id, Model model) {
         Delivery delivery = deliveryService.findDelivery(id);
         model.addAttribute("delivery",delivery);
         model.addAttribute("vendors", Delivery.DeliveryVendor.values());
@@ -25,7 +25,7 @@ public class DeliveryController {
 
     @PostMapping("/{id}/vendor")
     @ResponseBody
-    public ResponseEntity saveVendor(@PathVariable Long id,@RequestBody Delivery delivery, HttpSession session) {
+    public ResponseEntity saveVendor(@PathVariable Long id,@RequestBody Delivery delivery) {
         deliveryService.saveVendor(id,delivery);
         return ResponseEntity.ok().build();
     }

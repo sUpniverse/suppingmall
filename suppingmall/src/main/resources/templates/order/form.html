@@ -80,9 +80,9 @@
                                 </div>
                                 <div style="display: block;" id="originDelivery">
                                     <ul>
-                                        <li th:text="${session.user.name}"></li>
-                                        <li th:text="${session.user.phoneNumber}"></li>
-                                        <li th:text="@{${session.user.zipCode} + ' ' +${session.user.address}+' '+${session.user.addressDetail}}"></li>
+                                        <li th:text="${#authentication.principal.name}"></li>
+                                        <li th:text="${#authentication.principal.phoneNumber}"></li>
+                                        <li th:text="@{${#authentication.principal.zipCode} + ' ' +${#authentication.principal.address}+' '+${#authentication.principal.addressDetail}}"></li>
                                     </ul>
                                 </div>
                                 <div id="newDelivery" style="display: none;">
@@ -90,36 +90,36 @@
                                         <li class="media text-muted pt-3">
                                             <strong>수령인</strong>
                                             <div class="media-body ml-4">
-                                                <input type="text" class="form-control col-3" th:value="${session.user.name}" name="orders.delivery.name">
+                                                <input type="text" class="form-control col-3" th:value="${#authentication.principal.name}" name="orders.delivery.name">
                                             </div>
                                         </li>
                                         <li class="media text-muted pt-3">
                                             <strong>연락처</strong>
                                             <div class="media-body ml-4 row">
                                                 <select id="phoneFirst" class="custom-select col">
-                                                    <option th:selected="${#strings.substring(session.user.phoneNumber,0,3).equals('010')}" value="010">010</option>
-                                                    <option th:selected="${#strings.substring(session.user.phoneNumber,0,3).equals('011')}" value="011">011</option>
-                                                    <option th:selected="${#strings.substring(session.user.phoneNumber,0,3).equals('018')}" value="018">018</option>
-                                                    <option th:selected="${#strings.substring(session.user.phoneNumber,0,3).equals('019')}" value="019">019</option>
+                                                    <option th:selected="${#strings.substring(#authentication.principal.phoneNumber,0,3).equals('010')}" value="010">010</option>
+                                                    <option th:selected="${#strings.substring(#authentication.principal.phoneNumber,0,3).equals('011')}" value="011">011</option>
+                                                    <option th:selected="${#strings.substring(#authentication.principal.phoneNumber,0,3).equals('018')}" value="018">018</option>
+                                                    <option th:selected="${#strings.substring(#authentication.principal.phoneNumber,0,3).equals('019')}" value="019">019</option>
                                                 </select>
                                                 -
-                                                <input type="text" class="form-control col" th:value="${#strings.substring(session.user.phoneNumber,3,7)}" id="phoneMiddle">
+                                                <input type="text" class="form-control col" th:value="${#strings.substring(#authentication.principal.phoneNumber,3,7)}" id="phoneMiddle">
                                                 -
-                                                <input type="text" class="form-control col" th:value="${#strings.substring(session.user.phoneNumber,7,11)}" id="phoneLast">
+                                                <input type="text" class="form-control col" th:value="${#strings.substring(#authentication.principal.phoneNumber,7,11)}" id="phoneLast">
                                                 <input type="button" class="btn btn-outline-secondary col ml-2" id="verifyPhone" value="핸드폰 인증">
-                                                <input type="hidden" th:name="delivery.phone" th:value="${session.user.phoneNumber}" th:id="phone">
+                                                <input type="hidden" th:name="delivery.phone" th:value="${#authentication.principal.phoneNumber}" th:id="phone">
                                             </div>
                                         </li>
                                         <li class="media text-muted pt-3">
                                             <strong>우편번호</strong>
                                             <div class="media-body ml-4">
                                                 <div class="row">
-                                                    <input type="text" th:name="delivery.zipCode" th:id="zipCode" class="form-control col-3 mr-2" th:value="${session.user.zipCode}" readonly>
+                                                    <input type="text" th:name="delivery.zipCode" th:id="zipCode" class="form-control col-3 mr-2" th:value="${#authentication.principal.zipCode}" readonly>
                                                     <input type="button" class="btn btn-outline-secondary col-3" id="search_address" value="우편번호 찾기">
                                                 </div>
                                                 <div class="mt-3 row">
-                                                    <input type="text" class="form-control col mr-2" th:name="delivery.address" th:id="address" th:value="${session.user.address}" readonly>
-                                                    <input type="text" class="form-control col" th:name="delivery.addressDetail" th:id="addressDetail" th:value="${session.user.addressDetail}" >
+                                                    <input type="text" class="form-control col mr-2" th:name="delivery.address" th:id="address" th:value="${#authentication.principal.address}" readonly>
+                                                    <input type="text" class="form-control col" th:name="delivery.addressDetail" th:id="addressDetail" th:value="${#authentication.principal.addressDetail}" >
                                                 </div>
                                             </div>
                                         </li>
@@ -128,11 +128,11 @@
                             </div>
                             <div class="col-12 col-md-4">
                                 <h4>주문자정보</h4>
-                                <input type="hidden" name="delivery.name" th:value="${session.user.name}">
+                                <input type="hidden" name="delivery.name" th:value="${#authentication.principal.name}">
                                 <ul>
-                                    <li th:text="${session.user.name}"></li>
-                                    <li th:text="${session.user.phoneNumber}"></li>
-                                    <li th:text="${session.user.email}"></li>
+                                    <li th:text="${#authentication.principal.name}"></li>
+                                    <li th:text="${#authentication.principal.phoneNumber}"></li>
+                                    <li th:text="${#authentication.principal.email}"></li>
                                 </ul>
                             </div>
                         </div>
@@ -187,11 +187,11 @@
             merchant_uid : tempOrderId,
             name : [[${product.name}]],
             amount : [[${tempOrder.amountPrice}]],
-            buyer_email : [[${session.user.email}]],
-            buyer_name : [[${session.user.name}]],
-            buyer_tel : [[${session.user.phoneNumber}]],
-            buyer_addr : [[${session.user.address}]] +" "+[[${session.user.addressDetail}]],
-            buyer_postcode : [[${session.user.zipCode}]]
+            buyer_email : [[${#authentication.principal.email}]],
+            buyer_name : [[${#authentication.principal.name}]],
+            buyer_tel : [[${#authentication.principal.phoneNumber}]],
+            buyer_addr : [[${#authentication.principal.address}]] +" "+[[${#authentication.principal.addressDetail}]],
+            buyer_postcode : [[${#authentication.principal.zipCode}]]
         };
 
 
@@ -229,9 +229,9 @@
             document.getElementById('newDelivery').setAttribute('style','display: none;');
 
             // 원래의 주소로 input value로 바꾸기
-            document.getElementById("zipCode").setAttribute("value",[[${session.user.zipCode}]]);
-            document.getElementById("address").setAttribute("value",[[${session.user.address}]]);
-            document.getElementById("addressDetail").setAttribute("value",[[${session.user.addressDetail}]]);
+            document.getElementById("zipCode").setAttribute("value",[[${#authentication.principal.zipCode}]]);
+            document.getElementById("address").setAttribute("value",[[${#authentication.principal.address}]]);
+            document.getElementById("addressDetail").setAttribute("value",[[${#authentication.principal.addressDetail}]]);
         } else if(e.target.value === 'new') {
             document.getElementById('originDelivery').setAttribute('style','display: none;');
             document.getElementById('newDelivery').setAttribute('style','display: block;');

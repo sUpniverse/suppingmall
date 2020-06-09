@@ -17,7 +17,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-2 d-none d-md-block bg-light sidebar">
-            <nav th:replace="user/user-left-bar :: user-left-bar" th:if="${#strings.equals(session.user.getRole(),'USER')}"/>
+            <nav th:replace="user/user-left-bar :: user-left-bar" th:if="${#strings.equals(#authentication.principal.role,'USER')}"/>
         </div>
         <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
             <table class="d-flex p-3 my-3 bg-light rounded shadow-sm mt-5 border">
