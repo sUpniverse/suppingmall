@@ -136,8 +136,8 @@
 
                  </td>
                  <td>
-                     <a th:text="${qna.title}" sec:authorize="isAuthenticated()" href="#" th:href="'javascript:getQna('+${qna.boardId}+','+${#strings.equals(#authentication?.principal?.userId,qna.creator.userId)}+')'"></a>
-                     <a th:text="${qna.title}" sec:authorize="!isAuthenticated()" href="#" th:href="'javascript:getQna('+${qna.boardId}+','+${#strings.equals('undefined',qna.creator.userId)}+')'"></a>
+                     <a th:text="${qna.title}" sec:authorize="isAuthenticated()" href="#" th:href="'javascript:getQna('+${qna.boardId}+','+${#authentication.principal.userId}+')'"></a>
+                     <a th:text="${qna.title}" sec:authorize="!isAuthenticated()" href="#" th:href="'javascript:getQna('+${qna.boardId}+',undefined)'"></a>
                  </td>
                  <td th:text="${qna.creator.nickName}"></td>
                  <td th:text="${qna.createdDate}"></td>

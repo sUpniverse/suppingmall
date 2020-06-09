@@ -58,8 +58,6 @@ function setQnaDetail(title,comment,boardId,isCreator) {
     var question = '<div class="question border-bottom">' +
                       '<p class="col-md-6 offset-md-1">'+title+'</p>'
 
-    console.log(isCreator);
-
     if(isCreator) {
         question += edit;
     }
@@ -82,6 +80,5 @@ function setQnaDetail(title,comment,boardId,isCreator) {
         qna +=    answer + '</td></tr>';
     }
 
-    console.log(question)
     $('#qna'+boardId+'').after(qna);
 }
