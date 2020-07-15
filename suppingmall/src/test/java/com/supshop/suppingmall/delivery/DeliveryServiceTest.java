@@ -1,7 +1,7 @@
 package com.supshop.suppingmall.delivery;
 
 import com.supshop.suppingmall.user.UserService;
-import com.supshop.suppingmall.user.UserVO;
+import com.supshop.suppingmall.user.SessionUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class DeliveryServiceTest {
     @Test
     public void saveDelivery() throws Exception {
         //given
-        UserVO user = userService.getUserVO(2l);
+        SessionUser user = userService.getUserVO(2l);
         String memo = "경비실에 맞겨주세요";
         Delivery delivery = Delivery.builder()
                 .name(user.getName())

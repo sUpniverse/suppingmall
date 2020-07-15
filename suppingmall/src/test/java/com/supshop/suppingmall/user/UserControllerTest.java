@@ -237,7 +237,7 @@ public class UserControllerTest {
     }
 
     private void addUserInSession(User user) {
-        UserVO needUser = modelMapper.map(user, UserVO.class);
+        SessionUser needUser = modelMapper.map(user, SessionUser.class);
         session = new MockHttpSession();
         session.setAttribute("user",needUser);
 
@@ -252,7 +252,7 @@ public class UserControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         Long userId = 1l;
         String username = "kmsup2@gmail.com";
-        UserVO user = UserVO.builder()
+        SessionUser user = SessionUser.builder()
                 .email(username)
                 .name("운영자")
                 .nickName("운영자")

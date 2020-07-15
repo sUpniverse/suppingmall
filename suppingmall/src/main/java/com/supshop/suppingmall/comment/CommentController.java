@@ -1,6 +1,6 @@
 package com.supshop.suppingmall.comment;
 
-import com.supshop.suppingmall.user.UserVO;
+import com.supshop.suppingmall.user.SessionUser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
@@ -17,7 +17,7 @@ public class CommentController {
     }
 
     @PostMapping("")
-    public ResponseEntity createComment(@RequestBody Comment comment, @AuthenticationPrincipal UserVO sessionUser, Errors errors) {
+    public ResponseEntity createComment(@RequestBody Comment comment, @AuthenticationPrincipal SessionUser sessionUser, Errors errors) {
         comment.setCreator(sessionUser);
         int result = commentService.insertComment(comment);
 

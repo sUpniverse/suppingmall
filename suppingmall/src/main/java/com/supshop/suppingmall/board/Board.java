@@ -3,10 +3,9 @@ package com.supshop.suppingmall.board;
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.comment.Comment;
 import com.supshop.suppingmall.product.Product;
+import com.supshop.suppingmall.user.SessionUser;
 import com.supshop.suppingmall.user.User;
-import com.supshop.suppingmall.user.UserVO;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,7 +19,7 @@ public class Board {
     private String title;
     private String contents;
     private List<Comment> comments;
-    private UserVO creator;
+    private User creator;
     private Category category;
     private int hit;
     private String delYn;

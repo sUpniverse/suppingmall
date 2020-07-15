@@ -10,8 +10,8 @@ import com.supshop.suppingmall.image.ImageController;
 import com.supshop.suppingmall.image.ImageService;
 import com.supshop.suppingmall.product.Form.ProductForm;
 import com.supshop.suppingmall.product.Form.QnaForm;
-import com.supshop.suppingmall.user.Role;
-import com.supshop.suppingmall.user.UserVO;
+import com.supshop.suppingmall.user.SessionUser;
+import com.supshop.suppingmall.user.User;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -42,7 +41,7 @@ public class ProductController {
     private static final Long productCategoryId = 2L;
 
     @GetMapping("/form")
-    public String form(@AuthenticationPrincipal UserVO user, Model model) {
+    public String form(@AuthenticationPrincipal SessionUser user, Model model) {
         model.addAttribute("categories",categoryService.getCategory(productCategoryId).getChild());
         model.addAttribute("vendors", Delivery.DeliveryVendor.values());
         return "/product/form";
@@ -97,7 +96,7 @@ public class ProductController {
     }
 
     @GetMapping("/seller")
-    public String getProductsBySeller(@AuthenticationPrincipal UserVO user,Model model) {
+    public String getProductsBySeller(@AuthenticationPrincipal SessionUser user, Model model) {
         List<Product> products = productService.findProductsBySellerId(user.getUserId());
         model.addAttribute("user",user);
         model.addAttribute("products",products);
@@ -121,7 +120,7 @@ public class ProductController {
                         .category(Category.builder().id(30l).build())
                         .title(qna.getTitle())
                         .product(Product.builder().productId(productId).build())
-                        .creator(UserVO.builder().userId(qna.getUserId()).build()).build();
+                        .creator(User.builder().userId(qna.getUserId()).build()).build();
         boardService.createBoard(board);
         return ResponseEntity.ok().build();
     }
@@ -135,7 +134,7 @@ public class ProductController {
 
     @GetMapping("/qnas/{qnaId}/updateForm")
     public String getQnaUpdateForm(@PathVariable Long qnaId,
-                             @AuthenticationPrincipal UserVO user,
+                             @AuthenticationPrincipal SessionUser user,
                              Model model) {
         Board board = boardService.getBoard(qnaId);
         if(!UserUtils.isOwner(board.getCreator().getUserId(),user)) {
@@ -149,7 +148,7 @@ public class ProductController {
     @ResponseBody
     public ResponseEntity updateQna(@PathVariable Long qnaId,
                                     @RequestBody QnaForm qna,
-                                    @AuthenticationPrincipal UserVO user) {
+                                    @AuthenticationPrincipal SessionUser user) {
         Board oldQnA = boardService.getBoard(qnaId);
         if(!UserUtils.isOwner(oldQnA.getCreator().getUserId(),user)) {
             return ResponseEntity.badRequest().build();
@@ -163,7 +162,7 @@ public class ProductController {
     @DeleteMapping("/qnas/{qnaId}")
     @ResponseBody
     public ResponseEntity deleteQna(@PathVariable Long qnaId,
-                                    @AuthenticationPrincipal UserVO user) {
+                                    @AuthenticationPrincipal SessionUser user) {
 
         Board oldQnA = boardService.getBoard(qnaId);
         if(!UserUtils.isOwner(oldQnA.getCreator().getUserId(),user)) {

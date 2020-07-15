@@ -58,7 +58,7 @@ public class OAuthAttribute {
                 .build();
     }
 
-    public User setUserVo() {
+    public User setUserInformation() {
         return User.builder()
                 .email(this.email)
                 .name(this.name)

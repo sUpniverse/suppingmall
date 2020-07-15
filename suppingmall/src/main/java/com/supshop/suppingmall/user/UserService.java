@@ -49,9 +49,9 @@ public class UserService implements UserDetailsService {
         return userMapper.selectUser(id);
     }
 
-    public UserVO getUserVO(Long id) {
+    public SessionUser getUserVO(Long id) {
         User user = userMapper.selectUser(id);
-        UserVO vo = modelMapper.map(user, UserVO.class);
+        SessionUser vo = modelMapper.map(user, SessionUser.class);
         return vo;
     }
 
@@ -102,22 +102,23 @@ public class UserService implements UserDetailsService {
         userMapper.deleteUSer(id);
     }
 
-    public List<UserVO> getStore(String type, String value) {
+    public List<SessionUser> getStore(String type, String value) {
         List<User> users = userMapper.selectAllStore(null, type, value);
-        List<UserVO> userVOList= new ArrayList<>();
+        List<SessionUser> sessionUserList = new ArrayList<>();
         for(User user : users) {
-            UserVO map = modelMapper.map(user, UserVO.class);
-            userVOList.add(map);
+            SessionUser map = modelMapper.map(user, SessionUser.class);
+            sessionUserList.add(map);
         }
-        return userVOList;
+        return sessionUserList;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userMapper.findUserByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
-        UserVO userDetail = modelMapper.map(user, UserVO.class);
-        return userDetail;
+        return new org.springframework.security.core.userdetails.User(user.getEmail(),user.getPassword(),authorities(Arrays.asList(user.getRole())));
+//        UserVO userDetail = modelMapper.map(user, UserVO.class);
+//        return userDetail;
     }
 
     private Collection<? extends GrantedAuthority> authorities(List<Role> roles) {
@@ -126,7 +127,7 @@ public class UserService implements UserDetailsService {
                 .collect(Collectors.toSet());
     }
 
-    public UserVO isSignedInUser(String email, String password) {
+    public SessionUser isSignedInUser(String email, String password) {
         User user = null;
         try {
             user = getUserByEmail(email);
@@ -134,8 +135,8 @@ public class UserService implements UserDetailsService {
             return null;
         }
         if(passwordEncoder.matches(password,user.getPassword())) {
-            UserVO userVO = modelMapper.map(user, UserVO.class);
-            return userVO;
+            SessionUser sessionUser = modelMapper.map(user, SessionUser.class);
+            return sessionUser;
         }
         return null;
     }

@@ -1,12 +1,10 @@
 package com.supshop.suppingmall.comment;
 
 import com.supshop.suppingmall.board.Board;
-import com.supshop.suppingmall.user.User;
-import com.supshop.suppingmall.user.UserVO;
+import com.supshop.suppingmall.user.SessionUser;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter @Setter @Builder
 @ToString @EqualsAndHashCode(of = "commentId")
@@ -19,7 +17,7 @@ public class Comment {
     private String title;
     private String contents;
     private int score;
-    private UserVO creator;
+    private SessionUser creator;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 

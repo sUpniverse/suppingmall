@@ -1,8 +1,7 @@
 package com.supshop.suppingmall.cart;
 
 import com.supshop.suppingmall.cart.Form.CartForm;
-import com.supshop.suppingmall.common.UserUtils;
-import com.supshop.suppingmall.user.UserVO;
+import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.net.URI;
 import java.util.List;
 
@@ -27,7 +25,7 @@ public class CartController {
     private final ModelMapper modelMapper;
 
     @GetMapping("")
-    public String getCart(@AuthenticationPrincipal UserVO user, Model model) {
+    public String getCart(@AuthenticationPrincipal SessionUser user, Model model) {
         List<Cart> carts = cartService.findCartByBuyerId(user.getUserId());
         model.addAttribute("carts",carts);
 

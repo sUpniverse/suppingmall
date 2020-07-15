@@ -14,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -29,14 +28,14 @@ public class UserController {
     private static final String redirectMainUrl = "redirect:/";
 
     @GetMapping("/signup")
-    public String signupform(@AuthenticationPrincipal UserVO user) {
+    public String signupform(@AuthenticationPrincipal SessionUser user) {
         if (isLoginUser(user))
             return redirectMainUrl;
         return "/user/signup";
     }
 
     @GetMapping("/loginform")
-    public String loginform(@AuthenticationPrincipal UserVO user) {
+    public String loginform(@AuthenticationPrincipal SessionUser user) {
         if (isLoginUser(user)) return "redirect:/";
         return "/user/login";
     }
@@ -88,7 +87,7 @@ public class UserController {
 //    }
 
     @PostMapping("")
-    public String createUser(@Valid SignUpForm signUpForm, @AuthenticationPrincipal UserVO user) {
+    public String createUser(@Valid SignUpForm signUpForm, @AuthenticationPrincipal SessionUser user) {
         if(isLoginUser(user)) {
             return redirectMainUrl;
         }
@@ -99,7 +98,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public String updateUser(@PathVariable Long id, User user, @AuthenticationPrincipal UserVO sessionUser) {
+    public String updateUser(@PathVariable Long id, User user, @AuthenticationPrincipal SessionUser sessionUser) {
         if(isOwner(id, sessionUser) || isAdmin(sessionUser)) {
             userService.updateUser(id, user);
 //            updateSession(session); Todo : 업데이트시 시큐리티상에 갱신 필요
@@ -110,7 +109,7 @@ public class UserController {
 
     @PatchMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<String> partialUpdateUser(@RequestBody(required = false) @Valid UserVO userVO, @PathVariable Long id) {
+    public ResponseEntity<String> partialUpdateUser(@RequestBody(required = false) @Valid SessionUser sessionUser, @PathVariable Long id) {
 
 //        if(isAdmin(sessionUser)) {
 //            User user = modelMapper.map(userVO, User.class);
@@ -118,7 +117,7 @@ public class UserController {
 //            return ResponseEntity.ok().build();
 //        }
         try {
-            User user = modelMapper.map(userVO, User.class);
+            User user = modelMapper.map(sessionUser, User.class);
             userService.patchUser(id,user);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -143,7 +142,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/form")
-    public String getUserPage(@PathVariable Long id, Model model,@AuthenticationPrincipal UserVO sessionUser) {
+    public String getUserPage(@PathVariable Long id, Model model,@AuthenticationPrincipal SessionUser sessionUser) {
 
         // 관리자 일 경우 관리자 메인페이지로
         if(isAdmin(sessionUser)) {
@@ -155,11 +154,11 @@ public class UserController {
     }
 
     @GetMapping("/{id}/updateForm")
-    public String getUpdateForm(@PathVariable Long id, Model model, @AuthenticationPrincipal UserVO sessionUser) {
+    public String getUpdateForm(@PathVariable Long id, Model model, @AuthenticationPrincipal SessionUser sessionUser) {
 
         // 운영자 자격으로 해당 회원의 정보를 수정할 시 사용
         if(isAdmin(sessionUser)) {
-            UserVO userVO = userService.getUserVO(id);
+            SessionUser userVO = userService.getUserVO(id);
             model.addAttribute("user",userVO);
             return "/user/adminUpdateForm";
         }
@@ -174,7 +173,7 @@ public class UserController {
     public ResponseEntity<String> getSellerInfoByName(@RequestParam String type,
                                                       @RequestParam String value) {
 
-        List<UserVO> stores = userService.getStore(type, value);
+        List<SessionUser> stores = userService.getStore(type, value);
         if(stores.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -183,7 +182,7 @@ public class UserController {
     }
 
     @GetMapping("/seller/{id}")
-    public String getSeller(@PathVariable Long id, Model model, @AuthenticationPrincipal UserVO sessionUser) {
+    public String getSeller(@PathVariable Long id, Model model, @AuthenticationPrincipal SessionUser sessionUser) {
         if(isOwner(id, sessionUser)) {
             model.addAttribute("user", sessionUser);
             return "redirect:/user/"+id+"/form";
@@ -192,8 +191,10 @@ public class UserController {
     }
 
     @GetMapping("/seller/applyForm")
-    public String getApplySellerRoleForm(Model model, @AuthenticationPrincipal UserVO sessionUser) {
+    public String getApplySellerRoleForm(Model model, @AuthenticationPrincipal SessionUser sessionUser) {
+
         if(sessionUser.getRole().equals(Role.USER) && sessionUser.getStoreVO().getStoreApplyYn().equals("N")) {
+        //Todo : session User 이용해서 user 정보 가져온 뒤 비교
             model.addAttribute("user", sessionUser);
             return "/user/applySellerForm";
         }
@@ -203,7 +204,7 @@ public class UserController {
     @PostMapping("/seller/{id}/apply")
     public String applySellerRole(@PathVariable Long id,
                                   @Valid ApplySellerForm applyForm,
-                                  @AuthenticationPrincipal UserVO sessionUser) {
+                                  @AuthenticationPrincipal SessionUser sessionUser) {
         if(isOwner(id, sessionUser)) {
             StoreVO store = modelMapper.map(applyForm, StoreVO.class);
             userService.patchUser(id,User.builder().storeVO(store).build());
@@ -215,7 +216,7 @@ public class UserController {
     @GetMapping("/seller/applicants")
     public String getApplySeller(BoardCriteria boardCriteria,
                                  Model model,
-                                 @AuthenticationPrincipal UserVO sessionUser) {
+                                 @AuthenticationPrincipal SessionUser sessionUser) {
 
         if(isAdmin(sessionUser)) {
             List<User> applySellerUsers = userService.getApplySellerUsers(boardCriteria);
@@ -233,7 +234,7 @@ public class UserController {
 
     @PatchMapping("/seller/{id}/apply")
     @ResponseBody
-    public ResponseEntity grantSellerRole(@PathVariable Long id, @AuthenticationPrincipal UserVO sessionUser) {
+    public ResponseEntity grantSellerRole(@PathVariable Long id, @AuthenticationPrincipal SessionUser sessionUser) {
         if(isAdmin(sessionUser)) {
             User user = userService.getUser(id);
             StoreVO storeVO = user.getStoreVO();
@@ -253,7 +254,7 @@ public class UserController {
     @GetMapping("/confirm")
     public String confirmUser(@PathVariable String token,
                               RedirectAttributes redirAttrs,
-                              @AuthenticationPrincipal UserVO sessionUser) {
+                              @AuthenticationPrincipal SessionUser sessionUser) {
 
         User user = userService.getUserWithConfirmationByEmail(sessionUser.getEmail()).get();
         if(user.getEmailConfirmYn().equals("Y")) {
@@ -268,17 +269,17 @@ public class UserController {
     }
 
 
-    private boolean isLoginUser(UserVO userVO) {
-        if(userVO != null) return true;
+    private boolean isLoginUser(SessionUser sessionUser) {
+        if(sessionUser != null) return true;
         return false;
     }
 
     //세션의 유저와 해당 목표물의 주인의 아이디가 같은지 확인
-    private boolean isOwner(Long id, UserVO sessionUser) {
+    private boolean isOwner(Long id, SessionUser sessionUser) {
         return sessionUser != null && sessionUser.getUserId().equals(id);
     }
 
-    private boolean isAdmin(UserVO sessionUser) {
+    private boolean isAdmin(SessionUser sessionUser) {
         return sessionUser != null && (sessionUser.getRole().equals(Role.ADMIN) || (sessionUser.getRole().equals(Role.MASTER)));
     }
 

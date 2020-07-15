@@ -12,7 +12,7 @@ import com.supshop.suppingmall.product.ProductOption;
 import com.supshop.suppingmall.product.ProductService;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserService;
-import com.supshop.suppingmall.user.UserVO;
+import com.supshop.suppingmall.user.SessionUser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -87,13 +87,13 @@ public class OrdersServiceTest {
 
         //when
         Orders tempOrder = orderService.findOrder(tempOrderId);
-        UserVO userVO = userService.getUserVO(buyerId);
+        SessionUser sessionUser = userService.getUserVO(buyerId);
 
 
         //then
         assertThat(tempOrder.getStatus()).isEqualTo(Orders.OrderStatus.WAIT);
         assertThat(tempOrder.getBuyer().getUserId()).isEqualTo(buyerId);
-        assertThat(tempOrder.getBuyer().getNickName()).isEqualTo(userVO.getNickName());
+        assertThat(tempOrder.getBuyer().getNickName()).isEqualTo(sessionUser.getNickName());
         assertThat(tempOrder.getSeller().getUserId()).isEqualTo(sellerId);
 
         for(OrderItem orderNewItem : tempOrder.getOrderItems()) {
@@ -165,7 +165,7 @@ public class OrdersServiceTest {
 
         //유저정보
         User user = userService.getUser(19l);
-        UserVO userVO = UserVO.builder().userId(user.getUserId()).build();
+        SessionUser sessionUser = SessionUser.builder().userId(user.getUserId()).build();
 
         Orders order = orderService.findOrder(7l);
 
@@ -254,7 +254,7 @@ public class OrdersServiceTest {
 
         //유저정보
         User user = userService.getUser(19l);
-        UserVO userVO = UserVO.builder().userId(user.getUserId()).build();
+        SessionUser sessionUser = SessionUser.builder().userId(user.getUserId()).build();
 
         Orders order = orderService.findOrder(tempOrderId);
 

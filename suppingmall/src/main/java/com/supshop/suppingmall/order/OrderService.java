@@ -14,7 +14,7 @@ import com.supshop.suppingmall.product.Product;
 import com.supshop.suppingmall.product.ProductOption;
 import com.supshop.suppingmall.product.ProductService;
 import com.supshop.suppingmall.user.UserService;
-import com.supshop.suppingmall.user.UserVO;
+import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -219,8 +219,8 @@ public class OrderService {
 
         // 임시 주문 생성을 위한 정보 가져오기
         List<OrderItem> orderItems = this.setOrderItemsInfo(tempOrderForm);
-        UserVO buyer = userService.getUserVO(tempOrderForm.getBuyerId());
-        UserVO seller = userService.getUserVO(tempOrderForm.getSellerId());
+        SessionUser buyer = userService.getUserVO(tempOrderForm.getBuyerId());
+        SessionUser seller = userService.getUserVO(tempOrderForm.getSellerId());
 
         //임시 주문 생성 (주문상품, 구매자, 판매자)
         Orders tempOrder = Orders.createTempOrder(orderItems,buyer,seller);

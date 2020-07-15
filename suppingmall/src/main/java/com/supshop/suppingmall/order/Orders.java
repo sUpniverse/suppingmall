@@ -2,13 +2,9 @@ package com.supshop.suppingmall.order;
 
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.payment.Payment;
-import com.supshop.suppingmall.user.User;
-import com.supshop.suppingmall.user.UserVO;
+import com.supshop.suppingmall.user.SessionUser;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,8 +19,8 @@ public class Orders {
     private OrderStatus status; //Todo : enum (주문완료,배송,구매완료,취소)
     private LocalDateTime orderDate;
     private LocalDateTime updateDate;
-    private UserVO buyer;
-    private UserVO seller;
+    private SessionUser buyer;
+    private SessionUser seller;
     private Delivery delivery;
     private Payment payment;
     private List<OrderItem> orderItems = new ArrayList<>();
@@ -56,7 +52,7 @@ public class Orders {
     }
 
     // 임시주문 생성 (결제 시스템의 식별)
-    public static Orders createTempOrder(List<OrderItem> orderItemList, UserVO buyer, UserVO seller) {
+    public static Orders createTempOrder(List<OrderItem> orderItemList, SessionUser buyer, SessionUser seller) {
         Orders orders = Orders.builder()
                             .buyer(buyer)
                             .seller(seller)

@@ -1,11 +1,10 @@
 package com.supshop.suppingmall.order;
 
-import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.order.Form.OrderForm;
 import com.supshop.suppingmall.order.Form.TempOrderForm;
 import com.supshop.suppingmall.user.Role;
-import com.supshop.suppingmall.user.UserVO;
+import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -66,7 +65,7 @@ public class OrderController {
 
     @GetMapping("/{id}")
     public String getOrder(@PathVariable Long id,
-                           @AuthenticationPrincipal UserVO user,
+                           @AuthenticationPrincipal SessionUser user,
                            Model model) {
         Orders order = orderService.findOrder(id);
         model.addAttribute("order",order);
@@ -83,7 +82,7 @@ public class OrderController {
                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
                                     @RequestParam(required = false) String type,
                                     @RequestParam(required = false) Orders.OrderStatus status,
-                                    @AuthenticationPrincipal UserVO user,
+                                    @AuthenticationPrincipal SessionUser user,
                                     Model model) {
 
 //        if(sessionUser.getRole().equals(User.Role.SELLER)) {
@@ -107,7 +106,7 @@ public class OrderController {
                                      @RequestParam(required = false) String type,
                                      @RequestParam(required = false) Delivery.DeliveryStatus deliveryStatus,
                                      @RequestParam(required = false) Orders.OrderStatus orderStatus,
-                                     @AuthenticationPrincipal UserVO user,
+                                     @AuthenticationPrincipal SessionUser user,
                                      Model model) {
 
         List<Orders> orders = orderService.findOrderBySellerId(user.getUserId(),fromDate,toDate,type,deliveryStatus,orderStatus);
