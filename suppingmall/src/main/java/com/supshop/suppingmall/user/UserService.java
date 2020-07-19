@@ -110,9 +110,8 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userMapper.findUserByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
-        return new org.springframework.security.core.userdetails.User(user.getEmail(),user.getPassword(),authorities(Arrays.asList(user.getRole())));
-//        UserVO userDetail = modelMapper.map(user, UserVO.class);
-//        return userDetail;
+        SessionUser sessionUser = modelMapper.map(user, SessionUser.class);
+        return sessionUser;
     }
 
     private Collection<? extends GrantedAuthority> authorities(List<Role> roles) {

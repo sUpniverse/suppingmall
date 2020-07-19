@@ -27,7 +27,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final LoginSuccessHandler loginSuccessHandler;
+    private final LoginSuccessHandler   loginSuccessHandler;
 
     @Bean
     public TokenStore tokenStore() {
@@ -56,7 +56,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
             .anonymous()
-                .and()
+        .and()
+            .cors().disable()
             .csrf().disable()
             .formLogin()
                 .successHandler(loginSuccessHandler)
@@ -64,14 +65,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginProcessingUrl("/users/login")
                 .failureUrl("/users/loginform?error")
                     .permitAll()
-                .and()
+        .and()
             .logout()
                 .logoutUrl("/users/logout")
                 .logoutSuccessUrl("/")
-            .and()
-                .oauth2Login()
-                    .userInfoEndpoint()
-                        .userService(customOAuth2UserService);
+        .and()
+            .oauth2Login()
+                .successHandler(loginSuccessHandler)
+                .userInfoEndpoint()
+                    .userService(customOAuth2UserService);
         setAntMatchers(http);
     }
 

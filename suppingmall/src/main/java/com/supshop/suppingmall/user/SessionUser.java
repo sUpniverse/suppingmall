@@ -24,6 +24,7 @@ public class SessionUser implements UserDetails, OAuth2User, Serializable {
 
     private static final long serialVersionUID = 6831318661116074785L;
     private Long userId;
+    private String password;
     private String email;
     private String name;
     private String nickName;
@@ -54,7 +55,7 @@ public class SessionUser implements UserDetails, OAuth2User, Serializable {
 
     @Override
     public String getPassword() {
-        return null;
+        return this.password;
     }
 
     @Override

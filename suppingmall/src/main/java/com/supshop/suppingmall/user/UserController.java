@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -24,8 +25,11 @@ public class UserController {
 
     private final UserService userService;
     private final ModelMapper modelMapper;
+
     private static final String redirectLoginUrl = "redirect:/users/loginform";
     private static final String redirectMainUrl = "redirect:/";
+    private static final String requestReferer = "Referer";
+    private static final String prevPage = "prevPage";
 
     @GetMapping("/signup")
     public String signupform(@AuthenticationPrincipal SessionUser user) {
@@ -35,8 +39,15 @@ public class UserController {
     }
 
     @GetMapping("/loginform")
-    public String loginform(@AuthenticationPrincipal SessionUser user) {
+    public String loginform(@AuthenticationPrincipal SessionUser user, HttpServletRequest request) {
         if (isLoginUser(user)) return "redirect:/";
+
+        String uri = request.getHeader(requestReferer);
+        if (!uri.contains("/loginform")) {
+            request.getSession().setAttribute(prevPage,
+                    request.getHeader(requestReferer));
+        }
+
         return "/user/login";
     }
 
