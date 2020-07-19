@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.delivery;
 
+import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserService;
 import com.supshop.suppingmall.user.SessionUser;
 import org.junit.Test;
@@ -23,7 +24,7 @@ public class DeliveryServiceTest {
     @Test
     public void saveDelivery() throws Exception {
         //given
-        SessionUser user = userService.getUserVO(2l);
+        User user = userService.getUser(2l);
         String memo = "경비실에 맞겨주세요";
         Delivery delivery = Delivery.builder()
                 .name(user.getName())

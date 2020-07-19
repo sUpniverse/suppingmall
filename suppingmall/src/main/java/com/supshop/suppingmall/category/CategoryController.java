@@ -1,7 +1,9 @@
 package com.supshop.suppingmall.category;
 
 import com.supshop.suppingmall.common.UserUtils;
+import com.supshop.suppingmall.user.SessionUser;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +25,7 @@ public class CategoryController {
     }
 
     @GetMapping("/list")
-    public String getAllCategories(HttpSession session, Model model) {
+    public String getAllCategories(@AuthenticationPrincipal SessionUser session, Model model) {
         if (!UserUtils.isAdmin(session)) return "redirect:/users/loginform";
         model.addAttribute("categories",categoryService.getCategories());
         return "/category/list";
@@ -32,7 +34,7 @@ public class CategoryController {
     @GetMapping("/{id}")
     @ResponseBody
     public ResponseEntity<Category> getCategories(@PathVariable Long id,
-                                                  HttpSession session,
+                                                  @AuthenticationPrincipal SessionUser session,
                                                   Model model) {
         if (!UserUtils.isAdmin(session)) return ResponseEntity.badRequest().build();
         Category category = categoryService.getCategory(id);
@@ -42,7 +44,7 @@ public class CategoryController {
     @GetMapping("/{id}/children")
     @ResponseBody
     public ResponseEntity<List<Category>> getChildCategories(@PathVariable Long id,
-                                                             HttpSession session,
+                                                             @AuthenticationPrincipal SessionUser session,
                                                              Model model) {
         if (!UserUtils.isAdmin(session)) return ResponseEntity.badRequest().build();
         List<Category> category = categoryService.getChildByParent(id);
@@ -64,7 +66,7 @@ public class CategoryController {
     @ResponseBody
     public ResponseEntity<String> updateCategory(@PathVariable Long id,
                                                  @RequestBody Category category,
-                                                 HttpSession session,
+                                                 @AuthenticationPrincipal SessionUser session,
                                                  Model model) {
         if (!UserUtils.isAdmin(session)) return ResponseEntity.badRequest().build();
         categoryService.updateCategory(id,category);
@@ -73,7 +75,7 @@ public class CategoryController {
 
     @DeleteMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<String> deleteCategory(@PathVariable Long id, HttpSession session) {
+    public ResponseEntity<String> deleteCategory(@PathVariable Long id,@AuthenticationPrincipal SessionUser session) {
         if (!UserUtils.isAdmin(session)) return ResponseEntity.badRequest().build();
         categoryService.deleteCategory(id);
         return ResponseEntity.ok().build();

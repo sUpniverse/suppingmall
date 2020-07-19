@@ -49,12 +49,6 @@ public class UserService implements UserDetailsService {
         return userMapper.selectUser(id);
     }
 
-    public SessionUser getUserVO(Long id) {
-        User user = userMapper.selectUser(id);
-        SessionUser vo = modelMapper.map(user, SessionUser.class);
-        return vo;
-    }
-
     public Optional<User> getUserWithConfirmationByEmail(String email) {
         return userMapper.findUserConfirmationById(email);
     }

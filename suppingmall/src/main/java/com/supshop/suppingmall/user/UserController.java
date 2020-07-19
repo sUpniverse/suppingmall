@@ -158,8 +158,8 @@ public class UserController {
 
         // 운영자 자격으로 해당 회원의 정보를 수정할 시 사용
         if(isAdmin(sessionUser)) {
-            SessionUser userVO = userService.getUserVO(id);
-            model.addAttribute("user",userVO);
+            User user = userService.getUser(id);
+            model.addAttribute("user",user);
             return "/user/adminUpdateForm";
         }
 

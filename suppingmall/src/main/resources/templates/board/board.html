@@ -88,7 +88,7 @@
         var formObj = $("form[role='form']");
         var boardId = [[${board.boardId}]];
 
-        $().on("click",".btn-warning",function() {
+        $(document).on("click",".btn-warning",function() {
             formObj.children().removeAttr("input");
             formObj.attr("action","/boards/"+boardId+"/form");
             formObj.attr("method","get");
@@ -114,6 +114,9 @@
         $("#comment-button").on('click',() => {
             var boardId = [[${board.boardId}]];
             var contents = $('#comment-text').val();
+
+            console.log(boardId);
+            console.log(contents);
             $.ajax({
                 type:"POST",
                 url:"/comments",
@@ -159,7 +162,8 @@
 
 
         $(document).on('click',"#comment-text",() => {
-            if([[${#authentication.principal}]] == "anonymousUser") {
+            console.log([[${#authentication.principal}]] );
+            if([[${#authentication.principal}]] === "anonymousUser") {
                 var check = confirm("로그인 하시겠습니까?");
                 if(check == true) {
                     window.location.href='/users/loginform';

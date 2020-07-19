@@ -8,13 +8,13 @@
         <result property="status" column="OrderStatus" typeHandler="com.supshop.suppingmall.order.OrderStatusTypeHandler" />
         <result property="orderDate" column="OrderDate"/>
         <result property="updateDate" column="OrderUpdateDate"/>
-        <association property="buyer" javaType="com.supshop.suppingmall.user.SessionUser" >
+        <association property="buyer" javaType="com.supshop.suppingmall.user.User" >
             <id property="userId" column="BuyerId" />
             <result property="nickName" column="BuyerNickName" />
             <result property="name" column="BuyerName" />
             <result property="phoneNumber" column="BuyerPhoneNumber" />
         </association>
-        <association property="seller" javaType="com.supshop.suppingmall.user.SessionUser" >
+        <association property="seller" javaType="com.supshop.suppingmall.user.User" >
             <id property="userId" column="SellerId" />
             <association property="storeVO" javaType="com.supshop.suppingmall.user.StoreVO">
                 <result property="storeName" column="StoreName" />

@@ -87,7 +87,7 @@ public class OrdersServiceTest {
 
         //when
         Orders tempOrder = orderService.findOrder(tempOrderId);
-        SessionUser sessionUser = userService.getUserVO(buyerId);
+        User sessionUser = userService.getUser(buyerId);
 
 
         //then

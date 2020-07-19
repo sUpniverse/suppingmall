@@ -8,6 +8,7 @@ import com.supshop.suppingmall.page.BoardPageMaker;
 import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -33,11 +34,7 @@ public class BoardController {
         log.debug("'form'가 실행됨");
         List<Category> child = categoryService.getCategory(boardCategoryId).getChild();
         model.addAttribute("categories",child);
-//        UserVO user = SessionUtils.getSessionUser(session);
-//        if(user == null) {
-//            return "redirect:/users/loginform";
-//        }
-          return "/board/form";
+        return "/board/form";
     }
 
     @GetMapping("")
@@ -46,18 +43,22 @@ public class BoardController {
                               @RequestParam(required = false) String category,
                               @RequestParam(required = false) String type,
                               @RequestParam(required = false) String searchValue) {
+
         log.debug("'getAllBoard'가 실행됨");
+
         BoardPageMaker boardPageMaker = new BoardPageMaker();
         boardPageMaker.setBoardCriteria(boardCriteria);
         boardPageMaker.setTotalCount(boardService.getBoardCount());
         model.addAttribute(boardService.getBoardByCondition(boardCriteria,category,type,searchValue));
         model.addAttribute("boardPageMaker", boardPageMaker);
+
         return "/board/list";
     }
 
     @GetMapping("/{id}")
     public String getBoard(@PathVariable Long id, Model model) {
         log.debug("'getBoard'가 실행됨");
+
         Board board = boardService.getBoard(id);
         if(board != null) {
             model.addAttribute("board",board);
@@ -67,40 +68,36 @@ public class BoardController {
     }
 
     @PostMapping("")
-    public String createBoard(Board board, HttpSession session) {
+    public String createBoard(Board board, @AuthenticationPrincipal SessionUser sessionUser) {
         log.debug("'createBoard'가 실행됨");
-        SessionUser user = UserUtils.getSessionUser(session);
-        if(user.getUserId().equals(board.getCreator().getUserId())) boardService.createBoard(board);
+        if(sessionUser.getUserId().equals(board.getCreator().getUserId())) boardService.createBoard(board);
         return "redirect:/boards";
     }
 
     @GetMapping("/{id}/form")
-    public String modifyBoard(@PathVariable Long id, Model model, HttpSession session) {
+    public String modifyBoard(@PathVariable Long id, Model model, @AuthenticationPrincipal SessionUser sessionUser) {
         log.debug("'modifyBoard'가 실행됨");
         Board board = boardService.getBoard(id);
-        SessionUser user = UserUtils.getSessionUser(session);
-        if(!user.getUserId().equals(board.getCreator().getUserId())) return "redirect:/boards";
+        if(!sessionUser.getUserId().equals(board.getCreator().getUserId())) return "redirect:/boards";
 
         model.addAttribute("board",board);
         return "/board/updateform";
     }
 
     @PutMapping("/{id}")
-    public String updateBoard(@PathVariable Long id, Board board, HttpSession session) {
+    public String updateBoard(@PathVariable Long id, Board board, @AuthenticationPrincipal SessionUser sessionUser) {
         log.debug("'updateBoard'가 실행됨");
-//        SessionUser user = UserUtils.getSessionUser(session);
 //        board.setCreator(user);
         boardService.updateBoard(id, board);
         return "redirect:/boards/"+id;
     }
 
     @DeleteMapping("/{id}")
-    public String deleteBoard(@PathVariable Long id, HttpSession session) {
+    public String deleteBoard(@PathVariable Long id, @AuthenticationPrincipal SessionUser sessionUser) {
         log.debug("'deleteBoard'가 실행됨");
 
         Board board = boardService.getBoard(id);
-        SessionUser user = UserUtils.getSessionUser(session);
-        if(user.getUserId() != board.getCreator().getUserId()) {
+        if(sessionUser.getUserId() != board.getCreator().getUserId()) {
             return "redirect:/boards";
         }
         boardService.deleteBoard(id);

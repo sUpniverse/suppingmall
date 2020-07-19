@@ -13,11 +13,9 @@ import com.supshop.suppingmall.payment.PaymentService;
 import com.supshop.suppingmall.product.Product;
 import com.supshop.suppingmall.product.ProductOption;
 import com.supshop.suppingmall.product.ProductService;
+import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserService;
-import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,10 +37,13 @@ public class OrderService {
     private final OrderItemMapper orderItemMapper;
     private final PaymentService paymentService;
     private final DeliveryService deliveryService;
-    private static final String payModuleUrl = "/payModule";
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
     private final ModuleController moduleController;
+
+    private static final String payModuleUrl = "/payModule";
+    private static final int hour = 23;
+    private static final int minute = 59;
 
     public Orders findOrder(Long orderId) {
         Optional<Orders> order = orderMapper.findOne(orderId);
@@ -52,7 +53,7 @@ public class OrderService {
     //구매자의 관점에서 주문을 조회
     public List<Orders> findOrderByBuyerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Orders.OrderStatus status) {
         LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
-        LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(23, 59)).orElse(null);
+        LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
         String code = Optional.ofNullable(status).map(Orders.OrderStatus::getCode).orElse(null);
         List<Orders> ordersList = orderMapper.findByBuyerId(userId, formDateTime, toDateTime, type,  code);
         return ordersList;
@@ -61,7 +62,7 @@ public class OrderService {
     //판매자의 관점에서 주문을 조회
     public List<Orders> findOrderBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Delivery.DeliveryStatus deliveryStatus, Orders.OrderStatus orderStatus) {
         LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
-        LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(23, 59)).orElse(null);
+        LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
         String code = "";
         if(type != null && type.equals("delivery")) {
             code = Optional.ofNullable(deliveryStatus).map(Delivery.DeliveryStatus::getCode).orElse(null);
@@ -74,7 +75,7 @@ public class OrderService {
 
     public List<Orders> findOrders(LocalDate fromDate, LocalDate toDate) {
         LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
-        LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(23, 59)).orElse(null);
+        LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
         List<Orders> ordersList = orderMapper.findAll(formDateTime, toDateTime);
         return ordersList;
     }
@@ -163,10 +164,14 @@ public class OrderService {
         Long paymentId = order.getPayment().getPaymentId();
         Payment payment = paymentService.findPayment(paymentId);
         String vendorCheckNumber = payment.getVendorCheckNumber();
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity entity = new HttpEntity(headers);
+
+        //실제 모듈 적용시
+//        HttpHeaders headers = new HttpHeaders();
+//        HttpEntity entity = new HttpEntity(headers);
 //        URI payModuleURI = UriComponentsBuilder.fromHttpUrl(payModuleUrl + "/" + vendorCheckNumber).build().toUri();
 //        ResponseEntity<String> response = restTemplate.exchange(payModuleURI, HttpMethod.DELETE, entity, String.class);
+
+        // 테스트용 모듈
         ResponseEntity<String> response = moduleController.cancelPay(vendorCheckNumber);
         if(!response.getStatusCode().is2xxSuccessful()) {
             //재 전송 RetryTemplate 같은걸 사용 예정
@@ -214,13 +219,17 @@ public class OrderService {
     }
 
 
-
     private Orders setTempOrder(TempOrderForm tempOrderForm) {
 
         // 임시 주문 생성을 위한 정보 가져오기
-        List<OrderItem> orderItems = this.setOrderItemsInfo(tempOrderForm);
-        SessionUser buyer = userService.getUserVO(tempOrderForm.getBuyerId());
-        SessionUser seller = userService.getUserVO(tempOrderForm.getSellerId());
+        // 1. 상품조회
+        Product product = productService.findProduct(tempOrderForm.getProductId());
+        // 2. 주문생성
+        List<OrderItem> orderItems = this.setOrderItemsInfo(tempOrderForm, product);
+
+        // 3. 주문자 및 구매자 정보 조회
+        User buyer = userService.getUser(tempOrderForm.getBuyerId());
+        User seller = userService.getUser(tempOrderForm.getSellerId());
 
         //임시 주문 생성 (주문상품, 구매자, 판매자)
         Orders tempOrder = Orders.createTempOrder(orderItems,buyer,seller);
@@ -233,13 +242,10 @@ public class OrderService {
      * @param tempOrderForm
      * @return List<OrderItem>
      */
-    private List<OrderItem> setOrderItemsInfo(TempOrderForm tempOrderForm){
+    private List<OrderItem> setOrderItemsInfo(TempOrderForm tempOrderForm, Product product){
 
         // Json To OrderItem
         List<OrderItem> orderItems = this.setJsonToOrderItem(tempOrderForm.getOrderItems());
-
-        // 상품조회
-        Product product = productService.findProduct(tempOrderForm.getProductId());
 
         // 가져온 상품정보를 이용해 상품 옵션의 필요내용 설정
         for (OrderItem orderItem : orderItems) {

@@ -2,6 +2,7 @@ package com.supshop.suppingmall.comment;
 
 import com.supshop.suppingmall.board.Board;
 import com.supshop.suppingmall.user.SessionUser;
+import com.supshop.suppingmall.user.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ public class Comment {
     private String title;
     private String contents;
     private int score;
-    private SessionUser creator;
+    private User creator;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 
