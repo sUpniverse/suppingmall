@@ -44,8 +44,7 @@ public class UserController {
 
         String uri = request.getHeader(requestReferer);
         if (!uri.contains("/loginform")) {
-            request.getSession().setAttribute(prevPage,
-                    request.getHeader(requestReferer));
+            request.getSession().setAttribute(prevPage, request.getHeader(requestReferer));
         }
 
         return "/user/login";

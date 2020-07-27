@@ -26,7 +26,6 @@ public class CategoryController {
 
     @GetMapping("/list")
     public String getAllCategories(@AuthenticationPrincipal SessionUser session, Model model) {
-        if (!UserUtils.isAdmin(session)) return "redirect:/users/loginform";
         model.addAttribute("categories",categoryService.getCategories());
         return "/category/list";
     }

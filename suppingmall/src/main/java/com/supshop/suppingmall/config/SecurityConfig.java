@@ -29,6 +29,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final LoginSuccessHandler   loginSuccessHandler;
 
+    private static final String loginForm = "/users/loginform";
+    private static final String login = "/users/login";
+    private static final String loginFormError = "/users/loginform?error";
+    private static final String logout = "/users/logout";
+    private static final String main = "/";
+
     @Bean
     public TokenStore tokenStore() {
         return new InMemoryTokenStore();
@@ -61,14 +67,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf().disable()
             .formLogin()
                 .successHandler(loginSuccessHandler)
-                .loginPage("/users/loginform")
-                .loginProcessingUrl("/users/login")
-                .failureUrl("/users/loginform?error")
+                .loginPage(loginForm)
+                .loginProcessingUrl(login)
+                .failureUrl(loginFormError)
                     .permitAll()
         .and()
             .logout()
-                .logoutUrl("/users/logout")
-                .logoutSuccessUrl("/")
+                .logoutUrl(logout)
+                .logoutSuccessUrl(main)
+        .and()
+            .exceptionHandling()
+                .accessDeniedPage(loginForm)
         .and()
             .oauth2Login()
                 .successHandler(loginSuccessHandler)
@@ -121,6 +130,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/carts/**").authenticated()
                 .antMatchers("/payments/**").authenticated()
                 .antMatchers("/delivery/**").authenticated()
+                .antMatchers("/category/**").hasAnyRole("ROLE_MASTER","ROLE_ADMIN")
 
         ;
     }
