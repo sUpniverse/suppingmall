@@ -1,6 +1,7 @@
 package com.supshop.suppingmall.event;
 
-import com.supshop.suppingmall.mail.CustomMailSender;
+import com.supshop.suppingmall.mail.CustomMailSendService;
+import com.supshop.suppingmall.mail.Mail;
 import com.supshop.suppingmall.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +19,8 @@ import javax.mail.MessagingException;
 @Slf4j
 public class EventHandler {
 
-    private final CustomMailSender customMailSender;
+    private final CustomMailSendService customMailSendService;
     private final SpringTemplateEngine templateEngine;
-    private final String subject = "님, suppingmall 가입 인증 메일입니다.";
 
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = UserCreatedEvent.class)
@@ -29,13 +29,21 @@ public class EventHandler {
 
         User user = event.getUser();
 
+        String subject = "님, suppingmall 가입 인증 메일입니다.";
+
         Context context = new Context();
         context.setVariable("token", user.getUserConfirmation().getConfirmToken());
         context.setVariable("name", user.getNickName());
         String html = templateEngine.process("mail/confirm", context);
 
+        Mail mail = Mail.builder()
+                .to(user.getEmail())
+                .subject(user.getNickName() + subject)
+                .text(html)
+                .build();
+
         try {
-            customMailSender.sendEmail(user.getEmail(),user.getNickName()+subject,html);
+            customMailSendService.sendEmail(mail);
         } catch (MessagingException e) {
             e.printStackTrace();
         }

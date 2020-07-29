@@ -30,8 +30,6 @@ public class UserService implements UserDetailsService {
     private final ModelMapper modelMapper;
     private final ApplicationEventPublisher eventPublisher;
 
-    private final String rolePrefix = "ROLE_";
-
     public List<User> getAllUser(BoardCriteria boardCriteria, String type, String searchValue) {
         return userMapper.selectAllUser(boardCriteria,type,searchValue);
     }
@@ -49,6 +47,7 @@ public class UserService implements UserDetailsService {
         return userMapper.selectUser(id);
     }
 
+    //UserConfirmation의 정보를 같이 가져옴
     public Optional<User> getUserWithConfirmationByEmail(String email) {
         return userMapper.findUserConfirmationById(email);
     }
@@ -65,20 +64,11 @@ public class UserService implements UserDetailsService {
         }
 
         userMapper.insertUser(user);
-        String token = TokenGenerator.issueToken();
-        UserConfirmation userConfirmation = UserConfirmation.builder()
-                .userId(user.getUserId())
-                .confirmToken(token)
-                .build();
-        int result = userMapper.saveConfirmation(userConfirmation);
-        user.setUserConfirmation(userConfirmation);
-
-        if(result == 1) {
-            eventPublisher.publishEvent(new UserCreatedEvent(user, LocalDateTime.now()));
-        }
+        sendConfirmationEmail(user);
 
         return user;
     }
+
 
     @Transactional
     public void updateUser(Long id, User user) {
@@ -114,26 +104,24 @@ public class UserService implements UserDetailsService {
         return sessionUser;
     }
 
-    private Collection<? extends GrantedAuthority> authorities(List<Role> roles) {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(rolePrefix+ role.name()))
-                .collect(Collectors.toSet());
+    public void resendConfirmationEmail(User user) {
+        eventPublisher.publishEvent(new UserCreatedEvent(user, LocalDateTime.now()));
     }
 
-    public SessionUser isSignedInUser(String email, String password) {
-        User user = null;
-        try {
-            user = getUserByEmail(email);
-        } catch (UsernameNotFoundException e) {
-            return null;
-        }
-        if(passwordEncoder.matches(password,user.getPassword())) {
-            SessionUser sessionUser = modelMapper.map(user, SessionUser.class);
-            return sessionUser;
-        }
-        return null;
-    }
 
+    private void sendConfirmationEmail(User user) {
+        String token = TokenGenerator.issueToken();
+        UserConfirmation userConfirmation = UserConfirmation.builder()
+                .userId(user.getUserId())
+                .confirmToken(token)
+                .build();
+        int result = userMapper.saveConfirmation(userConfirmation);
+        user.setUserConfirmation(userConfirmation);
+
+        if(result == 1) {
+            eventPublisher.publishEvent(new UserCreatedEvent(user, LocalDateTime.now()));
+        }
+    }
 
     protected User getUserByEmail(String email) {
         User user = userMapper.findUserByEmail(email)

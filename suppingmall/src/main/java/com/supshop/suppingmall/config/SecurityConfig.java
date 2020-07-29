@@ -29,11 +29,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final LoginSuccessHandler   loginSuccessHandler;
 
+
+    private static final String resourcesPath = "/resources/**";
     private static final String loginForm = "/users/loginform";
     private static final String login = "/users/login";
     private static final String loginFormError = "/users/loginform?error";
     private static final String logout = "/users/logout";
     private static final String main = "/";
+
 
     @Bean
     public TokenStore tokenStore() {
@@ -54,7 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().mvcMatchers("/resources/**");
+        web.ignoring().mvcMatchers(resourcesPath);
         web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
@@ -82,7 +85,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .oauth2Login()
                 .successHandler(loginSuccessHandler)
                 .userInfoEndpoint()
-                    .userService(customOAuth2UserService);
+                    .userService(customOAuth2UserService)
+        ;
         setAntMatchers(http);
     }
 
@@ -102,6 +106,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST,"/users/seller/{id}/apply").hasAnyRole("ROLE_MASTER","ROLE_ADMIN","ROLE_USER")
                 .antMatchers(HttpMethod.GET,"/users/seller/applicant").hasAnyRole("ROLE_MASTER","ROLE_ADMIN")
                 .antMatchers(HttpMethod.PATCH,"/users/seller/{id}/apply").hasAnyRole("ROLE_MASTER","ROLE_ADMIN")
+                .antMatchers(HttpMethod.GET,"/users/confirm").authenticated()
                 .antMatchers(HttpMethod.GET,"/boards/form").authenticated()
                 .antMatchers(HttpMethod.GET,"/boards").permitAll()
                 .antMatchers(HttpMethod.GET,"/boards/{id}").permitAll()

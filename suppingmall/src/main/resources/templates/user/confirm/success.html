@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: header" />
+<body>
+<div class="container">
+    <h3 th:text="@{${#authentication?.principal.nickName} +'님, 환영합니다.'}"></h3>
+    <br/>
+    <p>이메일 인증이 완료되었습니다.</p>
+    <p>앞으로 모든 suppingmall의 서비스를 이용하실 수 있습니다.</p>
+    <div style="margin:0;padding:0 0 36px;border:none;font-size:14px;line-height:1.5;text-align:center;">
+        <div style="width:100%;margin:0;padding:0;border:none;text-align:center;">
+            <a th:href="@{'http://localhost:8080'}" target="_blank" style="text-decoration:none;display:block;max-width:120px;word-break:keep-all;margin:0 auto;padding:8px 12px 8px;border:1px solid #4e61ff;border-radius:4px;background-color:#4e61ff;color:#fff;font-size:14px;line-height:1.5;" rel="noopener noreferrer">메인으로</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

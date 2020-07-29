@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +44,7 @@ public class UserController {
         if (isLoginUser(user)) return "redirect:/";
 
         String uri = request.getHeader(requestReferer);
-        if (!uri.contains("/loginform")) {
+        if (uri == null || !uri.contains("/loginform")) {
             request.getSession().setAttribute(prevPage, request.getHeader(requestReferer));
         }
 
@@ -262,20 +263,36 @@ public class UserController {
     }
 
     @GetMapping("/confirm")
-    public String confirmUser(@PathVariable String token,
-                              RedirectAttributes redirAttrs,
+    public String confirmUser(@RequestParam String token,
                               @AuthenticationPrincipal SessionUser sessionUser) {
 
         User user = userService.getUserWithConfirmationByEmail(sessionUser.getEmail()).get();
+
         if(user.getEmailConfirmYn().equals("Y")) {
-            redirAttrs.addFlashAttribute("message","이미 인증된 회원입니다.");
-        } else {
-            redirAttrs.addFlashAttribute("message","인증 되었습니다.");
-            user.setEmailConfirmYn("Y");
-            userService.patchUser(user.getUserId(), user);
+            return redirectMainUrl;
         }
 
-        return "";
+        if(!user.getUserConfirmation().getConfirmToken().equals(token)) {
+            return "/user/confirm/fail";
+        }
+        user.setEmailConfirmYn("Y");
+        userService.patchUser(user.getUserId(), user);
+
+        return "/user/confirm/success";
+    }
+
+    @PostMapping("/confirm/resend")
+    @ResponseBody
+    public ResponseEntity resendConfirmEmail(@AuthenticationPrincipal SessionUser sessionUser) {
+        String fail = "가입되지 않은 이메일입니다.";
+        User user;
+        try {
+            user = userService.getUserWithConfirmationByEmail(sessionUser.getEmail()).orElseThrow(() -> new UsernameNotFoundException(fail));
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.noContent().build();
+        }
+        userService.resendConfirmationEmail(user);
+        return ResponseEntity.ok().build();
     }
 
 

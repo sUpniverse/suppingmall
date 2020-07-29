@@ -190,6 +190,9 @@
         <if test="user.delYn != null">
             delete_yes_or_no = #{user.delYn},
         </if>
+        <if test="user.emailConfirmYn != null">
+            email_confirm_yes_or_no = #{user.emailConfirmYn},
+        </if>
         <if test="user.storeVO != null">
             <if test="user.storeVO.storePrivateNumber != null">
                 store_private_number = #{user.storeVO.storePrivateNumber},
@@ -257,9 +260,9 @@
         SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
         U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
-        U.email_confirm_yes_or_no AS "UserConfirmationYn", UC.confirm_token AS "UserConfirmationToken", UC.send_date AS "UserConfirmationSendDate"
-        FROM User AS U
-        LEFT OUTER JOIN User_confirmation AS UC on (U.user_id = UC.user_id)
+        U.email_confirm_yes_or_no AS "UserEmailConfirmationYn", UC.confirm_token AS "UserConfirmationToken", UC.send_date AS "UserConfirmationSendDate"
+        FROM user AS U
+        LEFT OUTER JOIN user_confirmation AS UC on (U.user_id = UC.user_id)
         WHERE U.email = #{email}
     </select>
 </mapper>
