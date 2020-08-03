@@ -3,6 +3,7 @@ package com.supshop.suppingmall.user;
 import com.supshop.suppingmall.page.BoardCriteria;
 import com.supshop.suppingmall.page.BoardPageMaker;
 import com.supshop.suppingmall.user.Form.ApplySellerForm;
+import com.supshop.suppingmall.user.Form.FindAccountForm;
 import com.supshop.suppingmall.user.Form.SignUpForm;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -13,7 +14,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -292,6 +292,39 @@ public class UserController {
             return ResponseEntity.noContent().build();
         }
         userService.resendConfirmationEmail(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/findAccountForm")
+    public String getFindAccountForm(@AuthenticationPrincipal SessionUser sessionUser) {
+        if(sessionUser != null)
+            return redirectMainUrl;
+
+        return "/user/findAccountForm";
+    }
+
+    @PostMapping("/findAccount")
+    @ResponseBody
+    public ResponseEntity findAccount(@AuthenticationPrincipal SessionUser sessionUser,@RequestBody FindAccountForm findAccountForm) {
+        if(sessionUser != null)
+            return ResponseEntity.badRequest().build();
+
+        User user;
+
+        try {
+            user = userService.getUserByEmail(findAccountForm.getEmail());
+            if(!user.getName().equals(findAccountForm.getUserName()))
+                throw new UsernameNotFoundException("유저의 이름이 존재하지 않습니다.");
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.noContent().build();
+        }
+
+        try {
+            userService.sendChangePasswordEmail(user);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+
         return ResponseEntity.ok().build();
     }
 

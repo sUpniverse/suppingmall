@@ -11,22 +11,20 @@
 </head>
 <body>
 <div th:replace="fragments/navigation :: navigation" />
-    <div class="container">
+    <div class="container mb-5">
         <div class="position-relative overflow-hidden p-1 mb-5 text-center bg-light">
             <div class="p-lg-5 mx-auto my-2">
                 <h1 class="display-4 font-weight-normal">회원가입</h1>
             </div>
         </div>
         <div class="row mb-3">
-            <div class="col-md-8 orders-md-1  mx-auto">
+            <div class="col-md-9 orders-md-1  mx-auto">
                     <div>
                         <p class="lead">이미 아이디를 가지고 계시다구요?</p>
                     </div>
                     <div>
-                        <p class="lead">그렇다면 <a href="#" class="lead">이 곳에서 찾으세요</a></p>
+                        <p class="lead">그렇다면 <a href="/users/findAccountForm" class="lead">이 곳에서 찾으세요</a></p>
                     </div>
-
-
                 <form class="needs-validation mt-5"  novalidate="" th:action="@{/users}" method="post" name="user" onsubmit="return checkAllValidation()">
                     <input type="hidden" name="role" value="USER">
                     <input type="hidden" name="type" value="LOCAL">
@@ -41,7 +39,7 @@
                                 중복 확인이 필요합니다.
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mt-2">
                             <input type="button" class="btn btn-outline-secondary mt-4" id="emailCheck" value="중복확인">
                         </div>
                     </div>
@@ -72,7 +70,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="name">이 름</label>
-                            <input type="text" class="form-control" id="name" placeholder="고객님의 이름을 입력해주세요" name="name">
+                            <input type="text" class="form-control" id="name" placeholder="회원님의 이름을 입력해주세요" name="name">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="nickName">별 명</label>
@@ -98,7 +96,7 @@
                                 <input type="hidden" id="phone" name="phoneNumber">
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-3 mt-2">
                             <input type="button" class="btn btn-outline-secondary mt-4" id="verifyPhone" value="핸드폰 인증">
                         </div>
                     </div>
@@ -112,7 +110,7 @@
                                 Zip code required.
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-3 mt-2">
                             <input type="button" class="btn btn-outline-secondary mt-4" id="search_address" value="우편번호 찾기">
                         </div>
                     </div>
@@ -138,182 +136,186 @@
             </div>
         </div>
     </div>
+<footer th:replace="fragments/footer :: footer" />
 </body>
 <script>
 
-    let checkEmailResult = false;
-    let checkPasswordResult = false;
-    let checkPhoneResult = false;
-    let checkAddressResult = false;
+    $(document).ready(function() {
 
-    const email = document.getElementById('email');
-    const validation = document.getElementById("validEmail");
-    const duplication = document.getElementById("duplicateEmail");
-    const password = document.getElementById('password');
-    const passwordcheck = document.getElementById('passwordcheck');
+        let checkEmailResult = false;
+        let checkPasswordResult = false;
+        let checkPhoneResult = false;
+        let checkAddressResult = false;
 
-    function check(re, what) {
-        if(re.test(what.value)) {
-            return true;
-        }
-    }
+        const email = document.getElementById('email');
+        const validation = document.getElementById("validEmail");
+        const duplication = document.getElementById("duplicateEmail");
+        const password = document.getElementById('password');
+        const passwordcheck = document.getElementById('passwordcheck');
 
-
-    $(document).on('change keyup paste','#email', function () {
-        var reEmail = /^[A-Za-z0-9_]+[A-Za-z0-9]*[@]{1}[A-Za-z0-9]+[A-Za-z0-9]*[.]{1}[A-Za-z]{1,3}$/;
-
-        checkEmailResult = false;
-
-        if(check(reEmail, email)) {
-            validation.className = "valid-feedback";
-        } else {
-            validation.className = "invalid-feedback";
-            duplication.className = "invalid-feedback";
-            email.className = "form-control is-invalid";
+        function check(re, what) {
+            if(re.test(what.value)) {
+                return true;
+            }
         }
 
-    });
 
-    $(document).on('click','#emailCheck',function () {
+        $(document).on('change keyup paste','#email', function () {
+            var reEmail = /^[A-Za-z0-9_]+[A-Za-z0-9]*[@]{1}[A-Za-z0-9]+[A-Za-z0-9]*[.]{1}[A-Za-z]{1,3}$/;
 
-        if(validation.className === "valid-feedback") {
-            var emailval = email.value;
-            $.ajax({
-                type:"GET",
-                url:"/users/emails/"+emailval,
-                contentType: 'application/json',
-                success: (data) => {
-                    if(data) {
-                        duplication.className = "valid-feedback";
-                        email.className = "form-control is-valid";
-                        checkEmailResult = true;
-                    } else {
-                        duplication.className = "invalid-feedback";
-                        email.className = "form-control is-invalid";
-                        alert("아이디가 중복됩니다.");
+            checkEmailResult = false;
+
+            if(check(reEmail, email)) {
+                validation.className = "valid-feedback";
+            } else {
+                validation.className = "invalid-feedback";
+                duplication.className = "invalid-feedback";
+                email.className = "form-control is-invalid";
+            }
+
+        });
+
+        $(document).on('click','#emailCheck',function () {
+
+            if(validation.className === "valid-feedback") {
+                var emailval = email.value;
+                $.ajax({
+                    type:"GET",
+                    url:"/users/emails/"+emailval,
+                    contentType: 'application/json',
+                    success: (data) => {
+                        if(data) {
+                            duplication.className = "valid-feedback";
+                            email.className = "form-control is-valid";
+                            checkEmailResult = true;
+                        } else {
+                            duplication.className = "invalid-feedback";
+                            email.className = "form-control is-invalid";
+                            alert("아이디가 중복됩니다.");
+                        }
+                    }
+                });
+            } else {
+                alert("유효성을 만족하지 않습니다.");
+            }
+        });
+
+        $(document).on('change keyup paste','#password', function () {
+            var rePassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,15}$/;
+
+
+            if(check(rePassword, password)) {
+                password.className = "form-control is-valid";
+            } else {
+                password.className = "form-control is-invalid";
+            }
+        });
+
+        $(document).on('change keyup paste','#passwordcheck', function () {
+
+
+            if(password.value === passwordcheck.value) {
+                passwordcheck.className = "form-control is-valid";
+                checkPasswordResult = true;
+            } else {
+                passwordcheck.className = "form-control is-invalid";
+                checkPasswordResult  = false;
+            }
+        });
+
+
+        $(document).on('click',"#verifyPhone",function () {
+
+            var rePhone = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4}))(\d{4})$/;
+
+
+            var first = document.getElementById("phoneFirst").value;
+            var middle = document.getElementById("phoneMiddle").value;
+            var last = document.getElementById("phoneLast").value;
+            var phone = document.getElementById("phone")
+
+            var sum = first + middle + last;
+
+            if (rePhone.test(sum)) {
+                alert("인증되었습니다.");
+                phone.setAttribute('value',sum);
+                checkPhoneResult = true;
+            } else {
+                alert("인증되지 않았습니다");
+            }
+
+        });
+
+        $(document).on('change',"#phoneFirst",function () {
+            checkPhoneResult = false;
+        });
+
+        $(document).on('change',"#phoneMiddle",function () {
+            checkPhoneResult = false;
+        });
+
+        $(document).on('change',"#phoneLast",function () {
+            checkPhoneResult = false;
+        });
+
+        $(document).on('click',"#search_address",function () {
+
+            var zipcode;
+            var address;
+
+            new daum.Postcode({
+                popupName: 'postcodePopup',
+                theme: {
+                    searchBgColor: "#0B65C8", //검색창 배경색
+                    queryTextColor: "#FFFFFF" //검색창 글자색
+                },
+                autoClose: false,
+
+                oncomplete: function(data) {
+                    zipcode = data.zonecode;
+                    if(data.userSelectedType === "R") {
+                        address = data.roadAddress;
+                    } else if(data.userSelectedType === "J") {
+                        address = data.jibunAddress;
+                    }
+
+                    $('#zip').val(zipcode);
+                    $('#address').val(address);
+                },
+
+                onclose: function(state) {
+                    //state는 우편번호 찾기 화면이 어떻게 닫혔는지에 대한 상태 변수 이며, 상세 설명은 아래 목록에서 확인하실 수 있습니다.
+                    if(state === 'FORCE_CLOSE'){
+                        //사용자가 브라우저 닫기 버튼을 통해 팝업창을 닫았을 경우, 실행될 코드를 작성하는 부분입니다.
+                        checkAddressResult = false;
+
+                    } else if(state === 'COMPLETE_CLOSE'){
+                        //사용자가 검색결과를 선택하여 팝업창이 닫혔을 경우, 실행될 코드를 작성하는 부분입니다.
+                        //oncomplete 콜백 함수가 실행 완료된 후에 실행됩니다.
+                        checkAddressResult = true;
                     }
                 }
-            });
-        } else {
-            alert("유효성을 만족하지 않습니다.");
-        }
-    });
+            }).open();
+        });
 
-    $(document).on('change keyup paste','#password', function () {
-        var rePassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,15}$/;
+        function checkAllValidation() {
+            if(checkEmailResult && checkPasswordResult && checkPhoneResult && checkAddressResult) {
+                return true;
+            } else {
 
-
-        if(check(rePassword, password)) {
-            password.className = "form-control is-valid";
-        } else {
-            password.className = "form-control is-invalid";
-        }
-    });
-
-    $(document).on('change keyup paste','#passwordcheck', function () {
-
-
-        if(password.value === passwordcheck.value) {
-            passwordcheck.className = "form-control is-valid";
-            checkPasswordResult = true;
-        } else {
-            passwordcheck.className = "form-control is-invalid";
-            checkPasswordResult  = false;
-        }
-    });
-
-
-    $(document).on('click',"#verifyPhone",function () {
-
-        var rePhone = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4}))(\d{4})$/;
-
-
-        var first = document.getElementById("phoneFirst").value;
-        var middle = document.getElementById("phoneMiddle").value;
-        var last = document.getElementById("phoneLast").value;
-        var phone = document.getElementById("phone")
-
-        var sum = first + middle + last;
-
-        if (rePhone.test(sum)) {
-            alert("인증되었습니다.");
-            phone.setAttribute('value',sum);
-            checkPhoneResult = true;
-        } else {
-            alert("인증되지 않았습니다");
-        }
-
-    });
-
-    $(document).on('change',"#phoneFirst",function () {
-        checkPhoneResult = false;
-    });
-
-    $(document).on('change',"#phoneMiddle",function () {
-        checkPhoneResult = false;
-    });
-
-    $(document).on('change',"#phoneLast",function () {
-        checkPhoneResult = false;
-    });
-
-    $(document).on('click',"#search_address",function () {
-
-        var zipcode;
-        var address;
-
-        new daum.Postcode({
-            popupName: 'postcodePopup',
-            theme: {
-                searchBgColor: "#0B65C8", //검색창 배경색
-                queryTextColor: "#FFFFFF" //검색창 글자색
-            },
-            autoClose: false,
-
-            oncomplete: function(data) {
-                zipcode = data.zonecode;
-                if(data.userSelectedType === "R") {
-                    address = data.roadAddress;
-                } else if(data.userSelectedType === "J") {
-                    address = data.jibunAddress;
+                if(!checkEmailResult) {
+                    email.focus();
+                } else if(!checkPasswordResult) {
+                    password.focus();
+                } else if(!checkPhoneResult) {
+                    document.getElementById("phoneFirst").focus();
+                } else if(!checkAddressResult) {
+                    document.getElementById("zipcode").focus();
                 }
-
-                $('#zip').val(zipcode);
-                $('#address').val(address);
-            },
-
-            onclose: function(state) {
-                //state는 우편번호 찾기 화면이 어떻게 닫혔는지에 대한 상태 변수 이며, 상세 설명은 아래 목록에서 확인하실 수 있습니다.
-                if(state === 'FORCE_CLOSE'){
-                    //사용자가 브라우저 닫기 버튼을 통해 팝업창을 닫았을 경우, 실행될 코드를 작성하는 부분입니다.
-                    checkAddressResult = false;
-
-                } else if(state === 'COMPLETE_CLOSE'){
-                    //사용자가 검색결과를 선택하여 팝업창이 닫혔을 경우, 실행될 코드를 작성하는 부분입니다.
-                    //oncomplete 콜백 함수가 실행 완료된 후에 실행됩니다.
-                    checkAddressResult = true;
-                }
+                return false;
             }
-        }).open();
-    });
-
-    function checkAllValidation() {
-        if(checkEmailResult && checkPasswordResult && checkPhoneResult && checkAddressResult) {
-            return true;
-        } else {
-
-            if(!checkEmailResult) {
-                email.focus();
-            } else if(!checkPasswordResult) {
-                password.focus();
-            } else if(!checkPhoneResult) {
-                document.getElementById("phoneFirst").focus();
-            } else if(!checkAddressResult) {
-                document.getElementById("zipcode").focus();
-            }
-            return false;
         }
-    }
+    });
 
 </script>
 </html>

@@ -17,9 +17,9 @@ public interface UserMapper {
 
     List<User> findUserByApplySellerYn(BoardCriteria boardCriteria);
 
-    void insertUser(User user);
+    int insertUser(User user);
 
-    void updateUser(Long id, User user);
+    int updateUser(Long id, User user);
 
     void deleteUSer(Long id);
 

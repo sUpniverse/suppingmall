@@ -1,14 +1,13 @@
 package com.supshop.suppingmall.user;
 
 import com.supshop.suppingmall.common.TokenGenerator;
+import com.supshop.suppingmall.event.EventType;
 import com.supshop.suppingmall.mapper.UserMapper;
 import com.supshop.suppingmall.page.BoardCriteria;
-import com.supshop.suppingmall.event.UserCreatedEvent;
+import com.supshop.suppingmall.event.UserEvent;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -105,7 +103,7 @@ public class UserService implements UserDetailsService {
     }
 
     public void resendConfirmationEmail(User user) {
-        eventPublisher.publishEvent(new UserCreatedEvent(user, LocalDateTime.now()));
+        eventPublisher.publishEvent(new UserEvent(EventType.CREATED, LocalDateTime.now(),user));
     }
 
 
@@ -119,9 +117,26 @@ public class UserService implements UserDetailsService {
         user.setUserConfirmation(userConfirmation);
 
         if(result == 1) {
-            eventPublisher.publishEvent(new UserCreatedEvent(user, LocalDateTime.now()));
+            eventPublisher.publishEvent(new UserEvent(EventType.CREATED, LocalDateTime.now(),user));
         }
     }
+
+    @Transactional
+    public void sendChangePasswordEmail(User user) {
+
+        String token = TokenGenerator.issuePassword();
+
+        user.setPassword(passwordEncoder.encode(token));
+
+        int result = userMapper.updateUser(user.getUserId(), user);
+
+        if(result == 1) {
+            user.setPassword(token);
+            eventPublisher.publishEvent(new UserEvent(EventType.UPDATED, LocalDateTime.now(),user));
+        }
+    }
+
+
 
     protected User getUserByEmail(String email) {
         User user = userMapper.findUserByEmail(email)

@@ -23,10 +23,25 @@ public class EventHandler {
     private final SpringTemplateEngine templateEngine;
 
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = UserCreatedEvent.class)
-    public void handle(UserCreatedEvent event) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, classes = UserEvent.class)
+    public void handle(UserEvent event) {
         log.debug("메일 발송 이벤트 수신");
 
+        Mail mail;
+
+        if(event.getEventType().equals(EventType.CREATED))
+            mail = userCreatedEventHandler(event);
+        else
+            mail = userUpdatedEventHandler(event);
+
+        try {
+            customMailSendService.sendEmail(mail);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Mail userCreatedEventHandler(UserEvent event) {
         User user = event.getUser();
 
         String subject = "님, suppingmall 가입 인증 메일입니다.";
@@ -42,10 +57,25 @@ public class EventHandler {
                 .text(html)
                 .build();
 
-        try {
-            customMailSendService.sendEmail(mail);
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
+        return mail;
+    }
+
+    private Mail userUpdatedEventHandler(UserEvent event) {
+        User user = event.getUser();
+
+        String subject = "님, suppingmall 비밀번호 변경 메일입니다.";
+
+        Context context = new Context();
+        context.setVariable("password", user.getPassword());
+        context.setVariable("name", user.getNickName());
+        String html = templateEngine.process("mail/password", context);
+
+        Mail mail = Mail.builder()
+                .to(user.getEmail())
+                .subject(user.getNickName() + subject)
+                .text(html)
+                .build();
+
+        return mail;
     }
 }
