@@ -152,6 +152,39 @@ public class UserController {
         }
     }
 
+    /*
+
+    TODO 1. 추후 비밀번호 재확인을 통한 유저 검증 후
+         2. 유저의 정보 변경과 비밀번호 변경을 분리할 예정
+
+    @GetMapping("/checkForm")
+    public String checkForm(@AuthenticationPrincipal SessionUser user) {
+        if(user == null) {
+            return redirectMainUrl;
+        }
+        return "/user/checkForm";
+    }
+
+    @PostMapping("/{id}/password")
+    public String checkUser(@PathVariable Long id, @AuthenticationPrincipal SessionUser user, String password) {
+        if(user == null || !user.getUserId().equals(id)) {
+            return redirectMainUrl;
+        }
+        userService.matchedPassword(user.getEmail(),password);
+        return "/user/checkForm";
+    }
+
+    @PutMapping("/{id}/password")
+    @ResponseBody
+    public String updateUserPassword(@PathVariable Long id, User user, @AuthenticationPrincipal SessionUser sessionUser) {
+        if(isOwner(id, sessionUser) || isAdmin(sessionUser)) {
+            userService.updateUser(id, user);
+            return redirectMainUrl;
+        }
+        return redirectLoginUrl;
+    }
+    */
+
     @GetMapping("/{id}/form")
     public String getUserPage(@PathVariable Long id, Model model,@AuthenticationPrincipal SessionUser sessionUser) {
 
