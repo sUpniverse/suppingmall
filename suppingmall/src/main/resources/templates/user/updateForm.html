@@ -78,7 +78,7 @@
                             <td class="form-row">
                                 <div class="col">
                                     <select id="phoneFirst" class="custom-select">
-                                        <option th:selected="${#strings.substring(user.phoneNumber,0,3).equals('010')}" value="010">010</option>
+                                        <option th:selected="${#strings.substring(user?.phoneNumber,0,3).equals('010')}" value="010">010</option>
                                         <option th:selected="${#strings.substring(user.phoneNumber,0,3).equals('011')}" value="011">011</option>
                                         <option th:selected="${#strings.substring(user.phoneNumber,0,3).equals('018')}" value="018">018</option>
                                         <option th:selected="${#strings.substring(user.phoneNumber,0,3).equals('019')}" value="019">019</option>

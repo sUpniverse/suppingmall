@@ -27,6 +27,19 @@
 <script>
     $(document).ready(function() {
 
+        function check(re, what) {
+            if(re.test(what.value)) {
+                return true;
+            }
+        }
+
+        const email = getElement('email');
+        const validation = getElement("validEmail");
+
+        function getElement(id) {
+            return document.getElementById(id);
+        }
+
         let checkEmailResult = false;
 
         $(document).on('change keyup paste','#email', function () {
@@ -36,9 +49,9 @@
 
             if(check(reEmail, email)) {
                 validation.className = "valid-feedback";
+                email.className = "form-control is-valid";
             } else {
                 validation.className = "invalid-feedback";
-                duplication.className = "invalid-feedback";
                 email.className = "form-control is-invalid";
             }
 

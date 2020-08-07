@@ -8,6 +8,7 @@ import com.supshop.suppingmall.event.UserEvent;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -114,8 +115,8 @@ public class UserService implements UserDetailsService {
         eventPublisher.publishEvent(new UserEvent(EventType.CREATED, LocalDateTime.now(),user));
     }
 
-
-    private void sendConfirmationEmail(User user) {
+    @Async
+    void sendConfirmationEmail(User user) {
         String token = TokenGenerator.issueToken();
         UserConfirmation userConfirmation = UserConfirmation.builder()
                 .userId(user.getUserId())
@@ -130,6 +131,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
+    @Async
     public void sendChangePasswordEmail(User user) {
 
         String token = TokenGenerator.issuePassword();
