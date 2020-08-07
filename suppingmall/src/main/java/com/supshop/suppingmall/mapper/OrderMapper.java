@@ -20,6 +20,10 @@ public interface OrderMapper {
 
     List<Orders> findBySellerId(Long userId, LocalDateTime fromDate, LocalDateTime toDate, String type, String searchValue);
 
+    /*
+    patch 형태의 update임 (duty 체킹 후 바뀐 포인트만 업데이트)
+    Todo : 추후 캡슐화진행
+    */
     void updateOrder(Long orderId,Orders.OrderStatus status,Long deliveryId, Long paymentId);
 
     Orders findOneByDeliveryId(Long deliveryId);

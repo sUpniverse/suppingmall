@@ -106,7 +106,7 @@
                             </div>
                         </td>
                         <td th:text="${product?.deliveryPrice}"></td>
-                        <td th:text="${product?.registeredDate}"></td>
+                        <td th:text="${#temporals.format(product?.registeredDate,'yyyy-MM-dd')}"></td>
                     </tr>
                     </tbody>
                 </table>

@@ -54,7 +54,7 @@
                                         <span th:text="@{${#numbers.formatInteger(order.getAmountPrice(),3,'COMMA')}+'원'}" class="text-dark" style="font-size: 13px;"></span>
                                     </li>
                                     <li>
-                                        <span th:text="${order.orderDate}" class="text-muted" style="font-size: 13px; display: inline-block; padding-left: 11px"></span>
+                                        <span th:text="${#temporals.format(order.orderDate,'yyyy-MM-dd HH:mm')}" class="text-muted" style="font-size: 13px; display: inline-block; padding-left: 11px"></span>
                                     </li>
                                 </ul>
                                 <div>

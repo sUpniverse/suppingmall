@@ -17,7 +17,7 @@ import java.util.List;
 public class Orders {
 
     private Long orderId;
-    private OrderStatus status; //Todo : enum (주문완료,배송,구매완료,취소)
+    private OrderStatus status;
     private LocalDateTime orderDate;
     private LocalDateTime updateDate;
     private User buyer;
@@ -35,9 +35,9 @@ public class Orders {
         ORDER("주문완료","O001"),
         DELIVERY("배송","O002"),
         COMPLETE("구매완료","O003"),
-        CANCEL("취소완료","O004"),
-        REFUND("반품요청","O005"),
-        CHANGE("교환요청","O006");
+        CANCEL("구매취소","O004"),
+        REFUND("반품접수","O005"),
+        CHANGE("교환접수","O006");
 
         private String title;
         private String code;

@@ -30,7 +30,7 @@
                 <!-- Date/Time -->
                 <div class="mb-3 ml-2">
                     <img src="/logo/board/clock.png" height="12">
-                    <span class="text-muted" style="font-size: 0.8rem" th:text="${board.createdDate}"></span>
+                    <span class="text-muted" style="font-size: 0.8rem" th:text="${#temporals.format(board.createdDate,'yyyy-MM-dd HH:mm:ss')}"></span>
                 </div>
                 <!-- Post Content -->
                 <div class="pd-5 ml-2">
@@ -50,9 +50,11 @@
                 <div id="comments">
                     <!-- Single Comment -->
                     <div class="media pb-3" th:each="comment : ${board.comments}" th:data-no="${comment.commentId}">
-                        <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
                         <div class="media-body">
-                            <h5 class="mt-0" th:text="${comment.creator.nickName}" th:value="${comment.creator.userId}"></h5>
+                            <div class="bg-light mt-0 d-flex justify-content-between align-items-center w-100">
+                                <strong class="ml-2 " th:text="${comment.creator.nickName}" th:value="${comment.creator.userId}"></strong>
+                                <small th:text="${#temporals.format(comment.createdDate,'MM-dd HH:mm')}"></small>
+                            </div>
                             <div class="btn-group float-right" sec:authorize="isAuthenticated()"  th:if="${comment.creator.userId.equals(#authentication.principal?.userId)}">
                                 <button type="button" class="btn btn-secondary btn-sm dropdown-toggle"data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     수정 / 삭제 / 신고
@@ -62,7 +64,7 @@
                                     <button type="button" class="dropdown-item" th:id="comment-delete-button">삭제</button>
                                 </div>
                             </div>
-                            <p th:text="${comment.contents}"></p>
+                            <p class="ml-2" th:text="${comment.contents}"></p>
                         </div>
                     </div>
                 </div>

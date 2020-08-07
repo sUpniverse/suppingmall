@@ -62,6 +62,41 @@
         WHERE delivery_id = #{deliveryId}
     </update>
 
+    <update id="update" parameterType="com.supshop.suppingmall.delivery.Delivery">
+        update Delivery
+        set
+        <if test="name != null">
+            name = #{name},
+        </if>
+        <if test="address != null">
+            address = #{address},
+        </if>
+        <if test="addressDetail != null">
+            address_detail = #{addressDetail},
+        </if>
+        <if test="zipCode != null">
+            zipcode = #{zipCode},
+        </if>
+        <if test="phone != null">
+            phone = #{phone},
+        </if>
+        <if test="memo != null">
+            memo = #{memo},
+        </if>
+        <if test="vendor != null">
+            vendor = #{vendor, typeHandler=com.supshop.suppingmall.delivery.DeliveryVendorHandler},
+        </if>
+        <if test="trackingNumber != null">
+            tracking_number = #{trackingNumber},
+        </if>
+        <if test="status != null">
+            status = #{status, typeHandler=com.supshop.suppingmall.delivery.DeliveryStatusHandler},
+        </if>
+        updated_date  = now()
+        where delivery_id = #{deliveryId};
+    </update>
+
+
     <delete id="delete">
         DELETE
         FROM delivery

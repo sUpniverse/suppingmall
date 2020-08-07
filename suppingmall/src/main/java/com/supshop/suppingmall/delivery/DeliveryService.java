@@ -26,6 +26,12 @@ public class DeliveryService {
     }
 
     @Transactional
+    public Long update(Delivery delivery) {
+        deliveryMapper.update(delivery);
+        return delivery.getDeliveryId();
+    }
+
+    @Transactional
     public Long saveVendor(Long id,Delivery delivery) {
         // 택배사 등록 및 배송상태 변경
         delivery.setStatus(Delivery.DeliveryStatus.DELIVERY);

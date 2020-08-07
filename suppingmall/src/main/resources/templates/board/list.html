@@ -33,7 +33,7 @@
                             </td>
                             <td th:text="${board.creator.nickName}" />
                             <td class="text-center" th:text="${board.hit}"/>
-                            <td th:text="${board.createdDate}" />
+                            <td th:text="${#temporals.format(board.createdDate,'yyyy-MM-dd HH:mm:ss')}" />
                         </tr>
                     </tbody>
                 </table>

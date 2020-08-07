@@ -1,7 +1,6 @@
 package com.supshop.suppingmall.delivery;
 
 
-import com.supshop.suppingmall.order.Orders;
 import lombok.*;
 
 import java.util.Arrays;
@@ -11,6 +10,8 @@ import java.util.Arrays;
 @AllArgsConstructor @NoArgsConstructor
 public class Delivery {
 
+
+    //Todo : to , from 필요
     private Long deliveryId;
     private String name;
     private String address;
@@ -29,7 +30,9 @@ public class Delivery {
 
         WAIT("배송준비중","DS00"),
         DELIVERY("배송중","DS01"),
-        COMPLETE("배송완료","DS02");
+        COMPLETE("배송완료","DS02"),
+        CHANGE("교환","DS03"),
+        ;
 
         private String title;
         private String code;

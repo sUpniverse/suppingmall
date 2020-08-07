@@ -87,7 +87,7 @@ public class OrderService {
     @Transactional
     public Long order(OrderForm orderForm) {
 
-        //실제 주문 상태로 변경
+        //임시 주문상태를 실제 주문 상태로 변경
         Orders order = orderMapper.findOne(orderForm.getOrderId()).get();
         order.setStatus(Orders.OrderStatus.DELIVERY);
 
@@ -117,23 +117,54 @@ public class OrderService {
         return order.getOrderId();
     }
 
-    //상품 교환 or 취소시
+    //상품 교환 or 환불 시 상태변경 및 택배 요청
     @Transactional
-    public Long updateOrderStatus(Long orderId, Orders.OrderStatus orderStatus) {
+    public Long updateOrderByRefundOrChangeRequest(Long orderId, Orders.OrderStatus orderStatus) {
         Optional<Orders> one = orderMapper.findOne(orderId);
-        if(one.isEmpty()) {
+        //Todo : not found exception 처리로 수정
+        if(one.isEmpty() || !one.get().getOrderId().equals(orderId)) {
            return null;
         }
         Orders orders = one.get();
-        paymentService.cancelPayment(orders.getPayment());
-        orders.getDelivery().getDeliveryId();
-        orderMapper.updateOrder(orderId, orderStatus, null, null);
+        if(orderStatus.equals(Orders.OrderStatus.REFUND)) {
+            paymentService.cancelPayment(orders.getPayment());
+        };
+        Delivery delivery = orders.getDelivery();
+        delivery.setStatus(Delivery.DeliveryStatus.WAIT);
+        //Todo : 택배사에게 수거 요청 (to, from)
+        deliveryService.update(delivery);
+        //Todo : 캡슐화
+        orderMapper.updateOrder(orderId, orderStatus, delivery.getDeliveryId(), null);
+        return orderId;
+    }
+
+    /*
+    //상품환불 확정 시
+    @Transactional
+    public Long updateOrderAfterCheckingRefund(Long orderId) {
+        // 주문 가져오기
+        Orders order = orderMapper.findOne(orderId).get();
+
+        // 받은 상품 개수에 반환된 물품개수 추가
+        List<OrderItem> orderItems = order.getOrderItems();
+        List<ProductOption> productOptionList = new ArrayList<>();
+        for(OrderItem orderItem : orderItems) {
+            ProductOption productOption = orderItem.getProductOption();
+            productOption.addStock(orderItem.getCount());
+            productOptionList.add(productOption);
+        }
+        productService.updateProductOption(productOptionList);
+        //Todo : 상품 환불 확정 시, 택배비 동봉 or 환불금액에서 차감 등의 기능을 넣어야함
+        paymentService.cancelPayment(order.getPayment());
+        // 다시 보내야할 상품 개수를 통해 물품개수 감소
+
+
         return orderId;
     }
 
     //상품교환 확정 시
     @Transactional
-    public Long updateOrderByChange(Long orderId) {
+    public Long updateOrderAfterCheckingChange(Long orderId) {
         // 주문 가져오기
         Orders order = orderMapper.findOne(orderId).get();
 
@@ -152,8 +183,9 @@ public class OrderService {
 
         return orderId;
     }
+    */
 
-    //주문 취소 (결제취소 + 제품환불시)
+    //주문 취소 (제품 보내기 전 결제 취소 시)
     @Transactional
     public Long cancelOrder(Long orderId) {
 
@@ -179,9 +211,6 @@ public class OrderService {
         }
         payment.setStatus(Payment.PaymentStatus.CANCEL);
         paymentService.cancelPayment(payment);
-
-        //배송 기록 삭제
-        deliveryService.delete(order.getDelivery());
 
         // 주문 상태 변경
         order.setStatus(Orders.OrderStatus.CANCEL);

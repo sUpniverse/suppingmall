@@ -150,7 +150,7 @@ public class OrderController {
 
     @PostMapping("/{id}/refund")
     public String refundOrder(@PathVariable Long id, Model model) {
-        orderService.updateOrderStatus(id, Orders.OrderStatus.REFUND);
+        orderService.updateOrderByRefundOrChangeRequest(id, Orders.OrderStatus.REFUND);
         Orders order = orderService.findOrder(id);
         model.addAttribute("order",order);
         return "/order/refund";
