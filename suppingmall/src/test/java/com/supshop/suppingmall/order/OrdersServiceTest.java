@@ -233,6 +233,7 @@ public class OrdersServiceTest {
 
     }
 
+    //Todo : order 상태 변경에 대한 해당 조건에 맞는 테스트 세분화
     @Test
     @Transactional
     public void changeOrderStatus() throws Exception {
@@ -240,7 +241,7 @@ public class OrdersServiceTest {
         Orders orders = buildOrder();
 
         //when
-        orderService.updateOrderStatus(orders.getOrderId(), Orders.OrderStatus.REFUND);
+        orderService.updateOrderByRefundOrChangeRequest(orders.getOrderId(), Orders.OrderStatus.REFUND);
         Orders changedOrder = orderService.findOrder(orders.getOrderId());
 
         //then

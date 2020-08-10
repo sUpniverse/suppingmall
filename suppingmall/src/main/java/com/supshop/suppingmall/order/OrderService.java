@@ -117,6 +117,10 @@ public class OrderService {
         return order.getOrderId();
     }
 
+    private void updateOrderStatus(Long orderId, Orders.OrderStatus orderStatus) {
+        orderMapper.updateOrder(orderId, orderStatus, null, null);
+    }
+
     //상품 교환 or 환불 시 상태변경 및 택배 요청
     @Transactional
     public Long updateOrderByRefundOrChangeRequest(Long orderId, Orders.OrderStatus orderStatus) {
@@ -134,7 +138,7 @@ public class OrderService {
         //Todo : 택배사에게 수거 요청 (to, from)
         deliveryService.update(delivery);
         //Todo : 캡슐화
-        orderMapper.updateOrder(orderId, orderStatus, delivery.getDeliveryId(), null);
+        updateOrderStatus(orderId, orderStatus);
         return orderId;
     }
 

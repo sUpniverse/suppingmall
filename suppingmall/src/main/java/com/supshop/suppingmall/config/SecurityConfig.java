@@ -37,6 +37,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String logout = "/users/logout";
     private static final String main = "/";
 
+    private static final String MASTER = "MASTER";
+    private static final String ADMIN = "ADMIN";
+    private static final String SELLER = "SELLER";
+    private static final String USER = "USER";
+
 
     @Bean
     public TokenStore tokenStore() {
@@ -93,21 +98,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private void setAntMatchers(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-                .antMatchers(HttpMethod.GET,"/users").hasAnyRole("ROLE_MASTER","ROLE_ADMIN")
+                .antMatchers(HttpMethod.GET,"/users").hasAnyRole(MASTER,ADMIN)
                 .antMatchers(HttpMethod.GET,"/users/signup").anonymous()
                 .antMatchers(HttpMethod.GET,"/users/findAccountForm").anonymous()
                 .antMatchers(HttpMethod.POST,"/users/findAccount").anonymous()
                 .antMatchers(HttpMethod.POST,"/users").permitAll()
                 .antMatchers(HttpMethod.GET,"/users/{id}/**").authenticated()
                 .antMatchers(HttpMethod.PUT,"/users/{id}/**").authenticated()
-                .antMatchers(HttpMethod.DELETE,"/users/{id}/**").hasAnyRole("ROLE_MASTER","ROLE_ADMIN")
-                .antMatchers(HttpMethod.PATCH,"/users/{id}/**").hasAnyRole("ROLE_MASTER","ROLE_ADMIN")
-                .antMatchers(HttpMethod.GET,"/users/seller").hasAnyRole("ROLE_MASTER","ROLE_ADMIN")
-                .antMatchers(HttpMethod.GET,"/users/seller/{id}").hasAnyRole("ROLE_MASTER","ROLE_ADMIN","ROLE_SELLER")
-                .antMatchers(HttpMethod.GET,"/users/seller/applyForm").hasAnyRole("ROLE_MASTER","ROLE_ADMIN","ROLE_USER")
-                .antMatchers(HttpMethod.POST,"/users/seller/{id}/apply").hasAnyRole("ROLE_MASTER","ROLE_ADMIN","ROLE_USER")
-                .antMatchers(HttpMethod.GET,"/users/seller/applicant").hasAnyRole("ROLE_MASTER","ROLE_ADMIN")
-                .antMatchers(HttpMethod.PATCH,"/users/seller/{id}/apply").hasAnyRole("ROLE_MASTER","ROLE_ADMIN")
+                .antMatchers(HttpMethod.DELETE,"/users/{id}/**").hasAnyRole(MASTER,ADMIN)
+                .antMatchers(HttpMethod.PATCH,"/users/{id}/**").hasAnyRole(MASTER,ADMIN)
+                .antMatchers(HttpMethod.GET,"/users/seller").hasAnyRole(MASTER,ADMIN)
+                .antMatchers(HttpMethod.GET,"/users/seller/{id}").hasAnyRole(MASTER,ADMIN,SELLER)
+                .antMatchers(HttpMethod.GET,"/users/seller/applyForm").hasAnyRole(USER)
+                .antMatchers(HttpMethod.POST,"/users/seller/{id}/apply").hasAnyRole(MASTER,ADMIN,USER)
+                .antMatchers(HttpMethod.GET,"/users/seller/applicant").hasAnyRole(MASTER,ADMIN)
+                .antMatchers(HttpMethod.PATCH,"/users/seller/{id}/apply").hasAnyRole(MASTER,ADMIN)
                 .antMatchers(HttpMethod.GET,"/users/confirm").authenticated()
                 .antMatchers(HttpMethod.GET,"/boards/form").authenticated()
                 .antMatchers(HttpMethod.GET,"/boards").permitAll()
@@ -122,11 +127,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST,"/images/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/products").permitAll()
                 .antMatchers(HttpMethod.GET,"/products/{id}").permitAll()
-                .antMatchers(HttpMethod.GET,"/products/form").hasAnyRole("ROLE_MASTER","ROLE_ADMIN","ROLE_SELLER")
-                .antMatchers(HttpMethod.POST,"/products").hasAnyRole("ROLE_MASTER","ROLE_ADMIN","ROLE_SELLER")
-                .antMatchers(HttpMethod.PUT,"/products/{id}").hasAnyRole("ROLE_MASTER","ROLE_ADMIN","ROLE_SELLER")
-                .antMatchers(HttpMethod.DELETE,"/products/{id}").hasAnyRole("ROLE_MASTER","ROLE_ADMIN","ROLE_SELLER")
-                .antMatchers(HttpMethod.GET,"/products/seller").hasAnyRole("ROLE_MASTER","ROLE_ADMIN","ROLE_SELLER")
+                .antMatchers(HttpMethod.GET,"/products/form").hasAnyRole(MASTER,ADMIN,SELLER)
+                .antMatchers(HttpMethod.POST,"/products").hasAnyRole(MASTER,ADMIN,SELLER)
+                .antMatchers(HttpMethod.PUT,"/products/{id}").hasAnyRole(MASTER,ADMIN,SELLER)
+                .antMatchers(HttpMethod.DELETE,"/products/{id}").hasAnyRole(MASTER,ADMIN,SELLER)
+                .antMatchers(HttpMethod.GET,"/products/seller").hasAnyRole(MASTER,ADMIN,SELLER)
                 .antMatchers(HttpMethod.GET,"/products/{productId}/qnas/form").authenticated()
                 .antMatchers(HttpMethod.POST,"/products/{productId}/qnas").authenticated()
                 .antMatchers(HttpMethod.GET,"/products/qnas/{qnaId}").permitAll()
@@ -137,7 +142,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/carts/**").authenticated()
                 .antMatchers("/payments/**").authenticated()
                 .antMatchers("/delivery/**").authenticated()
-                .antMatchers("/category/**").hasAnyRole("ROLE_MASTER","ROLE_ADMIN")
+                .antMatchers("/category/**").hasAnyRole(MASTER,ADMIN)
 
         ;
     }

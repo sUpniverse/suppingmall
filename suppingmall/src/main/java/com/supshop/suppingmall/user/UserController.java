@@ -112,7 +112,6 @@ public class UserController {
     public String updateUser(@PathVariable Long id, User user, @AuthenticationPrincipal SessionUser sessionUser) {
         if(isOwner(id, sessionUser) || isAdmin(sessionUser)) {
             userService.updateUser(id, user);
-//            updateSession(session); Todo : 업데이트시 시큐리티상에 갱신 필요
             return redirectMainUrl;
         }
         return redirectLoginUrl;
@@ -154,7 +153,7 @@ public class UserController {
 
     /*
 
-    TODO 1. 추후 비밀번호 재확인을 통한 유저 검증 후
+    ToDo 1. 추후 비밀번호 재확인을 통한 유저 검증 후
          2. 유저의 정보 변경과 비밀번호 변경을 분리할 예정
 
     @GetMapping("/checkForm")
@@ -238,7 +237,6 @@ public class UserController {
     public String getApplySellerRoleForm(Model model, @AuthenticationPrincipal SessionUser sessionUser) {
 
         if(sessionUser.getRole().equals(Role.USER) && sessionUser.getStoreVO().getStoreApplyYn().equals("N")) {
-        //Todo : session User 이용해서 user 정보 가져온 뒤 비교
             model.addAttribute("user", sessionUser);
             return "/user/applySellerForm";
         }

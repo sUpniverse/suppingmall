@@ -29,9 +29,6 @@ public class UserControllerTest {
     @Autowired ModelMapper modelMapper;
     private MockHttpSession session;
 
-
-
-
     @Test
     public void getUserById() throws Exception {
         //given
