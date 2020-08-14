@@ -4,8 +4,10 @@ target/
 !**/src/main/**
 !**/src/test/**
 src/main/resources/images
+src/main/resources/key
 application-oauth.yml
 application-email.yml
+application-storage.yml
 
 ### STS ###
 .apt_generated
