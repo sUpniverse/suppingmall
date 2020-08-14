@@ -124,7 +124,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE,"/boards/{id}").authenticated()
                 .antMatchers("/comments/**").authenticated()
                 .antMatchers(HttpMethod.GET,"/images/**").permitAll()
-                .antMatchers(HttpMethod.POST,"/images/**").permitAll()
+                .antMatchers(HttpMethod.POST,"/images/**").authenticated()
                 .antMatchers(HttpMethod.GET,"/products").permitAll()
                 .antMatchers(HttpMethod.GET,"/products/{id}").permitAll()
                 .antMatchers(HttpMethod.GET,"/products/form").hasAnyRole(MASTER,ADMIN,SELLER)

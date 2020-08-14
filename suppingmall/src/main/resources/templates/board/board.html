@@ -117,8 +117,6 @@
             var boardId = [[${board.boardId}]];
             var contents = $('#comment-text').val();
 
-            console.log(boardId);
-            console.log(contents);
             $.ajax({
                 type:"POST",
                 url:"/comments",

@@ -70,7 +70,16 @@ public class BoardController {
     @PostMapping("")
     public String createBoard(Board board, @AuthenticationPrincipal SessionUser sessionUser) {
         log.debug("'createBoard'가 실행됨");
-        if(sessionUser.getUserId().equals(board.getCreator().getUserId())) boardService.createBoard(board);
+
+        if(board.getImagesUrl().size() > 0) {
+            for(String a :board.getImagesUrl()) {
+                String[] split = a.split("/");
+                System.out.println(split);
+            }
+        }
+
+        if(sessionUser.getUserId().equals(board.getCreator().getUserId()))
+            boardService.createBoard(board);
         return "redirect:/boards";
     }
 
@@ -92,7 +101,7 @@ public class BoardController {
         return "redirect:/boards/"+id;
     }
 
-    @DeleteMapping("/{id}")
+    @PostMapping("/{id}")
     public String deleteBoard(@PathVariable Long id, @AuthenticationPrincipal SessionUser sessionUser) {
         log.debug("'deleteBoard'가 실행됨");
 

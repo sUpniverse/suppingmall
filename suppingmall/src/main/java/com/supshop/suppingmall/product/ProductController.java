@@ -68,13 +68,15 @@ public class ProductController {
     }
 
     @PostMapping("")
-    public String createProduct(@Valid ProductForm productForm, MultipartFile[] thumnails) {
+    public String createProduct(@Valid ProductForm productForm,
+                                MultipartFile[] thumnails,
+                                @AuthenticationPrincipal SessionUser sessionUser) {
         Product product = modelMapper.map(productForm, Product.class);
         String thumnail = null;
         if(thumnails != null) {
             for(MultipartFile file : thumnails) {
                 try {
-                    thumnail = imageService.saveImage(file, ImageController.productSourceUrl,ImageController.productUri).toString();
+                    thumnail = imageService.saveImage(file, ImageController.productSourceUrl,ImageController.productUri,sessionUser.getUserId()).toString();
                 } catch (IOException e) {
 
                 }

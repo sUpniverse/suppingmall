@@ -9,6 +9,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Getter @Setter
 @ToString @Builder
@@ -18,6 +19,7 @@ public class Board {
     private Long boardId;
     private String title;
     private String contents;
+    private Set<String> imagesUrl;
     private List<Comment> comments;
     private User creator;
     private Category category;

@@ -17,15 +17,15 @@
 <div class="container">
     <div class="mt-3">
         <form role="form" th:method="POST" name="qna">
-            <input type="hidden" th:name="userId" th:value="${session.user.userId}">
+            <input type="hidden" th:name="userId" th:value="${#authentication.principal.userId}">
             <div>
-                <textarea type="text" class="form-control" name="title"></textarea>
+                <textarea type="text" class="form-control" name="title" style="resize: none"></textarea>
             </div>
         </form>
     </div>
-    <div class="mt-3 align-items-center form-inline">
-        <a class="btn btn-success btn-sm form-control" href="#" th:href="'javascript:submit()'">등록하기</a>
-        <a class="form-control btn-sm text-center" href="#" th:href="'javascript:cancel()'">취소</a>
+    <div class="mt-3 text-center">
+        <a class="btn btn-sm btn-success" href="#" th:href="'javascript:submit()'">등록하기</a>
+        <a class="btn btn-sm btn-light" href="#" th:href="'javascript:cancel()'">취소</a>
     </div>
 </div>
 <div class="mt-3 bg-light">
@@ -40,7 +40,6 @@
         <li class="notice_item">상품에 대한 이용 후기는 리뷰에 남겨 주세요.</li>
     </ul>
 </div>
-<footer th:replace="fragments/footer :: footer" />
 </body>
 <script>
     function submit() {

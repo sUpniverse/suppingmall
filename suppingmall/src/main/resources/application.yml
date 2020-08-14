@@ -10,6 +10,13 @@ spring:
     include:
       - oauth
       - email
+      - storage
+  devtools:
+    livereload:
+      enabled: true
+    remote:
+      restart:
+        enabled: false
 
   #DataSource
   datasource:
