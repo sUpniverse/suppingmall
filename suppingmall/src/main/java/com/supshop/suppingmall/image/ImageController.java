@@ -51,14 +51,24 @@ public class ImageController {
         log.debug("getBoardImage is called");
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(date).append(File.separator).append(userId).append(File.separator).append(filePath);
-        byte[] readImageBytes = imageService.getImage(boardSourceUrl + stringBuilder.toString());
+        byte[] readImageBytes = null;
+        try {
+            readImageBytes = imageService.getImage(boardSourceUrl + stringBuilder.toString());
+        } catch (IOException e){
+            ResponseEntity.notFound();
+        }
         return ResponseEntity.ok(readImageBytes);
     }
 
     @GetMapping("/board/{filePath}")
     public ResponseEntity<byte[]> getBoardImage(@PathVariable String filePath) {
         log.debug("getBoardImage is called");
-        byte[] readImageBytes = imageService.getImage(boardSourceUrl + filePath);
+        byte[] readImageBytes = null;
+        try {
+            readImageBytes = imageService.getImage(boardSourceUrl + filePath);
+        } catch (IOException e) {
+            ResponseEntity.notFound();
+        }
         return ResponseEntity.ok(readImageBytes);
     }
 
@@ -82,7 +92,12 @@ public class ImageController {
         log.debug("getProductImage is called");
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(date).append(File.separator).append(userId).append(File.separator).append(filePath);
-        byte[] readImageBytes = imageService.getImage(productSourceUrl + stringBuilder.toString());
+        byte[] readImageBytes = null;
+        try {
+            readImageBytes = imageService.getImage(productSourceUrl + stringBuilder.toString());
+        } catch (IOException e) {
+            ResponseEntity.notFound();
+        }
         return ResponseEntity.ok(readImageBytes);
     }
 
@@ -90,7 +105,12 @@ public class ImageController {
     @GetMapping("/product/{filePath}")
     public ResponseEntity<byte[]> getProductImage(@PathVariable String filePath) {
         log.debug("getProductImage is called");
-        byte[] readImageBytes = imageService.getImage(productSourceUrl + filePath);
+        byte[] readImageBytes = null;
+        try {
+            readImageBytes = imageService.getImage(productSourceUrl + filePath);
+        } catch (IOException e) {
+            ResponseEntity.notFound();
+        }
         return ResponseEntity.ok(readImageBytes);
     }
 

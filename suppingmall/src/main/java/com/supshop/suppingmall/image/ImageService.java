@@ -1,6 +1,10 @@
 package com.supshop.suppingmall.image;
 
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -10,17 +14,23 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 @Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class ImageService {
 
+    private final Storage storage;
+
+    private static final String storageBucketName = "suppingmall-image-storage-1";
+    private static final String classPath = "src/main/resources";
+
+    @Transactional
     public URI saveImage(MultipartFile file, String sourceUrl, String uri, Long userId) throws IOException {
 
         String imageName = file.getOriginalFilename().trim().replaceAll("\\p{Z}","");
-        // ex) sourceUrl + 2020/8/12/유저번호/이미지 이름
+        // ex) sourceUrl + yyyyMMdd/유저번호/파일명
         StringBuilder uploadImageUrlMaker = new StringBuilder();
         uploadImageUrlMaker.append(sourceUrl)
                      .append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))).append(File.separator)
@@ -43,32 +53,28 @@ public class ImageService {
         return imageUri;
     }
 
-    public byte[] getImage(String path) {
-        byte[] readImageBytes = new byte[0];
-        try {
-            FileInputStream fis = new FileInputStream(path);
-            readImageBytes = fis.readAllBytes();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public byte[] getImage(String path) throws IOException {
+        byte[] readImageBytes;
+        FileInputStream fis = new FileInputStream(path);
+        readImageBytes = fis.readAllBytes();
         return readImageBytes;
     }
 
-    /*Todo : 받은 url을 통해 그림을 Storage에 저장
-    public void saveInStorage(Set<String> pathUrls){
-
-    }*/
-
-    /*
-    * 업로드된 이미지를 임시 저장소에서 List 형태로 받아온다.
-    * */
-    public List<byte[]> getImages(Set<String> pathUrls) {
-        List<byte[]> byteList = new ArrayList<>();
-        for(String path : pathUrls) {
-            byte[] bytes = getImage(path);
-            byteList.add(bytes);
+    // Todo : 받은 url을 통해 그림을 Storage에 저장 /board/boardId/fileName
+    @Transactional
+    public boolean saveInStorage(Set<String> pathUrls, String path, Long Id, String directory){
+        try {
+            for(String url : pathUrls) {
+                String fileName = url.replace(path, "");
+                storage.create(BlobInfo.newBuilder(storageBucketName,directory+File.separator+Id+File.separator+fileName)
+                        .build(),
+                        getImage(classPath+File.separator+url));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
         }
-        return byteList;
+        return true;
     }
 
 }

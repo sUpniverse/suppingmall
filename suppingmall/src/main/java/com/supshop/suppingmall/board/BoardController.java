@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.board;
 
+import com.supshop.suppingmall.board.form.BoardCreateForm;
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryService;
 import com.supshop.suppingmall.common.UserUtils;
@@ -8,6 +9,7 @@ import com.supshop.suppingmall.page.BoardPageMaker;
 import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +26,8 @@ public class BoardController {
 
     private final BoardService boardService;
     private final CategoryService categoryService;
+    private final ModelMapper modelMapper;
+
     private final Long boardCategoryId = 21l;
 
 
@@ -68,18 +72,14 @@ public class BoardController {
     }
 
     @PostMapping("")
-    public String createBoard(Board board, @AuthenticationPrincipal SessionUser sessionUser) {
+    public String createBoard(BoardCreateForm createForm, @AuthenticationPrincipal SessionUser sessionUser) {
         log.debug("'createBoard'가 실행됨");
 
-        if(board.getImagesUrl().size() > 0) {
-            for(String a :board.getImagesUrl()) {
-                String[] split = a.split("/");
-                System.out.println(split);
-            }
-        }
-
-        if(sessionUser.getUserId().equals(board.getCreator().getUserId()))
+        if(sessionUser.getUserId().equals(createForm.getCreator().getUserId())) {
+            Board board = modelMapper.map(createForm, Board.class);
             boardService.createBoard(board);
+
+        }
         return "redirect:/boards";
     }
 
