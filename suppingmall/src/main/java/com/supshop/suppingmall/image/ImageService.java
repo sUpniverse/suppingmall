@@ -1,7 +1,10 @@
 package com.supshop.suppingmall.image;
 
+import com.google.api.client.util.Preconditions;
+import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
+import com.supshop.suppingmall.board.Board;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,7 +63,7 @@ public class ImageService {
         return readImageBytes;
     }
 
-    // Todo : 받은 url을 통해 그림을 Storage에 저장 /board/boardId/fileName
+    // 받은 url을 통해 그림을 Storage에 저장 /{board or product}/{boardId}/fileName
     @Transactional
     public boolean saveInStorage(Set<String> pathUrls, String path, Long Id, String directory){
         try {
@@ -76,5 +79,12 @@ public class ImageService {
         }
         return true;
     }
+
+    public byte[] getImageInStorage(String imageUrl) {
+        Blob blob = storage.get(storageBucketName, imageUrl);
+        Preconditions.checkNotNull(blob, "blob [%s] not found",imageUrl);
+        return blob.getContent();
+    }
+
 
 }

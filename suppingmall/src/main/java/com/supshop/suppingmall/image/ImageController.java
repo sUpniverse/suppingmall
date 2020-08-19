@@ -1,21 +1,16 @@
 package com.supshop.suppingmall.image;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -29,6 +24,8 @@ public class ImageController {
     public static final String productSourceUrl =  "src/main/resources/images/product/";
     private static final String boardUri =  "/images/board/";
     public static final String productUri =  "/images/product/";
+    private static final String boardName = "board";
+    private static final String productName = "product";
 
     @PostMapping("/board/{userId}")
     public ResponseEntity<String> createBoardTempImages(MultipartFile file,
@@ -36,11 +33,7 @@ public class ImageController {
 
         log.debug("createBoardTempImages is called");
         ResponseEntity<String> response = null;
-        try {
-            response = getResponse(file, boardSourceUrl, boardUri, userId);
-        } catch (Exception e) {
-            ResponseEntity.badRequest().build();
-        }
+        response = saveImageInTempProcess(file, boardSourceUrl, boardUri, userId);
         return response;
     }
 
@@ -49,26 +42,16 @@ public class ImageController {
                                                     @PathVariable Long userId,
                                                     @PathVariable String filePath) {
         log.debug("getBoardImage is called");
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(date).append(File.separator).append(userId).append(File.separator).append(filePath);
-        byte[] readImageBytes = null;
-        try {
-            readImageBytes = imageService.getImage(boardSourceUrl + stringBuilder.toString());
-        } catch (IOException e){
-            ResponseEntity.notFound();
-        }
-        return ResponseEntity.ok(readImageBytes);
+        ResponseEntity<byte[]> response = getImageInTempProcess(date, userId, filePath, boardSourceUrl);
+        return response;
     }
 
-    @GetMapping("/board/{filePath}")
-    public ResponseEntity<byte[]> getBoardImage(@PathVariable String filePath) {
+    @GetMapping("/board/{boardId}/{filePath}")
+    public ResponseEntity<byte[]> getBoardImage(@PathVariable Long boardId,
+                                                @PathVariable String filePath) {
         log.debug("getBoardImage is called");
         byte[] readImageBytes = null;
-        try {
-            readImageBytes = imageService.getImage(boardSourceUrl + filePath);
-        } catch (IOException e) {
-            ResponseEntity.notFound();
-        }
+        readImageBytes = imageService.getImageInStorage(boardName+File.separator+boardId+File.separator+filePath);
         return ResponseEntity.ok(readImageBytes);
     }
 
@@ -77,11 +60,7 @@ public class ImageController {
                                                           @PathVariable Long userId){
         log.debug("createProductTempImages is called");
         ResponseEntity response = null;
-        try {
-            response = getResponse(file, productSourceUrl, productUri, userId);
-        } catch (Exception e) {
-            ResponseEntity.badRequest().build();
-        }
+        response = saveImageInTempProcess(file, productSourceUrl, productUri, userId);
         return response;
     }
 
@@ -90,15 +69,8 @@ public class ImageController {
                                                   @PathVariable Long userId,
                                                   @PathVariable String filePath) {
         log.debug("getProductImage is called");
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(date).append(File.separator).append(userId).append(File.separator).append(filePath);
-        byte[] readImageBytes = null;
-        try {
-            readImageBytes = imageService.getImage(productSourceUrl + stringBuilder.toString());
-        } catch (IOException e) {
-            ResponseEntity.notFound();
-        }
-        return ResponseEntity.ok(readImageBytes);
+        ResponseEntity<byte[]> response = getImageInTempProcess(date, userId, filePath, productSourceUrl);
+        return response;
     }
 
 
@@ -114,15 +86,54 @@ public class ImageController {
         return ResponseEntity.ok(readImageBytes);
     }
 
-    private ResponseEntity<String> getResponse(MultipartFile file, String sourceUrl, String uri, Long userId) throws IOException {
+    @GetMapping("/product/{productId}/{filePath}")
+    public ResponseEntity<byte[]> getProductImage(@PathVariable Long productId,
+                                                @PathVariable String filePath) {
+        log.debug("getProductImage is called");
+        byte[] readImageBytes = null;
+        readImageBytes = imageService.getImageInStorage(productName +File.separator+productId+File.separator+filePath);
+        return ResponseEntity.ok(readImageBytes);
+    }
 
-        if(file.isEmpty()) {
-            return ResponseEntity.badRequest().build();
+    // board와 product 이미지를 임시 저장하기 위한 통합 프로세스
+    private ResponseEntity<String> saveImageInTempProcess(MultipartFile file, String sourceUrl, String uri, Long userId){
+
+        URI storedImagePath = null;
+
+        if(file.isEmpty()) return ResponseEntity.badRequest().build();
+
+        try {
+            storedImagePath = imageService.saveImage(file, sourceUrl, uri, userId);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        URI storedImagePath = imageService.saveImage(file, sourceUrl, uri, userId);
         ObjectMapper objectMapper = new ObjectMapper();
         ImageVo imageVo = ImageVo.builder().uploaded(true).url(storedImagePath).build();
-        return ResponseEntity.created(storedImagePath).body(objectMapper.writeValueAsString(imageVo));
+        ResponseEntity<String> response;
+
+        try {
+            response = ResponseEntity.created(storedImagePath).body(objectMapper.writeValueAsString(imageVo));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return response;
     }
+
+    // board와 product의 이미지를 임시저장소에서 가져오기 위한 통합 프로세스
+    private ResponseEntity<byte[]> getImageInTempProcess(@PathVariable int date, @PathVariable Long userId,
+                                                         @PathVariable String filePath, String boardSourceUrl) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(date).append(File.separator).append(userId).append(File.separator).append(filePath);
+        byte[] readImageBytes = null;
+        try {
+            readImageBytes = imageService.getImage(boardSourceUrl + stringBuilder.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+            ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(readImageBytes);
+    }
+
 }

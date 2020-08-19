@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -55,9 +57,10 @@ public class ProductFactory {
                 .seller(seller)
                 .deliveryVendor(Delivery.DeliveryVendor.CJ)
                 .deliveryPrice(3000)
+                .saleYn("Y")
+                .thumbnail("/images/product/20200819/18/맥북16.jpg")
+                .contents("<img src=\"/images/product/20200819/18/현대차.png\">")
                 .build();
-
-        productService.createProduct(product);
         return product;
     }
 }

@@ -198,6 +198,24 @@
             );
     </insert>
 
+    <update id="updateProduct" parameterType="com.supshop.suppingmall.product.Product">
+        UPDATE Product
+        SET
+        name = #{product.name},
+        price = #{product.price},
+        delivery_price = #{product.deliveryPrice},
+        delivery_vendor = #{product.deliveryVendor, typeHandler=com.supshop.suppingmall.delivery.DeliveryVendorHandler},
+        seller_id = #{product.seller.userId},
+        category_id = #{product.category.id},
+        sale_yes_or_no = #{product.saleYn},
+        thumbnail = #{product.thumbnail},
+        picture = #{product.picture},
+        rating = #{product.rating},
+        contents = #{product.contents}
+        where
+        product_id = #{productId};
+    </update>
+
     <update id="updateProductOption" parameterType="java.util.List">
         <foreach item="productOption" index="index" collection="list">
         UPDATE product_option

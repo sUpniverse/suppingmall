@@ -1,22 +1,19 @@
 package com.supshop.suppingmall.board;
 
-import com.supshop.suppingmall.board.form.BoardCreateForm;
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryService;
-import com.supshop.suppingmall.comment.CommentService;
 import com.supshop.suppingmall.image.ImageService;
 import com.supshop.suppingmall.mapper.BoardMapper;
 import com.supshop.suppingmall.page.BoardCriteria;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -29,7 +26,7 @@ public class BoardService {
     private final ImageService imageService;
 
     private static final String boardName = "board";
-    private static final String boardImageUrl = "image/board/";
+    private static final String boardImageUrl = "/images/board/";
 
     public List<Board> getAllBoard() { return boardMapper.selectAllBoard(); }
 
@@ -71,23 +68,23 @@ public class BoardService {
      *  3. 찾은 경로를 이용해 임시 저장된 이미지를 List로 모아서 ImageService에서 GCP Storage로 저장 With 해당 게시글 번호 (폴더 이름으로 쓸 예정)
      */
     @Transactional
-    public void createBoard(Board board) {
-        int imageCount = board.getImagesUrl().size();
+    public void createBoard(Board board, Set<String> urls) {
+        int imageCount = urls.size();
         String originUrl = null;
         int result = boardMapper.insertBoard(board);
         if(imageCount > 0 && result == 1){
-            originUrl = setBoardUrl(board);
+            originUrl = setBoardImageUrl(board,urls);
             boardMapper.updateBoard(board.getBoardId(), board);
-            imageService.saveInStorage(board.getImagesUrl(),originUrl,board.getBoardId(), boardName);
+            imageService.saveInStorage(urls,originUrl,board.getBoardId(), boardName);
         }
     }
 
     // image/{category}/{yyyyMMdd}/{userId}/fileName => image/{category}/{categoryId}/fileName
     // cloud storage의 경로 저장을 위해 이미지 url 변경
-    public String setBoardUrl(Board board) {
+    public String setBoardImageUrl(Board board, Set<String> urls) {
         String originUrl;
         String contents = board.getContents();
-        String imageUrl = board.getImagesUrl().iterator().next();
+        String imageUrl = urls.iterator().next();
         String[] splitUrl = imageUrl.split(File.separator);
         int fileIndex = imageUrl.indexOf(splitUrl[splitUrl.length-1]);
         originUrl = imageUrl.substring(0,fileIndex);

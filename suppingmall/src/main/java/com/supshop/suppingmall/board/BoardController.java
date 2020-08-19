@@ -77,8 +77,7 @@ public class BoardController {
 
         if(sessionUser.getUserId().equals(createForm.getCreator().getUserId())) {
             Board board = modelMapper.map(createForm, Board.class);
-            boardService.createBoard(board);
-
+            boardService.createBoard(board,createForm.getImagesUrl());
         }
         return "redirect:/boards";
     }

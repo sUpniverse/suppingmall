@@ -13,11 +13,11 @@ public interface ProductMapper {
 
     Product findProduct(Long sellerId);
 
-    void insertProduct(Product product);
+    int insertProduct(Product product);
     void addProductOptions(List<ProductOption> options);
     void addProductDetail(ProductDetail detail);
 
-    void updateProduct(Long id, Product product);
+    void updateProduct(Long productId, Product product);
 
     void updateProductOption(List<ProductOption> productOptionList);
 

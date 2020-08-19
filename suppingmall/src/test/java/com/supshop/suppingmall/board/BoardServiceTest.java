@@ -28,11 +28,10 @@ public class BoardServiceTest {
         Board board = Board.builder()
                 .boardId(3l)
                 .contents("<img src=\"image/board/20200818/32/jsjs.jpg\">")
-                .imagesUrl(url)
                 .build();
 
         //when
-        String urlString = boardService.setBoardUrl(board);
+        String urlString = boardService.setBoardImageUrl(board,url);
 
         //then
         assertThat(urlString).isEqualTo("image/board/20200818/32/");

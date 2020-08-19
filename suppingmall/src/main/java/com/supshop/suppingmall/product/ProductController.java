@@ -41,7 +41,7 @@ public class ProductController {
     private static final Long productCategoryId = 2L;
 
     @GetMapping("/form")
-    public String form(@AuthenticationPrincipal SessionUser user, Model model) {
+    public String form(Model model) {
         model.addAttribute("categories",categoryService.getCategory(productCategoryId).getChild());
         model.addAttribute("vendors", Delivery.DeliveryVendor.values());
         return "/product/form";
@@ -73,18 +73,19 @@ public class ProductController {
                                 @AuthenticationPrincipal SessionUser sessionUser) {
         Product product = modelMapper.map(productForm, Product.class);
         String thumnail = null;
-        if(thumnails != null) {
+        if(thumnails.length > 0) {
             for(MultipartFile file : thumnails) {
                 try {
                     thumnail = imageService.saveImage(file, ImageController.productSourceUrl,ImageController.productUri,sessionUser.getUserId()).toString();
                 } catch (IOException e) {
-
+                    e.printStackTrace();
+                    //Todo : 이미지 저장 실패시 다시 시도 or 게시글 저장 실패
                 }
             }
             product.setThumbnail(thumnail);
         }
-        productService.createProduct(product);
-        return "forward:/";
+        productService.createProduct(product,productForm.getImagesUrl());
+        return "redirect:/products/"+product.getProductId();
     }
 
     @PutMapping("/{id}")
@@ -117,13 +118,12 @@ public class ProductController {
     public ResponseEntity createQnaByProductId(@RequestBody QnaForm qna,
                                                @PathVariable Long productId) {
 
-
         Board board = Board.builder()
                         .category(Category.builder().id(30l).build())
                         .title(qna.getTitle())
                         .product(Product.builder().productId(productId).build())
                         .creator(User.builder().userId(qna.getUserId()).build()).build();
-        boardService.createBoard(board);
+        boardService.createBoard(board,null);
         return ResponseEntity.ok().build();
     }
 
