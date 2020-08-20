@@ -9,6 +9,8 @@ application-oauth.yml
 application-email.yml
 application-storage.yml
 
+.DS_Store
+
 ### STS ###
 .apt_generated
 .classpath

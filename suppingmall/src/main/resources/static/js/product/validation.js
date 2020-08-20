@@ -1,14 +1,14 @@
 //Validation check Point
-var emptyReg = /^\s+|\s+$/g;
-var nameCheck = false;
+const emptyReg = /^\s+|\s+$/g;
+let nameCheck = false;
 
-var positiveIntegerReg =  /^([1-9])([0-9]{1,9})$/;
-var priceCheck = false;
-var optionCheck = true;
+const positiveIntegerReg =  /^([1-9])([0-9]{1,9})$/;
+let priceCheck = false;
+let optionCheck = true;
 
 
 $(document).on('change',"#product_name",(e) => {
-    var name = e.target;
+    let name = e.target;
     if(!check(emptyReg,name)) {
         nameCheck = true;
     } else {
@@ -31,12 +31,12 @@ $(document).on('change',"#price",(e) => {
     }
 });
 
-var teleReg = /^\d{2,3}-\d{3,4}-\d{4}$/;
-var asCheck = false;
+const teleReg = /^\d{2,3}-\d{3,4}-\d{4}$/;
+let asCheck = false;
 
 
 $(document).on('change',"#as_number",(e) => {
-    var number = e.target;
+    let number = e.target;
     if(check(teleReg,number)) {
         asCheck = true;
     } else {

@@ -1,14 +1,11 @@
 $(document).ready(function() {
 
     $(document).on('click',"#cart",function() {
-        isSingIn();
-
+        isSingIn()
         var cartFrom = setCartForm();
         if(cartFrom === undefined) {
             return;
         }
-
-        console.log(cartFrom)
 
         $.ajax({
             url: "/cart",
@@ -29,7 +26,7 @@ $(document).ready(function() {
     });
 
     $(document).on('click',"#purchase",function() {
-        isSingIn();
+        isSingIn()
 
         var formObj = $("form[role='form']");
 
@@ -116,8 +113,8 @@ function setCartForm() {
 }
 
 function isSingIn() {
-    var userId = document.getElementById("userId").value;
-    if(userId === "") {
+
+    if(!document.getElementById("userId")) {
         var Login = confirm('로그인 하시겠습니까?');
         if(Login) {
             location.href = "/users/loginform";
