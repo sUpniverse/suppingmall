@@ -21,8 +21,12 @@ public class ProductService {
     private static final String productImageUrl = "/images/product/";
     private static final String productName = "product";
 
-    public List<Product> retrieveAllProduct() {
+    public List<Product> findAllProduct() {
         return productMapper.findProducts();
+    }
+
+    public List<Product> findAllProductOnSale() {
+        return productMapper.findProductsOnSale();
     }
 
     public Product findProduct(Long id) {
@@ -36,7 +40,7 @@ public class ProductService {
         int result = productMapper.insertProduct(product);
         Long productId = product.getProductId();
         List<ProductOption> options = product.getOptions();
-        product.setSaleYn("Y");
+        product.setStatus(Product.ProductStatus.SALE);
         for(ProductOption option : options) {
             option.setProductId(productId);
         }

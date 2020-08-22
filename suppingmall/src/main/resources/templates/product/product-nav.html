@@ -7,7 +7,7 @@
             <a class="text-muted" href="/boards">Farm</a>
         </div>
         <div class="col-4 text-center">
-            <a class="blog-header-logo text-dark" href="/products/">SuppingMall</a>
+            <a class="blog-header-logo text-dark" href="/products/main">SuppingMall</a>
         </div>
         <div sec:authorize="isAuthenticated()" class="col-3 d-flex justify-content-end align-items-center">
             <a class="text-muted" th:href="@{'/users/' + ${#authentication.principal.userId} + '/form'}">

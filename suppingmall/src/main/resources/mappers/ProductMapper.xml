@@ -8,7 +8,7 @@
         <result property="name" column="ProductName" />
         <result property="price" column="ProductPrice" />
         <result property="registeredDate" column="ProductRegisteredDate" />
-        <result property="saleYn" column="ProductSaleYn"/>
+        <result property="status" column="ProductStatus" typeHandler="com.supshop.suppingmall.product.ProductStatusTypeHandler" />
         <result property="thumbnail" column="ProductThumbnail" />
         <result property="picture" column="ProductPicture" />
         <result property="rating" column="ProductRating" />
@@ -67,6 +67,25 @@
         ORDER BY P.product_id ASC, PO.product_option_id ASC
     </select>
 
+    <select id="findProductsOnSale" resultMap="product">
+        SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice",
+        P.registered_date AS "ProductRegisteredDate", P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory",
+        P.thumbnail AS "ProductThumbnail", P.picture AS "ProductPicture", P.rating AS "ProductRating",
+        PD.product_detail_id AS "ProductDetailId", PD.as_number AS "ProductAsNumber", PD.manuplated_date AS "PrdouctManuplatedDate",
+        PD.contry_of_origin AS "ProductOrigin", PD.manufacturer AS "ProductManufacturer", PD.spec_1 AS "ProductSpec1",
+        PD.spec_2 AS "ProductSpec2",PD.spec_3 AS "ProductSpec3", PD.spec_4 AS "ProductSpec4", PD.spec_5 AS "ProductSpec5",
+        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.quantity AS "ProductOptionQuantity",
+        C.category_id AS "CategoryId", C.name AS "CategoryName"
+        FROM Product AS P
+        LEFT OUTER JOIN Product_Detail AS PD on (P.product_id = PD.product_id)
+        LEFT OUTER JOIN Product_Option AS PO on (P.product_id = PO.product_id)
+        LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
+        <!--        <include refid="conditionalSearch"></include>-->
+        WHERE P.status = 'PS01'
+        ORDER BY P.product_id ASC, PO.product_option_id ASC
+    </select>
+
+
     <sql id="conditionalSearch">
         <trim prefix="WHERE" prefixOverrides="AND|OR">
             <if test="id != null">
@@ -85,7 +104,7 @@
     <select id="findProductsById" resultMap="product">
         SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.registered_date AS "ProductRegisteredDate",
         P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
-        P.thumbnail AS "ProductThumbnail", P.picture AS "ProductPicture", P.rating AS "ProductRating",
+        P.thumbnail AS "ProductThumbnail", P.picture AS "ProductPicture", P.rating AS "ProductRating", P.status AS "ProductStatus",
         PD.product_detail_id AS "ProductDetailId", PD.as_number AS "ProductAsNumber", PD.manuplated_date AS "PrdouctManuplatedDate",
         PD.contry_of_origin AS "ProductOrigin", PD.manufacturer AS "ProductManufacturer", PD.spec_1 AS "ProductSpec1",
         PD.spec_2 AS "ProductSpec2",PD.spec_3 AS "ProductSpec3", PD.spec_4 AS "ProductSpec4", PD.spec_5 AS "ProductSpec5",
@@ -122,7 +141,7 @@
         LEFT OUTER JOIN Product_Option AS PO on (P.product_id = PO.product_id)
         LEFT OUTER JOIN user AS U on (P.seller_id = U.user_id)
         LEFT OUTER JOIN category AS C on (P.category_id = C.category_id)
-        WHERE P.product_id = #{id} AND P.sale_yes_or_no = 'Y'
+        WHERE P.product_id = #{id}
         ORDER BY P.product_id, PO.product_option_id ASC
     </select>
 
@@ -136,7 +155,7 @@
         registered_date,
         seller_id,
         category_id,
-        sale_yes_or_no,
+        status,
         thumbnail,
         picture,
         rating,
@@ -150,7 +169,7 @@
         now(),
         #{seller.userId},
         #{category.id},
-        'Y',
+        'PS00',
         #{thumbnail},
         #{picture},
         #{rating},
@@ -207,7 +226,7 @@
         delivery_vendor = #{product.deliveryVendor, typeHandler=com.supshop.suppingmall.delivery.DeliveryVendorHandler},
         seller_id = #{product.seller.userId},
         category_id = #{product.category.id},
-        sale_yes_or_no = #{product.saleYn},
+        status = #{product.status, typeHandler=com.supshop.suppingmall.product.ProductStatusTypeHandler},
         thumbnail = #{product.thumbnail},
         picture = #{product.picture},
         rating = #{product.rating},
@@ -232,7 +251,7 @@
     <update id="deleteProduct" parameterType="com.supshop.suppingmall.product.Product">
         UPDATE Product
         SET
-        delYn = 'Y',
+        status = 'PS04',
         WHERE product_id = #{id}
     </update>
 

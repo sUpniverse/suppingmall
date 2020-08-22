@@ -86,6 +86,8 @@
                         <th>재고</th>
                         <th>배송비</th>
                         <th>등록일</th>
+                        <th>상태</th>
+                        <th>상태변경</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -107,6 +109,20 @@
                         </td>
                         <td th:text="${product?.deliveryPrice}"></td>
                         <td th:text="${#temporals.format(product?.registeredDate,'yyyy-MM-dd')}"></td>
+                        <td><div th:id="${product.productId}+'_status'" th:text="${product?.status.title}"></div></td>
+                        <td>
+                            <div th:id="${product.productId}+'_statusButton'">
+                                <div th:if="${product.status.equals(product.status.WAIT) or product.status.equals(product.status.STOP)}">
+                                    <span><a class="btn btn-info btn-sm" href="#" th:href="'javascript:updateStatus('+${product.productId}+',\''+${product.status.SALE}+'\')'" th:text="${product.status.SALE.title}"></a></span>
+                                </div>
+                                <div th:class="mt-1" th:if="${product.status.equals(product.status.SALE)}">
+                                    <span><a class="btn btn-warning btn-sm" href="#" th:href="'javascript:updateStatus('+${product.productId}+',\''+${product.status.STOP}+'\')'" th:text="${product.status.STOP.title}"></a></span>
+                                </div>
+                                <div th:class="mt-1" th:unless="${product.status.equals(product.status.END)}">
+                                    <span><a class="btn btn-danger btn-sm" href="#" th:href="'javascript:updateStatus('+${product.productId}+',\''+${product.status.END}+'\')'" th:text="${product.status.END.title}"></a></span>
+                                </div>
+                            </div>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -116,7 +132,7 @@
 </div>
 <footer th:replace="fragments/footer :: footer" />
 </body>
-<script>
+<script type="text/javascript">
 
     function search() {
         var fromDate = document.getElementById('fromDate').value;
@@ -125,5 +141,24 @@
         console.log("1 : " +fromDate +" 2 :" +toDate);
         $(location).attr('href','/orders/main?fromDate=' + fromDate + '&toDate=' + toDate + '&type=order&status=' + status);
     }
+
+    function updateStatus(id,status) {
+        console.log("눌림");
+        $.ajax({
+            type: 'PATCH',
+            url: "/products/"+id+"/status/"+status,
+            contentType: 'application/json',
+            success: () => {
+                $(id+"_status").load(window.location.href+id+"_status");
+                $(id+"_statusButton").load(window.location.href+id+"_statusButton");
+            },
+            error: (response, error) => {
+                alert("Q&A수정에 실패했습니다.")
+            }
+        })
+    }
+
+
+
 </script>
 </html>

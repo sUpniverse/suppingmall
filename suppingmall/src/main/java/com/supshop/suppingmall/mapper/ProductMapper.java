@@ -9,6 +9,8 @@ import java.util.List;
 public interface ProductMapper {
 
     List<Product> findProducts();
+    List<Product> findProductsOnSale();
+
     List<Product> findProductsById(Long sellerId);
 
     Product findProduct(Long sellerId);

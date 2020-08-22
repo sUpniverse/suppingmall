@@ -1,18 +1,14 @@
 package com.supshop.suppingmall.product;
 
 import com.supshop.suppingmall.category.Category;
-import com.supshop.suppingmall.category.CategoryFactory;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.user.User;
-import com.supshop.suppingmall.user.UserFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -57,7 +53,7 @@ public class ProductFactory {
                 .seller(seller)
                 .deliveryVendor(Delivery.DeliveryVendor.CJ)
                 .deliveryPrice(3000)
-                .saleYn("Y")
+                .status(Product.ProductStatus.WAIT)
                 .thumbnail("/images/product/20200819/18/맥북16.jpg")
                 .contents("<img src=\"/images/product/20200819/18/현대차.png\">")
                 .build();

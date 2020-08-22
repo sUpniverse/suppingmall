@@ -47,13 +47,24 @@ public class ProductController {
         return "/product/form";
     }
 
+    //상태에 관계없이 모든 상품
     @GetMapping("")
     public String getAllProduct(Model model) {
-        List<Product> products = productService.retrieveAllProduct();
+        List<Product> products = productService.findAllProduct();
         model.addAttribute("products",products);
         model.addAttribute("categories",categoryService.getCategory(productCategoryId).getChild());
         return "/product/list";
     }
+
+    //판매상태의 모든 물품들
+    @GetMapping("/main")
+    public String getAllProductOnSale(Model model) {
+        List<Product> products = productService.findAllProductOnSale();
+        model.addAttribute("products",products);
+        model.addAttribute("categories",categoryService.getCategory(productCategoryId).getChild());
+        return "/product/list";
+    }
+
 
     @GetMapping("/{id}")
     public String getProduct(@PathVariable Long id, Model model) {
@@ -86,6 +97,19 @@ public class ProductController {
         }
         productService.createProduct(product,productForm.getImagesUrl());
         return "redirect:/products/"+product.getProductId();
+    }
+
+    @PatchMapping("/{id}/status/{status}")
+    @ResponseBody
+    public ResponseEntity updateProductStatus(@PathVariable Long id, @PathVariable Product.ProductStatus status) {
+        Product product = productService.findProduct(id);
+        product.setStatus(status);
+        try {
+            productService.updateProduct(id, product);
+        } catch (Exception e){
+            ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
