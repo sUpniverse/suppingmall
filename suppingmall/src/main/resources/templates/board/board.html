@@ -8,6 +8,7 @@
         <div th:replace="board/left-sidebar :: left-sidebar" />
         <div class="col-md-6">
             <form role="form" th:method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             </form>
             <div class="pt-5 pd-3 border-bottom">
                 <!-- Category -->
@@ -113,13 +114,19 @@
 
     $(document).ready(function (){
 
-        $("#comment-button").on('click',() => {
+        var header = [[${_csrf.headerName}]];
+        var token = [[${_csrf.token}]];
+
+        $("#comment-button").on('click',(e,xhr,options) => {
             var boardId = [[${board.boardId}]];
             var contents = $('#comment-text').val();
-
             $.ajax({
                 type:"POST",
                 url:"/comments",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader(header,token);
+                },
                 dataType: 'text',
                 data: JSON.stringify({
                     "board" : {
@@ -162,7 +169,6 @@
 
 
         $(document).on('click',"#comment-text",() => {
-            console.log([[${#authentication.principal}]] );
             if([[${#authentication.principal}]] === "anonymousUser") {
                 var check = confirm("로그인 하시겠습니까?");
                 if(check == true) {
@@ -188,27 +194,27 @@
         });
 
 
-        $(document).on('click',"#comment-delete-button",(e)=> {
+        $(document).on('click',"#comment-delete-button",(e,xhr,options)=> {
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;
             var comment_id = comment.getAttribute('data-no');
-            // var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
-
             $.ajax({
                 type:"DELETE",
                 url:"/comments/"+comment_id,
-                contentType: 'application/json',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader(header,token);
+                },
                 success: () => {
                     comment.remove();
                 }
             });
         });
 
-        $(document).on('click',"#update-comment-button",(e)=> {
+        $(document).on('click',"#update-comment-button",(e,xhr,options)=> {
             var comment = e.target.parentElement.parentElement.parentElement.parentElement;
             var comment_id = comment.getAttribute('data-no');
             var comment_text = comment.getElementsByTagName("p").item(0);
             var message = e.target.parentElement.getElementsByTagName("textarea").item(0).value;
-
             $.ajax({
                 type:"PUT",
                 url:"/comments/"+comment_id,
@@ -216,7 +222,10 @@
                 data: JSON.stringify({
                     "contents": message
                 }),
-                contentType: 'application/json',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader(header,token);
+                },
                 success: () => {
                     comment_text.innerText = message;
                 }
@@ -230,6 +239,11 @@
             comment_text.innerText = text;
             text = "";
         });
+
+        function setCSRFTokenInHeader(xhr) {
+            xhr.setRequestHeader(header,token);
+        }
+
 
     });
 </script>

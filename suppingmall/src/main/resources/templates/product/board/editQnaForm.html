@@ -43,45 +43,55 @@
 </body>
 <script>
 
-    function submit() {
-        var qna = $("form[role='form']").serializeObject();
-        var qnaId = [[${qna.boardId}]];
-        $.ajax({
-            type: 'PUT',
-            url: "/products/qnas/"+qnaId,
-            dataType: 'text',
-            data: JSON.stringify(qna),
-            contentType: 'application/json',
-            success: () => {
-                alert("Q&A가 수정되었습니다.");
-                window.opener.location.reload();
-                window.close();
-            },
-            error: (response, error) => {
-                alert("Q&A수정에 실패했습니다.")
-            }
-        })
-    }
-</script>
-<script>
-    jQuery.fn.serializeObject = function() {
-        var obj = null;
-        try {
-            if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) {
-                var arr = this.serializeArray();
-                if(arr){ obj = {};
-                    jQuery.each(arr, function() { obj[this.name] = this.value; });
+    $(document).ready(function () {
+        var header = [[${_csrf.headerName}]];
+        var token = [[${_csrf.token}]];
+
+        function submit() {
+            var qna = $("form[role='form']").serializeObject();
+            var qnaId = [[${qna.boardId}]];
+            $.ajax({
+                type: 'PUT',
+                url: "/products/qnas/"+qnaId,
+                dataType: 'text',
+                data: JSON.stringify(qna),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader(header,token);
+                },
+                success: () => {
+                    alert("Q&A가 수정되었습니다.");
+                    window.opener.location.reload();
+                    window.close();
+                },
+                error: (response, error) => {
+                    alert("Q&A수정에 실패했습니다.")
                 }
-            }
-        } catch(e) {
-            alert(e.message);
-        } finally {}
-        return obj;
-    }
-</script>
-<script>
-    function cancel() {
-        window.close();
-    }
+            })
+        }
+
+
+        jQuery.fn.serializeObject = function() {
+            var obj = null;
+            try {
+                if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) {
+                    var arr = this.serializeArray();
+                    if(arr){ obj = {};
+                        jQuery.each(arr, function() { obj[this.name] = this.value; });
+                    }
+                }
+            } catch(e) {
+                alert(e.message);
+            } finally {}
+            return obj;
+        }
+
+        function cancel() {
+            window.close();
+        }
+
+    });
+
+
 </script>
 </html>

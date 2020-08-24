@@ -84,13 +84,21 @@
 </body>
 <script>
     $(document).ready(function() {
+        var header = [[${_csrf.headerName}]];
+        var token = [[${_csrf.token}]];
 
-        $(document).on("click","#acceptButton",function(e) {
+        $(document).on("click","#acceptButton",function(e,xhr,options) {
             var userId = e.target.parentElement.parentElement.firstElementChild.textContent;
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
             $.ajax({
                 type: "patch",
                 url: "/users/seller/"+userId+"/apply" ,
                 contentType: 'application/json',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader(header,token);
+                },
                 success: () => {
                     e.target().remove();
                 },

@@ -16,6 +16,8 @@
             });
         })
     </script>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 <div th:replace="fragments/navigation-fix :: navigation-fix" />
@@ -56,6 +58,7 @@
                 <div class="col-md-5 ml-sm-3">
                     <h5>카테고리 상세</h5>
                     <form role="form">
+                        <input th:type="hidden" th:name="creator.userId" th:value="${#authentication?.principal.userId}" >
                         <input type="hidden" th:id="id">
                         <table class="table table-default">
                             <tr>
@@ -145,7 +148,7 @@
         $.ajax({
             type:"GET",
             url:"/category/"+parentId+'/children',
-            contentType: 'application/json',
+            contentType: "application/json",
             success: (data,status,xhr) => {
                 addCategoryInList(parentId,data);
             },
@@ -169,7 +172,6 @@
                             '<ul style="display: none;"></ul>' +
                          '</li>';
             }
-            // document.getElementById(parentId).parentElement.getElementsByTagName("ul")[0].innerHTML += option;
             document.getElementById(parentId).parentElement.getElementsByTagName("ul").item(0).insertAdjacentHTML('beforeend',option);
         });
     }

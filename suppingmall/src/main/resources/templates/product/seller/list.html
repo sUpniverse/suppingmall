@@ -134,31 +134,35 @@
 </body>
 <script type="text/javascript">
 
-    function search() {
-        var fromDate = document.getElementById('fromDate').value;
-        var toDate = document.getElementById('toDate').value;
-        var status = document.getElementById('status').value;
-        console.log("1 : " +fromDate +" 2 :" +toDate);
-        $(location).attr('href','/orders/main?fromDate=' + fromDate + '&toDate=' + toDate + '&type=order&status=' + status);
-    }
+    $(document).ready(function () {
+        var header = [[${_csrf.headerName}]];
+        var token = [[${_csrf.token}]];
 
-    function updateStatus(id,status) {
-        console.log("눌림");
-        $.ajax({
-            type: 'PATCH',
-            url: "/products/"+id+"/status/"+status,
-            contentType: 'application/json',
-            success: () => {
-                $(id+"_status").load(window.location.href+id+"_status");
-                $(id+"_statusButton").load(window.location.href+id+"_statusButton");
-            },
-            error: (response, error) => {
-                alert("Q&A수정에 실패했습니다.")
-            }
-        })
-    }
+        function search() {
+            var fromDate = document.getElementById('fromDate').value;
+            var toDate = document.getElementById('toDate').value;
+            var status = document.getElementById('status').value;
+            $(location).attr('href','/orders/main?fromDate=' + fromDate + '&toDate=' + toDate + '&type=order&status=' + status);
+        }
 
-
-
+        function updateStatus(id,status) {
+            console.log("눌림");
+            $.ajax({
+                type: 'PATCH',
+                url: "/products/"+id+"/status/"+status,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader(header,token);
+                },
+                success: () => {
+                    $(id+"_status").load(window.location.href+id+"_status");
+                    $(id+"_statusButton").load(window.location.href+id+"_statusButton");
+                },
+                error: (response, error) => {
+                    alert("Q&A수정에 실패했습니다.")
+                }
+            })
+        }
+    });
 </script>
 </html>

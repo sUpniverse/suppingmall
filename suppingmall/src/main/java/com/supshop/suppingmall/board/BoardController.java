@@ -83,7 +83,7 @@ public class BoardController {
     }
 
     @GetMapping("/{id}/form")
-    public String modifyBoard(@PathVariable Long id, Model model, @AuthenticationPrincipal SessionUser sessionUser) {
+    public String updateBoardForm(@PathVariable Long id, Model model, @AuthenticationPrincipal SessionUser sessionUser) {
         log.debug("'modifyBoard'가 실행됨");
         Board board = boardService.getBoard(id);
         if(!sessionUser.getUserId().equals(board.getCreator().getUserId())) return "redirect:/boards";
@@ -95,7 +95,7 @@ public class BoardController {
     @PutMapping("/{id}")
     public String updateBoard(@PathVariable Long id, Board board, @AuthenticationPrincipal SessionUser sessionUser) {
         log.debug("'updateBoard'가 실행됨");
-//        board.setCreator(user);
+        if(!UserUtils.isOwner(id, sessionUser)) return "redirect:/boards";
         boardService.updateBoard(id, board);
         return "redirect:/boards/"+id;
     }

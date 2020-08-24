@@ -1,5 +1,6 @@
 $(document).on("click",'#add',function() {
     document.getElementById("addCategoryForm").style.display = 'block';
+
 });
 
 $(document).on("click",'#addCategoryBtn',function () {
@@ -23,14 +24,12 @@ $(document).on("click",'#addCategoryBtn',function () {
             alert("카테고리를 선택해주세요");
             return;
         }
-        console.log(top_id)
         category.parent.id = top_id;
     } else {
         category.parent.id = middle_id;
     }
     category.name  = document.getElementById('addCategoryName').value;
     category.memo = document.getElementById('addCategoryMemo').value;
-
     addCategory(category);
 });
 
@@ -44,10 +43,16 @@ $(document).on("click",'#addCategoryCancelBtn',function () {
 
 function addCategory(category) {
 
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
+
     $.ajax({
         type:"POST",
         url:"/category",
-        contentType: 'application/json',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-type","application/json");
+            xhr.setRequestHeader(header,token);
+        },
         data : JSON.stringify(category),
         success: (data,status,xhr) => {
             var url = xhr.getResponseHeader("Location");

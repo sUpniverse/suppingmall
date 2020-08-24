@@ -9,6 +9,7 @@
         <h1>Sign in.</h1>
         <div class="col-md-5">
             <form class="form-signin" style="width: 100%; max-width: 330px; padding: 15px; margin: auto; left: auto" action="/users/login" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <div class="form-group">
                     <label for="exampleInputEmail1">Email address</label>
                     <input type="email" class="form-control" name="username" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">

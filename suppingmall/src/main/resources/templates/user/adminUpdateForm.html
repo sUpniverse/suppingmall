@@ -15,6 +15,7 @@
         <div class="col-md-8 orders-md-1  mx-auto">
 
             <form class="needs-validation mt-5" name="user" th:id="user">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <table class="table table-default">
                     <tbody>
                     <tr>
@@ -93,211 +94,223 @@
 </div>
 </body>
 <script>
-    let checkEmailResult = true;
-    let checkPhoneResult = true;
-    let checkAddressResult = true;
+    $(document).ready(function () {
+        let checkEmailResult = true;
+        let checkPhoneResult = true;
+        let checkAddressResult = true;
 
-    const email = getElement('email');
-    const validation = getElement("validEmail");
-    const duplication = getElement("duplicateEmail");
-    let first = getElementValue("phoneFirst");
-    let middle = getElementValue("phoneMiddle");
-    let last = getElementValue("phoneLast");
-    let phone = getElement("phone");
-    var sum = first + middle + last;
-    phone.setAttribute('value',sum);
+        const email = getElement('email');
+        const validation = getElement("validEmail");
+        const duplication = getElement("duplicateEmail");
+        let first = getElementValue("phoneFirst");
+        let middle = getElementValue("phoneMiddle");
+        let last = getElementValue("phoneLast");
+        let phone = getElement("phone");
+        var sum = first + middle + last;
+        phone.setAttribute('value',sum);
 
 
-    function check(re, what) {
-        if(re.test(what.value)) {
-            return true;
-        }
-    }
-
-    function getElement(id) {
-        return document.getElementById(id);
-    }
-
-    function getElementValue(id) {
-        return document.getElementById(id).value;
-    }
-
-    $(document).on('change keyup paste','#email', function () {
-        var reEmail = /^[A-Za-z0-9_]+[A-Za-z0-9]*[@]{1}[A-Za-z0-9]+[A-Za-z0-9]*[.]{1}[A-Za-z]{1,3}$/;
-
-        checkEmailResult = false;
-
-        if(check(reEmail, email)) {
-            validation.className = "valid-feedback";
-        } else {
-            validation.className = "invalid-feedback";
-            duplication.className = "invalid-feedback";
-            email.className = "form-control is-invalid";
+        function check(re, what) {
+            if(re.test(what.value)) {
+                return true;
+            }
         }
 
-    });
+        function getElement(id) {
+            return document.getElementById(id);
+        }
 
-    $(document).on('click','#emailCheck',function () {
+        function getElementValue(id) {
+            return document.getElementById(id).value;
+        }
 
-        if(validation.className === "valid-feedback") {
-            var emailval = email.value;
-            $.ajax({
-                type:"GET",
-                url:"/users/emails/"+emailval,
-                contentType: 'application/json',
-                success: (data) => {
-                    if(data) {
-                        duplication.className = "valid-feedback";
-                        email.className = "form-control is-valid";
-                        checkEmailResult = true;
-                    } else {
-                        duplication.className = "invalid-feedback";
-                        email.className = "form-control is-invalid";
-                        alert("아이디가 중복됩니다.");
+        $(document).on('change keyup paste','#email', function () {
+            var reEmail = /^[A-Za-z0-9_]+[A-Za-z0-9]*[@]{1}[A-Za-z0-9]+[A-Za-z0-9]*[.]{1}[A-Za-z]{1,3}$/;
+
+            checkEmailResult = false;
+
+            if(check(reEmail, email)) {
+                validation.className = "valid-feedback";
+            } else {
+                validation.className = "invalid-feedback";
+                duplication.className = "invalid-feedback";
+                email.className = "form-control is-invalid";
+            }
+
+        });
+
+        $(document).on('click','#emailCheck',function () {
+
+            if(validation.className === "valid-feedback") {
+                var emailval = email.value;
+                $.ajax({
+                    type:"GET",
+                    url:"/users/emails/"+emailval,
+                    contentType: 'application/json',
+                    success: (data) => {
+                        if(data) {
+                            duplication.className = "valid-feedback";
+                            email.className = "form-control is-valid";
+                            checkEmailResult = true;
+                        } else {
+                            duplication.className = "invalid-feedback";
+                            email.className = "form-control is-invalid";
+                            alert("아이디가 중복됩니다.");
+                        }
+                    }
+                });
+            } else {
+                alert("유효성을 만족하지 않습니다.");
+            }
+        });
+
+        $(document).on('change keyup paste','#password', function () {
+            var rePassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,15}$/;
+
+
+            if(check(rePassword, password)) {
+                password.className = "form-control is-valid";
+            } else {
+                password.className = "form-control is-invalid";
+            }
+        });
+
+        $(document).on('click',"#verifyPhone",function () {
+
+            var rePhone = /^(?:(010-\d{4})|(01[1|6|7|8|9]\d{3,4}))(\d{4})$/;
+
+            var sum = first + middle + last;
+
+            if (rePhone.test(sum)) {
+                alert("인증되었습니다.");
+                phone.setAttribute('value',sum);
+                checkPhoneResult = true;
+            } else {
+                alert("인증되지 않았습니다");
+            }
+
+        });
+
+        $(document).on('change',"#phoneFirst",function () {
+            checkPhoneResult = false;
+        });
+
+        $(document).on('change',"#phoneMiddle",function () {
+            checkPhoneResult = false;
+        });
+
+        $(document).on('change',"#phoneLast",function () {
+            checkPhoneResult = false;
+        });
+
+        $(document).on('click',"#search_address",function () {
+
+            var zipcode;
+            var address;
+
+            new daum.Postcode({
+                popupName: 'postcodePopup',
+                theme: {
+                    searchBgColor: "#0B65C8", //검색창 배경색
+                    queryTextColor: "#FFFFFF" //검색창 글자색
+                },
+                autoClose: false,
+
+                oncomplete: function(data) {
+                    zipcode = data.zonecode;
+                    if(data.userSelectedType === "R") {
+                        address = data.roadAddress;
+                    } else if(data.userSelectedType === "J") {
+                        address = data.jibunAddress;
+                    }
+
+                    document.getElementById("zip").setAttribute("value",zipcode);
+                    document.getElementById("address").setAttribute("value",address);
+
+                },
+
+                onclose: function(state) {
+                    //state는 우편번호 찾기 화면이 어떻게 닫혔는지에 대한 상태 변수 이며, 상세 설명은 아래 목록에서 확인하실 수 있습니다.
+                    if(state === 'FORCE_CLOSE'){
+                        //사용자가 브라우저 닫기 버튼을 통해 팝업창을 닫았을 경우, 실행될 코드를 작성하는 부분입니다.
+                        checkAddressResult = false;
+
+                    } else if(state === 'COMPLETE_CLOSE'){
+                        //사용자가 검색결과를 선택하여 팝업창이 닫혔을 경우, 실행될 코드를 작성하는 부분입니다.
+                        //oncomplete 콜백 함수가 실행 완료된 후에 실행됩니다.
+                        checkAddressResult = true;
                     }
                 }
-            });
-        } else {
-            alert("유효성을 만족하지 않습니다.");
-        }
-    });
+            }).open();
+        });
 
-    $(document).on('change keyup paste','#password', function () {
-        var rePassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,15}$/;
-
-
-        if(check(rePassword, password)) {
-            password.className = "form-control is-valid";
-        } else {
-            password.className = "form-control is-invalid";
-        }
-    });
-
-    $(document).on('click',"#verifyPhone",function () {
-
-        var rePhone = /^(?:(010-\d{4})|(01[1|6|7|8|9]\d{3,4}))(\d{4})$/;
-
-        var sum = first + middle + last;
-
-        if (rePhone.test(sum)) {
-            alert("인증되었습니다.");
-            phone.setAttribute('value',sum);
-            checkPhoneResult = true;
-        } else {
-            alert("인증되지 않았습니다");
-        }
-
-    });
-
-    $(document).on('change',"#phoneFirst",function () {
-        checkPhoneResult = false;
-    });
-
-    $(document).on('change',"#phoneMiddle",function () {
-        checkPhoneResult = false;
-    });
-
-    $(document).on('change',"#phoneLast",function () {
-        checkPhoneResult = false;
-    });
-
-    $(document).on('click',"#search_address",function () {
-
-        var zipcode;
-        var address;
-
-        new daum.Postcode({
-            popupName: 'postcodePopup',
-            theme: {
-                searchBgColor: "#0B65C8", //검색창 배경색
-                queryTextColor: "#FFFFFF" //검색창 글자색
-            },
-            autoClose: false,
-
-            oncomplete: function(data) {
-                zipcode = data.zonecode;
-                if(data.userSelectedType === "R") {
-                    address = data.roadAddress;
-                } else if(data.userSelectedType === "J") {
-                    address = data.jibunAddress;
+        function checkAllValidation() {
+            if(checkEmailResult && checkPhoneResult && checkAddressResult) {
+                return true;
+            } else {
+                var point;
+                if(!checkEmailResult) {
+                    point = "email";
+                    email.focus();
+                } else if(!checkPhoneResult) {
+                    point = "phone";
+                    document.getElementById("phoneFirst").focus();
+                } else if(!checkAddressResult) {
+                    point = "address";
+                    document.getElementById("zipcode").focus();
                 }
-
-                document.getElementById("zip").setAttribute("value",zipcode);
-                document.getElementById("address").setAttribute("value",address);
-
-            },
-
-            onclose: function(state) {
-                //state는 우편번호 찾기 화면이 어떻게 닫혔는지에 대한 상태 변수 이며, 상세 설명은 아래 목록에서 확인하실 수 있습니다.
-                if(state === 'FORCE_CLOSE'){
-                    //사용자가 브라우저 닫기 버튼을 통해 팝업창을 닫았을 경우, 실행될 코드를 작성하는 부분입니다.
-                    checkAddressResult = false;
-
-                } else if(state === 'COMPLETE_CLOSE'){
-                    //사용자가 검색결과를 선택하여 팝업창이 닫혔을 경우, 실행될 코드를 작성하는 부분입니다.
-                    //oncomplete 콜백 함수가 실행 완료된 후에 실행됩니다.
-                    checkAddressResult = true;
-                }
+                return false;
             }
-        }).open();
-    });
-
-    function checkAllValidation() {
-        if(checkEmailResult && checkPhoneResult && checkAddressResult) {
-            return true;
-        } else {
-            var point;
-            if(!checkEmailResult) {
-                point = "email";
-                email.focus();
-            } else if(!checkPhoneResult) {
-                point = "phone";
-                document.getElementById("phoneFirst").focus();
-            } else if(!checkAddressResult) {
-                point = "address";
-                document.getElementById("zipcode").focus();
-            }
-            return false;
         }
-    }
-</script>
-<script>
-    $(document).on('click','#updateButton',function () {
-
-        checkAllValidation();
-        var userData = $('#user').serializeObject();
-        var userId = [[${user.userId}]];
-
-        $.ajax({
-            type: 'PATCH',
-            url: "/users/"+userId,
-            data: JSON.stringify(userData),
-            dataType: 'text',
-            contentType: 'application/json',
-            success: () => {
-                window.opener.location.reload();
-                window.close();
-            },
-            error: (response, error) => {
-                alert("서버에 문제가 있습니다.")
-            }
-        })
     });
 </script>
 <script>
-    jQuery.fn.serializeObject = function() {
-        var obj = null;
-        try {
-            if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) {
-                var arr = this.serializeArray();
-                if(arr){ obj = {};
-                jQuery.each(arr, function() { obj[this.name] = this.value; });
+    $(document).ready(function () {
+        var header = [[${_csrf.headerName}]];
+        var token = [[${_csrf.token}]];
+        $(document).on('click','#updateButton',function () {
+
+
+            checkAllValidation();
+            var userData = $('#user').serializeObject();
+            var userId = [[${user.userId}]];
+
+            $.ajax({
+                type: 'PATCH',
+                url: "/users/"+userId,
+                data: JSON.stringify(userData),
+                dataType: 'text',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader(header,token);
+                },
+                success: () => {
+                    window.opener.location.reload();
+                    window.close();
+                },
+                error: (response, error) => {
+                    alert("서버에 문제가 있습니다.")
                 }
-            }
-        } catch(e) {
-            alert(e.message);
-        } finally {}
-        return obj;
-    }
+            })
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        jQuery.fn.serializeObject = function() {
+            var obj = null;
+            try {
+                if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) {
+                    var arr = this.serializeArray();
+                    if(arr){ obj = {};
+                        jQuery.each(arr, function() { obj[this.name] = this.value; });
+                    }
+                }
+            } catch(e) {
+                alert(e.message);
+            } finally {}
+            return obj;
+        }
+    });
 </script>
 </html>

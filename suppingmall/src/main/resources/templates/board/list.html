@@ -43,13 +43,15 @@
                     <nav aria-label="Page navigation example">
                         <ul class="pagination mx-auto">
                             <li class="page-item">
-                                <a class="page-link text-dark" th:if="${boardPageMaker.prev}" th:href="@{'/boards?page='+${boardPageMaker.startPage - 1}}" aria-label="Previous">
+                                <a class="page-link" th:if="${boardPageMaker.prev}" th:href="@{'/boards?page='+${boardPageMaker.startPage - 1}}" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
-                            <li class="page-item" th:each="idx : ${#numbers.sequence(boardPageMaker.startPage,boardPageMaker.endPage)}" th:if="${boardPageMaker.boardCriteria.page == idx} ? 'class = active': ''"><a class="page-link text-dark" th:href="@{'/boards?page='+${idx}}">[[${idx}]]</a></li>
+                            <li class="page-item" th:each="idx : ${#numbers.sequence(boardPageMaker.startPage,boardPageMaker.endPage)}" th:classappend="${boardPageMaker.boardCriteria.page} == ${idx} ? active">
+                                <a class="page-link" th:href="@{'/boards?page='+${idx}}" th:text="${idx}"></a>
+                            </li>
                             <li class="page-item" th:if="${boardPageMaker.next && boardPageMaker.endPage > 0}">
-                                <a class="page-link text-dark" th:href="@{'/boards?page='+${boardPageMaker.endPage + 1}}" aria-label="Next">
+                                <a class="page-link" th:href="@{'/boards?page='+${boardPageMaker.endPage + 1}}" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>

@@ -1,6 +1,8 @@
 $(document).ready(function () {
     const userId = [[${#authentication?.principal.userId}]];
     let theEditor;
+
+
     ClassicEditor
         .create( document.querySelector('#editor'), {
             language: "ko"

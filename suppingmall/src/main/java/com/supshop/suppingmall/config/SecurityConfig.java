@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.CustomUserTypesOAuth2UserService;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @RequiredArgsConstructor
 @Configuration
@@ -72,7 +73,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .anonymous()
         .and()
             .cors().disable()
-            .csrf().disable()
+            .csrf()
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+        .and()
             .formLogin()
                 .successHandler(loginSuccessHandler)
                 .loginPage(loginForm)
@@ -83,6 +86,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .logout()
                 .logoutUrl(logout)
                 .logoutSuccessUrl(main)
+                .invalidateHttpSession(true).deleteCookies("JSESSIONID")
         .and()
             .exceptionHandling()
                 .accessDeniedPage(loginForm)

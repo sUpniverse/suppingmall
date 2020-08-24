@@ -92,6 +92,9 @@
 <script>
     $(document).ready(function() {
 
+        var header = [[${_csrf.headerName}]];
+        var token = [[${_csrf.token}]];
+
         $(document).on("click","#manageButton",function(e) {
             var userId = e.target.parentElement.parentElement.firstElementChild.textContent;
             getUpdateUserFom(userId)
@@ -106,7 +109,10 @@
                 data: JSON.stringify({
                     "delYn": "Y"
                 }),
-                contentType: 'application/json',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader(header,token);
+                },
                 success: () => {
                     document.getElementById('deleteButton').outerHTML = '<input type="button" id="revivalButton" class="btn btn-primary" value="재개하기">';
                 },
@@ -127,7 +133,10 @@
                 data: JSON.stringify({
                     "delYn": "N"
                 }),
-                contentType: 'application/json',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader(header,token);
+                },
                 success: () => {
                     document.getElementById('revivalButton').outerHTML = '<input type="button" id="deleteButton" class="btn btn-danger" value="삭제하기">';
                 },

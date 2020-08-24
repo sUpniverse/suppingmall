@@ -31,11 +31,16 @@ function changeDisplay(id) {
 
 $(document).on("click",".btn-danger.delete",function() {
     var id = document.getElementById('id').val;
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
 
     $.ajax({
         type: "DELETE",
         url: "/category/"+id,
-        contentType: 'application/json',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-type","application/json");
+            xhr.setRequestHeader(header,token);
+        },
         success: (data,status,xhr) => {
             document.getElementById(id).parentElement.innerText = "";
         },
@@ -62,6 +67,8 @@ function initDetail(name,memo) {
 
 $(document).on("click",".btn-warning.updateDetail",function () {
     var id = document.getElementById('id').val;
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
 
     var newName = getInputText('name');
     var newMemo = getInputText('memo');
@@ -78,8 +85,11 @@ $(document).on("click",".btn-warning.updateDetail",function () {
     $.ajax({
         type: "PUT",
         url: "/category/"+id,
-        contentType: 'application/json',
         data: JSON.stringify(category),
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-type","application/json");
+            xhr.setRequestHeader(header,token);
+        },
         success: (data,status,xhr) => {
             initDetail(newName,newMemo);
         },

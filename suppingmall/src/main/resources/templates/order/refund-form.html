@@ -47,6 +47,7 @@
         </tr>
     </table>
     <form role="form">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         <table class="table table-default border-bottom">
             <thead>
             <tr class="text-center">

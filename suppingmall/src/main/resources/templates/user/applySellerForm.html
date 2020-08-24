@@ -62,6 +62,7 @@
                             <h3 class="h2 mr-3">추가정보입력</h3>
                             거짓정보 입력 시 심사에 탈락할 수 있습니다.
                             <form th:action="@{'/users/seller/'+${user.userId}+'/apply'}" method="post" name="store" onsubmit="return checkAllValidation()">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                 <input type="hidden" name="storeApplyYn" value="Y">
                                 <table class="table table-default mt-1">
                                     <tbody>

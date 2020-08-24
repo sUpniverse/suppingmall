@@ -17,6 +17,7 @@
                     <h1 class="h2">회원정보 수정</h1>
                 </div>
                 <form class="needs-validation"  novalidate="" th:action="@{/users/{id}(id=${user.userId})}" method="post" name="user" onsubmit="return checkAllValidation()">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                     <input type="hidden" th:name="_method" th:value="PUT">
                     <table class="table table-default">
                         <tbody>

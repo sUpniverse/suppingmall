@@ -27,6 +27,9 @@
 <script>
     $(document).ready(function() {
 
+        var header = [[${_csrf.headerName}]];
+        var token = [[${_csrf.token}]];
+
         function check(re, what) {
             if(re.test(what.value)) {
                 return true;
@@ -71,6 +74,10 @@
                     "userName" : name
                 }),
                 dataType: 'text',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader(header,token);
+                },
                 success : (data,status,xhr) => {
                     if(xhr.status === 200) {
                         alert("해당계정으로 비밀번호 발급 메일을 전송하였습니다.");

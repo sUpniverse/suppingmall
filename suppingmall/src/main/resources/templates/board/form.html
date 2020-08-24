@@ -14,7 +14,6 @@
     <nav th:replace="fragments/navigation :: navigation" />
     <div class="container">
         <form th:action="@{/boards}" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="category.id" th:value="1">
             <input th:type="hidden" th:name="creator.userId" th:value="${#authentication?.principal.userId}" >
             <input th:type="hidden" th:name="imagesUrl" id="imagesUrl">
             <table class="table">
@@ -26,7 +25,7 @@
                 <tbody>
                 <tr>
                     <td>
-                        <select class="form-control" id="category" required>
+                        <select class="form-control" id="category" name="category.id" required>
                             <option disabled selected value>카테고리를 선택해주세요</option>
                             <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
                         </select>
@@ -51,6 +50,9 @@
 </body>
 <script th:inline="javascript">
     $(document).ready(function () {
+
+        var header = [[${_csrf.headerName}]];
+        var token = [[${_csrf.token}]];
         const userId = [[${#authentication?.principal.userId}]];
         let theEditor;
         ClassicEditor
@@ -121,6 +123,7 @@
             _sendRequest(file) {
                 const data = new FormData();
                 data.append('file', file);
+                this.xhr.setRequestHeader(header,token);
                 this.xhr.send(data);
             }
         }
