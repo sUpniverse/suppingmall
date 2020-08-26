@@ -54,10 +54,11 @@
         SELECT B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents", B.hit AS "BoardHit",
         B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate", U.user_id AS "UserId",
         U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",
-        C.category_id AS "CategoryId", C.name AS "CategoryName"
+        C.category_id AS "CategoryId", C.name AS "CategoryName", CM.comment_id AS "commentId"
         FROM Board AS B
         LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
         LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
+        LEFT OUTER JOIN comment AS CM on (B.board_id = CM.board_id)
         WHERE B.category_id = #{categoryId}
         <include refid="conditionalSearch"></include>
         ORDER BY B.board_id desc
