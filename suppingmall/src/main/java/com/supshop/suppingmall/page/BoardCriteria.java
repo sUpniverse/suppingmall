@@ -10,7 +10,6 @@ public class BoardCriteria extends Criteria{
 
     @Override
     public void setPerPageNum(int perPageNum) {
-        if(perPageNum <= 0) this.setPerPageNum(boardPerPageNum);
-        else this.setPerPageNum(perPageNum);
+        if(perPageNum > 0) this.setPerPageNum(perPageNum);
     }
 }

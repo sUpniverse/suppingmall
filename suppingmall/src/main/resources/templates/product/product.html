@@ -9,6 +9,8 @@
         }
     </style>
     <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}" />
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 <div class="container">

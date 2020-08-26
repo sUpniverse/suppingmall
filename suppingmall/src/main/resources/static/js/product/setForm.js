@@ -1,7 +1,12 @@
 $(document).ready(function() {
 
+    var token = $("meta[name='_csrf']").attr("content");
+    var header = $("meta[name='_csrf_header']").attr("content");
+
     $(document).on('click',"#cart",function() {
-        isSingIn()
+        if(!isSingIn()) {
+            return;
+        }
         var cartFrom = setCartForm();
         if(cartFrom === undefined) {
             return;
@@ -10,7 +15,10 @@ $(document).ready(function() {
         $.ajax({
             url: "/cart",
             type: 'POST',
-            contentType: 'application/json',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Content-type","application/json");
+                xhr.setRequestHeader(header,token);
+            },
             data: JSON.stringify(cartFrom) ,
             success: () => {
                 var isMove = confirm('장바구니로 이동하시겠습니까?');
@@ -26,7 +34,9 @@ $(document).ready(function() {
     });
 
     $(document).on('click',"#purchase",function() {
-        isSingIn()
+        if(!isSingIn()) {
+            return;
+        }
 
         var formObj = $("form[role='form']");
 
@@ -119,6 +129,7 @@ function isSingIn() {
         if(Login) {
             location.href = "/users/loginform";
         }
+        return false;
     }
 }
 

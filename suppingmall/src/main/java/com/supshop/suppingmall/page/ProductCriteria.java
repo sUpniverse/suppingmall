@@ -11,9 +11,7 @@ public class ProductCriteria extends Criteria {
         super(productPerPageNum);
     }
 
-    @Override
     public void setPerPageNum(int perPageNum) {
-        if(perPageNum <= 0) this.setPerPageNum(productPerPageNum);
-        else this.setPerPageNum(perPageNum);
+        if(perPageNum > 0) this.setPerPageNum(perPageNum);
     }
 }

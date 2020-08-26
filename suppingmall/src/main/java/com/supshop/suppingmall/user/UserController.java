@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.user;
 
+import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.page.BoardCriteria;
 import com.supshop.suppingmall.page.BoardPageMaker;
 import com.supshop.suppingmall.user.Form.ApplySellerForm;
@@ -36,15 +37,11 @@ public class UserController {
 
     @GetMapping("/signup")
     public String signupform(@AuthenticationPrincipal SessionUser user) {
-        if (isLoginUser(user))
-            return redirectMainUrl;
         return "/user/signup";
     }
 
     @GetMapping("/loginform")
     public String loginform(@AuthenticationPrincipal SessionUser user, HttpServletRequest request) {
-        if (isLoginUser(user)) return "redirect:/";
-
         String uri = request.getHeader(requestReferer);
         if (uri == null || !uri.contains("/loginform")) {
             request.getSession().setAttribute(prevPage, request.getHeader(requestReferer));
@@ -99,9 +96,6 @@ public class UserController {
 
     @PostMapping("")
     public String createUser(@Valid SignUpForm signUpForm, @AuthenticationPrincipal SessionUser user) {
-        if(isLoginUser(user)) {
-            return redirectMainUrl;
-        }
         User createdUser = modelMapper.map(signUpForm, User.class);
         userService.createUser(createdUser);
 
@@ -110,7 +104,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     public String updateUser(@PathVariable Long id, User user, @AuthenticationPrincipal SessionUser sessionUser) {
-        if(isOwner(id, sessionUser) || isAdmin(sessionUser)) {
+        if(UserUtils.isOwner(id, sessionUser) || UserUtils.isAdmin(sessionUser)) {
             userService.updateUser(id, user);
             return redirectMainUrl;
         }
@@ -188,7 +182,7 @@ public class UserController {
     public String getUserPage(@PathVariable Long id, Model model,@AuthenticationPrincipal SessionUser sessionUser) {
 
         // 관리자 일 경우 관리자 메인페이지로
-        if(isAdmin(sessionUser)) {
+        if(UserUtils.isAdmin(sessionUser)) {
             model.addAttribute("user",sessionUser);
             return "/user/admin/main";
         }
@@ -200,7 +194,7 @@ public class UserController {
     public String getUpdateForm(@PathVariable Long id, Model model, @AuthenticationPrincipal SessionUser sessionUser) {
 
         // 운영자 자격으로 해당 회원의 정보를 수정할 시 사용
-        if(isAdmin(sessionUser)) {
+        if(UserUtils.isAdmin(sessionUser)) {
             User user = userService.getUser(id);
             model.addAttribute("user",user);
             return "/user/adminUpdateForm";
@@ -226,7 +220,7 @@ public class UserController {
 
     @GetMapping("/seller/{id}")
     public String getSeller(@PathVariable Long id, Model model, @AuthenticationPrincipal SessionUser sessionUser) {
-        if(isOwner(id, sessionUser)) {
+        if(UserUtils.isOwner(id, sessionUser)) {
             model.addAttribute("user", sessionUser);
             return "redirect:/user/"+id+"/form";
         }
@@ -247,7 +241,7 @@ public class UserController {
     public String applySellerRole(@PathVariable Long id,
                                   @Valid ApplySellerForm applyForm,
                                   @AuthenticationPrincipal SessionUser sessionUser) {
-        if(isOwner(id, sessionUser)) {
+        if(UserUtils.isOwner(id, sessionUser)) {
             StoreVO store = modelMapper.map(applyForm, StoreVO.class);
             userService.patchUser(id,User.builder().storeVO(store).build());
             return "redirect:/users/"+id+"/form";
@@ -260,7 +254,7 @@ public class UserController {
                                  Model model,
                                  @AuthenticationPrincipal SessionUser sessionUser) {
 
-        if(isAdmin(sessionUser)) {
+        if(UserUtils.isAdmin(sessionUser)) {
             List<User> applySellerUsers = userService.getApplySellerUsers(boardCriteria);
 
             BoardPageMaker boardPageMaker = new BoardPageMaker(applySellerUsers.size(),boardCriteria);
@@ -275,7 +269,7 @@ public class UserController {
     @PatchMapping("/seller/{id}/apply")
     @ResponseBody
     public ResponseEntity grantSellerRole(@PathVariable Long id, @AuthenticationPrincipal SessionUser sessionUser) {
-        if(isAdmin(sessionUser)) {
+        if(UserUtils.isAdmin(sessionUser)) {
             User user = userService.getUser(id);
             StoreVO storeVO = user.getStoreVO();
             storeVO.setStoreApplyYn("N");
@@ -357,19 +351,5 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-
-    private boolean isLoginUser(SessionUser sessionUser) {
-        if(sessionUser != null) return true;
-        return false;
-    }
-
-    //세션의 유저와 해당 목표물의 주인의 아이디가 같은지 확인
-    private boolean isOwner(Long id, SessionUser sessionUser) {
-        return sessionUser != null && sessionUser.getUserId().equals(id);
-    }
-
-    private boolean isAdmin(SessionUser sessionUser) {
-        return sessionUser != null && (sessionUser.getRole().equals(Role.ADMIN) || (sessionUser.getRole().equals(Role.MASTER)));
-    }
 
 }
