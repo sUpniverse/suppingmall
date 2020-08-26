@@ -28,9 +28,7 @@ public class BoardController {
     private final CategoryService categoryService;
     private final ModelMapper modelMapper;
 
-    private final Long boardCategoryId = 21l;
-
-
+    private static final Long boardCategoryId = 21l;
 
     @GetMapping("/form")
     public String form(@RequestParam(required = false) Long categoryId,
@@ -50,9 +48,7 @@ public class BoardController {
 
         log.debug("'getAllBoard'가 실행됨");
 
-        BoardPageMaker boardPageMaker = new BoardPageMaker();
-        boardPageMaker.setBoardCriteria(boardCriteria);
-        boardPageMaker.setTotalCount(boardService.getBoardCount());
+        BoardPageMaker boardPageMaker = new BoardPageMaker(boardService.getBoardCount(),boardCriteria);
         model.addAttribute(boardService.getBoardByCondition(boardCriteria,category,type,searchValue));
         model.addAttribute("boardPageMaker", boardPageMaker);
 

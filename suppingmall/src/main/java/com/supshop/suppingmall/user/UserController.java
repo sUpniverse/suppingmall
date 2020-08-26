@@ -32,6 +32,8 @@ public class UserController {
     private static final String requestReferer = "Referer";
     private static final String prevPage = "prevPage";
 
+    private static final int perPageNumber = 15;
+
     @GetMapping("/signup")
     public String signupform(@AuthenticationPrincipal SessionUser user) {
         if (isLoginUser(user))
@@ -58,9 +60,7 @@ public class UserController {
                              @RequestParam(required = false) String searchValue) {
 //        if(!isLoginUser(user)) return redirectLoginUrl;
         model.addAttribute(userService.getAllUser(boardCriteria,type,searchValue));
-        BoardPageMaker boardPageMaker = new BoardPageMaker();
-        boardPageMaker.setBoardCriteria(boardCriteria);
-        boardPageMaker.setTotalCount(userService.getBoardCount());
+        BoardPageMaker boardPageMaker = new BoardPageMaker(userService.getBoardCount(),boardCriteria);
         model.addAttribute("boardPageMaker", boardPageMaker);
         return "/user/list";
     }
@@ -263,9 +263,7 @@ public class UserController {
         if(isAdmin(sessionUser)) {
             List<User> applySellerUsers = userService.getApplySellerUsers(boardCriteria);
 
-            BoardPageMaker boardPageMaker = new BoardPageMaker();
-            boardPageMaker.setBoardCriteria(boardCriteria);
-            boardPageMaker.setTotalCount(applySellerUsers.size());
+            BoardPageMaker boardPageMaker = new BoardPageMaker(applySellerUsers.size(),boardCriteria);
 
             model.addAttribute("userList",applySellerUsers);
             model.addAttribute("boardPageMaker", boardPageMaker);

@@ -1,30 +1,16 @@
 package com.supshop.suppingmall.page;
 
-import lombok.Getter;
-import lombok.ToString;
+public class BoardCriteria extends Criteria{
 
-@Getter
-@ToString
-public class BoardCriteria {
-
-    private int page;
-    public static final int perPageNum = 10;
+    private static final int boardPerPageNum = 20;
 
     public BoardCriteria() {
-        this.page = 1;
+        super(boardPerPageNum);
     }
 
-    public void setPage(int page) {
-        if(page <= 0) {
-            this.page = 1;
-            return;
-        }
-
-        this.page = page;
+    @Override
+    public void setPerPageNum(int perPageNum) {
+        if(perPageNum <= 0) this.setPerPageNum(boardPerPageNum);
+        else this.setPerPageNum(perPageNum);
     }
-
-    public int getPageStart() {
-        return (this.page - 1) * perPageNum;
-    }
-
 }
