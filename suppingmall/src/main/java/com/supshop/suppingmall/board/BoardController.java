@@ -5,7 +5,7 @@ import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryService;
 import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.page.BoardCriteria;
-import com.supshop.suppingmall.page.BoardPageMaker;
+import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Slf4j
@@ -29,6 +28,7 @@ public class BoardController {
     private final ModelMapper modelMapper;
 
     private static final Long boardCategoryId = 21l;
+    private static final int boardDisplayPagingNum = 5;
 
     @GetMapping("/form")
     public String form(@RequestParam(required = false) Long categoryId,
@@ -48,9 +48,9 @@ public class BoardController {
 
         log.debug("'getAllBoard'가 실행됨");
 
-        BoardPageMaker boardPageMaker = new BoardPageMaker(boardService.getBoardCount(),boardCriteria);
+        PageMaker pageMaker = new PageMaker(boardService.getBoardCount(),boardDisplayPagingNum,boardCriteria);
         model.addAttribute(boardService.getBoardByCondition(boardCriteria,category,type,searchValue));
-        model.addAttribute("boardPageMaker", boardPageMaker);
+        model.addAttribute("boardPageMaker", pageMaker);
 
         return "/board/list";
     }

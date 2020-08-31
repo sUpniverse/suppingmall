@@ -14,6 +14,8 @@ public interface CategoryMapper {
 
     List<Category> findChildByParent(Long id);
 
+    Category findGrandParentByGrandChildren(Long id);
+
     void save(Category category);
 
     void delete(Long id);

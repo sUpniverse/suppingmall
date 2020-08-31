@@ -2,7 +2,7 @@ package com.supshop.suppingmall.user;
 
 import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.page.BoardCriteria;
-import com.supshop.suppingmall.page.BoardPageMaker;
+import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.user.Form.ApplySellerForm;
 import com.supshop.suppingmall.user.Form.FindAccountForm;
 import com.supshop.suppingmall.user.Form.SignUpForm;
@@ -34,6 +34,7 @@ public class UserController {
     private static final String prevPage = "prevPage";
 
     private static final int perPageNumber = 15;
+    private static final int pagingCount = 15;
 
     @GetMapping("/signup")
     public String signupform(@AuthenticationPrincipal SessionUser user) {
@@ -57,8 +58,8 @@ public class UserController {
                              @RequestParam(required = false) String searchValue) {
 //        if(!isLoginUser(user)) return redirectLoginUrl;
         model.addAttribute(userService.getAllUser(boardCriteria,type,searchValue));
-        BoardPageMaker boardPageMaker = new BoardPageMaker(userService.getBoardCount(),boardCriteria);
-        model.addAttribute("boardPageMaker", boardPageMaker);
+        PageMaker pageMaker = new PageMaker(userService.getBoardCount(),pagingCount,boardCriteria);
+        model.addAttribute("boardPageMaker", pageMaker);
         return "/user/list";
     }
 
@@ -257,10 +258,10 @@ public class UserController {
         if(UserUtils.isAdmin(sessionUser)) {
             List<User> applySellerUsers = userService.getApplySellerUsers(boardCriteria);
 
-            BoardPageMaker boardPageMaker = new BoardPageMaker(applySellerUsers.size(),boardCriteria);
+            PageMaker pageMaker = new PageMaker(userService.getBoardCount(),pagingCount,boardCriteria);
 
             model.addAttribute("userList",applySellerUsers);
-            model.addAttribute("boardPageMaker", boardPageMaker);
+            model.addAttribute("boardPageMaker", pageMaker);
             return "/user/admin/applySellerList";
         }
         return redirectLoginUrl;

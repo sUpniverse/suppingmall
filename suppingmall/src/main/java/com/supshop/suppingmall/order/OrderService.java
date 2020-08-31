@@ -7,6 +7,7 @@ import com.supshop.suppingmall.mapper.OrderItemMapper;
 import com.supshop.suppingmall.mapper.OrderMapper;
 import com.supshop.suppingmall.order.Form.OrderForm;
 import com.supshop.suppingmall.order.Form.TempOrderForm;
+import com.supshop.suppingmall.page.OrderCriteria;
 import com.supshop.suppingmall.payModule.ModuleController;
 import com.supshop.suppingmall.payment.Payment;
 import com.supshop.suppingmall.payment.PaymentService;
@@ -60,7 +61,7 @@ public class OrderService {
     }
 
     //판매자의 관점에서 주문을 조회
-    public List<Orders> findOrderBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Delivery.DeliveryStatus deliveryStatus, Orders.OrderStatus orderStatus) {
+    public List<Orders> findOrderBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Delivery.DeliveryStatus deliveryStatus, Orders.OrderStatus orderStatus, OrderCriteria criteria) {
         LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
         LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
         String code = "";
@@ -69,7 +70,7 @@ public class OrderService {
         } else if(type != null && type.equals("order")) {
             code = Optional.ofNullable(orderStatus).map(Orders.OrderStatus::getCode).orElse(null);
         }
-        List<Orders> ordersList = orderMapper.findBySellerId(userId, formDateTime, toDateTime, type,  code);
+        List<Orders> ordersList = orderMapper.findBySellerId(userId, formDateTime, toDateTime, type,  code, criteria);
         return ordersList;
     }
 

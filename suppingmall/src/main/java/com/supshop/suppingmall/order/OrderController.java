@@ -3,6 +3,9 @@ package com.supshop.suppingmall.order;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.order.Form.OrderForm;
 import com.supshop.suppingmall.order.Form.TempOrderForm;
+import com.supshop.suppingmall.page.Criteria;
+import com.supshop.suppingmall.page.OrderCriteria;
+import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.user.Role;
 import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,7 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    private static final int orderDisplayPagingNum = 5;
 
     @PostMapping("/orderSheet")
     public String getOrderSheet(TempOrderForm tempOrderForm,
@@ -107,14 +111,22 @@ public class OrderController {
                                      @RequestParam(required = false) Delivery.DeliveryStatus deliveryStatus,
                                      @RequestParam(required = false) Orders.OrderStatus orderStatus,
                                      @AuthenticationPrincipal SessionUser user,
+                                     OrderCriteria criteria,
                                      Model model) {
 
-        List<Orders> orders = orderService.findOrderBySellerId(user.getUserId(),fromDate,toDate,type,deliveryStatus,orderStatus);
-        model.addAttribute("orders",orders);
+
+        List<Orders> orders = orderService.findOrderBySellerId(user.getUserId(),fromDate,toDate,type,deliveryStatus,orderStatus,null);
+        PageMaker pageMaker = new PageMaker(orders.size(), orderDisplayPagingNum, criteria);
+        List<Orders> pagingOrders = orderService.findOrderBySellerId(user.getUserId(),fromDate,toDate,type,deliveryStatus,orderStatus,criteria);
+
+        model.addAttribute("orders",pagingOrders);
+        model.addAttribute("pageMaker",pageMaker);
+
         if(type != null && type.equals("order")) {
             model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.CANCEL,Orders.OrderStatus.REFUND,Orders.OrderStatus.CHANGE));
             return "/order/seller/refund-list";
         }
+
         model.addAttribute("statusList", Arrays.asList(Delivery.DeliveryStatus.values()));
         return "/order/seller/list";
     }

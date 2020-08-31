@@ -2,6 +2,8 @@ package com.supshop.suppingmall.product;
 
 import com.supshop.suppingmall.image.ImageService;
 import com.supshop.suppingmall.mapper.ProductMapper;
+import com.supshop.suppingmall.page.PageMaker;
+import com.supshop.suppingmall.page.ProductCriteria;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,18 +23,32 @@ public class ProductService {
     private static final String productImageUrl = "/images/product/";
     private static final String productName = "product";
 
-    public List<Product> findAllProduct() {
-        return productMapper.findProducts();
+    private static final int latestProductCount = 5;
+    private static final int recommandProductCount = 8;
+
+    public List<Product> findProducts() {
+        return productMapper.findAll();
     }
 
-    public List<Product> findAllProductOnSale() {
-        return productMapper.findProductsOnSale();
+    public List<Product> findOnSaleProducts(String name) {
+        return productMapper.findAll(null,null,name,Product.ProductStatus.SALE);
     }
 
     public Product findProduct(Long id) {
-      return productMapper.findProduct(id);
+      return productMapper.findOne(id);
     }
 
+    public List<Product> findLatestProduct() {
+        return productMapper.findLatestAll();
+    }
+
+    public List<Product> findProductsBySellerId(Long userId, ProductCriteria productCriteria) {
+        return productMapper.findAllBySellerId(userId, productCriteria);
+    }
+
+    public List<Product> findProductsByOrderCount() {
+        return productMapper.findAllByOrderCount();
+    }
 
 
     @Transactional
@@ -75,9 +91,6 @@ public class ProductService {
         productMapper.deleteProduct(id);
     }
 
-    public List<Product> findProductsBySellerId(Long userId) {
-        return productMapper.findProductsById(userId);
-    }
 
 
     // image/product/{yyyyMMdd}/{userId}/fileName => image/product/{categoryId}/fileName

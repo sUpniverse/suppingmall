@@ -2,6 +2,7 @@ package com.supshop.suppingmall.mapper;
 
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.order.Orders;
+import com.supshop.suppingmall.page.OrderCriteria;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,7 +19,7 @@ public interface OrderMapper {
 
     List<Orders> findByBuyerId(Long userId, LocalDateTime fromDate, LocalDateTime toDate, String type, String searchValue);
 
-    List<Orders> findBySellerId(Long userId, LocalDateTime fromDate, LocalDateTime toDate, String type, String searchValue);
+    List<Orders> findBySellerId(Long userId, LocalDateTime fromDate, LocalDateTime toDate, String type, String searchValue, OrderCriteria criteria);
 
     /*
     patch 형태의 update임 (duty 체킹 후 바뀐 포인트만 업데이트)

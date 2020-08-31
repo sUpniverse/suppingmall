@@ -2,12 +2,16 @@ package com.supshop.suppingmall.product;
 
 import com.supshop.suppingmall.board.Board;
 import com.supshop.suppingmall.board.BoardService;
+import com.supshop.suppingmall.cart.Cart;
+import com.supshop.suppingmall.cart.CartService;
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryService;
 import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.image.ImageController;
 import com.supshop.suppingmall.image.ImageService;
+import com.supshop.suppingmall.page.PageMaker;
+import com.supshop.suppingmall.page.ProductCriteria;
 import com.supshop.suppingmall.product.Form.ProductForm;
 import com.supshop.suppingmall.product.Form.QnaForm;
 import com.supshop.suppingmall.user.SessionUser;
@@ -34,11 +38,14 @@ public class ProductController {
     private final CategoryService categoryService;
     private final ImageService imageService;
     private final BoardService boardService;
+    private final CartService cartService;
     private final ModelMapper modelMapper;
 
     private static final Long qnaCategoryId = 30l;
     private static final Long reviewCategoryId = 29l;
     private static final Long productCategoryId = 2L;
+
+    private static final int productPagingCount = 5;
 
     @GetMapping("/form")
     public String form(Model model) {
@@ -50,7 +57,7 @@ public class ProductController {
     //상태에 관계없이 모든 상품
     @GetMapping("")
     public String getAllProduct(Model model) {
-        List<Product> products = productService.findAllProduct();
+        List<Product> products = productService.findProducts();
         model.addAttribute("products",products);
         model.addAttribute("categories",categoryService.getCategory(productCategoryId).getChild());
         return "/product/list";
@@ -58,17 +65,45 @@ public class ProductController {
 
     //판매상태의 모든 물품들
     @GetMapping("/main")
-    public String getAllProductOnSale(Model model) {
-        List<Product> products = productService.findAllProductOnSale();
+    public String getAllOnSaleProduct(Model model,
+                                      @RequestParam(required = false)String name) {
+        List<Product> products = productService.findOnSaleProducts(name);
         model.addAttribute("products",products);
         model.addAttribute("categories",categoryService.getCategory(productCategoryId).getChild());
         return "/product/list";
+    }
+
+    //판매상태의 모든 물품들
+    @GetMapping("/main2")
+    public String getAllOnSaleProduct2(Model model,
+                                       @AuthenticationPrincipal SessionUser user,
+                                       @RequestParam(required = false)String productName) {
+
+        List<Product> products = productService.findOnSaleProducts(productName);
+        ProductCriteria criteria = new ProductCriteria();
+        List<Cart> cart = null;
+        if(user != null) cart = cartService.findCartByBuyerId(user.getUserId());
+
+        model.addAttribute("products",products);
+        if(cart != null) model.addAttribute("cart",cart.size());
+        model.addAttribute("categories",categoryService.getCategory(productCategoryId).getChild());
+
+        // Todo: 추천, 베스트, 신제품 product 구해오기, 그에따른 페이지메이커 생성
+        PageMaker latestPageMaker = new PageMaker(products.size(),productPagingCount,criteria);
+        PageMaker bestPageMaker = new PageMaker(products.size(),productPagingCount,criteria);
+        PageMaker newPageMaker = new PageMaker(products.size(),productPagingCount,criteria);
+
+        return "/product/list2";
     }
 
 
     @GetMapping("/{id}")
     public String getProduct(@PathVariable Long id, Model model) {
         Product product = productService.findProduct(id);
+
+        Category category = categoryService.getGrandParentByGrandChildren(product.getCategory().getId());
+        product.setCategory(category);
+
         List<Board> qnaList = boardService.getBoardsByProduct(id,qnaCategoryId);
         List<Board> reviews = boardService.getBoardsByProduct(id,reviewCategoryId);
 
@@ -76,6 +111,47 @@ public class ProductController {
         model.addAttribute("qnaList",qnaList);
         model.addAttribute("reviews",reviews);
         return "/product/product";
+    }
+
+    @GetMapping("/{id}/2")
+    public String getProduct2(@PathVariable Long id, Model model) {
+        Product product = productService.findProduct(id);
+
+        Category category = categoryService.getGrandParentByGrandChildren(product.getCategory().getId());
+        product.setCategory(category);
+
+        List<Board> qnaList = boardService.getBoardsByProduct(id,qnaCategoryId);
+        List<Board> reviews = boardService.getBoardsByProduct(id,reviewCategoryId);
+
+        model.addAttribute("product",product);
+        model.addAttribute("qnaList",qnaList);
+        model.addAttribute("reviews",reviews);
+        return "/product/product2";
+    }
+
+
+    @GetMapping("/latest")
+    public String getLatestProduct(@PathVariable Long id, Model model) {
+        List<Product> products = productService.findLatestProduct();
+        model.addAttribute("product",products);
+        return "/product/latestList";
+    }
+
+    @GetMapping("/seller")
+    public String getProductsBySeller(@AuthenticationPrincipal SessionUser user,
+                                      ProductCriteria productCriteria,
+                                      Model model) {
+
+        List<Product> products = productService.findProductsBySellerId(user.getUserId(),null);
+        PageMaker pageMaker = new PageMaker(products.size(),productPagingCount,productCriteria);
+
+        List<Product> pagingProducts = productService.findProductsBySellerId(user.getUserId(), productCriteria);
+
+        model.addAttribute("user",user);
+        model.addAttribute("products",pagingProducts);
+        model.addAttribute("pageMaker",pageMaker);
+
+        return "/product/seller/list";
     }
 
     @PostMapping("")
@@ -120,14 +196,6 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public String deleteProduct(@PathVariable Long id) {
         return "";
-    }
-
-    @GetMapping("/seller")
-    public String getProductsBySeller(@AuthenticationPrincipal SessionUser user, Model model) {
-        List<Product> products = productService.findProductsBySellerId(user.getUserId());
-        model.addAttribute("user",user);
-        model.addAttribute("products",products);
-        return "/product/seller/list";
     }
 
     @GetMapping("/{productId}/qnas/form")

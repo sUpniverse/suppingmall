@@ -29,6 +29,10 @@ public class CategoryService {
         return categoryMapper.findChildByParent(id);
     }
 
+    public Category getGrandParentByGrandChildren(Long id) {
+        return categoryMapper.findGrandParentByGrandChildren(id);
+    }
+
     @Transactional
     public Long saveCategory(Category category) {
         categoryMapper.save(category);

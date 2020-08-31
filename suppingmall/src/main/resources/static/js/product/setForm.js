@@ -131,6 +131,7 @@ function isSingIn() {
         }
         return false;
     }
+    return true;
 }
 
 

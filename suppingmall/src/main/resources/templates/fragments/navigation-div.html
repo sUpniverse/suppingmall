@@ -1,20 +1,39 @@
-<div class="container d-flex flex-column flex-md-row justify-content-between" th:fragment="navigation-div">
-    <a class="py-2" href="/">
+<div th:fragment="navigation-div" id="replaced">
+    <a class="navbar-brand" href="/">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="d-block mx-auto" role="img" viewBox="0 0 24 24" focusable="false"><title>Product</title><circle cx="12" cy="12" r="10"></circle><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83m13.79-4l-5.74 9.94"></path></svg>
     </a>
-    <a class="py-2 d-none d-md-inline-block" href="/products/main">Price</a>
-    <a class="py-2 d-none d-md-inline-block" href="/boards/">Farm</a>
-    <a class="py-2 d-none d-md-inline-block" href="#">Enterprise</a>
-    <a class="py-2 d-none d-md-inline-block" href="#">Support</a>
-    <a sec:authorize="!isAuthenticated()" class="py-2 d-none d-md-inline-block" href="/users/signup">Signup</a>
-    <a sec:authorize="!isAuthenticated()" class="btn btn-outline-dark" href="/users/loginform">Login</a>
-    <div sec:authorize="isAuthenticated()">
-        <form action="/users/logout" method="post">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-            <button type="submit" class="btn btn-outline-dark" href="/users/logout">LogOut</button>
-        </form>
-    </div>
-    <div class="py-2" sec:authorize="isAuthenticated()">
-        <a th:text="${#authentication?.principal.nickName} + 님 " th:href="@{'/users/' +${#authentication.principal.userId}+ '/form'}"></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav">
+            <li>
+                <a class="py-2 d-none d-md-inline-block" href="/products/main">Price</a>
+            </li>
+            <li>
+                <a class="py-2 d-none d-md-inline-block" href="/boards/">Farm</a>
+            </li>
+            <li>
+                <a class="py-2 d-none d-md-inline-block" href="#">Enterprise</a>
+            </li>
+            <li>
+                <a class="py-2 d-none d-md-inline-block" href="#">Support</a>
+            </li>
+            <li>
+                <a sec:authorize="!isAuthenticated()" class="py-2 d-none d-md-inline-block" href="/users/signup">Signup</a>
+            </li>
+            <li>
+                <a sec:authorize="!isAuthenticated()" class="btn btn-outline-dark" href="/users/loginform">Login</a>
+            </li>
+        </ul>
+        <div sec:authorize="isAuthenticated()">
+            <form action="/users/logout" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="btn btn-outline-dark" href="/users/logout">LogOut</button>
+            </form>
+        </div>
+        <div class="py-2" sec:authorize="isAuthenticated()">
+            <a th:text="${#authentication?.principal.nickName} + 님 " th:href="@{'/users/' +${#authentication.principal.userId}+ '/form'}"></a>
+        </div>
     </div>
 </div>

@@ -11,20 +11,20 @@ public class PageMaker {
     private boolean prev;
     private boolean next;
     private final int displayPageNum;        // 몇개의 페이지 정보가 보일 것인지
-    private BoardCriteria boardCriteria;
+    private Criteria criteria;
 
-    public PageMaker(int totalCount, int displayPageNum, BoardCriteria boardCriteria) {
+    public PageMaker(int totalCount, int displayPageNum, Criteria criteria) {
         this.totalCount = totalCount;
         this.displayPageNum = displayPageNum;
-        this.boardCriteria = boardCriteria;
+        this.criteria = criteria;
         calcData();
     }
 
     private void calcData() {
-        this.endPage = (int) (Math.ceil(boardCriteria.getPage() / (double) displayPageNum) * displayPageNum);
+        this.endPage = (int) (Math.ceil(this.criteria.getPage() / (double) this.displayPageNum) * this.displayPageNum);
         this.startPage = (endPage - displayPageNum) + 1;
 
-        int tempEndPage = (int) (Math.ceil(totalCount / (double) this.boardCriteria.getPerPageNum()));
+        int tempEndPage = (int) (Math.ceil(this.totalCount / (double) this.criteria.getPerPageNum()));
 
         if( this.endPage > tempEndPage) {
             this.endPage = tempEndPage;
@@ -32,7 +32,7 @@ public class PageMaker {
 
         this.prev = this.startPage == 1 ? false : true;
 
-        this.next = this.endPage * this.boardCriteria.getPerPageNum() >= totalCount ? false : true;
+        this.next = this.endPage * this.criteria.getPerPageNum() >= totalCount ? false : true;
     }
 
 }
