@@ -250,6 +250,7 @@
                     .then(file => new Promise((resolve, reject) => {
                         this._initRequest();
                         this._initListeners(resolve, reject, file);
+                        this._resizingImage(file);
                         this._sendRequest(file);
                     }));
             }
@@ -288,6 +289,23 @@
                         }
                     });
                 }
+            }
+
+            _resizingImage(file){
+                const maxWidth = 800;
+                var width 	 	= file.width;
+                var height 		= file.height;
+                var size 		= file.size;
+
+                var ratio = 800/width;
+
+                if(width > maxWidth) {
+                    width = width * ratio;
+                    height = height * ratio;
+                }
+
+                file.width = width;
+                file.height = height;
             }
 
             _sendRequest(file) {
