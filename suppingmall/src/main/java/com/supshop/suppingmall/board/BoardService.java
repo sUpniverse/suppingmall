@@ -61,12 +61,6 @@ public class BoardService {
         return null;
     }
 
-    /*
-     * Todo : ImageService 이용하여 GCP Cloud에 이미지 업로드 후 해당 board 내용에서 경로 수정
-     *  1. DB에 해당 board 저장
-     *  2. board의 내용에서 <img src> 태그 찾아서 해당 업로드 된 이미지 찾기
-     *  3. 찾은 경로를 이용해 임시 저장된 이미지를 List로 모아서 ImageService에서 GCP Storage로 저장 With 해당 게시글 번호 (폴더 이름으로 쓸 예정)
-     */
     @Transactional
     public void createBoard(Board board, Set<String> urls) {
         int imageCount = urls.size();
