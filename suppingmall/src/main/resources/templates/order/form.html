@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-    <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-        <div th:include="fragments/header :: header" />
-        <style>
-            ul{
-                list-style:none;
-                padding: unset;
-            }
-            li{
-                margin-top: 1rem;
-            }
-        </style>
-    </head>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <div th:include="fragments/header :: header" />
+    <style>
+        ul{
+            list-style:none;
+            padding: unset;
+        }
+        li{
+            margin-top: 1rem;
+        }
+    </style>
+</head>
     <body>
         <header th:replace="product/product-nav-dark :: product-nav-dark" />
         <div class="container mt-3 pt-5 pl-5 pr-5 bg-light">
@@ -206,7 +206,7 @@
                 xhr.setRequestHeader("Content-type","application/json");
                 xhr.setRequestHeader(header,token);
             },
-            success : (data) => {
+            success : (data,status,xhr) => {
                 if(data.merchant_uid !== payInitInfo.merchant_uid) {
                     alert("결제 오류")
                 }
@@ -221,6 +221,7 @@
                 formObj.attr("method","post");
                 formObj.attr("action","/orders");
                 formObj.submit();
+
             },
             error : (data) => {
                 alert("결제 실패")
@@ -263,8 +264,8 @@
     }
 
     function setDeliveryCheckNameNull() {
-        document.getElementById("delivery1").removeAttribute("name");
-        document.getElementById("delivery2").removeAttribute("name");
+        document.getElementById("delivery1").removeAttribute("name");   //기존 배송지
+        document.getElementById("delivery2").removeAttribute("name");   //신규 배송지
     }
 
     function setPaymentInfo(data) {

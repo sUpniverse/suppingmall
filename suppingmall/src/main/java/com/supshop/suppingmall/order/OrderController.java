@@ -1,25 +1,38 @@
 package com.supshop.suppingmall.order;
 
+import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.delivery.Delivery;
+import com.supshop.suppingmall.image.ImageController;
 import com.supshop.suppingmall.order.Form.OrderForm;
 import com.supshop.suppingmall.order.Form.TempOrderForm;
 import com.supshop.suppingmall.page.Criteria;
 import com.supshop.suppingmall.page.OrderCriteria;
 import com.supshop.suppingmall.page.PageMaker;
+import com.supshop.suppingmall.product.Form.ProductForm;
+import com.supshop.suppingmall.product.Product;
 import com.supshop.suppingmall.user.Role;
 import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RequestMapping("/orders")
 @RequiredArgsConstructor
@@ -31,31 +44,64 @@ public class OrderController {
 
     private static final int orderDisplayPagingNum = 5;
 
+//    @PostMapping("/orderSheet")
+//    public String getOrderSheet(TempOrderForm tempOrderForm,
+//                                @ModelAttribute(value = "orderForm") OrderForm orderForm,
+//                                Model model) {
+//
+//        // 임시주문
+//        Orders tempOrder = orderService.createOrder(tempOrderForm);
+//
+//        // 반영된 주문 표시
+//        model.addAttribute("orderItems", tempOrder.getOrderItems());
+//        model.addAttribute("product",tempOrder.getOrderItems().get(0).getProduct());
+//        model.addAttribute("tempOrder",tempOrder);
+//        return "/order/form";
+//    }
+
     @PostMapping("/orderSheet")
-    public String getOrderSheet(TempOrderForm tempOrderForm,
-                                @ModelAttribute(value = "orderForm") OrderForm orderForm,
-                                HttpSession session,
-                                Model model) {
+    @ResponseBody
+    public ResponseEntity createOrderSheet(@RequestBody TempOrderForm tempOrderForm,
+                                           @ModelAttribute(value = "orderForm") OrderForm orderForm) {
 
         // 임시주문
-        Orders tempOrder = orderService.createOrder(tempOrderForm);
+        Orders tempOrder = orderService.createOrder2(tempOrderForm);
+        URI link = linkTo(OrderController.class).slash("/orderSheet").slash(tempOrder.getOrderId()).toUri();
 
         // 반영된 주문 표시
-        model.addAttribute("orderItems", tempOrder.getOrderItems());
-        model.addAttribute("product",tempOrder.getOrderItems().get(0).getProduct());
-        model.addAttribute("tempOrder",tempOrder);
-        return "/order/form";
+        return ResponseEntity.created(link).build();
     }
 
+
     @PostMapping("")
-    public String createOrder(OrderForm orderForm, HttpSession session){
-        System.out.println(orderForm.toString());
-        orderService.order(orderForm);
+    //Todo : REST API 형태로 변경, 결제
+    public String createOrder(OrderForm orderForm,
+                              @AuthenticationPrincipal SessionUser user){
+
+        Orders orders = null;
+        try {
+            orders = orderService.getOrderInForm(orderForm);
+        } catch (Exception e) {
+            // 주문 실패
+            return "/order/fail";
+        }
+        // 주문자와 현재 세션의 유저가 같지 않은지 && 이미 주문이 완료된 주문인지
+        if(!UserUtils.isOwner(orders.getBuyer().getUserId(),user) && !orders.getStatus().equals(Orders.OrderStatus.WAIT)) {
+            return "/order/fail";
+        }
+
+        try {
+            orderService.order(orders);
+        } catch (Exception e){
+            // Todo : 주문의 실패 혹은 상품수량의 부족등 여러 가지 이유를 세분화 해서 에러처리
+            return "/order/fail";
+        }
+
         //성공
         return "/order/success";
 
-
     }
+
 
     @GetMapping("")
     public String getOrders(@RequestParam(required = false) @DateTimeFormat(pattern = "YYYY-MM-dd") LocalDate fromDate,
@@ -81,6 +127,24 @@ public class OrderController {
         return "/order/detail";
     }
 
+    @GetMapping("/orderSheet/{id}")
+    public String getOrderSheet(@PathVariable Long id,
+                                @AuthenticationPrincipal SessionUser user,
+                                Model model) {
+
+        Orders order = orderService.findOrder(id);
+        if(!UserUtils.isOwner(order.getBuyer().getUserId(), user)) {
+            return "redirect:/products/";
+        }
+
+        // 반영된 주문 표시
+        model.addAttribute("orderItems", order.getOrderItems());
+        model.addAttribute("product",order.getOrderItems().get(0).getProduct());
+        model.addAttribute("tempOrder",order);
+        return "/order/form";
+    }
+
+
     @GetMapping("/main")
     public String getOrdersByBuyerId(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
@@ -89,20 +153,13 @@ public class OrderController {
                                     @AuthenticationPrincipal SessionUser user,
                                     Model model) {
 
-//        if(sessionUser.getRole().equals(User.Role.SELLER)) {
-//            List<Orders> sellerOrders = orderService.findOrderBySellerId(sessionUser.getUserId(),fromDate,toDate,type,status);
-//            model.addAttribute("orders",sellerOrders);
-//            model.addAttribute("statusList", Arrays.asList(Delivery.DeliveryStatus.values()));
-//            return "/order/seller/list";
-//        } else if(sessionUser.getRole().equals(User.Role.ADMIN) || sessionUser.getRole().equals(User.Role.MASTER) ) {
-//            return "/order/seller/list";
-//        }
         List<Orders> orders = orderService.findOrderByBuyerId(user.getUserId(),fromDate,toDate,type,status);
         model.addAttribute("orders",orders);
         model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.values()));
 
         return "/order/list";
     }
+
 
     @GetMapping("/seller/main")
     public String getOrdersBySellerIdOnDelivery(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
@@ -113,7 +170,6 @@ public class OrderController {
                                      @AuthenticationPrincipal SessionUser user,
                                      OrderCriteria criteria,
                                      Model model) {
-
 
         List<Orders> orders = orderService.findOrderBySellerId(user.getUserId(),fromDate,toDate,type,deliveryStatus,orderStatus,null);
         PageMaker pageMaker = new PageMaker(orders.size(), orderDisplayPagingNum, criteria);

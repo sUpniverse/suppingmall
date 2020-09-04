@@ -53,7 +53,7 @@
                         <form role="form">
                             <input type="hidden" name="productId" id="productId" th:value="${product.productId}">
                             <input type="hidden" sec:authorize="isAuthenticated()" name="buyerId" id="userId" th:value="${#authentication.principal?.userId}">
-                            <input type="hidden" name="sellerId" th:value="${product.seller.userId}">
+                            <input type="hidden" name="sellerId" id="sellerId" th:value="${product.seller.userId}">
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <input type="hidden" name="orderItems" id="orderItemJson">
                             <!-- manufacturer -->

@@ -77,6 +77,7 @@ public class Orders {
         return price;
     }
 
+    //물품 가격 + 배송비
     public int getAmountPrice() {
         int deliveryPrice = getDeliveryPrice();
         return this.getAmountProductPrice() + deliveryPrice;

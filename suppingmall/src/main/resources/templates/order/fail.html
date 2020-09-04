@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <div th:include="fragments/header :: header" />
+</head>
+<body>
+    <header th:replace="product/product-nav-dark :: product-nav-dark" />
+    <div class="container mt-5">
+        <h1>주문이 실패했습니다. 다시 시도해주시기 바랍니다.</h1>
+        <div class="container mt-5 text-center">
+            <a class="btn btn-primary" href="/products/">상품리스트로</a>
+        </div>
+    </div>
+</body>
+</html>

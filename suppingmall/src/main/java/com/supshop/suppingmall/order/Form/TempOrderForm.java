@@ -1,7 +1,10 @@
 package com.supshop.suppingmall.order.Form;
 
+import com.supshop.suppingmall.order.OrderItem;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter @Setter
 public class TempOrderForm {
@@ -10,6 +13,6 @@ public class TempOrderForm {
     private Long productId;
     private Long buyerId;
     private Long sellerId;
-    private String orderItems;                  //Json String 형태를 받기 위한 변수
+    private List<OrderItem> orderItems;                  //Json String 형태를 받기 위한 변수
 
 }

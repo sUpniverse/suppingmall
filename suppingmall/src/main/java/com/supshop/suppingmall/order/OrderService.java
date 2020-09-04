@@ -17,6 +17,8 @@ import com.supshop.suppingmall.product.ProductService;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.javassist.NotFoundException;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +48,7 @@ public class OrderService {
     private static final int hour = 23;
     private static final int minute = 59;
 
+    @Transactional
     public Orders findOrder(Long orderId) {
         Optional<Orders> order = orderMapper.findOne(orderId);
         return order.orElseThrow(NoSuchElementException::new);
@@ -86,18 +89,17 @@ public class OrderService {
     }
 
     @Transactional
-    public Long order(OrderForm orderForm) {
+    public Long order(Orders order) {
 
         //임시 주문상태를 실제 주문 상태로 변경
-        Orders order = orderMapper.findOne(orderForm.getOrderId()).get();
         order.setStatus(Orders.OrderStatus.DELIVERY);
 
         //결제 내용 추가
-        Payment payment = orderForm.getPayment();
+        Payment payment = order.getPayment();
         Long paymentId = paymentService.save(payment);
 
         //배송 내용 추가
-        Delivery delivery = orderForm.getDelivery();
+        Delivery delivery = order.getDelivery();
         delivery.setStatus(Delivery.DeliveryStatus.WAIT);
         Long deliveryId = deliveryService.save(delivery);
 
@@ -116,6 +118,13 @@ public class OrderService {
         orderMapper.updateOrder(order.getOrderId(),order.getStatus(),deliveryId,paymentId);
 
         return order.getOrderId();
+    }
+
+    public Orders getOrderInForm(OrderForm orderForm) throws Exception {
+        Orders orders = orderMapper.findOne(orderForm.getOrderId()).orElseThrow(Exception::new);
+        orders.setPayment(orderForm.getPayment());
+        orders.setDelivery(orderForm.getDelivery());
+        return orders;
     }
 
     private void updateOrderStatus(Long orderId, Orders.OrderStatus orderStatus) {
@@ -173,7 +182,7 @@ public class OrderService {
         // 주문 가져오기
         Orders order = orderMapper.findOne(orderId).get();
 
-        // 받은 상품 개수에 반환된 물품개수 추가
+        // 상품 개수에 반환된 물품개수 추가
         List<OrderItem> orderItems = order.getOrderItems();
         List<ProductOption> productOptionList = new ArrayList<>();
         for(OrderItem orderItem : orderItems) {
@@ -252,10 +261,28 @@ public class OrderService {
         return orders;
     }
 
+    @Transactional
+    public Orders createOrder2(TempOrderForm tempOrderForm) {
 
+        //임시 주문 생성
+        Orders orders = this.setTempOrder(tempOrderForm);
+        orderMapper.save(orders);
+
+        //주문상품 생성
+        for(OrderItem orderItem : orders.getOrderItems()) {
+            orderItem.setOrders(orders);
+        }
+        orderItemMapper.saveList(orders.getOrderItems());
+        return orders;
+    }
+
+    /**
+     * 임시 주문 생성을 위한 정보 셋팅
+     * @param tempOrderForm
+     * @return Order
+     */
     private Orders setTempOrder(TempOrderForm tempOrderForm) {
 
-        // 임시 주문 생성을 위한 정보 가져오기
         // 1. 상품조회
         Product product = productService.findProduct(tempOrderForm.getProductId());
         // 2. 주문생성
@@ -278,8 +305,7 @@ public class OrderService {
      */
     private List<OrderItem> setOrderItemsInfo(TempOrderForm tempOrderForm, Product product){
 
-        // Json To OrderItem
-        List<OrderItem> orderItems = this.setJsonToOrderItem(tempOrderForm.getOrderItems());
+        List<OrderItem> orderItems = tempOrderForm.getOrderItems();
 
         // 가져온 상품정보를 이용해 상품 옵션의 필요내용 설정
         for (OrderItem orderItem : orderItems) {
@@ -291,21 +317,21 @@ public class OrderService {
         return orderItems;
     }
 
-    /**
-     * Json To OrderItem List
-     * @param orderItems
-     * @return List<OrderItem>
-     */
-    private List<OrderItem> setJsonToOrderItem(String orderItems) {
-        List<OrderItem> items = null;
-
-        try {
-            items = Arrays.asList(objectMapper.readValue(orderItems, OrderItem[].class));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return items;
-    }
+//    /**
+//     * Json To OrderItem List
+//     * @param orderItems
+//     * @return List<OrderItem>
+//     */
+//    private List<OrderItem> setJsonToOrderItem(String orderItems) {
+//        List<OrderItem> items = null;
+//
+//        try {
+//            items = Arrays.asList(objectMapper.readValue(orderItems, OrderItem[].class));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return items;
+//    }
 
 
 

@@ -34,24 +34,97 @@ $(document).ready(function() {
     });
 
     $(document).on('click',"#purchase",function() {
-        if(!isSingIn()) {
+        if (!isSingIn()) {
             return;
         }
 
-        var formObj = $("form[role='form']");
+        // var formObj = $("form[role='form']");
 
-        var orderItemJson = setOrderItemJsonInOrderForm();
-        if(orderItemJson == undefined) {
+        // var orderItemJson = setOrderItemJsonInOrderForm();
+        // if(orderItemJson == undefined) {
+        //     alert("선택된 품목이 없습니다.");
+        //     return;
+        // }
+
+        // document.getElementById("orderItemJson").setAttribute('value',JSON.stringify(orderItemJson));
+        // formObj.attr("action","/orders/orderSheet");
+        // formObj.attr("method","post");
+        // formObj.submit();
+
+
+        var tempOrder = setOrders();
+        if (tempOrder == undefined) {
+            alert("선택된 품목이 없습니다.");
             return;
         }
 
-        document.getElementById("orderItemJson").setAttribute('value',JSON.stringify(orderItemJson));
-        formObj.attr("action","/orders/orderSheet");
-        formObj.attr("method","post");
-        formObj.submit();
+        sendOrderRequest(tempOrder,header,token);
+
     });
 
 });
+
+function sendOrderRequest(tempOrders,header,token) {
+    $.ajax({
+        url: "/orders/orderSheet",
+        type: 'POST',
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Content-type","application/json");
+            xhr.setRequestHeader(header,token);
+        },
+        data: JSON.stringify(tempOrders) ,
+        success: (data, status, xhr) => {
+            location.href = xhr.getResponseHeader('Location');
+        },
+        error: () => {
+
+        }
+    });
+}
+
+function setOrders() {
+    var optionItems = document.getElementById('add_option_area').getElementsByTagName('li');
+    var optionLength = optionItems.length;
+
+    if(optionLength === 0) {
+        return;
+    }
+
+
+    var buyerId = document.getElementById('userId').value;
+    var sellerId = document.getElementById('sellerId').value;
+    var productId = document.getElementById('productId').value;
+
+    var tempOrderForm = {
+        productId : productId,
+        sellerId : sellerId,
+        buyerId : buyerId,
+        orderItems : []
+    }
+
+
+    var temp = new Array();
+    for(var i = 0; i < optionLength; i++) {
+        var id = getOptionIdInList(optionItems,i);
+        var price = getPriceInList(optionItems,i);
+        var count = getCountInList(optionItems,i);
+        var orderItem = {
+            productOption : {
+                optionId : id,
+            },
+            price : price,
+            count : count
+        };
+        temp[id] = orderItem;
+    }
+    for(var i = 0; i < temp.length; i++) {
+        if(temp[i] !== undefined) {
+            tempOrderForm.orderItems.push(temp[i]);
+        }
+    }
+
+    return tempOrderForm;
+}
 
 function setOrderItemJsonInOrderForm() {
     var optionItems = document.getElementById('add_option_area').getElementsByTagName('li');
@@ -121,6 +194,7 @@ function setCartForm() {
     }
     return cartForm;
 }
+
 
 function isSingIn() {
 
