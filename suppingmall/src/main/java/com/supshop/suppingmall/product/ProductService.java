@@ -68,7 +68,7 @@ public class ProductService {
         productMapper.addProductDetail(detail);
 
 
-        if(urls.size() > 0 && result == 1) {
+        if((urls != null && urls.size() > 0) && result == 1) {
             urls.add(product.getThumbnail());
             String originUrl = setProductImageUrl(product, urls);
             productMapper.updateProduct(productId,product);

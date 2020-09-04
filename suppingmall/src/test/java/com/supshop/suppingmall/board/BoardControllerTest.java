@@ -26,15 +26,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class BoardControllerTest {
 
-    @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    BoardService boardService;
-
-    @Autowired
-    ModelMapper modelMapper;
-
+    @Autowired MockMvc mockMvc;
+    @Autowired BoardService boardService;
+    @Autowired ModelMapper modelMapper;
     private MockHttpSession session;
 
     @Test

@@ -15,10 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,10 +36,9 @@ public class ProductServiceTest {
     @Transactional
     public void createProduct() throws Exception {
         //given
-        User examUser = userFactory.createAdmin("exam");
-        Category examCategory = categoryFactory.createCategory("exam");
+        User examUser = userFactory.createUser("exam");
 
-        Product product = productFactory.createProduct("맥북프로", examUser, examCategory);
+        Product product = productFactory.buildProduct("맥북프로", examUser);
         Set<String> urls = new HashSet<>();
         urls.add("/images/product/20200819/18/현대차.png");
 

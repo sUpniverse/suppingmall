@@ -1,22 +1,28 @@
 package com.supshop.suppingmall.product;
 
 import com.supshop.suppingmall.category.Category;
+import com.supshop.suppingmall.category.CategoryFactory;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@ActiveProfiles("test")
 public class ProductFactory {
 
     @Autowired ProductService productService;
+    @Autowired CategoryFactory categoryFactory;
 
-    public Product createProduct(String productName,User seller,Category category) {
+    public Product buildProduct(String productName, User seller) {
+
+        Category category = categoryFactory.createCategory("product");
 
         ProductDetail productDetail = ProductDetail.builder()
                 .detailId(1)
@@ -57,6 +63,15 @@ public class ProductFactory {
                 .thumbnail("/images/product/20200819/18/맥북16.jpg")
                 .contents("<img src=\"/images/product/20200819/18/현대차.png\">")
                 .build();
+
+        return product;
+    }
+
+    public Product createProduct(String productName,User seller) {
+
+        Product product = buildProduct(productName, seller);
+        productService.createProduct(product, null);
+
         return product;
     }
 }

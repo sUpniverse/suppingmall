@@ -36,8 +36,7 @@ public class CartServiceTest {
         //given
         User buyer = userFactory.createAdmin("buyer");
         User seller = userFactory.createAdmin("seller");
-        Category exam = categoryFactory.createCategory("exam");
-        Product product = productFactory.createProduct("macbookPro",seller,exam);
+        Product product = productFactory.buildProduct("macbookPro",seller);
         List<CartItem> itemList = cartItemFactory.createItemList(product);
 
         //when
