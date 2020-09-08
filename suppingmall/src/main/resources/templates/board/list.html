@@ -2,83 +2,83 @@
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: header" >
 </head>
-<body>
+<body style="background-color: #eee;">
     <nav th:replace="fragments/navigation :: navigation" />
-
-    <div class="container-xs">
+    <div class="container" style="max-width: 1500px">
         <div class="row no-gutters">
             <div th:replace="board/left-sidebar :: left-sidebar" />
-            <div class="col-md-7">
-                <div class="position-relative overflow-hidden p-1 mb-5 text-center bg-light">
+            <div class="col-md-7 container mx-5" style="background-color: #ffffFF">
+                <div class="position-relative overflow-hidden p-1 mb-5 text-center">
                     <div class="p-lg-5 mx-auto my-2">
                         <h1 class="display-4 font-weight-small">Farm을 운영중인 유저의 공간</h1>
                     </div>
                 </div>
-
-                <table class="table table-bordered table-hover text-small">
-                    <thead>
+                <div class="container" th:fragment="list">
+                    <table class="table table-bordered table-hover text-small">
+                        <thead>
                         <tr>
                             <th class="text-center">댓글</th>
                             <th class="text-center">카테고리</th>
                             <th>제목</th>
-                            <th>작성자</th>
+                            <th class="text-center">작성자</th>
                             <th class="text-center">조회수</th>
-                            <th>생성일</th>
+                            <th class="text-center">작성일</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         <tr th:each="board : ${boardList}">
                             <td class="text-center" th:text="${board.comments.size()}"></td>
                             <td class="text-center" th:text="${board?.category.name}"></td>
                             <td>
                                 <a class="text-dark" th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}}" ></a>
                             </td>
-                            <td th:text="${board.creator.nickName}" />
+                            <td class="text-center" th:text="${board.creator.nickName}" />
                             <td class="text-center" th:text="${board.hit}"/>
                             <td th:text="${#temporals.format(board.createdDate,'yyyy-MM-dd HH:mm:ss')}" />
                         </tr>
-                    </tbody>
-                </table>
-                <a href="/boards/form" class="btn btn-primary float-right text-small">글쓰기</a>
+                        </tbody>
+                    </table>
+                    <a href="/boards/form" class="btn btn-primary float-right text-small">글쓰기</a>
 
-                <div class="container d-flex justify-content-center mb-3 text-small">
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination mx-auto">
-                            <li class="page-item">
-                                <a class="page-link" th:if="${boardPageMaker.prev}" th:href="@{'/boards?page='+${boardPageMaker.startPage - 1}}" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                            <li class="page-item" th:each="idx : ${#numbers.sequence(boardPageMaker.startPage,boardPageMaker.endPage)}" th:classappend="${boardPageMaker.criteria.page} == ${idx} ? active">
-                                <a class="page-link" th:href="@{'/boards?page='+${idx}}" th:text="${idx}"></a>
-                            </li>
-                            <li class="page-item" th:if="${boardPageMaker.next && boardPageMaker.endPage > 0}">
-                                <a class="page-link" th:href="@{'/boards?page='+${boardPageMaker.endPage + 1}}" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
+                    <div class="container d-flex justify-content-center mb-3 text-small">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination mx-auto">
+                                <li class="page-item">
+                                    <a class="page-link" th:if="${boardPageMaker.prev}" th:href="@{'/boards?page='+${boardPageMaker.startPage - 1}}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item" th:each="idx : ${#numbers.sequence(boardPageMaker.startPage,boardPageMaker.endPage)}" th:classappend="${boardPageMaker.criteria.page} == ${idx} ? active">
+                                    <a class="page-link" th:href="@{'/boards?page='+${idx}}" th:text="${idx}"></a>
+                                </li>
+                                <li class="page-item" th:if="${boardPageMaker.next && boardPageMaker.endPage > 0}">
+                                    <a class="page-link" th:href="@{'/boards?page='+${boardPageMaker.endPage + 1}}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
 
-                <div class="container d-flex justify-content-center">
-                    <form method="get" th:action="@{/boards}">
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <select class="btn btn-outline-secondary dropdown-toggle" th:name="type">
-                                    <option class="dropdown-item" th:value="title">제목검색</option>
-                                    <option class="dropdown-item" th:value="contents">내용검색</option>
-                                    <option class="dropdown-item" th:value="creator">작성자검색</option>
-                                </select>
+                    <div class="container d-flex justify-content-center">
+                        <form method="get" th:action="@{/boards}">
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <select class="btn btn-outline-secondary dropdown-toggle" th:name="type">
+                                        <option class="dropdown-item" th:value="title">제목검색</option>
+                                        <option class="dropdown-item" th:value="contents">내용검색</option>
+                                        <option class="dropdown-item" th:value="creator">작성자검색</option>
+                                    </select>
+                                </div>
+                                <input type="text" class="form-control" th:name="searchValue" aria-label="Text input with dropdown button">
+                                <div class="input-group-append">
+                                    <button class="input-group-text" type="submit">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img" viewBox="0 0 24 24" focusable="false"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"/><path d="M21 21l-5.2-5.2"/></svg>
+                                    </button>
+                                </div>
                             </div>
-                            <input type="text" class="form-control" th:name="searchValue" aria-label="Text input with dropdown button">
-                            <div class="input-group-append">
-                                <button class="input-group-text" type="submit">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img" viewBox="0 0 24 24" focusable="false"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"/><path d="M21 21l-5.2-5.2"/></svg>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

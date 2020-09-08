@@ -47,24 +47,33 @@ public class BoardController {
                               @RequestParam(required = false) String searchValue) {
 
         log.debug("'getAllBoard'가 실행됨");
-
+        List<Board> boards = boardService.getBoardByCondition(boardCriteria, category, type, searchValue);
         PageMaker pageMaker = new PageMaker(boardService.getBoardCount(),boardDisplayPagingNum,boardCriteria);
-        model.addAttribute(boardService.getBoardByCondition(boardCriteria,category,type,searchValue));
+
+        model.addAttribute("boardList",boards);
         model.addAttribute("boardPageMaker", pageMaker);
 
         return "/board/list";
     }
 
     @GetMapping("/{id}")
-    public String getBoard(@PathVariable Long id, Model model) {
+    public String getBoard(@PathVariable Long id,
+                           BoardCriteria boardCriteria,
+                           Model model) {
         log.debug("'getBoard'가 실행됨");
 
         Board board = boardService.getBoard(id);
-        if(board != null) {
-            model.addAttribute("board",board);
-            return "/board/board";
+        if(board == null) {
+            return "redirect:/boards";
         }
-        return "redirect:/boards";
+        List<Board> boards = boardService.getBoardByCondition(boardCriteria, null, null, null);
+        PageMaker pageMaker = new PageMaker(boards.size(),boardDisplayPagingNum,boardCriteria);
+        model.addAttribute("boardList",boards);
+        model.addAttribute("board",board);
+        model.addAttribute("boardPageMaker", pageMaker);
+
+
+        return "/board/board";
     }
 
     @PostMapping("")

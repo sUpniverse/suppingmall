@@ -96,7 +96,7 @@
         WHERE U.email = #{email}
     </select>
 
-    <select id="findUserByApplySellerYn" resultMap="User">
+    <select id="findApplySeller" resultMap="User">
         SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
         U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",

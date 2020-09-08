@@ -34,7 +34,7 @@ public class UserService implements UserDetailsService {
     }
 
     public List<User> getApplySellerUsers(BoardCriteria boardCriteria) {
-        return userMapper.findUserByApplySellerYn(boardCriteria);
+        return userMapper.findApplySeller(boardCriteria);
     }
 
 

@@ -1,88 +1,92 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: header" />
-<body>
+<body style="background-color: #eee;">
 <nav th:replace="fragments/navigation :: navigation" />
-<div class="container-fluid">
-    <div class="row">
+<div class="container" style="max-width: 1500px">
+    <div class="row no-gutters">
         <div th:replace="board/left-sidebar :: left-sidebar" />
-        <div class="col-md-6">
-            <form role="form" th:method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-            </form>
-            <div class="pt-5 pd-3 border-bottom">
-                <!-- Category -->
-                <h4 th:text="${board.category.name}"></h4>
-            </div>
-            <div>
-                <!-- Title -->
-                <h3 class="pt-3 pb-3" th:text="${board.title}"></h3>
-            </div>
-            <div class="bg-light border-top border-dark py-2" style="display: flex">
-                <!-- Author -->
-                <span class="col-6 lead" th:text="@{${board.creator.nickName} +'님'}"></span>
-                <!-- Hit -->
-                <div class="col-6 d-flex justify-content-end align-items-center">
-                    <img src="/logo/board/eyes.jpg" height="16">
-                    <span th:text="@{' '+${board.hit}}"></span>
+        <div class="col-md-7 container mx-5" style="background-color: #ffffFF">
+            <div class="container">
+                <form role="form" th:method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                </form>
+                <div class="pt-5 pd-3 border-bottom">
+                    <!-- Category -->
+                    <h4 th:text="${board.category.name}"></h4>
                 </div>
-            </div>
-            <div class="border">
-                <!-- Date/Time -->
-                <div class="mb-3 ml-2">
-                    <img src="/logo/board/clock.png" height="12">
-                    <span class="text-muted" style="font-size: 0.8rem" th:text="${#temporals.format(board.createdDate,'yyyy-MM-dd HH:mm:ss')}"></span>
+                <div>
+                    <!-- Title -->
+                    <h3 class="pt-3 pb-3" th:text="${board.title}"></h3>
                 </div>
-                <!-- Post Content -->
-                <div class="pd-5 ml-2">
-                    <p class="lead" th:id="contents" th:utext="${board.contents}"></p>
+                <div class="bg-light border-top border-dark py-2" style="display: flex">
+                    <!-- Author -->
+                    <span class="col-6 lead" th:text="@{${board.creator.nickName} +'님'}"></span>
+                    <!-- Hit -->
+                    <div class="col-6 d-flex justify-content-end align-items-center">
+                        <img src="/logo/board/eyes.jpg" height="16">
+                        <span th:text="@{' '+${board.hit}}"></span>
+                    </div>
                 </div>
-                <div class="box-footer text-center mb-3">
-                    <button sec:authorize="isAuthenticated()"  th:if="${board.creator.userId.equals(#authentication.principal.userId)}" type="submit" class="btn btn-warning">수정</button>
-                    <button sec:authorize="isAuthenticated()"  th:if="${board.creator.userId.equals(#authentication.principal.userId)}" type="submit" class="btn btn-danger">삭제</button>
-                    <button type="submit" class="btn btn-primary">목록</button>
+                <div class="border">
+                    <!-- Date/Time -->
+                    <div class="mb-3 ml-2">
+                        <img src="/logo/board/clock.png" height="12">
+                        <span class="text-muted" style="font-size: 0.8rem" th:text="${#temporals.format(board.createdDate,'yyyy-MM-dd HH:mm:ss')}"></span>
+                    </div>
+                    <!-- Post Content -->
+                    <div class="pd-5 ml-2">
+                        <p class="lead" th:id="contents" th:utext="${board.contents}"></p>
+                    </div>
+                    <div class="box-footer text-center mb-3">
+                        <button sec:authorize="isAuthenticated()"  th:if="${board.creator.userId.equals(#authentication.principal.userId)}" type="submit" class="btn btn-warning">수정</button>
+                        <button sec:authorize="isAuthenticated()"  th:if="${board.creator.userId.equals(#authentication.principal.userId)}" type="submit" class="btn btn-danger">삭제</button>
+                        <button type="submit" class="btn btn-primary">목록</button>
+                    </div>
                 </div>
-            </div>
 
 
-            <!-- Comments List -->
-            <div class="mt-5">
-                <div class="border-bottom border-gray pb-2 mb-3" th:text="@{'댓글 ['+${board.comments.size()}+']'}"></div>
-                <div id="comments">
-                    <!-- Single Comment -->
-                    <div class="media pb-3" th:each="comment : ${board.comments}" th:data-no="${comment.commentId}">
-                        <div class="media-body">
-                            <div class="bg-light mt-0 d-flex justify-content-between align-items-center w-100">
-                                <strong class="ml-2 " th:text="${comment.creator.nickName}" th:value="${comment.creator.userId}"></strong>
-                                <small th:text="${#temporals.format(comment.createdDate,'MM-dd HH:mm')}"></small>
-                            </div>
-                            <div class="btn-group float-right" sec:authorize="isAuthenticated()"  th:if="${comment.creator.userId.equals(#authentication.principal?.userId)}">
-                                <button type="button" class="btn btn-secondary btn-sm dropdown-toggle"data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    수정 / 삭제 / 신고
-                                </button>
-                                <div class="dropdown-menu">
-                                    <button type="button" class="dropdown-item" th:id="comment-update-button">수정</button>
-                                    <button type="button" class="dropdown-item" th:id="comment-delete-button">삭제</button>
+                <!-- Comments List -->
+                <div class="mt-5">
+                    <div class="border-bottom border-gray pb-2 mb-3" th:text="@{'댓글 ['+${board.comments.size()}+']'}"></div>
+                    <div id="comments">
+                        <!-- Single Comment -->
+                        <div class="media pb-3" th:each="comment : ${board.comments}" th:data-no="${comment.commentId}">
+                            <div class="media-body">
+                                <div class="bg-light mt-0 d-flex justify-content-between align-items-center w-100">
+                                    <strong class="ml-2 " th:text="${comment.creator.nickName}" th:value="${comment.creator.userId}"></strong>
+                                    <small th:text="${#temporals.format(comment.createdDate,'MM-dd HH:mm')}"></small>
                                 </div>
+                                <div class="btn-group float-right" sec:authorize="isAuthenticated()"  th:if="${comment.creator.userId.equals(#authentication.principal?.userId)}">
+                                    <button type="button" class="btn btn-secondary btn-sm dropdown-toggle"data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        수정 / 삭제 / 신고
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <button type="button" class="dropdown-item" th:id="comment-update-button">수정</button>
+                                        <button type="button" class="dropdown-item" th:id="comment-delete-button">삭제</button>
+                                    </div>
+                                </div>
+                                <p class="ml-2" th:text="${comment.contents}"></p>
                             </div>
-                            <p class="ml-2" th:text="${comment.contents}"></p>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Comments Form -->
-            <div class="card my-4" th:id="comment-form">
-                <h5 class="card-header">댓글입력</h5>
-                <div class="card-body">
-                    <div class="form-group">
-                        <textarea class="form-control" th:id="comment-text" rows="3"></textarea>
+                <!-- Comments Form -->
+                <div class="card my-4" th:id="comment-form">
+                    <h5 class="card-header">댓글입력</h5>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <textarea class="form-control" th:id="comment-text" rows="3"></textarea>
+                        </div>
+                        <button class="btn btn-light" th:id="comment-button">댓글달기</button>
                     </div>
-                    <button class="btn btn-light" th:id="comment-button">댓글달기</button>
                 </div>
             </div>
+            <div class="container" th:replace="/board/list::list"></div>
         </div>
     </div>
+
 </div>
 <footer th:include="fragments/footer :: footer" />
 </body>

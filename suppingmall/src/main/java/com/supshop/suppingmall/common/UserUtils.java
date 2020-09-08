@@ -56,7 +56,7 @@ public class UserUtils {
             return false;
         }
         SessionUser sessionUser = getSessionUser(session);
-        if (sessionUser.getRole().equals(Role.MASTER) || sessionUser.getRole().equals(Role.MASTER)) {
+        if (sessionUser.getRole().equals(Role.MASTER) || sessionUser.getRole().equals(Role.ADMIN)) {
             return true;
         }
         return false;

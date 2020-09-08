@@ -256,12 +256,12 @@ public class UserController {
                                  @AuthenticationPrincipal SessionUser sessionUser) {
 
         if(UserUtils.isAdmin(sessionUser)) {
-            List<User> applySellerUsers = userService.getApplySellerUsers(boardCriteria);
 
-            PageMaker pageMaker = new PageMaker(userService.getBoardCount(),pagingCount,boardCriteria);
+            List<User> applySellerUsers = userService.getApplySellerUsers(boardCriteria);
+            PageMaker pageMaker = new PageMaker(applySellerUsers.size(),pagingCount,boardCriteria);
 
             model.addAttribute("userList",applySellerUsers);
-            model.addAttribute("boardPageMaker", pageMaker);
+            model.addAttribute("pageMaker", pageMaker);
             return "/user/admin/applySellerList";
         }
         return redirectLoginUrl;
