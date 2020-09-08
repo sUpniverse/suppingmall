@@ -45,10 +45,16 @@
                                 <div class="hitarea expandable-hitarea" th:if="${not #arrays.isEmpty(category.getChild())}"></div>
                                 <a href="#" th:id="${category.id}" th:text="${category.name}"></a>
                                 <ul style="display: none;" th:if="${not #arrays.isEmpty(category.getChild())}">
-                                    <li th:each="child : ${category.getChild()}">
-                                        <div class="hitarea expandable-hitarea"></div>
+                                    <li th:each="child : ${category.getChild()}" th:class="${not #arrays.isEmpty(child.getChild())} ? 'expandable' : ''">
+                                        <div class="hitarea expandable-hitarea" th:if="${not #arrays.isEmpty(child.getChild())}"></div>
                                         <a href="#" th:text="${child.name}" th:id="${child.id}"></a>
-                                        <ul style="display: none"></ul>
+                                        <ul style="display: none;" th:if="${not #arrays.isEmpty(child.getChild())}">
+                                            <li th:each="grandChildren : ${child.getChild()}" th:class="${not #arrays.isEmpty(grandChildren.getChild())} ? 'expandable' : ''">
+                                                <div class="hitarea expandable-hitarea"></div>
+                                                <a href="#" th:text="${grandChildren.name}" th:id="${grandChildren.id}"></a>
+                                                <ul style="display: none"></ul>
+                                            </li>
+                                        </ul>
                                     </li>
                                 </ul>
                             </li>
@@ -68,6 +74,10 @@
                             <tr>
                                 <th>카테고리 설명</th>
                                 <td th:id="memo"></td>
+                            </tr>
+                            <tr>
+                                <th>카테고리 영문명</th>
+                                <td th:id="enName"></td>
                             </tr>
                         </table>
                     </form>
@@ -99,6 +109,11 @@
                                         <option th:value="0" selected>선택하세요</option>
                                     </select>
                                 </div>
+                                <div class="col">
+                                    <select class="form-control mx-3" th:id="category_bottom">
+                                        <option th:value="0" selected>선택하세요</option>
+                                    </select>
+                                </div>
                             </td>
                         </tr>
                         <tr>
@@ -109,6 +124,12 @@
                             <th>카테고리 메모</th>
                             <td>
                                 <input th:id="addCategoryMemo" class="form-control" th:name="memo">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>영문명</th>
+                            <td>
+                                <input th:id="addCategoryEnName" class="form-control" th:name="enName">
                             </td>
                         </tr>
                     </table>
@@ -124,7 +145,7 @@
         </div>
     </div>
 </div>
-<footer th:replace="fragments/footer :: footer" />
+<footer th:include="fragments/footer :: footer" />
 </body>
 <script th:inline="javascript" th:src="@{/js/category/getCategoryByOnClick.js}"></script>
 <script th:inline="javascript" th:src="@{/js/category/getCategoryBySelectedOption.js}"></script>

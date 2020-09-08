@@ -9,6 +9,7 @@ $(document).on('click','.treeview a',function (e) {
 function setCategory(data) {
     document.getElementById('name').textContent = data.name;
     document.getElementById('memo').textContent = data.memo;
+    document.getElementById('enName').textContent = data.enName;
     document.getElementById('id').val = data.id;
 }
 

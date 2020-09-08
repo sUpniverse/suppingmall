@@ -5,6 +5,16 @@ $('#category_top').on('change',(e) => {
         getCategoryBySelectedOption(category_id,"middle");
     } else {
         $("#category_middle").find("option").remove();
+        $("#category_bottom").find("option").remove();
+    }
+});
+
+$('#category_middle').on('change',(e) => {
+    var category_id = $("#category_middle option:selected").val();
+    if(category_id > 0) {
+        getCategoryBySelectedOption(category_id,"bottom");
+    } else {
+        $("#category_bottom").find("option").remove();
     }
 });
 

@@ -7,10 +7,12 @@
         <id property="id" column="CategoryId" />
         <result property="name" column="CategoryName" />
         <result property="memo" column="CategoryMemo" />
+        <result property="enName" column="CategoryEnName" />
         <association property="parent" javaType="com.supshop.suppingmall.category.Category">
             <id property="id" column="ParentCategoryId" />
             <result property="name" column="ParentCategoryName" />
             <result property="memo" column="ParentCategoryMemo" />
+            <result property="enName" column="ParentCategoryEnName" />
             <association property="parent" javaType="com.supshop.suppingmall.category.Category">
                 <id property="id" column="GrandParentCategoryId" />
                 <result property="name" column="GrandParentCategoryName" />
@@ -21,6 +23,7 @@
             <id property="id" column="ChildCategoryId" />
             <result property="name" column="ChildCategoryName" />
             <result property="memo" column="ChildCategoryMemo" />
+            <result property="enName" column="ChildCategoryEnName" />
             <collection property="child" ofType="com.supshop.suppingmall.category.Category">
                 <id property="id" column="GrandChildrenCategoryId" />
                 <result property="name" column="GrandChildrenCategoryName" />
@@ -38,18 +41,22 @@
     </resultMap>
 
     <select id="findAll" resultMap="Category">
-        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName", C.memo AS "CategoryMemo",
-        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName"
+        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName",  C.memo AS "CategoryMemo",
+        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName",
+        GCH.category_id AS "GrandChildrenCategoryId", GCH.name AS "GrandChildrenCategoryName"
         FROM category AS C
         LEFT OUTER JOIN category AS CH on (C.category_id = CH.parent_id)
+        LEFT OUTER JOIN category AS GCH on (CH.category_id = GCH.parent_id)
         ORDER BY C.category_id ASC
     </select>
 
     <select id="findAllByTop" resultMap="Category">
         SELECT C.category_id AS "CategoryId", C.name AS "CategoryName", C.memo AS "CategoryMemo",
-        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName"
+        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName",
+        GCH.category_id AS "GrandChildrenCategoryId", GCH.name AS "GrandChildrenCategoryName"
         FROM category AS C
         LEFT OUTER JOIN category AS CH on (C.category_id = CH.parent_id)
+        LEFT OUTER JOIN category AS GCH on (CH.category_id = GCH.parent_id)
         WHERE C.parent_id IS null
         ORDER BY C.category_id ASC
     </select>
@@ -81,8 +88,8 @@
     </select>
 
     <select id="findOne" resultMap="Category">
-        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName",  C.memo AS "CategoryMemo",
-        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName",
+        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName",  C.memo AS "CategoryMemo", C.en_name AS "CategoryEnName",
+        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName", CH.en_name AS "ChildCategoryEnName",
         GCH.category_id AS "GrandChildrenCategoryId", GCH.name AS "GrandChildrenCategoryName"
         FROM category AS C
         LEFT OUTER JOIN category AS CH on (C.category_id = CH.parent_id)
@@ -102,11 +109,14 @@
         INSERT INTO Category (
         parent_id,
         name,
-        memo)
+        memo,
+        en_name
+        )
         VALUES (
         #{parent.id},
         #{name},
-        #{memo}
+        #{memo},
+        #{enName}
         );
     </insert>
 

@@ -2,7 +2,7 @@ package com.supshop.suppingmall.page;
 
 public class BoardCriteria extends Criteria{
 
-    private static final int boardPerPageNum = 20;
+    private static final int boardPerPageNum = 30;
 
     public BoardCriteria() {
         super(boardPerPageNum);

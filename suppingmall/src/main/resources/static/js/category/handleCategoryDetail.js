@@ -1,12 +1,14 @@
     var name;
     var memo;
+    var enName;
 $(document).on("click",".btn-warning.update",function() {
     name = document.getElementById('name').textContent;
     memo = document.getElementById('memo').textContent;
-    changeCategoryToInput(name,memo);
+    enName = document.getElementById('enName').textContent;
+    changeCategoryToInput(name,memo,enName);
 });
 
-function changeCategoryToInput(name,memo) {
+function changeCategoryToInput(name,memo,enName) {
     if(document.getElementById('id').val === undefined) {
         return;
     }
@@ -15,6 +17,9 @@ function changeCategoryToInput(name,memo) {
 
     var categoryMemoInput = '<input type="text" name="memo" value="'+memo+'">';
     document.getElementById('memo').innerHTML = categoryMemoInput;
+
+    var categoryEnNameInput = '<input type="text" name="enName" value="'+enName+'">';
+    document.getElementById('enName').innerHTML = categoryEnNameInput;
 
     changeDisplay('detailBtnGrp');
     changeDisplay('changeBtnGrp');
@@ -58,6 +63,7 @@ $(document).on("click",".btn-primary.cancelDetail",function () {
 function initDetail(name,memo) {
     document.getElementById('name').innerText = name;
     document.getElementById('memo').innerText = memo;
+    document.getElementById('enName').innerText = enName;
 
     changeDisplay('detailBtnGrp');
     changeDisplay('changeBtnGrp');

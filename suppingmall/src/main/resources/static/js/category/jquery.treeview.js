@@ -129,6 +129,7 @@
 
 			// handle toggle com.supshop.suppingmall.event
 			function toggler() {
+				console.log('눌려')
 				$(this)
 					.parent()
 					// swap classes for hitarea
@@ -216,7 +217,6 @@
 				}
 				break;
 			}
-
 			branches.applyClasses(settings, toggler);
 
 			// if control option is set, create the treecontroller and show it

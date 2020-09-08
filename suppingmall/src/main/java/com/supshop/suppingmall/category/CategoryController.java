@@ -53,7 +53,7 @@ public class CategoryController {
     @PostMapping("")
     @ResponseBody
     public ResponseEntity createCategory(@RequestBody Category category,
-                                         HttpSession session,
+                                         @AuthenticationPrincipal SessionUser session,
                                          Model model) {
         if (!UserUtils.isAdmin(session)) return ResponseEntity.badRequest().build();
         Long categoryId = categoryService.saveCategory(category);
