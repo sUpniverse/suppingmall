@@ -100,8 +100,10 @@
 
     <select id="selectBoardCount" resultType="int">
         SELECT count(board_id)
-        From Board
-        WHERE board_id > 0
+        From Board AS B
+        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
+        WHERE B.category_id = #{categoryId}
+        <include refid="conditionalSearch"></include>
     </select>
 
     <select id="findBoardsByProductId" resultMap="Board">

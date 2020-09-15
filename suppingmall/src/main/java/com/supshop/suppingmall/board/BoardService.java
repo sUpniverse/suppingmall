@@ -30,17 +30,16 @@ public class BoardService {
 
     public List<Board> getAllBoard() { return boardMapper.selectAllBoard(); }
 
-    public List<Board> getBoardByCondition(BoardCriteria boardCriteria, String category, String type, String searchValue) {
-        if(category == null) {
+    public List<Board> getBoardByCondition(BoardCriteria boardCriteria, Long categoryId, String type, String searchValue) {
+        if(categoryId == null) {
             Category categoryByEnName = categoryService.getCategoryByEnName(boardName);
             return boardMapper.selectBoardByCondition(boardCriteria,categoryByEnName.getId(), type, searchValue);
         }
-        Category categoryByEnName = categoryService.getCategoryByEnName(category);
-        return boardMapper.selectBoardByCondition(boardCriteria,categoryByEnName.getId(), type, searchValue);
+        return boardMapper.selectBoardByCondition(boardCriteria,categoryId, type, searchValue);
     }
 
-    public int getBoardCount() {
-        return boardMapper.selectBoardCount();
+    public int getBoardCount(Long categoryId, String type, String searchValue) {
+        return boardMapper.selectBoardCount(categoryId,type,searchValue);
     }
 
     @Transactional

@@ -95,6 +95,11 @@
         var formObj = $("form[role='form']");
         var boardId = [[${board.boardId}]];
 
+        var pageNum = [[${pageNum}]];
+        var categoryId = [[${categoryId}]];
+        var type = [[${type}]];
+        var searchValue = [[${searchValue}]];
+
         $(document).on("click",".btn-warning",function() {
             formObj.children().removeAttr("input");
             formObj.attr("action","/boards/"+boardId+"/form");
@@ -108,8 +113,8 @@
         });
 
         $(document).on("click",".btn-primary",function() {
-            formObj.attr("action","/boards");
-            self.location ="/boards";
+            formObj.attr("action",'/boards?page='+pageNum+'&&categoryId='+categoryId+'&&type='+type+'&&searchValue='+searchValue);
+            self.location ='/boards?page='+pageNum+'&&categoryId='+categoryId+'&&type='+type+'&&searchValue='+searchValue;
         });
     });
 </script>

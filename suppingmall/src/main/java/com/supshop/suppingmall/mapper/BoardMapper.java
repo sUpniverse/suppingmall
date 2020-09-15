@@ -21,7 +21,7 @@ public interface BoardMapper {
 
     void deleteBoard(Long id);
 
-    int selectBoardCount();
+    int selectBoardCount(Long categoryId, String type, String searchValue);
 
     void updateBoardHit(Long id);
 

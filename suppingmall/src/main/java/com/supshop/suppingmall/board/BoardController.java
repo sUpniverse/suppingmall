@@ -42,16 +42,24 @@ public class BoardController {
     @GetMapping("")
     public String getAllBoard(Model model,
                               BoardCriteria boardCriteria,
-                              @RequestParam(required = false) String category,
+                              @RequestParam(required = false) Long categoryId,
                               @RequestParam(required = false) String type,
                               @RequestParam(required = false) String searchValue) {
 
         log.debug("'getAllBoard'가 실행됨");
-        List<Board> boards = boardService.getBoardByCondition(boardCriteria, category, type, searchValue);
-        PageMaker pageMaker = new PageMaker(boardService.getBoardCount(),boardDisplayPagingNum,boardCriteria);
+        if(categoryId == null) categoryId = boardCategoryId;
+
+        int boardCount = boardService.getBoardCount(categoryId, type, searchValue);
+        PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum,boardCriteria);
+        List<Board> boards = boardService.getBoardByCondition(boardCriteria, categoryId, type, searchValue);
 
         model.addAttribute("boardList",boards);
         model.addAttribute("boardPageMaker", pageMaker);
+
+        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("type", type);
+        model.addAttribute("searchValue", searchValue);
+        model.addAttribute("pageNum", boardCriteria.getPage());
 
         return "/board/list";
     }
@@ -59,19 +67,30 @@ public class BoardController {
     @GetMapping("/{id}")
     public String getBoard(@PathVariable Long id,
                            BoardCriteria boardCriteria,
-                           Model model) {
+                           Model model,
+                           @RequestParam(required = false) Long categoryId,
+                           @RequestParam(required = false) String type,
+                           @RequestParam(required = false) String searchValue) {
         log.debug("'getBoard'가 실행됨");
 
         Board board = boardService.getBoard(id);
         if(board == null) {
             return "redirect:/boards";
         }
-        List<Board> boards = boardService.getBoardByCondition(boardCriteria, null, null, null);
-        PageMaker pageMaker = new PageMaker(boards.size(),boardDisplayPagingNum,boardCriteria);
+        if(categoryId == null) categoryId = boardCategoryId;
+
+        List<Board> boards = boardService.getBoardByCondition(boardCriteria, board.getCategory().getId(), type, searchValue);
+        int boardCount = boardService.getBoardCount(categoryId, type, searchValue);
+        PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum,boardCriteria);
+
         model.addAttribute("boardList",boards);
         model.addAttribute("board",board);
         model.addAttribute("boardPageMaker", pageMaker);
 
+        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("type", type);
+        model.addAttribute("searchValue", searchValue);
+        model.addAttribute("pageNum", boardCriteria.getPage());
 
         return "/board/board";
     }
