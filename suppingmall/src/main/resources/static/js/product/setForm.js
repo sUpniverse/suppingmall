@@ -125,37 +125,37 @@ function setOrders() {
 
     return tempOrderForm;
 }
-
-function setOrderItemJsonInOrderForm() {
-    var optionItems = document.getElementById('add_option_area').getElementsByTagName('li');
-    var optionLength = optionItems.length;
-
-    if(optionLength === 0) {
-        return ;
-    }
-
-    var orderItems = [];
-    var temp = new Array();
-    for(var i = 0; i < optionLength; i++) {
-        var id = getOptionIdInList(optionItems,i);
-        var price = getPriceInList(optionItems,i);
-        var count = getCountInList(optionItems,i);
-        var orderItem = {
-            productOption : {
-                optionId : id,
-            },
-            price : price,
-            count : count
-        };
-        temp[id] = orderItem;
-    }
-    for(var i = 0; i < temp.length; i++) {
-        if(temp[i] !== undefined) {
-            orderItems.push(temp[i]);
-        }
-    }
-    return orderItems;
-}
+//
+// function setOrderItemJsonInOrderForm() {
+//     var optionItems = document.getElementById('add_option_area').getElementsByTagName('li');
+//     var optionLength = optionItems.length;
+//
+//     if(optionLength === 0) {
+//         return ;
+//     }
+//
+//     var orderItems = [];
+//     var temp = new Array();
+//     for(var i = 0; i < optionLength; i++) {
+//         var id = getOptionIdInList(optionItems,i);
+//         var price = getPriceInList(optionItems,i);
+//         var count = getCountInList(optionItems,i);
+//         var orderItem = {
+//             productOption : {
+//                 optionId : id,
+//             },
+//             price : price,
+//             count : count
+//         };
+//         temp[id] = orderItem;
+//     }
+//     for(var i = 0; i < temp.length; i++) {
+//         if(temp[i] !== undefined) {
+//             orderItems.push(temp[i]);
+//         }
+//     }
+//     return orderItems;
+// }
 
 function setCartForm() {
     var cartItems = document.getElementById('add_option_area').getElementsByTagName('li');

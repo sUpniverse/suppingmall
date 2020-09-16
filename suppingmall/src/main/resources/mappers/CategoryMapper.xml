@@ -89,6 +89,14 @@
 
     <select id="findOne" resultMap="Category">
         SELECT C.category_id AS "CategoryId", C.name AS "CategoryName",  C.memo AS "CategoryMemo", C.en_name AS "CategoryEnName",
+        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName", CH.en_name AS "ChildCategoryEnName"
+        FROM category AS C
+        LEFT OUTER JOIN category AS CH on (C.category_id = CH.parent_id)
+        WHERE C.category_id = #{id}
+    </select>
+
+    <select id="findOneToGrandChildren" resultMap="Category">
+        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName",  C.memo AS "CategoryMemo", C.en_name AS "CategoryEnName",
         CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName", CH.en_name AS "ChildCategoryEnName",
         GCH.category_id AS "GrandChildrenCategoryId", GCH.name AS "GrandChildrenCategoryName"
         FROM category AS C

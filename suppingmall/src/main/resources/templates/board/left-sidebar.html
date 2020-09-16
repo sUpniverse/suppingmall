@@ -1,4 +1,4 @@
-<div class="col-md-3 ml-md-5 sidebar bg-white" th:fragment="left-sidebar" style="max-width: 200px; max-height: 900px">
+<div class="col-md-3 ml-md-5 sidebar bg-white" th:fragment="left-sidebar" style="max-width: 200px; max-height: 600px">
     <!-- NAVBAR -->
     <nav class="navbar flex-sm-column navbar-light">
         <div class="sidebar-sticky">
@@ -36,6 +36,28 @@
                 <li class="nav-item">
                     <a class="nav-link text-dark" th:href="@{'/boards?categoryId=28'}">
                         대륙의실수농장
+                    </a>
+                </li>
+            </ul>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" th:href="@{'/boards'}">
+                        최신IT뉴스
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" th:href="@{'/boards'}">
+                        자랑게시판
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" th:href="@{'/boards'}">
+                        나의노하우
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" th:href="@{'/boards?categoryId=24'}">
+                        질문게시판
                     </a>
                 </li>
             </ul>

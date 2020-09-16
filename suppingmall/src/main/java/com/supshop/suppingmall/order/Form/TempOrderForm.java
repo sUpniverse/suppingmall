@@ -13,6 +13,6 @@ public class TempOrderForm {
     private Long productId;
     private Long buyerId;
     private Long sellerId;
-    private List<OrderItem> orderItems;                  //Json String 형태를 받기 위한 변수
+    private List<OrderItem> orderItems;
 
 }

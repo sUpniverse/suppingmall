@@ -20,6 +20,9 @@ public class CategoryService {
     public Category getCategoryByEnName(String enName) {
         return categoryMapper.findOneByEnName(enName);
     }
+    public Category getCategoryToGrandChildren(Long id) {
+        return categoryMapper.findOneToGrandChildren(id);
+    }
 
     public List<Category> getCategories() {
         return categoryMapper.findAllByTop();

@@ -68,7 +68,7 @@ public class OrderFactory {
         //임시상품정보
         User user = userFactory.createUser("tester");
         TempOrderForm tempOrderForm = buildTempOrderForm(user);
-        Orders order = orderService.createOrder2(tempOrderForm);
+        Orders order = orderService.createOrder(tempOrderForm);
 
         //배송입력정보
         Delivery delivery = deliveryFactory.buildDelivery(user);

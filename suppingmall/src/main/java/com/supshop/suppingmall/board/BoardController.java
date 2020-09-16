@@ -34,7 +34,7 @@ public class BoardController {
     public String form(@RequestParam(required = false) Long categoryId,
                        Model model) {
         log.debug("'form'가 실행됨");
-        List<Category> child = categoryService.getCategory(boardCategoryId).getChild();
+        List<Category> child = categoryService.getCategoryToGrandChildren(boardCategoryId).getChild();
         model.addAttribute("categories",child);
         return "/board/form";
     }

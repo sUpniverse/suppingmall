@@ -7,12 +7,22 @@
     <div class="container" style="max-width: 1500px">
         <div class="row no-gutters">
             <div th:replace="board/left-sidebar :: left-sidebar" />
-            <div class="col-md-7 container mx-5 mb-5" style="background-color: #ffffFF">
-                <div class="container mt-3">
-                    <p class="h4" th:text="${boardList?.get(0).category.getName()}"></p>
-                <hr>
+            <div class="col-md-7 p-3 mx-5 mb-5" style="background-color: #ffffFF">
+                <h4 class="py-2" th:text="${boardList?.get(0).category.getName()}"></h4>
+
+                <div class="py-2 border-top">
+                    <div class="dropdown">
+                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            등록일순
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                            <button class="dropdown-item" type="button">등록일순</button>
+                            <button class="dropdown-item" type="button">공감순</button>
+                            <button class="dropdown-item" type="button">댓글순</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="container" th:fragment="list">
+                <div th:fragment="list">
                     <table class="table table-bordered table-hover text-small">
                         <thead>
                         <tr>

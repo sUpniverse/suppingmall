@@ -17,17 +17,17 @@ import com.supshop.suppingmall.product.ProductService;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserService;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.javassist.NotFoundException;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -246,23 +246,9 @@ public class OrderService {
         return order.getOrderId();
     }
 
+    // 임시 주문 상태로 DB에 데이터 생성
     @Transactional
     public Orders createOrder(TempOrderForm tempOrderForm) {
-
-        //임시 주문 생성
-        Orders orders = this.setTempOrder(tempOrderForm);
-        orderMapper.save(orders);
-
-        //주문상품 생성
-        for(OrderItem orderItem : orders.getOrderItems()) {
-            orderItem.setOrders(orders);
-        }
-        orderItemMapper.saveList(orders.getOrderItems());
-        return orders;
-    }
-
-    @Transactional
-    public Orders createOrder2(TempOrderForm tempOrderForm) {
 
         //임시 주문 생성
         Orders orders = this.setTempOrder(tempOrderForm);
@@ -299,21 +285,17 @@ public class OrderService {
     }
 
     /**
-     * set Product, ProductOption Information
+     * 가져온 상품정보를 이용해 상품 옵션의 필요내용 설정
      * @param tempOrderForm
      * @return List<OrderItem>
      */
     private List<OrderItem> setOrderItemsInfo(TempOrderForm tempOrderForm, Product product){
-
         List<OrderItem> orderItems = tempOrderForm.getOrderItems();
-
-        // 가져온 상품정보를 이용해 상품 옵션의 필요내용 설정
         for (OrderItem orderItem : orderItems) {
             int optionId = orderItem.getProductOption().getOptionId();
             orderItem.setProductOption(product.getOptions().get(optionId - 1));
             orderItem.setProduct(product);
         }
-
         return orderItems;
     }
 

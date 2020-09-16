@@ -2,31 +2,21 @@ package com.supshop.suppingmall.order;
 
 import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.delivery.Delivery;
-import com.supshop.suppingmall.image.ImageController;
 import com.supshop.suppingmall.order.Form.OrderForm;
 import com.supshop.suppingmall.order.Form.TempOrderForm;
-import com.supshop.suppingmall.page.Criteria;
 import com.supshop.suppingmall.page.OrderCriteria;
 import com.supshop.suppingmall.page.PageMaker;
-import com.supshop.suppingmall.product.Form.ProductForm;
-import com.supshop.suppingmall.product.Product;
 import com.supshop.suppingmall.user.Role;
 import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
-import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -65,7 +55,7 @@ public class OrderController {
                                            @ModelAttribute(value = "orderForm") OrderForm orderForm) {
 
         // 임시주문
-        Orders tempOrder = orderService.createOrder2(tempOrderForm);
+        Orders tempOrder = orderService.createOrder(tempOrderForm);
         URI link = linkTo(OrderController.class).slash("/orderSheet").slash(tempOrder.getOrderId()).toUri();
 
         // 반영된 주문 표시
