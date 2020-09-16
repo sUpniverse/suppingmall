@@ -10,12 +10,14 @@ import java.util.List;
 
 public interface ProductMapper {
 
-    List<Product> findAll(Long id, String category, String name, Product.ProductStatus status);
+    // 모든 제품 조회
     List<Product> findAll();
-    List<Product> findLatestAll();
-
+    // 조건에 해당하는 모든 제품 조회
+    List<Product> findAll(Long id, String category, String name, Product.ProductStatus status);
+    // 판매자가 등록한 모든 상품 조회
     List<Product> findAllBySellerId(Long sellerId, ProductCriteria criteria);
-
+    // Paging을 위한 개수 조회
+    List<Product> findProductsCount();
     List<Product> findAllByOrderCount();
 
     Product findOne(Long id);

@@ -12,7 +12,7 @@
 </head>
 <body>
     <nav th:replace="fragments/navigation :: navigation" />
-    <div class="container">
+    <div class="container mb-3">
         <div class="py-1 mb-5 text-center">
             <img class="d-block mx-auto mb-4" src="/docs/4.3/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
             <h2>물품 등록</h2>
@@ -35,6 +35,11 @@
                     <div class="form-group col-md-6 mb-3">
                         <label for="category_middle"> 카테고리 분류 2차</label>
                         <select class="form-control" id="category_middle" th:name="category.id" required>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6 mb-3">
+                        <label for="category_middle"> 카테고리 분류 3차</label>
+                        <select class="form-control" id="category_bottom" th:name="category.id" required>
                         </select>
                     </div>
                 </div>
@@ -163,7 +168,7 @@
             </form>
         </div>
     </div>
-<footer th:replace="fragments/footer :: footer" />
+<footer th:include="fragments/footer :: footer" />
 </body>
 <script type="text/javascript">
 

@@ -44,8 +44,11 @@ public class ProductController {
     private static final Long qnaCategoryId = 30l;
     private static final Long reviewCategoryId = 29l;
     private static final Long productCategoryId = 2L;
+    private static final Long electronicsCategoryId = 3L;
+    private static final Long clothingCategoryId = 7L;
 
     private static final int productPagingCount = 5;
+
 
     @GetMapping("/form")
     public String form(Model model) {
@@ -59,22 +62,22 @@ public class ProductController {
     public String getAllProduct(Model model) {
         List<Product> products = productService.findProducts();
         model.addAttribute("products",products);
-        model.addAttribute("categories",categoryService.getCategory(productCategoryId).getChild());
-        return "/product/list";
-    }
-
-    //판매상태의 모든 물품들
-    @GetMapping("/main")
-    public String getAllOnSaleProduct(Model model,
-                                      @RequestParam(required = false)String name) {
-        List<Product> products = productService.findOnSaleProducts(name);
-        model.addAttribute("products",products);
-        model.addAttribute("categories",categoryService.getCategory(productCategoryId).getChild());
+        model.addAttribute("categories",categoryService.getCategoryToGrandChildren(productCategoryId));
         return "/product/list";
     }
 
     //판매상태의 모든 물품들
     @GetMapping("/main2")
+    public String getAllOnSaleProduct(Model model,
+                                      @RequestParam(required = false)String name) {
+        List<Product> products = productService.findOnSaleProducts(name);
+        model.addAttribute("products",products);
+        model.addAttribute("categories",categoryService.getCategoryToGrandChildren(productCategoryId).getChild());
+        return "/product/list";
+    }
+
+    //판매상태의 모든 물품들
+    @GetMapping("/main")
     public String getAllOnSaleProduct2(Model model,
                                        @AuthenticationPrincipal SessionUser user,
                                        @RequestParam(required = false)String productName) {
@@ -86,14 +89,26 @@ public class ProductController {
 
         model.addAttribute("products",products);
         if(cart != null) model.addAttribute("cart",cart.size());
-        model.addAttribute("categories",categoryService.getCategory(productCategoryId).getChild());
+
+        model.addAttribute("electronics",categoryService.getCategoryToGrandChildren(electronicsCategoryId));
+        model.addAttribute("clothing",categoryService.getCategoryToGrandChildren(clothingCategoryId));
 
         // Todo: 추천, 베스트, 신제품 product 구해오기, 그에따른 페이지메이커 생성
-        PageMaker latestPageMaker = new PageMaker(products.size(),productPagingCount,criteria);
+        PageMaker recommandPageMaker = new PageMaker(products.size(),productPagingCount,criteria);
         PageMaker bestPageMaker = new PageMaker(products.size(),productPagingCount,criteria);
         PageMaker newPageMaker = new PageMaker(products.size(),productPagingCount,criteria);
 
         return "/product/list2";
+    }
+
+    //카테고리별 물품 조회
+    @GetMapping("/category/{id}")
+    public String getAllOnSaleProduct2(Model model,
+                                       @AuthenticationPrincipal SessionUser user,
+                                       @PathVariable Long id) {
+
+
+        return "/product/list-category";
     }
 
 
@@ -129,13 +144,6 @@ public class ProductController {
         return "/product/product2";
     }
 
-
-    @GetMapping("/latest")
-    public String getLatestProduct(@PathVariable Long id, Model model) {
-        List<Product> products = productService.findLatestProduct();
-        model.addAttribute("product",products);
-        return "/product/latestList";
-    }
 
     @GetMapping("/seller")
     public String getProductsBySeller(@AuthenticationPrincipal SessionUser user,
@@ -268,7 +276,7 @@ public class ProductController {
     }
 
 
-    @GetMapping("/{productId}/reivews")
+    @GetMapping("/{productId}/reivews/form")
     public String getReviewForm(@PathVariable Long productId) {
         return "";
     }

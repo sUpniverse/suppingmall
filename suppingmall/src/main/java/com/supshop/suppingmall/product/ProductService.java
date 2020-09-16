@@ -38,14 +38,13 @@ public class ProductService {
       return productMapper.findOne(id);
     }
 
-    public List<Product> findLatestProduct() {
-        return productMapper.findLatestAll();
-    }
-
     public List<Product> findProductsBySellerId(Long userId, ProductCriteria productCriteria) {
         return productMapper.findAllBySellerId(userId, productCriteria);
     }
 
+    public List<Product> findProductsCount(Long categoryId) {
+        return productMapper.findAllByOrderCount();
+    }
     public List<Product> findProductsByOrderCount() {
         return productMapper.findAllByOrderCount();
     }
