@@ -64,20 +64,20 @@
                         <span class="text-muted" th:text="@{'('+${order.seller.storeVO.storePhoneNumber}+')'}" style="font-size: 13px;"></span>
                     </td>
                     <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${iter.index} > 0">
-                        <span th:if="${not #strings.equals(order.status,'DELIVERY')}" th:text="${order.status.title}"></span>
-                        <div th:if="${#strings.equals(order.status,'DELIVERY')}">
+                        <span th:if="${not #strings.equals(order.status,order.status.DELIVERY)}" th:text="${order.status.title}"></span>
+                        <div th:if="${#strings.equals(order.status,order.status.DELIVERY)}">
                             <span th:text="${order.delivery.status.title}"></span>
                             <br>
-                            <button th:if="${not #strings.equals(order.delivery.status,'WAIT')}" class="btn btn-success btn-sm" href="#">배송조회</button>
+                            <button th:if="${not #strings.equals(order.delivery.status,order.status.WAIT)}" class="btn btn-success btn-sm" href="#">배송조회</button>
                         </div>
                     </td>
                     <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${iter.index} > 0">
-                        <div th:if="${#strings.equals(order.delivery.status ,'DELIVERY')}">
+                        <div th:if="${#strings.equals(order.delivery.status ,order.status.DELIVERY)}">
                             <a class="btn btn-danger btn-sm" th:href="@{'/orders/'+${order.orderId} +'/refundForm/'}">반품신청</a>
                             <br>
                             <a class="btn btn-warning btn-sm mt-1" href="#">교환신청</a>
                         </div>
-                        <div th:if="${#strings.equals(order.delivery.status,'WAIT')}">
+                        <div th:if="${#strings.equals(order.delivery.status,order.status.WAIT)}">
                             <a class="btn btn-danger btn-sm" th:href="@{'/orders/'+${order.orderId} +'/cancelForm/'}">결제취소</a>
                         </div>
                     </td>
