@@ -2,9 +2,11 @@
 const emptyReg = /^\s+|\s+$/g;
 let nameCheck = false;
 
+
 const positiveIntegerReg =  /^([1-9])([0-9]{1,9})$/;
 let priceCheck = false;
 let optionCheck = true;
+let deliveryCheck = true;
 
 
 $(document).on('change',"#product_name",(e) => {
@@ -70,3 +72,30 @@ function checkAllValidation() {
         return false;
     }
 }
+
+
+// 이상하게 정규표현식적용이 되지 않음
+$(document).on('click',"#checkOption",() => {
+    var count = 0;
+    optionCheck = true;
+
+    while(count < $("#option_table tbody tr").length) {
+        let name = $("#option_table tbody tr")[count].getElementsByTagName('input')[1].value;
+        let price = $("#option_table tbody tr")[count].getElementsByTagName('input')[2].value;
+        let quantity = $("#option_table tbody tr")[count].getElementsByTagName('input')[3].value
+
+        if(name.length == 0) {
+            alert(count+1 + " 품목 옵션명 에러")
+            optionCheck = false;
+        } else if(price.length == 0 || check(positiveIntegerReg,price) ) {
+            alert(count+1 + " 품목 판매가 에러")
+            optionCheck = false;
+        } else if(quantity.length == 0 || check(positiveIntegerReg,quantity)) {
+            alert(count+1 + " 품목 재고량 에러")
+            optionCheck = false;
+        }
+        count++;
+    }
+    if(optionCheck)
+        alert("확인 완료");
+});

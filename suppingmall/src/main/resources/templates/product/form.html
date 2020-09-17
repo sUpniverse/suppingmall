@@ -34,12 +34,14 @@
                     </div>
                     <div class="form-group col-md-6 mb-3">
                         <label for="category_middle"> 카테고리 분류 2차</label>
-                        <select class="form-control" id="category_middle" th:name="category.id" required>
+                        <select class="form-control" id="category_middle" required>
+                            <option disabled selected value>카테고리를 선택해주세요 </option>
                         </select>
                     </div>
                     <div class="form-group col-md-6 mb-3">
                         <label for="category_middle"> 카테고리 분류 3차</label>
                         <select class="form-control" id="category_bottom" th:name="category.id" required>
+                            <option disabled selected value>카테고리를 선택해주세요 </option>
                         </select>
                     </div>
                 </div>
@@ -194,30 +196,11 @@
             }
         });
 
-        // 이상하게 정규표현식적용이 되지 않음
-        // $(document).on('click',"#checkOption",() => {
-        //     var count = $("#option_table tbody tr").length;
-        //     optionCheck = true;
-        //
-        //     while(count > 0) {
-        //         if(!check(emptyReg,$("#option_table tbody tr")[count-1].getElementsByTagName('input')[1])) {
-        //             alert("옵션명 에러")
-        //             optionCheck = false;
-        //         } else if(check(positiveIntegerReg,$("#option_table tbody tr")[count-1].getElementsByTagName('input')[2]) ) {
-        //             alert("판매가 에러")
-        //             optionCheck = false;
-        //         } else if(check(positiveIntegerReg,$("#option_table tbody tr")[count-1].getElementsByTagName('input')[3])) {
-        //             alert("재고량 에러")
-        //             optionCheck = false;
-        //         }
-        //         count--;
-        //     }
-        // });
-
         function deleteOptionListener(obj) {
             var tr = $(obj).parent().parent();
             tr.remove();
         }
+
 
     });
 
@@ -311,13 +294,13 @@
 
                 file.width = width;
                 file.height = height;
+
             }
 
             _sendRequest(file) {
                 const data = new FormData();
                 data.append('file', file);
                 this.xhr.setRequestHeader(header,token);
-                this.xhr.setRequestHeader("Content-type","application/json");
                 this.xhr.send(data);
             }
         }
@@ -330,7 +313,6 @@
             images.forEach(element => console.log(element));
             let urls = document.getElementById('imagesUrl');
             urls.value = images;
-            console.log(document.getElementById('imagesUrl'));
 
             return true;
         });
