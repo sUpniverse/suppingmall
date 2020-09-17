@@ -45,7 +45,8 @@ public class Product {
         SALE("판매중","PS01"),
         STOP("판매중지","PS02"),
         SOLDOUT("품절","PS03"),
-        END("판매종료","PS04");
+        END("판매종료","PS04"),
+        DELETED("삭제","PS05");
 
         private String title;
         private String code;

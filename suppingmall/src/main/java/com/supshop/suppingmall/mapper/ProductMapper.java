@@ -1,6 +1,5 @@
 package com.supshop.suppingmall.mapper;
 
-import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.page.ProductCriteria;
 import com.supshop.suppingmall.product.Product;
 import com.supshop.suppingmall.product.ProductDetail;
@@ -10,14 +9,22 @@ import java.util.List;
 
 public interface ProductMapper {
 
+    //셀러 판매 물품 총 갯수 조회
+    int findSaleProductCount(String type,Long id);
+
     // 모든 제품 조회
     List<Product> findAll();
+
     // 조건에 해당하는 모든 제품 조회
     List<Product> findAll(Long id, String category, String name, Product.ProductStatus status);
+
     // 판매자가 등록한 모든 상품 조회
-    List<Product> findAllBySellerId(Long sellerId, ProductCriteria criteria);
+    List<Product> findAllBySellerId(Long sellerId,ProductCriteria criteria);
+
     // Paging을 위한 개수 조회
     List<Product> findProductsCount();
+
+    // 판매순별로 물춤조회
     List<Product> findAllByOrderCount();
 
     Product findOne(Long id);

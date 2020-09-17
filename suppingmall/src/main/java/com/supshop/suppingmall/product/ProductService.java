@@ -42,9 +42,18 @@ public class ProductService {
         return productMapper.findAllBySellerId(userId, productCriteria);
     }
 
-    public List<Product> findProductsCount(Long categoryId) {
-        return productMapper.findAllByOrderCount();
+    public List<Product> findProductsBySellerId(ProductCriteria productCriteria) {
+        return productMapper.findAllBySellerId(null,productCriteria);
     }
+
+    public int findProductsCount(String type,Long id) {
+        return productMapper.findSaleProductCount(type,id);
+    }
+    public int findProductsCount() {
+        return productMapper.findSaleProductCount(null,null);
+    }
+
+    //    판매량이 가장 높은 순으로 검색
     public List<Product> findProductsByOrderCount() {
         return productMapper.findAllByOrderCount();
     }

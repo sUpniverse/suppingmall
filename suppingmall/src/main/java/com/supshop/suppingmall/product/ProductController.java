@@ -103,7 +103,7 @@ public class ProductController {
 
     //카테고리별 물품 조회
     @GetMapping("/category/{id}")
-    public String getAllOnSaleProduct2(Model model,
+    public String getProductOnSaleInCategory(Model model,
                                        @AuthenticationPrincipal SessionUser user,
                                        @PathVariable Long id) {
 
@@ -150,14 +150,26 @@ public class ProductController {
                                       ProductCriteria productCriteria,
                                       Model model) {
 
-        List<Product> products = productService.findProductsBySellerId(user.getUserId(),null);
-        PageMaker pageMaker = new PageMaker(products.size(),productPagingCount,productCriteria);
+        int count = 0;
+        List<Product> products = null;
+        if(UserUtils.isSeller(user)){
+            count = productService.findProductsCount("seller", user.getUserId());
+            products = productService.findProductsBySellerId(user.getUserId(),productCriteria);
 
-        List<Product> pagingProducts = productService.findProductsBySellerId(user.getUserId(), productCriteria);
+        } else if(UserUtils.isAdmin(user)) {
+            count = productService.findProductsCount();
+            products = productService.findProductsBySellerId(productCriteria);
+        }
+
+        //option의 문제로 1개의 제품이 아닌 같은 ID로 여러개의 제품이 뜨므로 페이징 불가
+//        PageMaker pageMaker = new PageMaker(count,productPagingCount,productCriteria);
+
+
 
         model.addAttribute("user",user);
-        model.addAttribute("products",pagingProducts);
-        model.addAttribute("pageMaker",pageMaker);
+        model.addAttribute("count",count);
+        model.addAttribute("products",products);
+//        model.addAttribute("pageMaker",pageMaker);
 
         return "/product/seller/list";
     }

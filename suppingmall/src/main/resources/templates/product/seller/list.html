@@ -75,7 +75,7 @@
             </div>
             <div class="mt-5">
                 <h3>판매목록</h3>
-                <span th:text="@{'등록된 상품 개수 : ' + ${products.size()}}"></span>
+                <span th:text="@{'등록된 상품 개수 : ' + ${count}}"></span>
                 <table class="table table-default mt-3 text-small">
                     <thead class="table-secondary">
                     <tr>
@@ -83,6 +83,7 @@
                         <th>상품카테고리</th>
                         <th>상품명</th>
                         <th>옵션명</th>
+                        <th>판매자</th>
                         <th>재고</th>
                         <th>배송비</th>
                         <th>등록일</th>
@@ -103,6 +104,9 @@
                             </div>
                         </td>
                         <td>
+                            <span th:text="${product.getSeller().getStoreVO().getStoreName()}"></span>
+                        </td>
+                        <td>
                             <div th:each="option : ${product?.options}">
                                 <span th:text="${option?.quantity}"></span>
                             </div>
@@ -121,41 +125,43 @@
                                 <div th:class="mt-1" th:unless="${product.status.equals(product.status.END)}">
                                     <span><a class="btn btn-danger btn-sm" href="#" th:href="'javascript:updateStatus('+${product.productId}+',\''+${product.status.END}+'\')'" th:text="${product.status.END.title}"></a></span>
                                 </div>
+                                <div th:class="mt-1" th:if="${product.status.equals(product.status.END)}">
+                                    <span><a class="btn btn-danger btn-sm" href="#" th:href="'javascript:updateStatus('+${product.productId}+',\''+${product.status.DELETED}+'\')'" th:text="${product.status.DELETED.title}"></a></span>
+                                </div>
                             </div>
                         </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="container d-flex justify-content-center mb-3 text-small">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination mx-auto">
-                        <li class="page-item">
-                            <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/products/seller?page='+${pageMaker.startPage - 1}}" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:classappend="${pageMaker.criteria.page} == ${idx} ? active">
-                            <a class="page-link" th:href="@{'/products/seller?page='+${idx}}" th:text="${idx}"></a>
-                        </li>
-                        <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">
-                            <a class="page-link" th:href="@{'/products/seller?page='+${pageMaker.endPage + 1}}" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+<!--            <div class="container d-flex justify-content-center mb-3 text-small">-->
+<!--                <nav aria-label="Page navigation example">-->
+<!--                    <ul class="pagination mx-auto">-->
+<!--                        <li class="page-item">-->
+<!--                            <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/products/seller?page='+${pageMaker.startPage - 1}}" aria-label="Previous">-->
+<!--                                <span aria-hidden="true">&laquo;</span>-->
+<!--                            </a>-->
+<!--                        </li>-->
+<!--                        <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:classappend="${pageMaker.criteria.page} == ${idx} ? active">-->
+<!--                            <a class="page-link" th:href="@{'/products/seller?page='+${idx}}" th:text="${idx}"></a>-->
+<!--                        </li>-->
+<!--                        <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">-->
+<!--                            <a class="page-link" th:href="@{'/products/seller?page='+${pageMaker.endPage + 1}}" aria-label="Next">-->
+<!--                                <span aria-hidden="true">&raquo;</span>-->
+<!--                            </a>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+<!--                </nav>-->
+<!--            </div>-->
         </div>
     </div>
 </div>
 <footer th:include="fragments/footer :: footer" />
 </body>
-<script type="text/javascript">
+<script th:inline="javascript">
 
     $(document).ready(function () {
-        var header = [[${_csrf.headerName}]];
-        var token = [[${_csrf.token}]];
+
 
         function search() {
             var fromDate = document.getElementById('fromDate').value;
@@ -164,24 +170,46 @@
             $(location).attr('href','/orders/main?fromDate=' + fromDate + '&toDate=' + toDate + '&type=order&status=' + status);
         }
 
-        function updateStatus(id,status) {
-            console.log("눌림");
-            $.ajax({
-                type: 'PATCH',
-                url: "/products/"+id+"/status/"+status,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Content-type","application/json");
-                    xhr.setRequestHeader(header,token);
-                },
-                success: () => {
-                    $(id+"_status").load(window.location.href+id+"_status");
-                    $(id+"_statusButton").load(window.location.href+id+"_statusButton");
-                },
-                error: (response, error) => {
-                    alert("Q&A수정에 실패했습니다.")
-                }
-            })
-        }
     });
+
+    var header = [[${_csrf.headerName}]];
+    var token = [[${_csrf.token}]];
+
+    function updateStatus(id,status) {
+        console.log("눌림");
+
+        $.ajax({
+            type: 'PATCH',
+            url: "/products/"+id+"/status/"+status,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Content-type","application/json");
+                xhr.setRequestHeader(header,token);
+            },
+            success: () => {
+                chagneButton(id,status);
+            },
+            error: (response, error) => {
+                alert("Q&A수정에 실패했습니다.")
+            }
+        });
+    }
+
+    function chagneButton(id,status) {
+        if(status === "STOP") {
+            document.getElementById(id+"_status").innerText = '판매중지';
+            document.getElementById(id+'_statusButton').innerHTML = '<div class="mt-1"><span><a class="btn btn-info btn-sm" href="javascript:updateStatus('+id+',\'SALE\')">판매중</a></span></div>' +
+                                                                    '<div class="mt-1"><span><a class="btn btn-danger btn-sm"  href="javascript:updateStatus('+id+',\'END\')">판매종료</a></span></div>'
+        } else if(status === "END") {
+            document.getElementById(id+"_status").innerText = '판매종료';
+            document.getElementById(id+'_statusButton').innerHTML = '<div class="mt-1"><span><a class="btn btn-danger btn-sm" href="javascript:updateStatus('+id+',\'DELETED\')">삭제</a></span></div>'
+        } else if(status === "SALE") {
+            document.getElementById(id+"_status").innerText = '판매중';
+            document.getElementById(id+'_statusButton').innerHTML = '<div class="mt-1"><span><a class="btn btn-warning btn-sm" href="javascript:updateStatus('+id+',\'STOP\')">판매중지</a></span></div>' +
+                                                                    '<div class="mt-1"><span><a class="btn btn-danger btn-sm" href="javascript:updateStatus('+id+',\'END\')">판매종료</a></span></div>'
+        } else if(status === "DELETED") {
+            document.getElementById(id+"_status").innerText = '물품삭제';
+            document.getElementById(id+'_statusButton').innerHTML = ''
+        }
+    }
 </script>
 </html>
