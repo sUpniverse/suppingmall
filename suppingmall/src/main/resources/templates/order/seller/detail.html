@@ -18,11 +18,10 @@
 </head>
 <body>
 <header th:replace="product/product-nav-dark :: product-nav-dark" />
-<div class="container-fluid  mt-5">
+<div class="container-fluid p-5">
     <div>
         <h3>배송/주문상세정보</h3>
     </div>
-
     <div>
         <table class="table table-default border-bottom">
             <thead>
@@ -91,41 +90,54 @@
             </tr>
             </tbody>
         </table>
-
-        <div class="mt-5">
-            <h4>배송지 정보</h4>
-            <table class="table table-default">
-                <tr>
-                    <th>수령인</th>
-                    <td th:text="${order.delivery.name}"></td>
-                </tr>
-                <tr>
-                    <th>연락처</th>
-                    <td th:text="${order.delivery.phone}"></td>
-                </tr>
-                <tr>
-                    <th>배송지</th>
-                    <td>
-                        <span th:text="${order.delivery.zipCode}"></span>
-                        <span th:text="${order.delivery.address}"></span>
-                        <span th:text="${order.delivery?.addressDetail}"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <th>배송메모</th>
-                    <td th:text="${order.delivery?.memo}"></td>
-                </tr>
-                <tr th:if="${#strings.equals(order.delivery.status,'DELIVERY')}">
-                    <th>택배사</th>
-                    <td th:text="${order.delivery.vendor}"></td>
-                </tr>
-                <tr th:if="${#strings.equals(order.delivery.status,'DELIVERY')}">
-                    <th>송장번호</th>
-                    <td th:text="${order.delivery.trackingNumber}"></td>
-                </tr>
-            </table>
+        <div class="row mt-5">
+            <div class="col-12 col-lg-6">
+                <h4>주문자 정보</h4>
+                <table class="table table-default">
+                    <tr>
+                        <th>주문자</th>
+                        <td th:text="${order.buyer.name}"></td>
+                    </tr>
+                    <tr>
+                        <th>연락처</th>
+                        <td th:text="${order.buyer.phoneNumber}"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-12 col-lg-6">
+                <h4>배송지 정보</h4>
+                <table class="table table-default">
+                    <tr>
+                        <th>수령인</th>
+                        <td th:text="${order.delivery.name}"></td>
+                    </tr>
+                    <tr>
+                        <th>연락처</th>
+                        <td th:text="${order.delivery.phone}"></td>
+                    </tr>
+                    <tr>
+                        <th>배송지</th>
+                        <td>
+                            <span th:text="${order.delivery.zipCode}"></span>
+                            <span th:text="${order.delivery.address}"></span>
+                            <span th:text="${order.delivery?.addressDetail}"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>배송메모</th>
+                        <td th:text="${order.delivery?.memo}"></td>
+                    </tr>
+                    <tr th:if="${#strings.equals(order.delivery.status,'DELIVERY')}">
+                        <th>택배사</th>
+                        <td th:text="${order.delivery.vendor}"></td>
+                    </tr>
+                    <tr th:if="${#strings.equals(order.delivery.status,'DELIVERY')}">
+                        <th>송장번호</th>
+                        <td th:text="${order.delivery.trackingNumber}"></td>
+                    </tr>
+                </table>
+            </div>
         </div>
-
         <div class="mt-5">
             <h4>결제상세 정보</h4>
             <table class="table table-default">

@@ -75,15 +75,15 @@
     <sql id="conditionalSearch">
         <if test="type != null and searchValue != null">
             <if test='type.equals("order")'>
-                AND O.status LIKE #{searchValue}
+                AND O.status = #{searchValue}
             </if>
             <if test='type.equals("delivery")'>
-                AND D.status LIKE #{searchValue}
+                AND D.status = #{searchValue}
             </if>
         </if>
         <if test="type != null and searchValue == null">
             <if test='type.equals("order")'>
-                AND (O.status LIKE "O004" OR O.status LIKE "O005" OR O.status LIKE "O006")
+                AND (O.status = "O004" OR O.status = "O005" OR O.status = "O006")
             </if>
         </if>
         <if test="fromDate != null and toDate != null">
@@ -93,14 +93,81 @@
         </if>
         <if test="fromDate == null and toDate == null">
             <![CDATA[
-            AND O.order_date >= date_sub(now(), interval 180 day)
+            AND O.order_date >= date_sub(now(), interval 360 day)
             ]]>
         </if>
     </sql>
 
+    <sql id="adminConditionalSearch">
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="searchValue == null">
+                NOT O.status = "O000"
+            </if>
+            <if test="searchValue != null">
+                 O.status = #{searchValue}
+            </if>
+
+            <if test="fromDate != null and toDate != null">
+                <![CDATA[
+            AND O.order_date >= #{fromDate} AND O.order_date < #{toDate}
+            ]]>
+            </if>
+            <if test="fromDate == null and toDate == null">
+                <![CDATA[
+            AND O.order_date >= date_sub(now(), interval 180 day)
+            ]]>
+            </if>
+        </trim>
+    </sql>
+
+
+    <sql id="pagingCondition">
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test='type != null and type.equals("seller")'>
+                O.seller_id = #{id}
+                AND NOT O.status = 'O000'
+            </if>
+            <if test='type != null and type.equals("buyer")'>
+                O.buyer_id = #{id}
+                AND NOT O.status = 'O000'
+            </if>
+            <if test='type != null and type.equals("admin")'>
+                O.buyer_id = #{id}
+            </if>
+        </trim>
+    </sql>
+    
+    <select id="findCount" resultType="int">
+        SELECT count(*)
+        FROM Orders AS O
+        LEFT OUTER JOIN Delivery AS D on (O.delivery_id = D.delivery_id)
+        <include refid="pagingCondition"></include>
+    </select>
+
+
+    <select id="findAll" resultMap="order">
+        SELECT O.order_id AS "OrderId", O.status AS "OrderStatus", O.order_date AS "OrderDate", O.update_date AS "OrderUpdateDate",
+        B.user_id AS "BuyerId", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber", B.nickName AS "BuyerNickName", S.user_id AS "SellerId", S.store_name AS "StoreName",
+        S.store_phone_number AS "StorePhoneNumber", D.delivery_id AS "DeliveryId", D.name AS "DeliveryName",
+        D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode", D.phone AS "DeliveryPhone",
+        D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
+        OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice",
+        P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail"
+        FROM Orders AS O
+        LEFT OUTER JOIN User AS B on (O.buyer_id = B.user_id)
+        LEFT OUTER JOIN User AS S on (O.seller_id = S.user_id)
+        LEFT OUTER JOIN Delivery AS D on (O.delivery_id = D.delivery_id)
+        LEFT OUTER JOIN OrderItem AS OI on (O.order_id = OI.order_id)
+        LEFT OUTER JOIN Product AS P on (OI.product_id = P.product_id)
+        <include refid="adminConditionalSearch"></include>
+        ORDER BY O.order_date desc
+    </select>
+
+
     <select id="findOne" resultMap="order">
         SELECT O.order_id AS "OrderId", O.status AS "OrderStatus", O.order_date AS "OrderDate", O.update_date AS "OrderUpdateDate",
-        B.user_id AS "BuyerId", B.nickName AS "BuyerNickName", S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
+        B.user_id AS "BuyerId", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber",
+        S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
         S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
         D.delivery_id AS "DeliveryId", D.name AS "DeliveryName", D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode",
         D.phone AS "DeliveryPhone", D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
@@ -122,7 +189,7 @@
 
     <select id="findByBuyerId" resultMap="order">
         SELECT O.order_id AS "OrderId", O.status AS "OrderStatus", O.order_date AS "OrderDate", O.update_date AS "OrderUpdateDate",
-        B.user_id AS "BuyerId", B.nickName AS "BuyerNickName", S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
+        B.user_id AS "BuyerId", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber", S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
         S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
         D.delivery_id AS "DeliveryId", D.name AS "DeliveryName", D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail",
         D.zipcode AS "DeliveryZipCode", D.phone AS "DeliveryPhone", D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber",
@@ -143,12 +210,11 @@
         WHERE O.buyer_id = ${userId} AND NOT O.status = 'O000'
         <include refid="conditionalSearch"></include>
         ORDER BY O.order_date desc
-        <include refid="paging"></include>
     </select>
 
     <select id="findBySellerId" resultMap="order">
         SELECT O.order_id AS "OrderId", O.status AS "OrderStatus", O.order_date AS "OrderDate", O.update_date AS "OrderUpdateDate",
-        B.user_id AS "BuyerId", B.nickName AS "BuyerNickName", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber",
+        B.user_id AS "BuyerId", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber",
         D.delivery_id AS "DeliveryId", D.name AS "DeliveryName", D.address AS "DeliveryAddress",
         D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode", D.phone AS "DeliveryPhone",
         D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
@@ -173,7 +239,7 @@
 
     <select id="findOneBySellerId" resultMap="order">
         SELECT O.order_id AS "OrderId", O.status AS "OrderStatus", O.order_date AS "OrderDate", O.update_date AS "OrderUpdateDate",
-        B.user_id AS "BuyerId", B.nickName AS "BuyerNickName", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber",
+        B.user_id AS "BuyerId", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber",
         D.delivery_id AS "DeliveryId", D.name AS "DeliveryName", D.address AS "DeliveryAddress",
         D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode", D.phone AS "DeliveryPhone",
         D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
@@ -194,31 +260,6 @@
         ORDER BY O.order_date desc
         <include refid="paging"></include>
     </select>
-
-    <select id="findAll" resultMap="order">
-        SELECT O.order_id AS "OrderId", O.status AS "OrderStatus", O.order_date AS "OrderDate", O.update_date AS "OrderUpdateDate",
-        B.user_id AS "BuyerId", B.nickName AS "BuyerNickName", S.user_id AS "SellerId", S.store_name AS "StoreName",
-        S.store_phone_number AS "StorePhoneNumber", D.delivery_id AS "DeliveryId", D.name AS "DeliveryName",
-        D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode", D.phone AS "DeliveryPhone",
-        D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
-        PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus",
-        PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
-        OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice",
-        P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail",
-        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity"
-        FROM Orders AS O
-        LEFT OUTER JOIN User AS B on (O.buyer_id = B.user_id)
-        LEFT OUTER JOIN User AS S on (O.seller_id = S.user_id)
-        LEFT OUTER JOIN Delivery AS D on (O.delivery_id = D.delivery_id)
-        LEFT OUTER JOIN Payment AS PA on (O.payment_id = PA.payment_id)
-        LEFT OUTER JOIN OrderItem AS OI on (O.order_id = OI.order_id)
-        LEFT OUTER JOIN Product AS P on (OI.product_id = P.product_id)
-        LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
-        <include refid="conditionalSearch"></include>
-        ORDER BY O.order_date desc
-    </select>
-
-
 
 
     <insert id="save" parameterType="com.supshop.suppingmall.order.Orders" useGeneratedKeys="true" keyProperty="orderId">

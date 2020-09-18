@@ -22,7 +22,7 @@
         <div class="col-md-2 d-none d-md-block bg-light sidebar" th:if="${#strings.equals(#authentication.principal.role,'ADMIN') || #strings.equals(#authentication.principal.role,'MASTER')}">
             <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
         </div>
-        <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
+        <div class="col-md-6 ml-sm-auto col-lg-8 p-5 container">
             <table class="d-flex p-3 my-3 bg-light rounded shadow-sm mt-5 border">
                 <tr>
                     <td>
@@ -85,15 +85,15 @@
 <!--                <nav aria-label="Page navigation example">-->
 <!--                    <ul class="pagination mx-auto">-->
 <!--                        <li class="page-item">-->
-<!--                            <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/products/seller/main?page='+${pageMaker.startPage - 1}}" aria-label="Previous">-->
+<!--                            <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/orders?page='+${pageMaker.startPage - 1}}" aria-label="Previous">-->
 <!--                                <span aria-hidden="true">&laquo;</span>-->
 <!--                            </a>-->
 <!--                        </li>-->
 <!--                        <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:classappend="${pageMaker.criteria.page} == ${idx} ? active">-->
-<!--                            <a class="page-link" th:href="@{'/products/seller/main?page='+${idx}}" th:text="${idx}"></a>-->
+<!--                            <a class="page-link" th:href="@{'/orders?page='+${idx}}" th:text="${idx}"></a>-->
 <!--                        </li>-->
 <!--                        <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">-->
-<!--                            <a class="page-link" th:href="@{'/products/seller/main?page='+${pageMaker.endPage + 1}}" aria-label="Next">-->
+<!--                            <a class="page-link" th:href="@{'/orders?page='+${pageMaker.endPage + 1}}" aria-label="Next">-->
 <!--                                <span aria-hidden="true">&raquo;</span>-->
 <!--                            </a>-->
 <!--                        </li>-->
@@ -114,7 +114,8 @@
         var fromDate = document.getElementById('fromDate').value;
         var toDate = document.getElementById('toDate').value;
         var status = document.getElementById('status').value;
-        $(location).attr('href','/orders/seller/main?fromDate=' + fromDate + '&toDate=' + toDate +'&type=delivery&status=' + status);
+        console.log(status);
+        $(location).attr('href','/orders?fromDate=' + fromDate + '&toDate=' + toDate +'&status=' + status);
     }
     function getDeliveryForm(deliveryId) {
         window.open("/delivery/"+deliveryId+"/form","_blank","width=500,height=600,left=500,top=100,menubar=no,toolbar=no,location=no");

@@ -48,6 +48,20 @@ public class OrderService {
     private static final int hour = 23;
     private static final int minute = 59;
 
+    public int findCount(String type, Long id) {
+        return orderMapper.findCount(type, id);
+    }
+
+    public List<Orders> findOrders(LocalDate fromDate, LocalDate toDate,Orders.OrderStatus orderStatus, OrderCriteria criteria) {
+        LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
+        LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
+
+        //code : orderStatus Value
+        String code = Optional.ofNullable(orderStatus).map(Orders.OrderStatus::getCode).orElse(null);
+        List<Orders> ordersList = orderMapper.findAll(formDateTime, toDateTime,code,criteria);
+        return ordersList;
+    }
+
     @Transactional
     public Orders findOrder(Long orderId) {
         Optional<Orders> order = orderMapper.findOne(orderId);
@@ -58,6 +72,7 @@ public class OrderService {
     public List<Orders> findOrderByBuyerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Orders.OrderStatus status) {
         LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
         LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
+        //code : orderStatus Value
         String code = Optional.ofNullable(status).map(Orders.OrderStatus::getCode).orElse(null);
         List<Orders> ordersList = orderMapper.findByBuyerId(userId, formDateTime, toDateTime, type,  code);
         return ordersList;
@@ -67,20 +82,15 @@ public class OrderService {
     public List<Orders> findOrderBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Delivery.DeliveryStatus deliveryStatus, Orders.OrderStatus orderStatus, OrderCriteria criteria) {
         LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
         LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
+
+        //code : orderStatus Value
         String code = "";
-        if(type != null && type.equals("delivery")) {
+        if(type != null && "delivery".equals(type)) {
             code = Optional.ofNullable(deliveryStatus).map(Delivery.DeliveryStatus::getCode).orElse(null);
-        } else if(type != null && type.equals("order")) {
+        } else if(type != null && "order".equals(type)) {
             code = Optional.ofNullable(orderStatus).map(Orders.OrderStatus::getCode).orElse(null);
         }
         List<Orders> ordersList = orderMapper.findBySellerId(userId, formDateTime, toDateTime, type,  code, criteria);
-        return ordersList;
-    }
-
-    public List<Orders> findOrders(LocalDate fromDate, LocalDate toDate) {
-        LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
-        LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
-        List<Orders> ordersList = orderMapper.findAll(formDateTime, toDateTime);
         return ordersList;
     }
 

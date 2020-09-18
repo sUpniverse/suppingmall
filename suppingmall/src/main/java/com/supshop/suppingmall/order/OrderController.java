@@ -94,13 +94,23 @@ public class OrderController {
 
 
     @GetMapping("")
-    public String getOrders(@RequestParam(required = false) @DateTimeFormat(pattern = "YYYY-MM-dd") LocalDate fromDate,
-                            @RequestParam(required = false) @DateTimeFormat(pattern = "YYYY-MM-dd") LocalDate toDate,
-                            @RequestParam(required = false) String type,
+    public String getOrders(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+                            @RequestParam(required = false) Orders.OrderStatus orderStatus,
+                            @AuthenticationPrincipal SessionUser user,
+                            OrderCriteria criteria,
                             Model model) {
-        List<Orders> orders = orderService.findOrders(fromDate,toDate);
+
+
+        int count = orderService.findCount("seller", user.getUserId());
+        PageMaker pageMaker = new PageMaker(count, orderDisplayPagingNum, criteria);
+        List<Orders> orders = orderService.findOrders(fromDate,toDate,orderStatus,null);
+
         model.addAttribute("orders",orders);
-        return "/order/list";
+        model.addAttribute("pageMaker",pageMaker);
+
+        model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.ORDER,Orders.OrderStatus.DELIVERY,Orders.OrderStatus.COMPLETE,Orders.OrderStatus.CANCEL,Orders.OrderStatus.REFUND,Orders.OrderStatus.CHANGE));
+        return "/order/admin/list";
     }
 
     @GetMapping("/{id}")
@@ -161,21 +171,25 @@ public class OrderController {
                                      OrderCriteria criteria,
                                      Model model) {
 
-        List<Orders> orders = orderService.findOrderBySellerId(user.getUserId(),fromDate,toDate,type,deliveryStatus,orderStatus,null);
-        PageMaker pageMaker = new PageMaker(orders.size(), orderDisplayPagingNum, criteria);
+
+        int count = orderService.findCount("seller", user.getUserId());
+        PageMaker pageMaker = new PageMaker(count, orderDisplayPagingNum, criteria);
         List<Orders> pagingOrders = orderService.findOrderBySellerId(user.getUserId(),fromDate,toDate,type,deliveryStatus,orderStatus,criteria);
 
         model.addAttribute("orders",pagingOrders);
         model.addAttribute("pageMaker",pageMaker);
 
+        // type이 order일시에는 환불관련 페이지로
         if(type != null && type.equals("order")) {
             model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.CANCEL,Orders.OrderStatus.REFUND,Orders.OrderStatus.CHANGE));
             return "/order/seller/refund-list";
         }
 
         model.addAttribute("statusList", Arrays.asList(Delivery.DeliveryStatus.values()));
+
         return "/order/seller/list";
     }
+
 
     @GetMapping("/{id}/seller")
     public String getOrderBySellerId(@PathVariable Long id, Model model) {

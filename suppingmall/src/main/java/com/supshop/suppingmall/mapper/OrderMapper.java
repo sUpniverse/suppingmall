@@ -13,9 +13,11 @@ public interface OrderMapper {
 
     void save(Orders orders);
 
+    int findCount(String type,Long id);
+
     Optional<Orders> findOne(Long orderId);
 
-    List<Orders> findAll(LocalDateTime fromDate, LocalDateTime toDate);
+    List<Orders> findAll(LocalDateTime fromDate, LocalDateTime toDate, String searchValue, OrderCriteria criteria);
 
     List<Orders> findByBuyerId(Long userId, LocalDateTime fromDate, LocalDateTime toDate, String type, String searchValue);
 
