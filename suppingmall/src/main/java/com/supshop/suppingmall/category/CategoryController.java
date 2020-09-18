@@ -35,7 +35,6 @@ public class CategoryController {
     public ResponseEntity<Category> getCategories(@PathVariable Long id,
                                                   @AuthenticationPrincipal SessionUser session,
                                                   Model model) {
-        if (!UserUtils.isAdmin(session)) return ResponseEntity.badRequest().build();
         Category category = categoryService.getCategory(id);
         return ResponseEntity.ok(category);
     }

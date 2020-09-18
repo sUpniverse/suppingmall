@@ -148,7 +148,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/carts/**").authenticated()
                 .antMatchers("/payments/**").authenticated()
                 .antMatchers("/delivery/**").authenticated()
-                .antMatchers("/category/**").hasAnyRole(MASTER,ADMIN)
+                .antMatchers(HttpMethod.GET,"/category/{id}").hasAnyRole(MASTER,ADMIN,SELLER)
+                .antMatchers(HttpMethod.POST,"/category/**").hasAnyRole(MASTER,ADMIN)
+                .antMatchers(HttpMethod.PUT,"/category/**").hasAnyRole(MASTER,ADMIN)
+                .antMatchers(HttpMethod.DELETE,"/category/**").hasAnyRole(MASTER,ADMIN)
+
 
         ;
     }
