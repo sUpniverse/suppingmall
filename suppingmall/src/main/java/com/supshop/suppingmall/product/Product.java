@@ -34,7 +34,6 @@ public class Product {
     private Category category;
     private ProductStatus status;
     private String thumbnail;
-    private String picture;
 
 
     @Getter
