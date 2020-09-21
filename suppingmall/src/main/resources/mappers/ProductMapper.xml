@@ -53,18 +53,18 @@
 
     <sql id="conditionalSearch">
         <trim prefix="WHERE" prefixOverrides="AND|OR">
-            <if test='id != null'>
-                AND P.product_id = #{id}
+            <if test='sellerId != null'>
+                AND P.seller_id = #{sellerId}
             </if>
-            <if test='category != null'>
-                AND P.category_id = #{category.id}
+            <if test='categoryId != null'>
+                AND P.category_id = #{categoryId}
             </if>
             <if test='name != null'>
                 <bind name="name" value="'%'+name+'%'"/>
                 AND P.name LIKE #{name}
             </if>
             <if test='status != null'>
-                AND P.status LIKE #{status, typeHandler=com.supshop.suppingmall.product.ProductStatusTypeHandler}
+                AND P.status = #{status, typeHandler=com.supshop.suppingmall.product.ProductStatusTypeHandler}
             </if>
         </trim>
     </sql>
@@ -75,27 +75,18 @@
         </if>
     </sql>
 
-    <sql id="pagingCondition">
-        <trim prefix="WHERE" prefixOverrides="AND|OR">
-            <if test='type != null and type.equals("seller")'>
-                P.seller_id = #{id}
-            </if>
-        </trim>
-    </sql>
-
-    <sql id="conditionalSearchById">
-        <trim prefix="WHERE" prefixOverrides="AND|OR">
-            <if test="sellerId != null">
-                AND P.seller_id = #{sellerId}
-            </if>
-        </trim>
-    </sql>
-
-
 
     <select id="findSaleProductCount" resultType="int">
         SELECT count(*) FROM Product AS P
-        <include refid="pagingCondition"/>
+        <include refid="conditionalSearch"/>
+    </select>
+
+    <select id="findAllCount" resultType="int">
+        SELECT count(*) FROM Product AS P
+        LEFT OUTER JOIN Product_Detail AS PD on (P.product_id = PD.product_id)
+        LEFT OUTER JOIN Product_Option AS PO on (P.product_id = PO.product_id)
+        LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
+        <include refid="conditionalSearch"/>
     </select>
 
     <select id="findAll" resultMap="product">
@@ -111,7 +102,29 @@
         LEFT OUTER JOIN Product_Option AS PO on (P.product_id = PO.product_id)
         LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
         <include refid="conditionalSearch"/>
-        ORDER BY P.product_id ASC, PO.product_option_id ASC
+        ORDER BY P.product_id DESC, PO.product_option_id ASC
+    </select>
+
+    <select id="findAllPart" resultMap="product">
+        SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice",
+        P.registered_date AS "ProductRegisteredDate", P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory", P.thumbnail AS "ProductThumbnail",P.rating AS "ProductRating",
+        C.category_id AS "CategoryId", C.name AS "CategoryName"
+        FROM Product AS P
+        LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
+        <include refid="conditionalSearch"/>
+        ORDER BY P.product_id DESC
+        <include refid="paging"></include>
+    </select>
+
+    <select id="findAllPartByParentCategory" resultMap="product">
+        SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice",
+        P.registered_date AS "ProductRegisteredDate", P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory", P.thumbnail AS "ProductThumbnail",P.rating AS "ProductRating",
+        C.category_id AS "CategoryId", C.name AS "CategoryName"
+        FROM Product AS P
+        LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
+        WHERE C.parent_id = #{parentId} AND P.status ='PS01'
+        ORDER BY P.product_id DESC
+        <include refid="paging"></include>
     </select>
 
     <select id="findOnSaleProducts" resultMap="product">
@@ -129,21 +142,6 @@
         <include refid="conditionalSearch"/>
         ORDER BY P.product_id ASC, PO.product_option_id ASC
         <include refid="paging"/>
-    </select>
-
-
-    <select id="findAllBySellerId" resultMap="product">
-        SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.registered_date AS "ProductRegisteredDate",
-        P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
-        P.thumbnail AS "ProductThumbnail", P.rating AS "ProductRating", P.status AS "ProductStatus",
-        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.quantity AS "ProductOptionQuantity", PO.price AS "ProductOptionPrice",
-        U.store_name AS "StoreName",C.category_id AS "CategoryId", C.name AS "CategoryName"
-        FROM Product AS P
-        LEFT OUTER JOIN Product_Option AS PO on (P.product_id = PO.product_id)
-        LEFT OUTER JOIN user AS U on (P.seller_id = U.user_id)
-        LEFT OUTER JOIN category AS C on (P.category_id = C.category_id)
-        <include refid="conditionalSearchById"/>
-        ORDER BY P.product_id DESC, PO.product_option_id ASC
     </select>
 
     <select id="findOne" resultMap="product">
@@ -165,7 +163,7 @@
         ORDER BY P.product_id, PO.product_option_id ASC
     </select>
 
-    <select id="findProductByOrderCount" resultMap="product">
+    <select id="findAllOrderByOrdersQuantity" resultMap="product">
         SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.registered_date AS "ProductRegisteredDate",
         P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
         P.thumbnail AS "ProductThumbnail", P.rating AS "ProductRating", P.status AS "ProductStatus",
@@ -299,8 +297,5 @@
         status = 'PS04',
         WHERE product_id = #{id}
     </update>
-
-
-
 
 </mapper>

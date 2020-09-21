@@ -1,6 +1,5 @@
 package com.supshop.suppingmall.product;
 
-import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryFactory;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserFactory;
@@ -44,7 +43,7 @@ public class ProductServiceTest {
 
         //when
         productService.createProduct(product,urls);
-        Product product1 = productService.findProduct(product.getProductId());
+        Product product1 = productService.getProduct(product.getProductId());
 
 
         //then

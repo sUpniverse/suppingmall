@@ -10,6 +10,7 @@ import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.image.ImageController;
 import com.supshop.suppingmall.image.ImageService;
+import com.supshop.suppingmall.page.Criteria;
 import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.page.ProductCriteria;
 import com.supshop.suppingmall.product.Form.ProductForm;
@@ -60,7 +61,7 @@ public class ProductController {
     //상태에 관계없이 모든 상품
     @GetMapping("")
     public String getAllProduct(Model model) {
-        List<Product> products = productService.findProducts();
+        List<Product> products = productService.getProducts();
         model.addAttribute("products",products);
         model.addAttribute("categories",categoryService.getCategoryToGrandChildren(productCategoryId));
         return "/product/list";
@@ -68,53 +69,59 @@ public class ProductController {
 
     //판매상태의 모든 물품들
     @GetMapping("/main2")
-    public String getAllOnSaleProduct(Model model,
+    public String getAllOnSaleProduct2(Model model,
                                       @RequestParam(required = false)String name) {
-        List<Product> products = productService.findOnSaleProducts(name);
+        List<Product> products = productService.getOnSaleProductsOnMenu(null,name,null);
         model.addAttribute("products",products);
         model.addAttribute("categories",categoryService.getCategoryToGrandChildren(productCategoryId).getChild());
-        return "/product/list";
+        return "/product/list2";
     }
 
     //판매상태의 모든 물품들
     @GetMapping("/main")
-    public String getAllOnSaleProduct2(Model model,
+    public String getAllOnSaleProduct(Model model,
                                        @AuthenticationPrincipal SessionUser user,
-                                       @RequestParam(required = false)String productName) {
+                                       @RequestParam(required = false)String name) {
 
-        List<Product> products = productService.findOnSaleProducts(productName);
-        ProductCriteria criteria = new ProductCriteria();
         List<Cart> cart = null;
         if(user != null) cart = cartService.findCartByBuyerId(user.getUserId());
 
-        model.addAttribute("products",products);
         if(cart != null) model.addAttribute("cart",cart.size());
 
         model.addAttribute("electronics",categoryService.getCategoryToGrandChildren(electronicsCategoryId));
         model.addAttribute("clothing",categoryService.getCategoryToGrandChildren(clothingCategoryId));
 
-        // Todo: 추천, 베스트, 신제품 product 구해오기, 그에따른 페이지메이커 생성
-        PageMaker recommandPageMaker = new PageMaker(products.size(),productPagingCount,criteria);
-        PageMaker bestPageMaker = new PageMaker(products.size(),productPagingCount,criteria);
-        PageMaker newPageMaker = new PageMaker(products.size(),productPagingCount,criteria);
+        Criteria criteria = new ProductCriteria();
+        model.addAttribute("latestComputerList",productService.getOnSaleProductsByParentCategoryOnMenu(4l,criteria));
+        model.addAttribute("latestMobileList",productService.getOnSaleProductsByParentCategoryOnMenu(5l,criteria));
+        model.addAttribute("productList",productService.getOnSaleProductsOnMenu(null, null, criteria));
 
-        return "/product/list2";
+
+        return "/product/list";
     }
 
     //카테고리별 물품 조회
     @GetMapping("/category/{id}")
     public String getProductOnSaleInCategory(Model model,
                                        @AuthenticationPrincipal SessionUser user,
-                                       @PathVariable Long id) {
+                                       @PathVariable Long id,
+                                       ProductCriteria criteria) {
+
+
+        int productsCount = productService.getProductsCount(id, null, null, null);
+
+        model.addAttribute("productList",productService.getOnSaleProductsOnMenu(id, null, criteria));
+        model.addAttribute("categoryId",id);
+        model.addAttribute("productPageMaker",new PageMaker(productsCount, productPagingCount, criteria));
 
 
         return "/product/list-category";
     }
 
 
-    @GetMapping("/{id}")
-    public String getProduct(@PathVariable Long id, Model model) {
-        Product product = productService.findProduct(id);
+    @GetMapping("/{id}/2")
+    public String getProduct2(@PathVariable Long id, Model model) {
+        Product product = productService.getProduct(id);
 
         Category category = categoryService.getGrandParentByGrandChildren(product.getCategory().getId());
         product.setCategory(category);
@@ -128,9 +135,9 @@ public class ProductController {
         return "/product/product";
     }
 
-    @GetMapping("/{id}/2")
-    public String getProduct2(@PathVariable Long id, Model model) {
-        Product product = productService.findProduct(id);
+    @GetMapping("/{id}")
+    public String getProduct(@PathVariable Long id, Model model) {
+        Product product = productService.getProduct(id);
 
         Category category = categoryService.getGrandParentByGrandChildren(product.getCategory().getId());
         product.setCategory(category);
@@ -153,12 +160,12 @@ public class ProductController {
         int count = 0;
         List<Product> products = null;
         if(UserUtils.isSeller(user)){
-            count = productService.findProductsCount("seller", user.getUserId());
-            products = productService.findProductsBySellerId(user.getUserId(),productCriteria);
+            count = productService.getProductsCount(null, user.getUserId(),null,null);
+            products = productService.getProductsBySeller(user.getUserId(),productCriteria);
 
         } else if(UserUtils.isAdmin(user)) {
-            count = productService.findProductsCount();
-            products = productService.findProductsBySellerId(productCriteria);
+            count = productService.getProductsCount(null, null,null,null);
+            products = productService.getProducts(productCriteria);
         }
 
         //option의 문제로 1개의 제품이 아닌 같은 ID로 여러개의 제품이 뜨므로 페이징 불가
@@ -198,7 +205,7 @@ public class ProductController {
     @PatchMapping("/{id}/status/{status}")
     @ResponseBody
     public ResponseEntity updateProductStatus(@PathVariable Long id, @PathVariable Product.ProductStatus status) {
-        Product product = productService.findProduct(id);
+        Product product = productService.getProduct(id);
         product.setStatus(status);
         try {
             productService.updateProduct(id, product);

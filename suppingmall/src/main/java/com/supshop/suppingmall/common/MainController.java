@@ -18,7 +18,7 @@ public class MainController {
 
     @RequestMapping("")
     public String mainPage(Model model){
-        List<Product> products = productService.findOnSaleProducts(null);
+        List<Product> products = productService.getOnSaleProductsOnMenu(null,null,null);
         model.addAttribute("products",products);
         return "main.html";
     }

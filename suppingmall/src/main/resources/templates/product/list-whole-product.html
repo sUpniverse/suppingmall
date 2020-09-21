@@ -1,0 +1,41 @@
+<div class="container for-you" th:fragment="recommand-product">
+    <div class="heading heading-flex mb-3">
+        <div class="heading-left">
+            <h2 class="title">둘러보기</h2><!-- End .title -->
+        </div><!-- End .heading-left -->
+
+        <div class="heading-right">
+            <a href="#" class="title-link">판매상품 전체 둘러보기<i class="icon-long-arrow-right"></i></a>
+        </div><!-- End .heading-right -->
+    </div><!-- End .heading -->
+
+    <div class="products">
+        <div class="row justify-content-center">
+            <div class="col-6 col-md-4 col-lg-3" th:each="product : ${productList}">
+                <div class="product product-2">
+                    <figure class="product-media">
+                        <a href="product.html">
+                            <img th:src="${product.thumbnail}" alt="Product image" class="product-image">
+                        </a>
+                    </figure><!-- End .product-media -->
+
+                    <div class="product-body">
+                        <div class="product-cat">
+                            <a href="#" th:text="${product.category.name}"></a>
+                        </div><!-- End .product-cat -->
+                        <h3 class="product-title"><a th:href="@{'/product/'+${product.productId}}" th:text="${product.name}"></a></h3><!-- End .product-title -->
+                        <div class="product-price">
+                            <span class="new-price" th:text="@{${#numbers.formatInteger(product.price,3,'COMMA')}+'원'}"></span>
+                        </div><!-- End .product-price -->
+                        <div class="ratings-container">
+                            <div class="ratings">
+                                <div class="ratings-val" style="width: 40%;"></div><!-- End .ratings-val -->
+                            </div><!-- End .ratings -->
+                            <span class="ratings-text">( 4 Reviews )</span>
+                        </div><!-- End .rating-container -->
+                    </div><!-- End .product-body -->
+                </div><!-- End .product -->
+            </div><!-- End .col-sm-6 col-md-4 col-lg-3 -->
+        </div><!-- End .row -->
+    </div><!-- End .products -->
+</div><!-- End .container -->

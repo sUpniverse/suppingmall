@@ -280,7 +280,7 @@ public class OrderService {
     private Orders setTempOrder(TempOrderForm tempOrderForm) {
 
         // 1. 상품조회
-        Product product = productService.findProduct(tempOrderForm.getProductId());
+        Product product = productService.getProduct(tempOrderForm.getProductId());
         // 2. 주문생성
         List<OrderItem> orderItems = this.setOrderItemsInfo(tempOrderForm, product);
 

@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.mapper;
 
+import com.supshop.suppingmall.page.Criteria;
 import com.supshop.suppingmall.page.ProductCriteria;
 import com.supshop.suppingmall.product.Product;
 import com.supshop.suppingmall.product.ProductDetail;
@@ -10,22 +11,26 @@ import java.util.List;
 public interface ProductMapper {
 
     //셀러 판매 물품 총 갯수 조회
-    int findSaleProductCount(String type,Long id);
-
-    // 모든 제품 조회
-    List<Product> findAll();
-
-    // 조건에 해당하는 모든 제품 조회
-    List<Product> findAll(Long id, String category, String name, Product.ProductStatus status);
-
-    // 판매자가 등록한 모든 상품 조회
-    List<Product> findAllBySellerId(Long sellerId,ProductCriteria criteria);
+    int findSaleProductCount(Long categoryId,Long sellerId, String name, Product.ProductStatus status);
 
     // Paging을 위한 개수 조회
-    List<Product> findProductsCount();
+    int findAllCount(Long categoryId, String name, Product.ProductStatus status);
 
-    // 판매순별로 물춤조회
-    List<Product> findAllByOrderCount();
+    // 모든 제품 조회 (product, product detail, product option까지 모두)
+    List<Product> findAll();
+    // 조건에 추가
+    List<Product> findAll(Long sellerId, Long categoryId, String name, Product.ProductStatus status,Criteria criteria);
+
+    // 모든 제품 조회 (only product 정보만)
+    List<Product> findAllPart();
+    // 조건에 추가
+    List<Product> findAllPart(Long sellerId, Long categoryId, String name, Product.ProductStatus status,  Criteria criteria);
+
+    // 부모 카테고리 아이디로 조회
+    List<Product> findAllPartByParentCategory(Long parentId, Criteria criteria);
+
+    // 판매순별로 물품조회
+    List<Product> findAllOrderByOrdersQuantity();
 
     Product findOne(Long id);
     Product findOne(Long id, String category, String name, Product.ProductStatus status);

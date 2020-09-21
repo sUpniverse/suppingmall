@@ -38,7 +38,7 @@ logging:
     com.supshop.suppingmall: debug
     org.hibernate.sql: debug
     org.type.descriptor.sql.BasicBinder: trace
-    org.springframework: debug
+#    org.springframework: debug
 
 
 

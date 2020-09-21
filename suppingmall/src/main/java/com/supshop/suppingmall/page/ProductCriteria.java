@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class ProductCriteria extends Criteria {
 
-    private static final int productPerPageNum = 12;
+    private static final int productPerPageNum = 8;
 
     public ProductCriteria() {
         super(productPerPageNum);

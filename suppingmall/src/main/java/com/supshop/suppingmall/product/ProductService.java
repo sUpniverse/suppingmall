@@ -2,7 +2,7 @@ package com.supshop.suppingmall.product;
 
 import com.supshop.suppingmall.image.ImageService;
 import com.supshop.suppingmall.mapper.ProductMapper;
-import com.supshop.suppingmall.page.PageMaker;
+import com.supshop.suppingmall.page.Criteria;
 import com.supshop.suppingmall.page.ProductCriteria;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 @Service
 @Transactional(readOnly = true)
@@ -26,36 +27,41 @@ public class ProductService {
     private static final int latestProductCount = 5;
     private static final int recommandProductCount = 8;
 
-    public List<Product> findProducts() {
+
+    public List<Product> getProducts() {
         return productMapper.findAll();
     }
 
-    public List<Product> findOnSaleProducts(String name) {
-        return productMapper.findAll(null,null,name,Product.ProductStatus.SALE);
+    // 전체 리스트 에서 오직 물품 정보만을 보여줄 때
+    public List<Product> getOnSaleProductsOnMenu(Long categoryId, String name, Criteria criteria) {
+        return productMapper.findAllPart(null,categoryId,name,Product.ProductStatus.SALE,criteria);
     }
 
-    public Product findProduct(Long id) {
+    // 전체 리스트 에서 상위 카테고리로 조회하며 물품 가져올 때
+    public List<Product> getOnSaleProductsByParentCategoryOnMenu(Long parentId, Criteria criteria) {
+        return productMapper.findAllPartByParentCategory(parentId, criteria);
+    }
+
+    public Product getProduct(Long id) {
       return productMapper.findOne(id);
     }
 
-    public List<Product> findProductsBySellerId(Long userId, ProductCriteria productCriteria) {
-        return productMapper.findAllBySellerId(userId, productCriteria);
+    // 물품 + 물품상세정보 + 물품 옵션
+    public List<Product> getProducts(ProductCriteria productCriteria) {
+        return productMapper.findAll(null,null,null,null,productCriteria);
+    }
+    // 물품 + 물품상세정보 + 물품 옵션 by 판매자 (판매자의 판매물품 정보 전체)
+    public List<Product> getProductsBySeller(Long sellerId, ProductCriteria productCriteria) {
+        return productMapper.findAll(sellerId,null,null,null,productCriteria);
     }
 
-    public List<Product> findProductsBySellerId(ProductCriteria productCriteria) {
-        return productMapper.findAllBySellerId(null,productCriteria);
+    public int getProductsCount(Long categoryId,Long sellerId, String name, Product.ProductStatus status) {
+        return productMapper.findSaleProductCount(categoryId,sellerId,name,status);
     }
 
-    public int findProductsCount(String type,Long id) {
-        return productMapper.findSaleProductCount(type,id);
-    }
-    public int findProductsCount() {
-        return productMapper.findSaleProductCount(null,null);
-    }
-
-    //    판매량이 가장 높은 순으로 검색
-    public List<Product> findProductsByOrderCount() {
-        return productMapper.findAllByOrderCount();
+    // 판매량이 가장 높은 순으로 검색
+    public List<Product> getProductsOrderByOrdersQuantity() {
+        return productMapper.findAllOrderByOrdersQuantity();
     }
 
 
@@ -75,12 +81,22 @@ public class ProductService {
         detail.setProductId(productId);
         productMapper.addProductDetail(detail);
 
-
+        // product의 create가 성공이면, 물품들의 이미지 url을 가져와 Stroage에 저장하도록 함
         if(result == 1) {
-            urls.add(product.getThumbnail());
+            urls.add(product.getThumbnail());   // 썸네일 이미지도 포함
             String originUrl = setProductImageUrl(product, urls);
+            boolean saveInStorage = imageService.saveInStorage(urls, originUrl, product.getProductId(), productName);
+            if(!saveInStorage) {
+                // Todo : 파일 저장 실패 exception && 시간초과 (지금은 단지 3번 실패 후 exception)
+                int count  = 0;
+                while (!saveInStorage && count < 3){
+                    saveInStorage = imageService.saveInStorage(urls, originUrl, product.getProductId(), productName);
+                    count++;
+                }
+
+                if(!saveInStorage) throw new RuntimeException();
+            }
             productMapper.updateProduct(productId,product);
-            imageService.saveInStorage(urls,originUrl,product.getProductId(), productName);
         }
     }
 

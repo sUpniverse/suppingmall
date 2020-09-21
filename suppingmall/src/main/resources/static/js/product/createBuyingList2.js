@@ -25,11 +25,11 @@ $(document).on('change',"#product_options",() => {
         '  <div class="col-4">\n' +
         '    <div class="input-group input-spinner">\n' +
         '      <div class="input-group-prepend">\n' +
-        '        <button type="button" style="min-width: 26px" class="btn btn-decrement btn-spinner" id="subtractOption"><strong>-</strong></i></button>\n' +
+        '        <button type="button" style="min-width: 26px" class="btn btn-decrement btn-spinner" id="subtractOption"><i class="icon-minus"></i></button>\n' +
         '      </div>\n' +
         '      <input type="text" id="cuid_'+id+'" class="form-control text-center" value="1">\n' +
         '      <div class="input-group-append">\n' +
-        '        <button type="button" style="min-width: 26px" class="btn btn-increment btn-spinner" id="plusOption"><strong>+</strong></i></button>\n' +
+        '        <button type="button" style="min-width: 26px" class="btn btn-increment btn-spinner" id="plusOption"><i class="icon-plus"></i></button>\n' +
         '      </div>\n' +
         '    </div>\n' +
         '  </div>\n' +
@@ -59,13 +59,13 @@ function getSumPrice() {
             '<div class="row justify-content-between" id="total_price">\n' +
             '<strong class="col-4">총 합계 금액</strong>\n' +
             '<span class="col-5 row">\n' +
-            '<h4 class="text-danger  mr-1" id="ui_total_price">'+wholePrice+'</h4>\n' +
+            '<h4 class="text-danger  mr-1" id="ui_total_price">'+numberWithCommas(wholePrice)+'</h4>\n' +
             '원\n' +
             '</span>\n' +
             '</div>\n' +
             '<hr>';
     } else {
-        document.getElementById("ui_total_price").textContent = wholePrice;
+        document.getElementById("ui_total_price").textContent = numberWithCommas(wholePrice);
     }
 }
 
@@ -134,7 +134,6 @@ function RemoveCommas(x) {
 }
 
 function getWholePrice() {
-    console.log("근데 여기는 왜???");
     var optionItems = document.getElementById("add_option_area").getElementsByTagName("li");
 
     var length = optionItems.length;
@@ -146,5 +145,5 @@ function getWholePrice() {
             whole_price += price;
         }
     }
-    return numberWithCommas(whole_price);
+    return whole_price;
 }

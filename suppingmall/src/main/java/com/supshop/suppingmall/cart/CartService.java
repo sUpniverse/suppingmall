@@ -42,7 +42,7 @@ public class CartService {
 
     private Cart buildCartByForm(CartForm cartForm) {
         User user = userService.getUser(cartForm.getBuyerId());
-        Product product = productService.findProduct(cartForm.getProductId());
+        Product product = productService.getProduct(cartForm.getProductId());
 
         List<CartItem> cartItems = cartForm.getCartItemList();
 
