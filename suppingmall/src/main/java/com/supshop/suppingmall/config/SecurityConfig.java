@@ -15,7 +15,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.userinfo.CustomUserTypesOAuth2UserService;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -102,8 +101,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private void setAntMatchers(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-                .antMatchers(HttpMethod.GET,"/users").hasAnyRole(MASTER,ADMIN)
-                .antMatchers(HttpMethod.GET,"/users/signup").anonymous()
+                .antMatchers(HttpMethod.GET,"/users/signup/**").anonymous()
                 .antMatchers(HttpMethod.GET,"/users/findAccountForm").anonymous()
                 .antMatchers(HttpMethod.POST,"/users/findAccount").anonymous()
                 .antMatchers(HttpMethod.POST,"/users").permitAll()
@@ -118,6 +116,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET,"/users/seller/applicant").hasAnyRole(MASTER,ADMIN)
                 .antMatchers(HttpMethod.PATCH,"/users/seller/{id}/apply").hasAnyRole(MASTER,ADMIN)
                 .antMatchers(HttpMethod.GET,"/users/confirm").authenticated()
+                .antMatchers(HttpMethod.GET,"/users/**").hasAnyRole(MASTER,ADMIN)
                 .antMatchers(HttpMethod.GET,"/boards/form").authenticated()
                 .antMatchers(HttpMethod.GET,"/boards").permitAll()
                 .antMatchers(HttpMethod.GET,"/boards/{id}").permitAll()
@@ -129,9 +128,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/comments/**").authenticated()
                 .antMatchers(HttpMethod.GET,"/images/**").permitAll()
                 .antMatchers(HttpMethod.POST,"/images/**").authenticated()
-                .antMatchers(HttpMethod.GET,"/products").hasAnyRole(MASTER,ADMIN,SELLER)
                 .antMatchers(HttpMethod.GET,"/products/form").hasAnyRole(MASTER,ADMIN,SELLER)
-                .antMatchers(HttpMethod.POST,"/products").hasAnyRole(MASTER,ADMIN,SELLER)
                 .antMatchers(HttpMethod.PUT,"/products/{id}").hasAnyRole(MASTER,ADMIN,SELLER)
                 .antMatchers(HttpMethod.DELETE,"/products/{id}").hasAnyRole(MASTER,ADMIN,SELLER)
                 .antMatchers(HttpMethod.GET,"/products/seller").hasAnyRole(MASTER,ADMIN,SELLER)
@@ -144,6 +141,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET,"/products/qnas/{qnaId}/updateForm").authenticated()
                 .antMatchers(HttpMethod.PUT,"/products/qnas/{qnaId}").authenticated()
                 .antMatchers(HttpMethod.DELETE,"/products/qnas/{qnaId}").authenticated()
+                .antMatchers(HttpMethod.POST,"/products/**").hasAnyRole(MASTER,ADMIN,SELLER)
+                .antMatchers(HttpMethod.GET,"/products/**").hasAnyRole(MASTER,ADMIN,SELLER)
                 .antMatchers("/orders/**").authenticated()
                 .antMatchers("/carts/**").authenticated()
                 .antMatchers("/payments/**").authenticated()

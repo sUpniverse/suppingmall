@@ -23,7 +23,7 @@ public interface UserMapper {
 
     void deleteUSer(Long id);
 
-    int selectUserCount();
+    int selectUserCount(String type, String searchValue);
 
     void patchUser(Long id, User user);
 

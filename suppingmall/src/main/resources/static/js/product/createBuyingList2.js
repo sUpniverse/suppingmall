@@ -20,7 +20,7 @@ $(document).on('change',"#product_options",() => {
     optionLi.setAttribute('data-prdno',id);
     optionLi.innerHTML =
         '<div class="card-body">\n' +
-        '    <h5 class="card-title">'+name+'</h5>\n' +
+        '    <h5 class="card-title py-4 pb-4">'+name+'</h5>\n' +
         '<div class="row">\n' +
         '  <div class="col-4">\n' +
         '    <div class="input-group input-spinner">\n' +

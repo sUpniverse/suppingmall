@@ -1,8 +1,7 @@
 package com.supshop.suppingmall.mapper;
 
 import com.supshop.suppingmall.board.Board;
-import com.supshop.suppingmall.category.Category;
-import com.supshop.suppingmall.page.BoardCriteria;
+import com.supshop.suppingmall.page.Criteria;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +10,7 @@ public interface BoardMapper {
 
     List<Board> selectAllBoard();
 
-    List<Board> selectBoardByCondition(BoardCriteria boardCriteria, Long categoryId, String type, String searchValue);
+    List<Board> selectBoardByCondition(Criteria boardCriteria, Long categoryId, String type, String searchValue);
     
     Optional<Board> selectBoard(Long id);
 

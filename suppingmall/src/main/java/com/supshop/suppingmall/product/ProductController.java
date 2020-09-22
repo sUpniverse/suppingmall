@@ -74,7 +74,7 @@ public class ProductController {
         List<Product> products = productService.getOnSaleProductsOnMenu(null,name,null);
         model.addAttribute("products",products);
         model.addAttribute("categories",categoryService.getCategoryToGrandChildren(productCategoryId).getChild());
-        return "/product/list2";
+        return "/product/list";
     }
 
     //판매상태의 모든 물품들
@@ -97,7 +97,7 @@ public class ProductController {
         model.addAttribute("productList",productService.getOnSaleProductsOnMenu(null, null, criteria));
 
 
-        return "/product/list";
+        return "/product/main";
     }
 
     //카테고리별 물품 조회
@@ -108,8 +108,9 @@ public class ProductController {
                                        ProductCriteria criteria) {
 
 
-        int productsCount = productService.getProductsCount(id, null, null, null);
+        int productsCount = productService.getProductsCount(id, null, null, Product.ProductStatus.SALE);
 
+        model.addAttribute("count",productsCount);
         model.addAttribute("productList",productService.getOnSaleProductsOnMenu(id, null, criteria));
         model.addAttribute("categoryId",id);
         model.addAttribute("productPageMaker",new PageMaker(productsCount, productPagingCount, criteria));
@@ -168,7 +169,7 @@ public class ProductController {
             products = productService.getProducts(productCriteria);
         }
 
-        //option의 문제로 1개의 제품이 아닌 같은 ID로 여러개의 제품이 뜨므로 페이징 불가
+        //option의 문제로 1개의 제품이 아닌 같은 ID로 여러개의 제품이 뜨므로 페이징 불가피
 //        PageMaker pageMaker = new PageMaker(count,productPagingCount,productCriteria);
 
 

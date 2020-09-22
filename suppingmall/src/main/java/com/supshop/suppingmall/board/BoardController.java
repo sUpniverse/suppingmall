@@ -52,11 +52,12 @@ public class BoardController {
         int boardCount = boardService.getBoardCount(categoryId, type, searchValue);
         PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum,boardCriteria);
         List<Board> boards = boardService.getBoardByCondition(boardCriteria, categoryId, type, searchValue);
+        Category category = categoryService.getCategory(categoryId);
 
         model.addAttribute("boardList",boards);
         model.addAttribute("boardPageMaker", pageMaker);
 
-        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("category", category);
         model.addAttribute("type", type);
         model.addAttribute("searchValue", searchValue);
         model.addAttribute("pageNum", boardCriteria.getPage());

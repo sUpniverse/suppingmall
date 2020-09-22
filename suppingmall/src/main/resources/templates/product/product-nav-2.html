@@ -17,29 +17,7 @@
                     <li>
                         <a href="#">Links</a>
                         <ul>
-                            <li>
-                                <div class="header-dropdown">
-                                    <a href="#">USD</a>
-                                    <div class="header-menu">
-                                        <ul>
-                                            <li><a href="#">Eur</a></li>
-                                            <li><a href="#">Usd</a></li>
-                                        </ul>
-                                    </div><!-- End .header-menu -->
-                                </div>
-                            </li>
-                            <li>
-                                <div class="header-dropdown">
-                                    <a href="#">English</a>
-                                    <div class="header-menu">
-                                        <ul>
-                                            <li><a href="#">English</a></li>
-                                            <li><a href="#">French</a></li>
-                                            <li><a href="#">Spanish</a></li>
-                                        </ul>
-                                    </div><!-- End .header-menu -->
-                                </div>
-                            </li>
+                            <li><a href="about.html">고객센터/문의</a></li>
                             <li sec:authorize="isAuthenticated()">
                                 <a th:href="@{'/users/' + ${#authentication.principal.userId} + '/form'}" th:text="@{${#authentication.principal.name}+'님'}">
                                     <i class="icon-user"></i>
@@ -64,7 +42,7 @@
     <div class="header-middle sticky-header">
         <div class="container">
             <div class="header-left">
-                <a href="/products/main2"><h5>SuppingMall</h5></a>
+                <a href="/products/main"><h5>SuppingMall</h5></a>
                 <button class="mobile-menu-toggler active">
                     <span class="sr-only">Toggle mobile menu</span>
                     <i class="icon-bars"></i>

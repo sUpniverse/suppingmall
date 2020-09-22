@@ -42,18 +42,20 @@ public class ProductService {
         return productMapper.findAllPartByParentCategory(parentId, criteria);
     }
 
+    // 물품 + 물품상세정보 + 물품 옵션
+    public List<Product> getProducts(Criteria productCriteria) {
+        return productMapper.findAll(null,null,null,null,productCriteria);
+    }
+    // 물품 + 물품상세정보 + 물품 옵션 by 판매자 (판매자의 판매물품 정보 전체)
+    public List<Product> getProductsBySeller(Long sellerId, Criteria productCriteria) {
+        return productMapper.findAll(sellerId,null,null,null,productCriteria);
+    }
+
+
     public Product getProduct(Long id) {
       return productMapper.findOne(id);
     }
 
-    // 물품 + 물품상세정보 + 물품 옵션
-    public List<Product> getProducts(ProductCriteria productCriteria) {
-        return productMapper.findAll(null,null,null,null,productCriteria);
-    }
-    // 물품 + 물품상세정보 + 물품 옵션 by 판매자 (판매자의 판매물품 정보 전체)
-    public List<Product> getProductsBySeller(Long sellerId, ProductCriteria productCriteria) {
-        return productMapper.findAll(sellerId,null,null,null,productCriteria);
-    }
 
     public int getProductsCount(Long categoryId,Long sellerId, String name, Product.ProductStatus status) {
         return productMapper.findSaleProductCount(categoryId,sellerId,name,status);

@@ -69,9 +69,10 @@
     </sql>
 
     <select id="selectUserCount" resultType="int">
-        SELECT count(user_id)
+        SELECT count(*)
         From USER
         WHERE user_id > 0
+        <include refid="conditionalSearch"></include>
     </select>
 
     <select id="selectUser" resultMap="User">

@@ -56,10 +56,10 @@ public class UserController {
                              BoardCriteria boardCriteria,
                              @RequestParam(required = false) String type,
                              @RequestParam(required = false) String searchValue) {
-//        if(!isLoginUser(user)) return redirectLoginUrl;
+
         model.addAttribute(userService.getAllUser(boardCriteria,type,searchValue));
-        PageMaker pageMaker = new PageMaker(userService.getBoardCount(),pagingCount,boardCriteria);
-        model.addAttribute("boardPageMaker", pageMaker);
+        PageMaker pageMaker = new PageMaker(userService.getUserCount(type,searchValue),pagingCount,boardCriteria);
+        model.addAttribute("pageMaker", pageMaker);
         return "/user/list";
     }
 

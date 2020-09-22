@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: header" />
+<head>
+    <style>
+        div.pd-5.ml-2  img {
+            max-width: 750px;
+            width: auto;
+            height: auto;
+        }
+    </style>
+</head>
 <body style="background-color: #eee;">
 <nav th:replace="fragments/navigation :: navigation" />
 <div class="container" style="max-width: 1500px">

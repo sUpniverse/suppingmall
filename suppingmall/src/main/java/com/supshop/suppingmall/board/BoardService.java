@@ -4,7 +4,7 @@ import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryService;
 import com.supshop.suppingmall.image.ImageService;
 import com.supshop.suppingmall.mapper.BoardMapper;
-import com.supshop.suppingmall.page.BoardCriteria;
+import com.supshop.suppingmall.page.Criteria;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class BoardService {
 
     public List<Board> getAllBoard() { return boardMapper.selectAllBoard(); }
 
-    public List<Board> getBoardByCondition(BoardCriteria boardCriteria, Long categoryId, String type, String searchValue) {
+    public List<Board> getBoardByCondition(Criteria boardCriteria, Long categoryId, String type, String searchValue) {
         if(categoryId == null) {
             Category categoryByEnName = categoryService.getCategoryByEnName(boardName);
             return boardMapper.selectBoardByCondition(boardCriteria,categoryByEnName.getId(), type, searchValue);

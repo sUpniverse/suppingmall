@@ -38,8 +38,8 @@ public class UserService implements UserDetailsService {
     }
 
 
-    public int getBoardCount() {
-        return userMapper.selectUserCount();
+    public int getUserCount(String type, String searchValue) {
+        return userMapper.selectUserCount(type, searchValue);
     }
 
     public User getUser(Long id) {

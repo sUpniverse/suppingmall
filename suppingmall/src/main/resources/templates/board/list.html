@@ -8,7 +8,7 @@
         <div class="row no-gutters">
             <div th:replace="board/left-sidebar :: left-sidebar" />
             <div class="col-md-7 p-3 mx-5 mb-5" style="background-color: #ffffFF">
-                <h4 class="py-2" th:text="${boardList?.get(0).category.getName()}"></h4>
+                <h4 class="py-2" th:text="${category.name}"></h4>
 
                 <div class="py-2 border-top">
                     <div class="dropdown">
@@ -39,7 +39,7 @@
                             <td class="text-center" th:text="${board.comments.size()}"></td>
                             <td class="text-center" th:text="${board?.category.name}"></td>
                             <td>
-                                <a class="text-dark" th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}+'?page='+${pageNum}+'&&categoryId='+${categoryId}+'&&type='+${type}+'&&searchValue='+${searchValue}}" ></a>
+                                <a class="text-dark" th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}+'?page='+${pageNum}+'&&categoryId='+${category.id}+'&&type='+${type}+'&&searchValue='+${searchValue}}" ></a>
                             </td>
                             <td class="text-center" th:text="${board.creator.nickName}" />
                             <td class="text-center" th:text="${board.hit}"/>
@@ -53,15 +53,15 @@
                         <nav aria-label="Page navigation example">
                             <ul class="pagination mx-auto">
                                 <li class="page-item">
-                                    <a class="page-link" th:if="${boardPageMaker.prev}" th:href="@{'/boards?page='+${boardPageMaker.startPage - 1}'&&categoryId='+${categoryId}+'&&type='+${type}+'&&searchValue='+${searchValue}}" aria-label="Previous">
+                                    <a class="page-link" th:if="${boardPageMaker.prev}" th:href="@{'/boards?page='+${boardPageMaker.startPage - 1}'&&categoryId='+${category.id}+'&&type='+${type}+'&&searchValue='+${searchValue}}" aria-label="Previous">
                                         <span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
                                 <li class="page-item" th:each="idx : ${#numbers.sequence(boardPageMaker.startPage,boardPageMaker.endPage)}" th:classappend="${boardPageMaker.criteria.page} == ${idx} ? active">
-                                    <a class="page-link" th:href="@{'/boards?page='+${idx}+'&&categoryId='+${categoryId}+'&&type='+${type}+'&&searchValue='+${searchValue}}" th:text="${idx}"></a>
+                                    <a class="page-link" th:href="@{'/boards?page='+${idx}+'&&categoryId='+${category.id}+'&&type='+${type}+'&&searchValue='+${searchValue}}" th:text="${idx}"></a>
                                 </li>
                                 <li class="page-item" th:if="${boardPageMaker.next && boardPageMaker.endPage > 0}">
-                                    <a class="page-link" th:href="@{'/boards?page='+${boardPageMaker.endPage + 1}+'&&categoryId='+${categoryId}+'&&type='+${type}+'&&searchValue='+${searchValue}}}" aria-label="Next">
+                                    <a class="page-link" th:href="@{'/boards?page='+${boardPageMaker.endPage + 1}+'&&categoryId='+${category.id}+'&&type='+${type}+'&&searchValue='+${searchValue}}}" aria-label="Next">
                                         <span aria-hidden="true">&raquo;</span>
                                     </a>
                                 </li>
