@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:include="fragments/header :: header" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" />
+</head>
+<body>
+<div th:replace="fragments/navigation-fix :: navigation-fix" />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 d-none d-md-block bg-light sidebar">
+            <nav th:replace="user/user-left-bar :: user-left-bar" />
+        </div>
+        <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
+            <div class="board">
+                <div class="d-flex flex-column flex-md-row align-items-center mb-3 bg-white border-bottom">
+                    <div class="row align-items-center">
+                        <div class="col-sm mb-2 mb-sm-0">
+                            <h3 class="page-header-title">회원정보</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <table>
+                    <td></td>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-2">
+            여기도 광고?
+        </div>
+    </div>
+</div>
+
+<footer th:include="fragments/footer :: footer" />
+</body>
+</html>

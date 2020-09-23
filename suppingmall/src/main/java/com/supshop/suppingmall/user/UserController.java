@@ -3,9 +3,7 @@ package com.supshop.suppingmall.user;
 import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.page.BoardCriteria;
 import com.supshop.suppingmall.page.PageMaker;
-import com.supshop.suppingmall.user.Form.ApplySellerForm;
-import com.supshop.suppingmall.user.Form.FindAccountForm;
-import com.supshop.suppingmall.user.Form.SignUpForm;
+import com.supshop.suppingmall.user.Form.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
@@ -63,12 +61,20 @@ public class UserController {
         return "/user/list";
     }
 
-    /* 나중에 MSA 전환 시 사용 */
-//    @ResponseBody
-//    @GetMapping(value = "/{id}",produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-//    public User getUser(@PathVariable Long id) {
-//        return userService.getUser(id);
-//    }
+
+    @GetMapping("/{id}")
+    public String getUserPage(@PathVariable Long id, Model model,@AuthenticationPrincipal SessionUser sessionUser) {
+
+        if(UserUtils.isOwner(id,sessionUser)) {
+
+            User user = userService.getUser(id);
+            model.addAttribute("user",user);
+
+            return "/user/main";
+        }
+
+        return "redirect:/";
+    }
 
     @ResponseBody
     @GetMapping(value = "/emails/{email}",produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -77,6 +83,35 @@ public class UserController {
         userAlreadyExist = userService.isUserAlreadyExistByEmail(email);
         if(userAlreadyExist) return ResponseEntity.ok(userAlreadyExist);
         return ResponseEntity.ok(userAlreadyExist);
+    }
+
+    @GetMapping("/{id}/updateForm")
+    public String getUpdateForm(@PathVariable Long id, Model model, @AuthenticationPrincipal SessionUser sessionUser) {
+
+        // 운영자 자격으로 해당 회원의 정보를 수정할 시 사용
+        if(UserUtils.isAdmin(sessionUser)) {
+            User user = userService.getUser(id);
+            model.addAttribute("user",user);
+            return "/user/adminUpdateForm";
+        } else if(UserUtils.isOwner(id,sessionUser)) { // 개인화원 자격으로 자신의 회원 정보를 수정할 시 사용
+            User user = userService.getUser(id);
+            model.addAttribute("user",user);
+            return "/user/updateForm";
+        }
+
+        return "redirect:/";
+    }
+
+    @GetMapping("/{id}/passwordForm")
+    public String getPasswordForm(@PathVariable Long id, Model model, @AuthenticationPrincipal SessionUser sessionUser) {
+
+        if(UserUtils.isOwner(id,sessionUser)) {
+            User user = userService.getUser(id);
+            model.addAttribute("user",user);
+            return "/user/passwordForm";
+        }
+
+        return "redirect:/";
     }
 
 //    @PostMapping("/login")
@@ -104,13 +139,56 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public String updateUser(@PathVariable Long id, User user, @AuthenticationPrincipal SessionUser sessionUser) {
-        if(UserUtils.isOwner(id, sessionUser) || UserUtils.isAdmin(sessionUser)) {
-            userService.updateUser(id, user);
-            return redirectMainUrl;
+    @ResponseBody
+    public ResponseEntity updateUser(@PathVariable Long id, @RequestBody @Valid UpdateUserForm form, @AuthenticationPrincipal SessionUser sessionUser) {
+
+        if(!(UserUtils.isOwner(id, sessionUser))) {
+            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
-        return redirectLoginUrl;
+
+        User originUser = userService.getUser(id);
+
+        // 제대로 비밀번호를 입력했는지 확인
+        if(!userService.matchedPassword(originUser.getEmail(), form.getPassword())){
+            return ResponseEntity.badRequest().body("유효하지 않은 패스워드 입니다.");
+        }
+
+        User user = modelMapper.map(form, User.class);
+        try {
+            userService.updateUser(id, user);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("회원변경 실패");
+        }
+
+        return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/{id}/password")
+    @ResponseBody
+    public ResponseEntity updatePassword(@PathVariable Long id, @RequestBody UpdatePasswordForm form, @AuthenticationPrincipal SessionUser sessionUser) {
+
+        if(!(UserUtils.isOwner(id, sessionUser))) {
+            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
+        }
+
+        User user = userService.getUser(id);
+
+        //Todo : 직접 validator 구현
+        // 제대로 원래 비밀번호를 입력했는지 확인 && 새로 입력한 비밀번호와 확인 비밀번호가 맞는지 확인
+        if(!userService.matchedPassword(user.getEmail(), form.getPassword()) || !form.getNewPassword().equals(form.getNewPasswordCheck())){
+            return ResponseEntity.badRequest().body("유효하지 않은 비밀번호 입니다.");
+        }
+
+        try {
+            user.setPassword(form.getNewPassword());
+            userService.updateUser(id, user);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("회원변경 실패");
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
 
     @PatchMapping("/{id}")
     @ResponseBody
@@ -126,7 +204,7 @@ public class UserController {
             userService.patchUser(id,user);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("업데이트 실패");
         }
     }
 
@@ -146,65 +224,6 @@ public class UserController {
         }
     }
 
-    /*
-
-    ToDo 1. 추후 비밀번호 재확인을 통한 유저 검증 후
-         2. 유저의 정보 변경과 비밀번호 변경을 분리할 예정
-
-    @GetMapping("/checkForm")
-    public String checkForm(@AuthenticationPrincipal SessionUser user) {
-        if(user == null) {
-            return redirectMainUrl;
-        }
-        return "/user/checkForm";
-    }
-
-    @PostMapping("/{id}/password")
-    public String checkUser(@PathVariable Long id, @AuthenticationPrincipal SessionUser user, String password) {
-        if(user == null || !user.getUserId().equals(id)) {
-            return redirectMainUrl;
-        }
-        userService.matchedPassword(user.getEmail(),password);
-        return "/user/checkForm";
-    }
-
-    @PutMapping("/{id}/password")
-    @ResponseBody
-    public String updateUserPassword(@PathVariable Long id, User user, @AuthenticationPrincipal SessionUser sessionUser) {
-        if(isOwner(id, sessionUser) || isAdmin(sessionUser)) {
-            userService.updateUser(id, user);
-            return redirectMainUrl;
-        }
-        return redirectLoginUrl;
-    }
-    */
-
-    @GetMapping("/{id}/form")
-    public String getUserPage(@PathVariable Long id, Model model,@AuthenticationPrincipal SessionUser sessionUser) {
-
-        // 관리자 일 경우 관리자 메인페이지로
-        if(UserUtils.isAdmin(sessionUser)) {
-            model.addAttribute("user",sessionUser);
-            return "/user/admin/main";
-        }
-
-        return "/user/main";
-    }
-
-    @GetMapping("/{id}/updateForm")
-    public String getUpdateForm(@PathVariable Long id, Model model, @AuthenticationPrincipal SessionUser sessionUser) {
-
-        // 운영자 자격으로 해당 회원의 정보를 수정할 시 사용
-        if(UserUtils.isAdmin(sessionUser)) {
-            User user = userService.getUser(id);
-            model.addAttribute("user",user);
-            return "/user/adminUpdateForm";
-        }
-
-        // 개인화원 자격으로 자신의 회원 정보를 수정할 시 사용
-        model.addAttribute("user",sessionUser);
-        return "/user/updateForm";
-    }
 
     @GetMapping("/seller")
     @ResponseBody

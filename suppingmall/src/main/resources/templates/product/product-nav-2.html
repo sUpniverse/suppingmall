@@ -19,7 +19,7 @@
                         <ul>
                             <li><a href="about.html">고객센터/문의</a></li>
                             <li sec:authorize="isAuthenticated()">
-                                <a th:href="@{'/users/' + ${#authentication.principal.userId} + '/form'}" th:text="@{${#authentication.principal.name}+'님'}">
+                                <a th:href="@{'/users/' + ${#authentication.principal.userId}}" th:text="@{${#authentication.principal.name}+'님'}">
                                     <i class="icon-user"></i>
                                 </a>
                             </li>

@@ -103,13 +103,13 @@ public class UserService implements UserDetailsService {
         return sessionUser;
     }
 
-    /*
-    유저의 비밀번호 검증시 사용할 예정
-    public boolean matchedPassword(String email, String password) {
+
+    //유저의 비밀번호 검증시
+    protected boolean matchedPassword(String email, String password) {
         String encodedPassword = userMapper.findUserByEmail(email).get().getPassword();
         return passwordEncoder.matches(password,encodedPassword);
     }
-    */
+
 
     public void resendConfirmationEmail(User user) {
         eventPublisher.publishEvent(new UserEvent(EventType.CREATED, LocalDateTime.now(),user));
@@ -145,7 +145,6 @@ public class UserService implements UserDetailsService {
             eventPublisher.publishEvent(new UserEvent(EventType.UPDATED, LocalDateTime.now(),user));
         }
     }
-
 
 
     protected User getUserByEmail(String email) {
