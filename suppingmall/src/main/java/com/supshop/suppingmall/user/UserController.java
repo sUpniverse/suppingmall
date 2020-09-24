@@ -1,6 +1,5 @@
 package com.supshop.suppingmall.user;
 
-import com.mysql.cj.util.StringUtils;
 import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.page.BoardCriteria;
 import com.supshop.suppingmall.page.PageMaker;
@@ -77,15 +76,6 @@ public class UserController {
         }
 
         return "redirect:/";
-    }
-
-    @ResponseBody
-    @GetMapping(value = "/emails/{email}",produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Boolean> getUserByEmail(@PathVariable String email) {
-        boolean userAlreadyExist;
-        userAlreadyExist = userService.isUserAlreadyExistByEmail(email);
-        if(userAlreadyExist) return ResponseEntity.ok(userAlreadyExist);
-        return ResponseEntity.ok(userAlreadyExist);
     }
 
     @GetMapping("/{id}/updateForm")
@@ -250,86 +240,6 @@ public class UserController {
         }
     }
 
-
-    @GetMapping("/seller")
-    @ResponseBody
-    public ResponseEntity<String> getSellerInfoByName(@RequestParam String type,
-                                                      @RequestParam String value) {
-
-        List<SessionUser> stores = userService.getStore(type, value);
-        if(stores.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok().build();
-
-    }
-
-    @GetMapping("/seller/{id}")
-    public String getSeller(@PathVariable Long id, Model model, @AuthenticationPrincipal SessionUser sessionUser) {
-        if(UserUtils.isOwner(id, sessionUser)) {
-            model.addAttribute("user", sessionUser);
-            return "redirect:/user/"+id+"/form";
-        }
-        return redirectLoginUrl;
-    }
-
-    @GetMapping("/seller/applyForm")
-    public String getApplySellerRoleForm(Model model, @AuthenticationPrincipal SessionUser sessionUser) {
-
-        if(sessionUser.getRole().equals(Role.USER) && sessionUser.getStoreVO().getStoreApplyYn().equals("N")) {
-            model.addAttribute("user", sessionUser);
-            return "/user/applySellerForm";
-        }
-        return redirectLoginUrl;
-    }
-
-    @PostMapping("/seller/{id}/apply")
-    public String applySellerRole(@PathVariable Long id,
-                                  @Valid ApplySellerForm applyForm,
-                                  @AuthenticationPrincipal SessionUser sessionUser) {
-        if(UserUtils.isOwner(id, sessionUser)) {
-            StoreVO store = modelMapper.map(applyForm, StoreVO.class);
-            userService.patchUser(id,User.builder().storeVO(store).build());
-            return "redirect:/users/"+id+"/form";
-        }
-        return redirectLoginUrl;
-    }
-
-    @GetMapping("/seller/applicants")
-    public String getApplySeller(BoardCriteria boardCriteria,
-                                 Model model,
-                                 @AuthenticationPrincipal SessionUser sessionUser) {
-
-        if(UserUtils.isAdmin(sessionUser)) {
-
-            List<User> applySellerUsers = userService.getApplySellerUsers(boardCriteria);
-            PageMaker pageMaker = new PageMaker(applySellerUsers.size(),pagingCount,boardCriteria);
-
-            model.addAttribute("userList",applySellerUsers);
-            model.addAttribute("pageMaker", pageMaker);
-            return "/user/admin/applySellerList";
-        }
-        return redirectLoginUrl;
-    }
-
-    @PatchMapping("/seller/{id}/apply")
-    @ResponseBody
-    public ResponseEntity grantSellerRole(@PathVariable Long id, @AuthenticationPrincipal SessionUser sessionUser) {
-        if(UserUtils.isAdmin(sessionUser)) {
-            User user = userService.getUser(id);
-            StoreVO storeVO = user.getStoreVO();
-            storeVO.setStoreApplyYn("N");
-            user.setStoreVO(storeVO);
-            user.setRole(Role.SELLER);
-            try {
-                userService.patchUser(user.getUserId(), user);
-            } catch (Exception e){
-                return ResponseEntity.badRequest().build();
-            }
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.badRequest().build();
-    }
 
     @GetMapping("/confirm")
     public String confirmUser(@RequestParam String token,

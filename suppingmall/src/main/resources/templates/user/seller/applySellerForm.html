@@ -175,7 +175,7 @@
                                 </div>
                                 <div class="text-center mt-5 md-5">
                                     <input type="submit" class="btn btn-primary" value="확인">
-                                    <input type="button" class="btn btn-primary" value="취소">
+                                    <input type="button" class="btn btn-primary" id="cancle" value="취소">
                                 </div>
                             </form>
                         </div>
@@ -190,7 +190,7 @@
 <footer th:include="fragments/footer :: footer" />
 </div>
 </body>
-<script>
+<script th:inline="javascript">
 
     var emptyReg = /\s/g;
     var checkName = false;
@@ -220,14 +220,6 @@
         let number = getElement("privateNumber");
         var sum = first + '-' + middle+ '-' + last;
         checkPrivateNumber = true;
-        // if (rePhone.test(sum)) {
-        //     number.setAttribute('value',sum);
-        //     alert("인증되었습니다.");
-        //     checkPrivateNumber = true;
-        // } else {
-        //     alert("유효한 전화번호가 아닙니다.");
-        //     checkPrivateNumber = false;
-        // }
     });
 
     $(document).on('change',"#storeName",() => {
@@ -374,5 +366,11 @@
             return false;
         }
     }
+</script>
+<script th:inline="javascript">
+
+    $(document).on('click',"#cancle", () => {
+
+    });
 </script>
 </html>

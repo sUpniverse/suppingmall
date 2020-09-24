@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:include="fragments/header :: header" />
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}" />
+</head>
+<body>
+<div th:replace="fragments/navigation-fix :: navigation-fix" />
+<div class="container-fluid">
+    <div class="row">
+        <div th:replace="user/left-bar"></div>
+        <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
+            <div class="container pr-5">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mt-5">
+                    <h1 class="h2">스토어정보 수정</h1>
+                </div>
+                <form method="post" name="store">
+                    <table class="table table-default mt-1">
+                        <tbody>
+                        <tr>
+                            <th>비밀번호 확인</th>
+                            <td class="form-row">
+                                <input type="password" class="form-control" id="password" placeholder="비밀번호를 입력하세요" name="password">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">개인사업자번호 <br>(변경을 원할 시 고객센터로 문의주시기 바랍니다.)</th>
+                            <td th:text="${store.storePrivateNumber}">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">스토어명</th>
+                            <td class="row">
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="storeName" name="storeName" th:value="${store.storeName}">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="button" class="btn btn-outline-secondary" id="nameCheck" value="중복확인">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">전화번호</th>
+                            <td class="form-row">
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" id="phoneFirst" th:value="${#strings.substring(#strings.defaultString(store.storePhoneNumber,'000000000000'),0,2)}">
+                                </div>
+                                -
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" id="phoneMiddle" th:value="${#strings.substring(#strings.defaultString(store.storePhoneNumber,'000000000000'),2,6)}">
+                                </div>
+                                -
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" id="phoneLast" th:value="${#strings.substring(#strings.defaultString(store.storePhoneNumber,'000000000000'),6,10)}">
+                                </div>
+                                <input type="button" class="btn btn-outline-secondary" id="verifyPhoneNumber" value="인증">
+                                <input type="hidden" id="phone" name="storePhoneNumber">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">스토어 우편번호</th>
+                            <td class="row">
+                                <div class="col-md-9 mb-3">
+                                    <input type="text" class="form-control" id="zip" name="storeZipCode" th:value="${store.storeZipCode}" readonly>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="button" class="btn btn-outline-secondary" id="search_address" value="우편번호 찾기">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">주소</th>
+                            <td>
+                                <input type="text" class="form-control" id="address" name="storeAddress" th:value="${store.storeAddress}" readonly>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">상세주소</th>
+                            <td>
+                                <input type="text" class="form-control" id="addressDetail" placeholder="상세주소를 기입해주세요" name="storeAddressDetail" th:value="${store.storeAddressDetail}">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-center mt-5 md-5">
+                        <input type="button" class="btn btn-primary" id="update" value="변경">
+                        <input type="button" class="btn btn-primary" id="cancel" value="취소">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-2">
+        </div>
+    </div>
+</div>
+<footer th:include="fragments/footer :: footer" />
+</body>
+<script th:inline="javascript">
+
+    $(document).ready(function () {
+
+        var emptyReg = /\s/g;
+        let checkName = true;
+        let checkPhoneResult = true;
+        let checkAddressResult = true;
+
+        const originStoreName = getElementValue("storeName");
+        const first = getElementValue("phoneFirst");
+        const middle = getElementValue("phoneMiddle");
+        const last = getElementValue("phoneLast");
+        const phone = getElement("phone");
+        var sum = first + middle + last;
+        phone.setAttribute('value',sum);
+
+
+        function check(re, what) {
+            if(re.test(what.value)) {
+                return true;
+            }
+        }
+
+        function getElement(id) {
+            return document.getElementById(id);
+        }
+
+        function getElementValue(id) {
+            return document.getElementById(id).value;
+        }
+
+
+        $(document).on('change',"#storeName",() => {
+            checkName = false;
+        });
+
+        $(document).on('click',"#nameCheck",() => {
+            let name = getElement("storeName").value.replace(/(\s*)/g,"");
+            if(originStoreName === name) {
+                alert("현재 스토어 명입니다.");
+                checkName = true;
+                return ;
+            }
+            if(!check(emptyReg,name) && name !== "") {
+                $.ajax({
+                    type:"GET",
+                    url:"/users/seller",
+                    dataType: 'json',
+                    data: ({
+                        "type": "name",
+                        "value" : getElementValue("storeName")
+                    }) ,
+                    contentType: 'application/json;charset=UTF-8',
+                    success: (data, textStatus, xhr) => {
+                        if(xhr.status === 204) {
+                            alert("사용 가능한 스토어 명입니다.");
+                            checkName = true;
+
+                        } else {
+                            alert("중복되는 스토어명이 있습니다.");
+                        }
+                    }
+                });
+            } else {
+                alert("공백은 허용되지 않습니다.");
+                name.value = "";
+                checkName = false;
+            }
+        });
+
+
+
+        $(document).on('click',"#verifyPhone",function () {
+
+            var rePhone = /^(?:(010\d{4})|(01[1|6|7|8|9]\d{3,4}))(\d{4})$/;
+
+
+            var first = getElementValue("phoneFirst");
+            var middle = getElementValue("phoneMiddle");
+            var last = getElementValue("phoneLast");
+            var phone = getElement("phone");
+
+            var sum = first + middle + last;
+
+            if (rePhone.test(sum)) {
+                alert("인증되었습니다.");
+                phone.setAttribute('value',sum);
+                checkPhoneResult = true;
+            } else {
+                alert("인증되지 않았습니다");
+            }
+
+        });
+
+        $(document).on('change','#storeName', function (){
+            checkStoreName = false;
+        })
+
+        $(document).on('change',"#phoneFirst",function () {
+            checkPhoneResult = false;
+        });
+
+        $(document).on('change',"#phoneMiddle",function () {
+            checkPhoneResult = false;
+        });
+
+        $(document).on('change',"#phoneLast",function () {
+            checkPhoneResult = false;
+        });
+
+        $(document).on('click',"#search_address",function () {
+
+            var zipcode;
+            var address;
+
+            new daum.Postcode({
+                popupName: 'postcodePopup',
+                theme: {
+                    searchBgColor: "#0B65C8", //검색창 배경색
+                    queryTextColor: "#FFFFFF" //검색창 글자색
+                },
+                autoClose: false,
+
+                oncomplete: function(data) {
+                    zipcode = data.zonecode;
+                    if(data.userSelectedType === "R") {
+                        address = data.roadAddress;
+                    } else if(data.userSelectedType === "J") {
+                        address = data.jibunAddress;
+                    }
+
+                    document.getElementById("zip").setAttribute("value",zipcode);
+                    document.getElementById("address").setAttribute("value",address);
+
+                },
+
+                onclose: function(state) {
+                    //state는 우편번호 찾기 화면이 어떻게 닫혔는지에 대한 상태 변수 이며, 상세 설명은 아래 목록에서 확인하실 수 있습니다.
+                    if(state === 'FORCE_CLOSE'){
+                        //사용자가 브라우저 닫기 버튼을 통해 팝업창을 닫았을 경우, 실행될 코드를 작성하는 부분입니다.
+                        checkAddressResult = false;
+
+                    } else if(state === 'COMPLETE_CLOSE'){
+                        //사용자가 검색결과를 선택하여 팝업창이 닫혔을 경우, 실행될 코드를 작성하는 부분입니다.
+                        //oncomplete 콜백 함수가 실행 완료된 후에 실행됩니다.
+                        checkAddressResult = true;
+                    }
+                }
+            }).open();
+        });
+
+        function checkAllValidation() {
+
+            if(checkName && checkPhoneResult && checkAddressResult) {
+                return true;
+            } else {
+                if(!checkName) {
+                    alert("스토어명 중복확인을 해주세요");
+                } else if(!checkPhoneResult) {
+                    alert("올바른 전화번호를 입력해주세요");
+                } else if(!checkAddressResult) {
+                    alert("주소를 입력해주세요");
+                }
+                return false;
+            }
+        }
+
+        $(document).on('click', '#update', () => {
+            var header = [[${_csrf.headerName}]];
+            var token = [[${_csrf.token}]];
+            var userId = [[${#authentication.principal.userId}]];
+
+            if(checkAllValidation()) {
+                if (confirm("수정하시겠습니까?")) {
+                    var inputData = $("form[name=store]").serializeObject();
+                    console.log(inputData);
+                    $.ajax({
+                        type: 'PUT',
+                        url: '/users/seller/'+userId,
+                        data: JSON.stringify(inputData),
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("Content-type","application/json");
+                            xhr.setRequestHeader(header,token);
+                        },
+                        error: function (xhr, status, error) {
+                            alert(xhr.responseText);
+                        },
+                        success: function (json) {
+                            window.location.href = '/users/seller/'+userId+'/main';
+                        }
+                    });
+                }
+            }
+        });
+
+        $(document).on('click', '#cancel', () => {
+            window.location.href = '/users/seller/'+userId+'/main';
+        });
+
+
+        jQuery.fn.serializeObject = function() {
+            var obj = null;
+            try {
+                if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) {
+                    var arr = this.serializeArray();
+                    if(arr){ obj = {};
+                        jQuery.each(arr, function() {
+                            obj[this.name] = this.value; });
+                    }
+                }
+            }catch(e) {
+                alert(e.message);
+            }finally {}
+            return obj;
+        }
+
+    });
+
+
+
+</script>
+</html>

@@ -1,5 +1,7 @@
-package com.supshop.suppingmall.user;
+package com.supshop.suppingmall.user.Form;
 
+
+import com.supshop.suppingmall.user.StoreVO;
 import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
@@ -9,7 +11,11 @@ import java.time.LocalDateTime;
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @ToString @Builder
-public class StoreVO {
+public class UpdateSellerForm {
+
+    @NotEmpty
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,15}$")
+    private String password;
 
     private String storePrivateNumber;
     private String storeName;
@@ -19,4 +25,5 @@ public class StoreVO {
     private String storeAddressDetail;
     private String storeApplyYn;
     private LocalDateTime storeRegisteredDate;
+
 }

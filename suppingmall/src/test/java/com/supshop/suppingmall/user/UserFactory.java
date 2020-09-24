@@ -23,12 +23,12 @@ public class UserFactory {
     @Autowired UserMapper userMapper;
     @Autowired UserService userService;
     @Autowired ModelMapper modelMapper;
+    public static final String userpassword = "kkk111222333!";
 
     @Transactional
     public SessionUser createAdminToSession(String name) {
 
         String email = name+"@email.com";
-        String userpassword = "sup2";
         User user = User.builder()
                 .email(email)
                 .password(userpassword)
@@ -56,7 +56,7 @@ public class UserFactory {
         if(userByEmail.isPresent()) {
             return userByEmail.get();
         }
-        String userpassword = "sup2";
+
         User user = User.builder()
                 .email(email)
                 .password(userpassword)
@@ -77,27 +77,10 @@ public class UserFactory {
     @Transactional
     public User createSeller(String name) {
 
-        String email = name+"@email.com";
-        Optional<User> userByEmail = userMapper.findUserByEmail(email);
-        if(userByEmail.isPresent()) {
-            return userByEmail.get();
-        }
-        String userpassword = "sup2";
-        User user = User.builder()
-                .email(email)
-                .password(userpassword)
-                .name(name)
-                .nickName(name)
-                .address("운영자의 집")
-                .addressDetail("그건 엄마집")
-                .zipCode("00000")
-                .phoneNumber("010-0000-0000")
-                .delYn("N")
-                .role(Role.getCodeString(Role.SELLER.getCode()))
-                .type(User.LoginType.getCodeString(User.LoginType.LOCAL.getCode()))
-                .build();
-        userService.createUser(user);
-        return user;
+        User applicant = createApplicant(name);
+        applicant.getStoreVO().setStoreApplyYn("Y");
+        userService.patchUser(applicant.getUserId(), applicant);
+        return applicant;
     }
 
     @Transactional
@@ -108,14 +91,13 @@ public class UserFactory {
         if(userByEmail.isPresent()) {
             return userByEmail.get();
         }
-        String userpassword = "sup2";
         StoreVO store = StoreVO.builder()
                 .storeName("섭프라이즈스토어")
                 .storePrivateNumber("000-000-000")
                 .storeAddress("서울시 중구 신당동 432")
                 .storeAddressDetail("서프라이즈빌딩 502호")
                 .storeZipCode("347532")
-                .storeApplyYn("Y")
+                .storeApplyYn("N")
                 .build();
 
         User user = User.builder()
@@ -144,7 +126,7 @@ public class UserFactory {
         if(userByEmail.isPresent()) {
             return userByEmail.get();
         }
-        String userpassword = "sup2";
+
         User user = User.builder()
                 .email(email)
                 .password(userpassword)
@@ -170,7 +152,14 @@ public class UserFactory {
         return new UserDetailsService() {
             @Override
             public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-                User tester = createUser(username);
+                User tester;
+                if(username.equals("admin")) {
+                    tester = createAdmin(username);
+                } else if(username.equals("seller")) {
+                    tester = createSeller(username);
+                } else {
+                    tester = createUser(username);
+                }
                 SessionUser map = modelMapper.map(tester, SessionUser.class);
                 return map;
             }

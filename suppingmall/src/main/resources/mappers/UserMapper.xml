@@ -27,6 +27,7 @@
             <result property="storeAddressDetail" column="StoreAddressDetail" />
             <result property="storeZipCode" column="StoreZipCode" />
             <result property="storeApplyYn" column="StoreApplyYn" />
+            <result property="storeRegisteredDate" column="StoreRegisteredDate" />
         </association>
         <association property="userConfirmation" javaType="com.supshop.suppingmall.user.UserConfirmation">
             <result property="confirmToken" column="UserConfirmationToken" />
@@ -68,6 +69,23 @@
         </trim>
     </sql>
 
+
+    <sql id="conditionalSearchStore">
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="type != null and searchValue != null">
+                <if test='type.equals("id")'>
+                    AND U.user_id LIKE #{searchValue}
+                </if>
+                <if test='type.equals("number")'>
+                    AND U.store_private_number = #{searchValue}
+                </if>
+                <if test='type.equals("name")'>
+                    AND U.store_name LIKE #{searchValue}
+                </if>
+            </if>
+        </trim>
+    </sql>
+
     <select id="selectUserCount" resultType="int">
         SELECT count(*)
         From USER
@@ -81,7 +99,7 @@
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
         U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.store_private_number AS "StorePrivateNumber", U.store_name AS "StoreName",
         U.store_phone_number AS "StorePhoneNumber", U.store_address AS "StoreAddress", U.store_address_detail AS "StoreAddressDetail",
-        U.store_zipcode AS "StoreZipCode", U.store_apply_yes_or_no AS "StoreApplyYn"
+        U.store_zipcode AS "StoreZipCode", U.store_apply_yes_or_no AS "StoreApplyYn", U.store_registered_date AS "StoreRegisteredDate", U.store_updated_date AS "StoreUpdatedDate"
         FROM User AS U
         WHERE U.user_id = #{id}
     </select>
@@ -213,6 +231,10 @@
             <if test="user.storeVO.storeApplyYn != null">
                 store_apply_yes_or_no = #{user.storeVO.storeApplyYn},
             </if>
+            <if test="user.storeVO.storeRegisteredDate != null">
+                store_registered_date = #{user.storeVO.storeRegisteredDate},
+            </if>
+            store_updated_date = now(),
         </if>
         updated_date = now()
         WHERE user_id = #{id};
@@ -222,27 +244,11 @@
         SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.name AS "UserName", U.nickname AS "UserNickName",
         U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.store_private_number AS "StorePrivateNumber", U.store_name AS "StoreName",
         U.store_phone_number AS "StorePhoneNumber", U.store_address AS "StoreAddress", U.store_address_detail AS "StoreAddressDetail",
-        U.store_zipcode AS "StoreZipCode", U.store_apply_yes_or_no AS "StoreApplyYn"
+        U.store_zipcode AS "StoreZipCode", U.store_apply_yes_or_no AS "StoreApplyYn", U.store_registered_date AS "StoreRegisteredDate", U.store_updated_date AS "StoreUpdatedDate"
         FROM User AS U
         <include refid="conditionalSearchStore"></include>
         ORDER BY U.user_id asc
     </select>
-
-    <sql id="conditionalSearchStore">
-        <trim prefix="WHERE" prefixOverrides="AND|OR">
-            <if test="type != null and searchValue != null">
-                <if test='type.equals("id")'>
-                    AND U.user_id LIKE #{searchValue}
-                </if>
-                <if test='type.equals("number")'>
-                    AND U.store_private_number = #{searchValue}
-                </if>
-                <if test='type.equals("name")'>
-                    AND U.store_name LIKE #{searchValue}
-                </if>
-            </if>
-        </trim>
-    </sql>
 
     <insert id="saveConfirmation" parameterType="com.supshop.suppingmall.user.UserConfirmation" useGeneratedKeys="true" keyProperty="confirmId">
         INSERT INTO user_confirmation (
