@@ -1,6 +1,7 @@
 package com.supshop.suppingmall.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.modelmapper.ModelMapper;
@@ -9,11 +10,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -27,6 +30,7 @@ public class UserControllerTest {
     @Autowired MockMvc mockMvc;
     @Autowired UserFactory userFactory;
     @Autowired ModelMapper modelMapper;
+    @Autowired UserService userService;
     private MockHttpSession session;
 
     @Test
@@ -275,23 +279,45 @@ public class UserControllerTest {
 
     @Test
     @Transactional
-    public void patchUserWithDelYn() throws Exception {
+    @WithUserDetails(value = "tester", userDetailsServiceBeanName = "userDetailsService")
+    public void signOut() throws Exception {
         //given
-        addUserInSession(userFactory.createUser("test"));
-        ObjectMapper objectMapper = new ObjectMapper();
-        Long userId = 1l;
+        User tester = userFactory.createUser("tester");
+        String password = "{\"password\":\"sup2\"}";
 
-        String delYn = "{\"delYn\":\"Y\"}";
 
         //when
 
-        mockMvc.perform(delete("/users/{id}",userId)
-                    .content(delYn)
+        mockMvc.perform(delete("/users/{id}",tester.getUserId())
+                    .content(password)
+                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .session(session)
         )
                     .andExpect(status().isOk())
                     .andDo(print());
+        User user = userService.getUser(tester.getUserId());
+        //then
+        Assert.assertEquals("Y",user.getDelYn());
+    }
+
+    @Test
+    @Transactional
+    @WithUserDetails(value = "tester", userDetailsServiceBeanName = "userDetailsService")
+    public void signOutWithWrongPassword() throws Exception {
+        //given
+        User tester = userFactory.createUser("tester");
+        String password = "{\"password\":\"22345335\"}";
+
+
+        //when
+
+        mockMvc.perform(delete("/users/{id}",tester.getUserId())
+                .content(password)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isBadRequest())
+                .andDo(print());
         //then
     }
 

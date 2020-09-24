@@ -107,7 +107,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST,"/users").permitAll()
                 .antMatchers(HttpMethod.GET,"/users/{id}/**").authenticated()
                 .antMatchers(HttpMethod.PUT,"/users/{id}/**").authenticated()
-                .antMatchers(HttpMethod.DELETE,"/users/{id}/**").hasAnyRole(MASTER,ADMIN)
+                .antMatchers(HttpMethod.DELETE,"/users/{id}/**").authenticated()
                 .antMatchers(HttpMethod.PATCH,"/users/{id}/**").hasAnyRole(MASTER,ADMIN)
                 .antMatchers(HttpMethod.GET,"/users/seller").hasAnyRole(MASTER,ADMIN)
                 .antMatchers(HttpMethod.GET,"/users/seller/{id}").hasAnyRole(MASTER,ADMIN,SELLER)

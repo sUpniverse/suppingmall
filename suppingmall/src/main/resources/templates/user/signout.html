@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:include="fragments/header :: header" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" />
+</head>
+<body>
+<div th:replace="fragments/navigation-fix :: navigation-fix" />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 d-none d-md-block bg-light sidebar">
+            <nav th:replace="user/user-left-bar :: user-left-bar" />
+        </div>
+        <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
+            <div class="container pr-5">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mt-5">
+                    <h1 class="h2">회원탈퇴</h1>
+                </div>
+                <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-warning rounded shadow-sm">
+                    <svg width="2em" height="2em" viewBox="0 0 17 16" class="bi bi-exclamation-triangle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M7.938 2.016a.146.146 0 0 0-.054.057L1.027 13.74a.176.176 0 0 0-.002.183c.016.03.037.05.054.06.015.01.034.017.066.017h13.713a.12.12 0 0 0 .066-.017.163.163 0 0 0 .055-.06.176.176 0 0 0-.003-.183L8.12 2.073a.146.146 0 0 0-.054-.057A.13.13 0 0 0 8.002 2a.13.13 0 0 0-.064.016zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+                        <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+                    </svg>
+                    <div class="p-3 lh-100">
+                        <h6 class="mb-0 text-white lh-100">회원탈퇴를 하실 경우 약용방지를 위해 일정 기간 재가입이 제한됩니다. 탈퇴한 경우엔 suppingmall의 서비스를 더 이상 이용하실 수 없습니다.</h6>
+                    </div>
+                </div>
+                <form class="needs-validation"  novalidate="" name="signout">
+                    <table class="table table-default">
+                        <tbody>
+                        <tr>
+                           <th>이메일</th>
+                            <td th:text="${user.email}"></td>
+                        </tr>
+                        <tr>
+                            <th>비밀번호</th>
+                            <td class="form-row">
+                                <input type="password" class="form-control" id="password" placeholder="비밀번호를 입력하세요" name="password">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <input class="btn btn-primary btn-block" id="submit" type="button" value="탈퇴하기"/>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-2">
+
+        </div>
+    </div>
+</div>
+<footer th:include="fragments/footer :: footer" />
+<script th:inline="javascript">
+
+    $(document).ready( function (){
+
+        $(document).on('click', '#submit', () => {
+            var header = [[${_csrf.headerName}]];
+            var token = [[${_csrf.token}]];
+            var userId = [[${user.userId}]];
+
+
+            if (confirm("탈퇴 하시겠습니까? 더 이상 suppingmall 이용이 불가능 합니다.")) {
+                var inputData = $("form[name=signout]").serializeObject();
+                console.log(inputData)
+                $.ajax({
+                    type : "DELETE",
+                    url: '/users/'+userId,
+                    data: JSON.stringify(inputData),
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("Content-type","application/json");
+                        xhr.setRequestHeader(header,token);
+                    },
+                    error: function (xhr, status, error) {
+                        alert(xhr.responseText);
+                    },
+                    success: function (json) {
+                        window.location.href = '/';
+                    }
+                });
+            }
+
+        });
+
+    })
+
+
+
+    jQuery.fn.serializeObject = function() {
+        var obj = null;
+        try {
+            if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) {
+                var arr = this.serializeArray();
+                if(arr){ obj = {};
+                    jQuery.each(arr, function() {
+                        obj[this.name] = this.value; });
+                }
+            }
+        }catch(e) {
+            alert(e.message);
+        }finally {}
+        return obj;
+    }
+</script>
+</body>
+</html>

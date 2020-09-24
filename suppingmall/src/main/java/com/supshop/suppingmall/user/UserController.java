@@ -1,10 +1,12 @@
 package com.supshop.suppingmall.user;
 
+import com.mysql.cj.util.StringUtils;
 import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.page.BoardCriteria;
 import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.user.Form.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import java.util.List;
 @RequestMapping("/users")
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -165,7 +168,7 @@ public class UserController {
 
     @PutMapping("/{id}/password")
     @ResponseBody
-    public ResponseEntity updatePassword(@PathVariable Long id, @RequestBody UpdatePasswordForm form, @AuthenticationPrincipal SessionUser sessionUser) {
+    public ResponseEntity updatePassword(@PathVariable Long id, @RequestBody @Valid UpdatePasswordForm form, @AuthenticationPrincipal SessionUser sessionUser) {
 
         if(!(UserUtils.isOwner(id, sessionUser))) {
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");
@@ -208,15 +211,38 @@ public class UserController {
         }
     }
 
+    @GetMapping("/{id}/signout")
+    public String getSignOutForm(@PathVariable Long id, Model model, @AuthenticationPrincipal SessionUser sessionUser) {
+
+        if(UserUtils.isOwner(id,sessionUser)) {
+            User user = userService.getUser(id);
+            model.addAttribute("user",user);
+            return "/user/signout";
+        }
+
+        return "redirect:/";
+    }
+
     @DeleteMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<String> deleteUser(@RequestBody User user,
-                                             @PathVariable Long id) {
-//        if(isAdmin(sessionUser)) {
-//            userService.patchUser(id,user);
-//            return ResponseEntity.ok().build();
-//        }
+    public ResponseEntity<String> deleteUser(@PathVariable Long id,
+                                             @RequestBody SignOutForm form,
+                                             @AuthenticationPrincipal SessionUser sessionUser) {
+
+        log.debug("deleteUser 호출 됌");
+
+        if(!(UserUtils.isOwner(id, sessionUser))) {
+            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
+        }
+
+        User user = userService.getUser(id);
+
+        if(!userService.matchedPassword(user.getEmail(), form.getPassword())){
+            return ResponseEntity.badRequest().body("유효하지 않은 비밀번호 입니다.");
+        }
+
         try {
+            user.setDelYn("Y");
             userService.patchUser(id,user);
             return ResponseEntity.ok().build();
         } catch (Exception e) {

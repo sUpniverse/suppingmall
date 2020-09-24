@@ -53,19 +53,22 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User createUser(User user) throws RuntimeException {
-        User existUser = getUserByEmail(user.getEmail());
-        if(existUser != null) {
-            return existUser;
+
+        User existUser;
+        try {
+            existUser = getUserByEmail(user.getEmail());
+        } catch (UsernameNotFoundException e){
+            if(user.getType().equals(User.LoginType.LOCAL)) {
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
+
+            userMapper.insertUser(user);
+            sendConfirmationEmail(user);
+
+            return user;
         }
 
-        if(user.getType().equals(User.LoginType.LOCAL)) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-        }
-
-        userMapper.insertUser(user);
-        sendConfirmationEmail(user);
-
-        return user;
+        return existUser;
     }
 
 
