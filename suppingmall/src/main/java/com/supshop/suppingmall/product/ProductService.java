@@ -28,8 +28,12 @@ public class ProductService {
     private static final int recommandProductCount = 8;
 
 
+    // 물품 + 물품상세정보 + 물품 옵션
     public List<Product> getProducts() {
-        return productMapper.findAll();
+        return getProducts(null);
+    }
+    public List<Product> getProducts(Criteria productCriteria) {
+        return productMapper.findAll(null,null,null,null,productCriteria);
     }
 
     // 전체 리스트 에서 오직 물품 정보만을 보여줄 때
@@ -42,10 +46,7 @@ public class ProductService {
         return productMapper.findAllPartByParentCategory(parentId, criteria);
     }
 
-    // 물품 + 물품상세정보 + 물품 옵션
-    public List<Product> getProducts(Criteria productCriteria) {
-        return productMapper.findAll(null,null,null,null,productCriteria);
-    }
+
     // 물품 + 물품상세정보 + 물품 옵션 by 판매자 (판매자의 판매물품 정보 전체)
     public List<Product> getProductsBySeller(Long sellerId, Criteria productCriteria) {
         return productMapper.findAll(sellerId,null,null,null,productCriteria);
@@ -57,6 +58,9 @@ public class ProductService {
     }
 
 
+    public int getProductsCount() {
+        return getProductsCount(null, null, null, null);
+    }
     public int getProductsCount(Long categoryId,Long sellerId, String name, Product.ProductStatus status) {
         return productMapper.findSaleProductCount(categoryId,sellerId,name,status);
     }

@@ -39,32 +39,6 @@
         </collection>
     </resultMap>
 
-    <select id="selectAllBoard" resultMap="Board">
-        SELECT distinct B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents", B.hit AS "BoardHit",
-        B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate", U.user_id AS "UserId",
-        U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",
-        C.category_id AS "CategoryId", C.name AS "CategoryName"
-        FROM Board AS B
-        LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
-        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
-        ORDER BY B.board_id desc
-    </select>
-
-    <select id="selectBoardByCondition" resultMap="Board">
-        SELECT B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents", B.hit AS "BoardHit",
-        B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate", U.user_id AS "UserId",
-        U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",
-        C.category_id AS "CategoryId", C.name AS "CategoryName", CM.comment_id AS "commentId"
-        FROM Board AS B
-        LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
-        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
-        LEFT OUTER JOIN comment AS CM on (B.board_id = CM.board_id)
-        WHERE B.category_id = #{categoryId}
-        <include refid="conditionalSearch"></include>
-        ORDER BY B.board_id desc
-        limit #{boardCriteria.pageStart}, #{boardCriteria.perPageNum}
-    </select>
-
     <sql id="conditionalSearch">
         <if test="type != null and searchValue != null">
             <if test='type.equals("title")'>
@@ -81,7 +55,41 @@
         </if>
     </sql>
 
-    <select id="selectBoard" resultMap="Board">
+    <sql id="paging">
+        limit #{criteria.pageStart}, #{criteria.perPageNum}
+    </sql>
+
+    <select id="selectBoardCount" resultType="int">
+        SELECT count(*)
+        From Board AS B
+        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
+        WHERE B.category_id = #{categoryId}
+        <include refid="conditionalSearch"></include>
+    </select>
+
+
+    <select id="findAll" resultMap="Board">
+        SELECT B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents", B.hit AS "BoardHit",
+        B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate",
+        B.user_id AS "UserId",B.email AS "UserEmail", B.nickname AS "UserNickName",
+        B.category_id AS "CategoryId", B.name AS "CategoryName", CM.comment_id AS "CommentId"
+        FROM
+        (
+        SELECT B.board_id, B.title, B.contents, B.hit, B.created_date , B.updated_date, B.user_id, B.category_id,
+        U.email, U.nickname, C.name
+        FROM Board AS B
+        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
+        LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
+        WHERE B.category_id = #{categoryId}
+        <include refid="conditionalSearch"></include>
+        ORDER BY B.board_id desc
+        <include refid="paging"></include>
+        ) AS B
+        LEFT OUTER JOIN comment AS CM on (B.board_id = CM.board_id)
+    </select>
+
+
+    <select id="findOne" resultMap="Board">
         SELECT B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents", B.hit AS "BoardHit",
         B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate", U.user_id AS "UserId",
         U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",
@@ -98,13 +106,7 @@
         WHERE B.board_id = #{id}
     </select>
 
-    <select id="selectBoardCount" resultType="int">
-        SELECT count(board_id)
-        From Board AS B
-        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
-        WHERE B.category_id = #{categoryId}
-        <include refid="conditionalSearch"></include>
-    </select>
+
 
     <select id="findBoardsByProductId" resultMap="Board">
         SELECT B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents", B.hit AS "BoardHit",

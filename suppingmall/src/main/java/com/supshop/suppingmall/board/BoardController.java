@@ -51,7 +51,7 @@ public class BoardController {
 
         int boardCount = boardService.getBoardCount(categoryId, type, searchValue);
         PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum,boardCriteria);
-        List<Board> boards = boardService.getBoardByCondition(boardCriteria, categoryId, type, searchValue);
+        List<Board> boards = boardService.getBoards(boardCriteria, categoryId, type, searchValue);
         Category category = categoryService.getCategory(categoryId);
 
         model.addAttribute("boardList",boards);
@@ -80,7 +80,7 @@ public class BoardController {
         }
         if(categoryId == null) categoryId = boardCategoryId;
 
-        List<Board> boards = boardService.getBoardByCondition(boardCriteria, board.getCategory().getId(), type, searchValue);
+        List<Board> boards = boardService.getBoards(boardCriteria, board.getCategory().getId(), type, searchValue);
         int boardCount = boardService.getBoardCount(categoryId, type, searchValue);
         PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum,boardCriteria);
 
@@ -88,7 +88,7 @@ public class BoardController {
         model.addAttribute("board",board);
         model.addAttribute("boardPageMaker", pageMaker);
 
-        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("category", board.getCategory());
         model.addAttribute("type", type);
         model.addAttribute("searchValue", searchValue);
         model.addAttribute("pageNum", boardCriteria.getPage());

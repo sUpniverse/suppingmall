@@ -17,7 +17,6 @@ public interface ProductMapper {
     int findAllCount(Long categoryId, String name, Product.ProductStatus status);
 
     // 모든 제품 조회 (product, product detail, product option까지 모두)
-    List<Product> findAll();
     // 조건에 추가
     List<Product> findAll(Long sellerId, Long categoryId, String name, Product.ProductStatus status,Criteria criteria);
 

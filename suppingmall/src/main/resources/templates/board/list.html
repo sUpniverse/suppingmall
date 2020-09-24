@@ -43,7 +43,8 @@
                             </td>
                             <td class="text-center" th:text="${board.creator.nickName}" />
                             <td class="text-center" th:text="${board.hit}"/>
-                            <td th:text="${#temporals.format(board.createdDate,'yyyy-MM-dd HH:mm:ss')}" />
+<!--                            <td th:text="${#temporals.format(board.createdDate,'yyyy-MM-dd HH:mm:ss')}" />-->
+                            <td  th:text="${#temporals.format(board.createdDate,'yyyy-MM-dd') == #dates.format(#dates.createToday(),'yyyy-MM-dd')? #temporals.format(board.createdDate,'HH:mm') : #temporals.format(board.createdDate,'MM-dd')}" />
                         </tr>
                         </tbody>
                     </table>
@@ -61,7 +62,7 @@
                                     <a class="page-link" th:href="@{'/boards?page='+${idx}+'&&categoryId='+${category.id}+'&&type='+${type}+'&&searchValue='+${searchValue}}" th:text="${idx}"></a>
                                 </li>
                                 <li class="page-item" th:if="${boardPageMaker.next && boardPageMaker.endPage > 0}">
-                                    <a class="page-link" th:href="@{'/boards?page='+${boardPageMaker.endPage + 1}+'&&categoryId='+${category.id}+'&&type='+${type}+'&&searchValue='+${searchValue}}}" aria-label="Next">
+                                    <a class="page-link" th:href="@{'/boards?page='+${boardPageMaker.endPage + 1}+'&&categoryId='+${category.id}+'&&type='+${type}+'&&searchValue='+${searchValue}}" aria-label="Next">
                                         <span aria-hidden="true">&raquo;</span>
                                     </a>
                                 </li>
@@ -71,6 +72,7 @@
 
                     <div class="container d-flex justify-content-center">
                         <form method="get" th:action="@{/boards}">
+                            <input type="hidden" th:name="categoryId" th:value="${category.id}">
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <select class="btn btn-outline-secondary dropdown-toggle" th:name="type">

@@ -10,6 +10,7 @@ import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.image.ImageController;
 import com.supshop.suppingmall.image.ImageService;
+import com.supshop.suppingmall.page.BoardCriteria;
 import com.supshop.suppingmall.page.Criteria;
 import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.page.ProductCriteria;
@@ -155,29 +156,26 @@ public class ProductController {
 
     @GetMapping("/seller")
     public String getProductsBySeller(@AuthenticationPrincipal SessionUser user,
-                                      ProductCriteria productCriteria,
+                                      BoardCriteria criteria,
                                       Model model) {
 
         int count = 0;
         List<Product> products = null;
         if(UserUtils.isSeller(user)){
             count = productService.getProductsCount(null, user.getUserId(),null,null);
-            products = productService.getProductsBySeller(user.getUserId(),productCriteria);
+            products = productService.getProductsBySeller(user.getUserId(),criteria);
 
         } else if(UserUtils.isAdmin(user)) {
-            count = productService.getProductsCount(null, null,null,null);
-            products = productService.getProducts(productCriteria);
+            count = productService.getProductsCount();
+            products = productService.getProducts(criteria);
         }
 
-        //option의 문제로 1개의 제품이 아닌 같은 ID로 여러개의 제품이 뜨므로 페이징 불가피
-//        PageMaker pageMaker = new PageMaker(count,productPagingCount,productCriteria);
-
-
+        PageMaker pageMaker = new PageMaker(count,productPagingCount,criteria);
 
         model.addAttribute("user",user);
         model.addAttribute("count",count);
         model.addAttribute("products",products);
-//        model.addAttribute("pageMaker",pageMaker);
+        model.addAttribute("pageMaker",pageMaker);
 
         return "/product/seller/list";
     }

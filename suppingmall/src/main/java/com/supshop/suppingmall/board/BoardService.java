@@ -28,14 +28,12 @@ public class BoardService {
     private static final String boardName = "board";
     private static final String boardImageUrl = "/images/board/";
 
-    public List<Board> getAllBoard() { return boardMapper.selectAllBoard(); }
-
-    public List<Board> getBoardByCondition(Criteria boardCriteria, Long categoryId, String type, String searchValue) {
+    public List<Board> getBoards(Criteria boardCriteria, Long categoryId, String type, String searchValue) {
         if(categoryId == null) {
             Category categoryByEnName = categoryService.getCategoryByEnName(boardName);
-            return boardMapper.selectBoardByCondition(boardCriteria,categoryByEnName.getId(), type, searchValue);
+            return boardMapper.findAll(boardCriteria,categoryByEnName.getId(), type, searchValue);
         }
-        return boardMapper.selectBoardByCondition(boardCriteria,categoryId, type, searchValue);
+        return boardMapper.findAll(boardCriteria,categoryId, type, searchValue);
     }
 
     public int getBoardCount(Long categoryId, String type, String searchValue) {
@@ -44,7 +42,7 @@ public class BoardService {
 
     @Transactional
     public Board getBoard(Long id) {
-        Optional<Board> board = boardMapper.selectBoard(id);
+        Optional<Board> board = boardMapper.findOne(id);
         if(!board.isEmpty()) {
             boardMapper.updateBoardHit(id);
             return board.get();
@@ -53,7 +51,7 @@ public class BoardService {
     }
 
     public Board getBoardByProduct(Long id) {
-        Optional<Board> board = boardMapper.selectBoard(id);
+        Optional<Board> board = boardMapper.findOne(id);
         if(!board.isEmpty()) {
             return board.get();
         }

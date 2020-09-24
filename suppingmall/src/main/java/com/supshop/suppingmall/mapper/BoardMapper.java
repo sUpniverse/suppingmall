@@ -8,11 +8,9 @@ import java.util.Optional;
 
 public interface BoardMapper {
 
-    List<Board> selectAllBoard();
-
-    List<Board> selectBoardByCondition(Criteria boardCriteria, Long categoryId, String type, String searchValue);
+    List<Board> findAll(Criteria criteria, Long categoryId, String type, String searchValue);
     
-    Optional<Board> selectBoard(Long id);
+    Optional<Board> findOne(Long id);
 
     int insertBoard(Board board);
 

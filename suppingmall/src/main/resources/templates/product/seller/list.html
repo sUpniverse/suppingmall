@@ -119,25 +119,25 @@
                     </tbody>
                 </table>
             </div>
-<!--            <div class="container d-flex justify-content-center mb-3 text-small">-->
-<!--                <nav aria-label="Page navigation example">-->
-<!--                    <ul class="pagination mx-auto">-->
-<!--                        <li class="page-item">-->
-<!--                            <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/products/seller?page='+${pageMaker.startPage - 1}}" aria-label="Previous">-->
-<!--                                <span aria-hidden="true">&laquo;</span>-->
-<!--                            </a>-->
-<!--                        </li>-->
-<!--                        <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:classappend="${pageMaker.criteria.page} == ${idx} ? active">-->
-<!--                            <a class="page-link" th:href="@{'/products/seller?page='+${idx}}" th:text="${idx}"></a>-->
-<!--                        </li>-->
-<!--                        <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">-->
-<!--                            <a class="page-link" th:href="@{'/products/seller?page='+${pageMaker.endPage + 1}}" aria-label="Next">-->
-<!--                                <span aria-hidden="true">&raquo;</span>-->
-<!--                            </a>-->
-<!--                        </li>-->
-<!--                    </ul>-->
-<!--                </nav>-->
-<!--            </div>-->
+            <div class="container d-flex justify-content-center mb-3 text-small">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination mx-auto">
+                        <li class="page-item">
+                            <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/products/seller?page='+${pageMaker.startPage - 1}}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:classappend="${pageMaker.criteria.page} == ${idx} ? active">
+                            <a class="page-link" th:href="@{'/products/seller?page='+${idx}}" th:text="${idx}"></a>
+                        </li>
+                        <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">
+                            <a class="page-link" th:href="@{'/products/seller?page='+${pageMaker.endPage + 1}}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 </div>
