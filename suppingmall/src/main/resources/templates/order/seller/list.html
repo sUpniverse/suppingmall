@@ -23,83 +23,158 @@
             <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
         </div>
         <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
-            <table class="d-flex p-3 my-3 bg-light rounded shadow-sm mt-5 border">
-                <tr>
-                    <td>
-                        <div class="row row-cols-3 ml-3">
-                            <input type="date" id="fromDate" class="form-control col">
-                            <span class="col">~</span>
-                            <input type="date" id="toDate" class="form-control col">
+            <div class="product">
+                <div class="d-flex flex-column flex-md-row align-items-center mb-3 bg-white border-bottom">
+                    <div class="row align-items-center">
+                        <div class="col-sm mb-2 mb-sm-0">
+                            <h3 class="page-header-title">주문 현황</h3>
                         </div>
-                    </td>
-                    <td>
-                        <select class="form-control ml-4" id="status">
-                            <option th:text="전체상태" value="" selected></option>
-                            <option th:each="status : ${statusList}" th:text="${status.title}" th:value="${status}"></option>
-                        </select>
-                    </td>
-                    <td>
-                        <a class="btn btn-success ml-5" href="javascript:search()">조회</a>
-                    </td>
-                </tr>
-            </table>
-            <ul class="mt-5">
-                <li th:each="order : ${orders}" class="row border-bottom mt-4 pb-4">
-                    <div class="col row">
-                        <a th:href="@{'/orders/'+${order.orderId}+'/seller'}">
-                            <img th:src="${order.orderItems[0].product.thumbnail}" style="width: 90px; height: 90px">
-                        </a>
-                        <div class="ml-3">
-                            <a th:href="@{'/orders/'+${order.orderId}+'/seller'}" style="text-decoration: none;">
-                                <span th:text="${order.orderItems[0].product.name}" class="text-dark" style="font-size: 16px"></span>
-                                <ul class="container row">
-                                    <li>
-                                        <span th:text="@{${#numbers.formatInteger(order.getAmountPrice(),3,'COMMA')}+'원'}" class="text-dark" style="font-size: 13px;"></span>
-                                    </li>
-                                    <li>
-                                        <span th:text="${#temporals.format(order.orderDate,'yyyy-MM-dd HH:mm')}" class="text-muted" style="font-size: 13px; display: inline-block; padding-left: 11px"></span>
-                                    </li>
-                                </ul>
-                                <div>
-                                    <span th:if="${not #strings.equals(order.status.title,'DELIVERY')}" th:text="${order.status.title}" class="text-dark" style="font-size: 16px"></span>
-                                    <span th:if="${#strings.equals(order.status.title,'DELIVERY')}" th:text="${order.delivery.status.title}" class="text-dark" style="font-size: 16px"></span>
-                                </div>
+                    </div>
+                </div>
+                <div class="card-deck mb-3 text-center">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header">
+                            <h4 class="my-0 font-weight-normal">배송준비중</h4>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li>
+                                    <svg width="4em" height="4em" viewBox="0 0 16 16" class="bi bi-box-seam" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zm3.564 1.426L5.596 5 8 5.961 14.154 3.5l-2.404-.961zm3.25 1.7l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464L7.443.184z"/>
+                                    </svg>
+                                    <h1>[[${status.get(0)}]] <small class="text-muted">건</small></h1>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header">
+                            <h4 class="my-0 font-weight-normal">배송중</h4>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li>
+                                    <svg width="4em" height="4em" viewBox="0 0 16 16" class="bi bi-truck" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+                                    </svg>
+                                    <h1>[[${status.get(1)}]] <small class="text-muted">건</small></h1>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header">
+                            <h4 class="my-0 font-weight-normal">배송완료</h4>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li>
+                                    <svg width="4em" height="4em" viewBox="0 0 16 16" class="bi bi-building" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M14.763.075A.5.5 0 0 1 15 .5v15a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5V14h-1v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V10a.5.5 0 0 1 .342-.474L6 7.64V4.5a.5.5 0 0 1 .276-.447l8-4a.5.5 0 0 1 .487.022zM6 8.694L1 10.36V15h5V8.694zM7 15h2v-1.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5V15h2V1.309l-7 3.5V15z"/>
+                                        <path d="M2 11h1v1H2v-1zm2 0h1v1H4v-1zm-2 2h1v1H2v-1zm2 0h1v1H4v-1zm4-4h1v1H8V9zm2 0h1v1h-1V9zm-2 2h1v1H8v-1zm2 0h1v1h-1v-1zm2-2h1v1h-1V9zm0 2h1v1h-1v-1zM8 7h1v1H8V7zm2 0h1v1h-1V7zm2 0h1v1h-1V7zM8 5h1v1H8V5zm2 0h1v1h-1V5zm2 0h1v1h-1V5zm0-2h1v1h-1V3z"/>
+                                    </svg>
+                                    <h1>[[${status.get(2)}]] <small class="text-muted">건</small></h1>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header">
+                            <h4 class="my-0 font-weight-normal">교환/환불</h4>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li>
+                                    <svg width="4em" height="4em" viewBox="0 0 16 16" class="bi bi-arrow-counterclockwise" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                                        <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+                                    </svg>
+                                    <h1>[[${status.get(3)}]] <small class="text-muted">건</small></h1>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <table class="d-flex p-3 my-3 bg-light rounded shadow-sm mt-5 border">
+                    <tr>
+                        <td>
+                            <div class="row row-cols-3 ml-3">
+                                <input type="date" id="fromDate" class="form-control col">
+                                <span class="col">~</span>
+                                <input type="date" id="toDate" class="form-control col">
+                            </div>
+                        </td>
+                        <td>
+                            <select class="form-control ml-4" id="status">
+                                <option th:text="전체상태" value="" selected></option>
+                                <option th:each="status : ${statusList}" th:text="${status.title}" th:value="${status}"></option>
+                            </select>
+                        </td>
+                        <td>
+                            <a class="btn btn-success ml-5" href="javascript:search()">조회</a>
+                        </td>
+                    </tr>
+                </table>
+                <ul class="mt-5">
+                    <li th:each="order : ${orders}" class="row border-bottom mt-4 pb-4">
+                        <div class="col row">
+                            <a th:href="@{'/orders/'+${order.orderId}+'/seller'}">
+                                <img th:src="${order.orderItems[0].product.thumbnail}" style="width: 90px; height: 90px">
                             </a>
+                            <div class="ml-3">
+                                <a th:href="@{'/orders/'+${order.orderId}+'/seller'}" style="text-decoration: none;">
+                                    <span th:text="${order.orderItems[0].product.name}" class="text-dark" style="font-size: 16px"></span>
+                                    <ul class="container row">
+                                        <li>
+                                            <span th:text="@{${#numbers.formatInteger(order.getAmountPrice(),3,'COMMA')}+'원'}" class="text-dark" style="font-size: 13px;"></span>
+                                        </li>
+                                        <li>
+                                            <span th:text="${#temporals.format(order.orderDate,'yyyy-MM-dd HH:mm')}" class="text-muted" style="font-size: 13px; display: inline-block; padding-left: 11px"></span>
+                                        </li>
+                                    </ul>
+                                    <div>
+                                        <span th:if="${not #strings.equals(order.status.title,'DELIVERY')}" th:text="${order.status.title}" class="text-dark" style="font-size: 16px"></span>
+                                        <span th:if="${#strings.equals(order.status.title,'DELIVERY')}" th:text="${order.delivery.status.title}" class="text-dark" style="font-size: 16px"></span>
+                                    </div>
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-auto text-center align-items-center">
-                        <span th:text="${order.buyer.name}"></span>
-                        <br>
-                        <span class="text-muted" th:text="@{'('+${order.buyer.phoneNumber}+')'}" style="font-size: 14px"></span>
-                    </div>
-                    <div class="col col-lg-2  d-flex align-items-center text-center">
-                        <div th:if="${#strings.equals(order.delivery?.status,'DELIVERY')}">
-                            <span th:text="${order.delivery.vendor.title}"></span>
-                            <span th:text="@{'('+${order.delivery.trackingNumber}+')'}"></span>
+                        <div class="col-md-auto text-center align-items-center">
+                            <span th:text="${order.buyer.name}"></span>
+                            <br>
+                            <span class="text-muted" th:text="@{'('+${order.buyer.phoneNumber}+')'}" style="font-size: 14px"></span>
                         </div>
-                        <a class="form-control" href="#" th:href="'javascript:getDeliveryForm('+${order.delivery.deliveryId}+')'" th:if="${#strings.equals(order.delivery.status,'WAIT')}">송장등록</a>
-                    </div>
-                </li>
-            </ul>
-<!--            <div class="container d-flex justify-content-center mb-3 text-small">-->
-<!--                <nav aria-label="Page navigation example">-->
-<!--                    <ul class="pagination mx-auto">-->
-<!--                        <li class="page-item">-->
-<!--                            <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/products/seller/main?page='+${pageMaker.startPage - 1}}" aria-label="Previous">-->
-<!--                                <span aria-hidden="true">&laquo;</span>-->
-<!--                            </a>-->
-<!--                        </li>-->
-<!--                        <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:classappend="${pageMaker.criteria.page} == ${idx} ? active">-->
-<!--                            <a class="page-link" th:href="@{'/products/seller/main?page='+${idx}}" th:text="${idx}"></a>-->
-<!--                        </li>-->
-<!--                        <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">-->
-<!--                            <a class="page-link" th:href="@{'/products/seller/main?page='+${pageMaker.endPage + 1}}" aria-label="Next">-->
-<!--                                <span aria-hidden="true">&raquo;</span>-->
-<!--                            </a>-->
-<!--                        </li>-->
-<!--                    </ul>-->
-<!--                </nav>-->
-<!--            </div>-->
+                        <div class="col col-lg-2  d-flex align-items-center text-center">
+                            <div th:if="${#strings.equals(order.delivery?.status,'DELIVERY')}">
+                                <span th:text="${order.delivery.vendor.title}"></span>
+                                <span th:text="@{'('+${order.delivery.trackingNumber}+')'}"></span>
+                            </div>
+                            <a class="form-control" href="#" th:href="'javascript:getDeliveryForm('+${order.delivery.deliveryId}+')'" th:if="${#strings.equals(order.delivery.status,'WAIT')}">송장등록</a>
+                        </div>
+                    </li>
+                </ul>
+                <!--            <div class="container d-flex justify-content-center mb-3 text-small">-->
+                <!--                <nav aria-label="Page navigation example">-->
+                <!--                    <ul class="pagination mx-auto">-->
+                <!--                        <li class="page-item">-->
+                <!--                            <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/products/seller/main?page='+${pageMaker.startPage - 1}}" aria-label="Previous">-->
+                <!--                                <span aria-hidden="true">&laquo;</span>-->
+                <!--                            </a>-->
+                <!--                        </li>-->
+                <!--                        <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:classappend="${pageMaker.criteria.page} == ${idx} ? active">-->
+                <!--                            <a class="page-link" th:href="@{'/products/seller/main?page='+${idx}}" th:text="${idx}"></a>-->
+                <!--                        </li>-->
+                <!--                        <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">-->
+                <!--                            <a class="page-link" th:href="@{'/products/seller/main?page='+${pageMaker.endPage + 1}}" aria-label="Next">-->
+                <!--                                <span aria-hidden="true">&raquo;</span>-->
+                <!--                            </a>-->
+                <!--                        </li>-->
+                <!--                    </ul>-->
+                <!--                </nav>-->
+                <!--            </div>-->
+            </div>
         </div>
         <div class="col-md-2">
 

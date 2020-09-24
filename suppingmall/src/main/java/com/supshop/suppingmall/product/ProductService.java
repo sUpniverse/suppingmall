@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.product;
 
+import com.mysql.cj.util.StringUtils;
 import com.supshop.suppingmall.image.ImageService;
 import com.supshop.suppingmall.mapper.ProductMapper;
 import com.supshop.suppingmall.page.Criteria;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
@@ -88,7 +90,8 @@ public class ProductService {
         productMapper.addProductDetail(detail);
 
         // product의 create가 성공이면, 물품들의 이미지 url을 가져와 Stroage에 저장하도록 함
-        if(result == 1) {
+        if(result == 1 && !StringUtils.isNullOrEmpty(product.getThumbnail())) {
+            if(urls == null) urls = new HashSet<>();
             urls.add(product.getThumbnail());   // 썸네일 이미지도 포함
             String originUrl = setProductImageUrl(product, urls);
             boolean saveInStorage = imageService.saveInStorage(urls, originUrl, product.getProductId(), productName);

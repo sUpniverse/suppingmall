@@ -2,7 +2,6 @@
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: header" />
 <head th:include="fragments/header :: header-product" />
-</head>
 <body>
     <header th:insert="fragments/navigation-main :: main-nav" />
     <div style="background-color: #eee;" class="page-wrapper">
@@ -62,7 +61,7 @@
                         <ul class="posts-list px-5 py-3">
                             <li th:each="board : ${appleBoards}">
                                 <div>
-                                    <h5><a th:href="@{'/boards/'+${board.boardId}}" th:text="${board.title}"></a></h5>
+                                    <h5><a th:href="@{'/boards/'+${board.boardId}}" th:text="${board.title}"><span th:text="${board.comments.size()}"></span></a></h5>
                                 </div>
                             </li>
                         </ul>

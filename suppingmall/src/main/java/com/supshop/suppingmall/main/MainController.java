@@ -2,10 +2,8 @@ package com.supshop.suppingmall.main;
 
 import com.supshop.suppingmall.board.Board;
 import com.supshop.suppingmall.board.BoardService;
-import com.supshop.suppingmall.page.BoardCriteria;
 import com.supshop.suppingmall.page.Criteria;
 import com.supshop.suppingmall.page.ProductCriteria;
-import com.supshop.suppingmall.product.Product;
 import com.supshop.suppingmall.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -32,10 +30,10 @@ public class MainController {
 
 //        List<Board> newBoards = boardService.getBoardByCondition(productCriteria, categoryId, null, null);
 //        List<Board> storyBoards = boardService.getBoardByCondition(productCriteria, categoryId, null, null);
-        List<Board> appleBoards = boardService.getBoardByCondition(productCriteria, 24l, null, null);
-        List<Board> samsungBoards = boardService.getBoardByCondition(productCriteria, 25l, null, null);
-        List<Board> lgBoards = boardService.getBoardByCondition(productCriteria, 26l, null, null);
-        List<Board> foreignBoards = boardService.getBoardByCondition(productCriteria, 27l, null, null);
+        List<Board> appleBoards = boardService.getBoards(productCriteria, 24l, null, null);
+        List<Board> samsungBoards = boardService.getBoards(productCriteria, 25l, null, null);
+        List<Board> lgBoards = boardService.getBoards(productCriteria, 26l, null, null);
+        List<Board> foreignBoards = boardService.getBoards(productCriteria, 27l, null, null);
 
         model.addAttribute("appleBoards",appleBoards);
         model.addAttribute("samsungBoards",samsungBoards);

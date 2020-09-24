@@ -185,6 +185,13 @@ public class OrderController {
             return "/order/seller/refund-list";
         }
 
+        int wait = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.WAIT)).count();
+        int delivery = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.DELIVERY)).count();
+        int complete = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.COMPLETE)).count();
+        int change = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.CHANGE)).count();
+
+
+        model.addAttribute("status",Arrays.asList(wait,delivery,complete,change));
         model.addAttribute("statusList", Arrays.asList(Delivery.DeliveryStatus.values()));
 
         return "/order/seller/list";
