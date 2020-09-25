@@ -16,7 +16,7 @@
                     <a class="nav-link sidebar-heading" th:href="@{'/users/seller/applyForm'}">회원전환/판매자전환</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link sidebar-heading" href="/users/">회원탈퇴</a>
+                    <a class="nav-link sidebar-heading" th:href="@{'/users/'+${#authentication?.principal.userId}+'/signout'}">회원탈퇴</a>
                 </li>
             </ul>
         </div>
@@ -57,6 +57,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link sidebar-heading">QnA관리</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link sidebar-heading" th:href="@{'/users/seller/'+${#authentication?.principal.userId}+'/transfer'}">회원전환</a>
                 </li>
             </ul>
         </div>

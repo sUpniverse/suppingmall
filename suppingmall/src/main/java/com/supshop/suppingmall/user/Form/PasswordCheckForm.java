@@ -9,7 +9,7 @@ import javax.validation.constraints.Pattern;
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @ToString @Builder
-public class SignOutForm {
+public class PasswordCheckForm {
 
     @NotEmpty
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,15}$")

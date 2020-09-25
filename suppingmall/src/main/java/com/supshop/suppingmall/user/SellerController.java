@@ -4,6 +4,7 @@ import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.page.BoardCriteria;
 import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.user.Form.ApplySellerForm;
+import com.supshop.suppingmall.user.Form.PasswordCheckForm;
 import com.supshop.suppingmall.user.Form.UpdateSellerForm;
 import com.supshop.suppingmall.user.Form.UpdateUserForm;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequestMapping("/users/seller")
@@ -130,12 +132,12 @@ public class SellerController {
     @ResponseBody
     public ResponseEntity grantSellerRole(@PathVariable Long id, @AuthenticationPrincipal SessionUser sessionUser) {
         if(UserUtils.isAdmin(sessionUser)) {
-            User user = userService.getUser(id);
-            StoreVO storeVO = user.getStoreVO();
-            storeVO.setStoreApplyYn("N");
-            user.setStoreVO(storeVO);
-            user.setRole(Role.SELLER);
             try {
+                User user = userService.getUser(id);
+                StoreVO storeVO = user.getStoreVO();
+                storeVO.setStoreApplyYn("N");
+                user.setStoreVO(storeVO);
+                user.setRole(Role.SELLER);
                 userService.patchUser(user.getUserId(), user);
             } catch (Exception e){
                 return ResponseEntity.badRequest().build();
@@ -167,6 +169,51 @@ public class SellerController {
             userService.patchUser(id, User.builder().storeVO(storeVO).build());
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body("회원변경 실패");
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/transfer")
+    public String getTransferForm(@PathVariable Long id,
+                                  @AuthenticationPrincipal SessionUser sessionUser,
+                                  Model model){
+
+        if(!UserUtils.isOwner(id, sessionUser) || !"Y".equals(sessionUser.getStoreVO().getStoreApplyYn())) {
+            return redirectMainUrl;
+        }
+
+        User user = userService.getUser(id);
+
+        model.addAttribute("user",user);
+
+        return "/user/seller/transferForm";
+    }
+
+
+    @PatchMapping("/{id}/transfer")
+    @ResponseBody
+    public ResponseEntity transferSellerToUser(@PathVariable Long id,
+                                               @RequestBody PasswordCheckForm form,
+                                               @AuthenticationPrincipal SessionUser sessionUser){
+
+        if(!UserUtils.isOwner(id, sessionUser) || !"Y".equals(sessionUser.getStoreVO().getStoreApplyYn())) {
+            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
+        }
+
+        User originUser = userService.getUser(id);
+
+        // 제대로 비밀번호를 입력했는지 확인
+        if(!userService.matchedPassword(originUser.getEmail(), form.getPassword())){
+            return ResponseEntity.badRequest().body("유효하지 않은 패스워드 입니다.");
+        }
+
+        try {
+            User user = userService.getUser(id);
+            user.setRole(Role.USER);
+            userService.patchUser(user.getUserId(), user);
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
         }
 
         return ResponseEntity.ok().build();

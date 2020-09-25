@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.user;
 
+import com.supshop.suppingmall.user.Form.PasswordCheckForm;
 import com.supshop.suppingmall.user.Form.UpdateSellerForm;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
@@ -177,5 +178,48 @@ public class SellerControllerTest {
         Assert.assertEquals(storeVO.getStoreAddressDetail(),user.getStoreVO().getStoreAddressDetail());
         Assert.assertEquals(storeVO.getStoreName(),user.getStoreVO().getStoreName());
 
+    }
+
+    @Test
+    @Transactional
+    @WithUserDetails(value = "seller", userDetailsServiceBeanName = "userDetailsService")
+    public void getTransferForm() throws Exception {
+        //given
+        User seller = userFactory.createSeller("seller");
+
+
+        //when
+        mockMvc.perform(get("/users/seller/{id}/transfer",seller.getUserId()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(view().name("/user/seller/transferForm"));
+
+        //then
+
+    }
+
+
+    @Test
+    @Transactional
+    @WithUserDetails(value = "seller", userDetailsServiceBeanName = "userDetailsService")
+    public void transferSellerToUser() throws Exception {
+        //given
+        User seller = userFactory.createSeller("seller");
+
+        PasswordCheckForm form = PasswordCheckForm.builder().password(UserFactory.userpassword).build();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        //when
+        mockMvc.perform(patch("/users/seller/{id}/transfer",seller.getUserId())
+                        .content(objectMapper.writeValueAsString(form))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
+                        .andDo(print())
+                        .andExpect(status().isOk());
+
+        User user = userService.getUser(seller.getUserId());
+
+        //then
+        Assert.assertEquals(Role.USER,user.getRole());
     }
 }

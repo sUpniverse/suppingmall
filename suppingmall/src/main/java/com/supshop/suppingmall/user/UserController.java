@@ -7,7 +7,6 @@ import com.supshop.suppingmall.user.Form.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.List;
 
 @RequestMapping("/users")
 @Controller
@@ -216,7 +214,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     @ResponseBody
     public ResponseEntity<String> deleteUser(@PathVariable Long id,
-                                             @RequestBody SignOutForm form,
+                                             @RequestBody PasswordCheckForm form,
                                              @AuthenticationPrincipal SessionUser sessionUser) {
 
         log.debug("deleteUser 호출 됌");

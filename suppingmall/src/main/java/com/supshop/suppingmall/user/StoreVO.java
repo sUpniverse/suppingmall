@@ -19,4 +19,5 @@ public class StoreVO {
     private String storeAddressDetail;
     private String storeApplyYn;
     private LocalDateTime storeRegisteredDate;
+    private LocalDateTime storeUpdatedDate;
 }
