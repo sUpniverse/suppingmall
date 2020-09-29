@@ -4,6 +4,7 @@ import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryFactory;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.user.User;
+import com.supshop.suppingmall.user.UserFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,8 @@ public class ProductFactory {
 
     @Autowired ProductService productService;
     @Autowired CategoryFactory categoryFactory;
+    @Autowired UserFactory userFactory;
+    @Autowired QnAService qnaService;
 
     public Product buildProduct(String productName, User seller) {
 
@@ -73,5 +76,23 @@ public class ProductFactory {
         productService.createProduct(product, null);
 
         return product;
+    }
+
+    public QnA createQna() {
+
+        User kevin = userFactory.createUser("kevin");
+        User seller = userFactory.createSeller("seller");
+
+        Product macBook = this.createProduct("맥북", seller);
+
+
+        QnA qna = QnA.builder().title("이거 좋나요?????")
+                .creator(kevin)
+                .product(macBook)
+                .build();
+
+        qnaService.createQnA(qna);
+
+        return qna;
     }
 }

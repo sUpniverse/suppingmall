@@ -6,6 +6,8 @@ $(document).ready(function() {
     $(document).on('click',"#cart",function() {
         if(!isSingIn()) {
             return;
+        } else if(isSeller()) {
+            return ;
         }
         var cartFrom = setCartForm();
         if(cartFrom === undefined) {
@@ -35,6 +37,8 @@ $(document).ready(function() {
 
     $(document).on('click',"#purchase",function() {
         if (!isSingIn()) {
+            return;
+        } else if(isSeller()) {
             return;
         }
 
@@ -206,6 +210,16 @@ function isSingIn() {
         return false;
     }
     return true;
+}
+
+function isSeller() {
+    let userId = document.getElementById("userId");
+    let sellerId = document.getElementById("sellerId");
+    if(userId === sellerId) {
+        alert('판매자는 구매할 수 없습니다.');
+        return true;
+    }
+    return false;
 }
 
 

@@ -1,7 +1,5 @@
 package com.supshop.suppingmall.product;
 
-import com.supshop.suppingmall.board.Board;
-import com.supshop.suppingmall.board.BoardService;
 import com.supshop.suppingmall.cart.Cart;
 import com.supshop.suppingmall.cart.CartService;
 import com.supshop.suppingmall.category.Category;
@@ -10,14 +8,16 @@ import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.image.ImageController;
 import com.supshop.suppingmall.image.ImageService;
-import com.supshop.suppingmall.page.BoardCriteria;
-import com.supshop.suppingmall.page.Criteria;
-import com.supshop.suppingmall.page.PageMaker;
-import com.supshop.suppingmall.page.ProductCriteria;
+import com.supshop.suppingmall.page.*;
 import com.supshop.suppingmall.product.Form.ProductForm;
 import com.supshop.suppingmall.product.Form.QnaForm;
+import com.supshop.suppingmall.product.Form.QnaReplyForm;
+import com.supshop.suppingmall.review.Review;
+import com.supshop.suppingmall.review.ReviewService;
+import com.supshop.suppingmall.user.Role;
 import com.supshop.suppingmall.user.SessionUser;
 import com.supshop.suppingmall.user.User;
+import com.supshop.suppingmall.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
@@ -29,22 +29,27 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RequestMapping("/products")
 @Controller
 @RequiredArgsConstructor
 public class ProductController {
 
+    private final UserService userService;
     private final ProductService productService;
     private final CategoryService categoryService;
     private final ImageService imageService;
-    private final BoardService boardService;
     private final CartService cartService;
+    private final QnAService qnaService;
+    private final ReviewService reviewService;
     private final ModelMapper modelMapper;
 
-    private static final Long qnaCategoryId = 30l;
-    private static final Long reviewCategoryId = 29l;
     private static final Long productCategoryId = 2L;
     private static final Long electronicsCategoryId = 3L;
     private static final Long clothingCategoryId = 7L;
@@ -128,12 +133,14 @@ public class ProductController {
         Category category = categoryService.getGrandParentByGrandChildren(product.getCategory().getId());
         product.setCategory(category);
 
-        List<Board> qnaList = boardService.getBoardsByProduct(id,qnaCategoryId);
-        List<Board> reviews = boardService.getBoardsByProduct(id,reviewCategoryId);
+        Criteria qnaCriteria = new TenItemsCriteria();
+        List<QnA> qnaList = qnaService.getQnAList(qnaCriteria,id,null, null);
+//        List<Board> reviews = boardService.getBoardsByProduct(id,reviewCategoryId);
 
         model.addAttribute("product",product);
         model.addAttribute("qnaList",qnaList);
-        model.addAttribute("reviews",reviews);
+//        model.addAttribute("reviews",reviews);
+
         return "/product/product";
     }
 
@@ -144,19 +151,25 @@ public class ProductController {
         Category category = categoryService.getGrandParentByGrandChildren(product.getCategory().getId());
         product.setCategory(category);
 
-        List<Board> qnaList = boardService.getBoardsByProduct(id,qnaCategoryId);
-        List<Board> reviews = boardService.getBoardsByProduct(id,reviewCategoryId);
+        Criteria qnaCriteria = new TenItemsCriteria();
+        List<QnA> qnaList = qnaService.getQnAList(qnaCriteria,id,null, null);
+        List<Review> reviewList = reviewService.getReviewList();
 
         model.addAttribute("product",product);
         model.addAttribute("qnaList",qnaList);
-        model.addAttribute("reviews",reviews);
+        model.addAttribute("reviews",reviewList);
+
+        int qnaCount = qnaService.getQnACount(id, null, null);
+        PageMaker qnaPageMaker = new PageMaker(qnaCount, 10, qnaCriteria);
+        model.addAttribute("qnaPageMaker",qnaPageMaker);
+
         return "/product/product2";
     }
 
 
     @GetMapping("/seller")
     public String getProductsBySeller(@AuthenticationPrincipal SessionUser user,
-                                      BoardCriteria criteria,
+                                      ThirtyItemsCriteria criteria,
                                       Model model) {
 
         int count = 0;
@@ -224,78 +237,98 @@ public class ProductController {
         return "";
     }
 
-    @GetMapping("/{productId}/qnas/form")
+    @GetMapping("/{productId}/qna/form")
     public String getQnaForm(@PathVariable Long productId,
                              Model model) {
         model.addAttribute("productId",productId);
-        return "/product/board/qnaForm";
+        return "/product/qna/qnaForm";
     }
 
-    @PostMapping("/{productId}/qnas")
+    @GetMapping("/{productId}/qna/{page}")
     @ResponseBody
-    public ResponseEntity createQnaByProductId(@RequestBody QnaForm qna,
-                                               @PathVariable Long productId) {
+    public ResponseEntity<Map<String,Object>> getQnaList(@PathVariable Long productId,
+                                               @PathVariable int page,
+                                               @RequestParam(required = false) String type,
+                                               @RequestParam(required = false) String searchValue) {
 
-        Board board = Board.builder()
-                        .category(Category.builder().id(30l).build())
-                        .title(qna.getTitle())
-                        .product(Product.builder().productId(productId).build())
-                        .creator(User.builder().userId(qna.getUserId()).build()).build();
-        boardService.createBoard(board,null);
-        return ResponseEntity.ok().build();
+        Map<String,Object> map = new HashMap<>();
+
+        TenItemsCriteria criteria = new TenItemsCriteria();
+        criteria.setPage(page);
+
+        int qnACount = qnaService.getQnACount(productId, type, searchValue);
+        PageMaker pageMaker = new PageMaker(qnACount,10,criteria);
+
+        map.put("qnaPageMaker",pageMaker);
+
+        List<QnA> qnAList = null;
+        try {
+            qnAList = qnaService.getQnAList(criteria, productId, type, searchValue);
+            map.put("list",qnAList);
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(map);
     }
 
-    @GetMapping("/qnas/{qnaId}")
+    @GetMapping("/qna/{qnaId}")
     @ResponseBody
     public ResponseEntity getQna(@PathVariable Long qnaId) {
-        Board board = boardService.getBoardByProduct(qnaId);
-        return ResponseEntity.ok(board);
+        QnA qna = qnaService.getQna(qnaId);
+        return ResponseEntity.ok(qna);
     }
 
-    @GetMapping("/qnas/{qnaId}/updateForm")
-    public String getQnaUpdateForm(@PathVariable Long qnaId,
-                             @AuthenticationPrincipal SessionUser user,
-                             Model model) {
-        Board board = boardService.getBoard(qnaId);
-        if(!UserUtils.isOwner(board.getCreator().getUserId(),user)) {
-            return "redirect:/users/loginform";
-        }
-        model.addAttribute("qna",board);
-        return "/product/board/editQnaForm";
-    }
-
-    @PutMapping("/qnas/{qnaId}")
+    @PostMapping("/{productId}/qna")
     @ResponseBody
-    public ResponseEntity updateQna(@PathVariable Long qnaId,
-                                    @RequestBody QnaForm qna,
-                                    @AuthenticationPrincipal SessionUser user) {
-        Board oldQnA = boardService.getBoard(qnaId);
-        if(!UserUtils.isOwner(oldQnA.getCreator().getUserId(),user)) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity createQnaByProductId(@RequestBody QnaForm qnaForm,
+                                               @PathVariable Long productId,
+                                               @AuthenticationPrincipal SessionUser sessionUser) {
+
+
+        if(qnaForm.getUserId() != sessionUser.getUserId()) {
+            return ResponseEntity.badRequest().body("유저 아이디가 일치하지 않습니다.");
         }
-        Board board = Board.builder()
-                .title(qna.getTitle()).build();
-        boardService.updateBoard(qnaId, board);
-        return ResponseEntity.ok().build();
+
+        User user = userService.getUser(qnaForm.getUserId());
+
+        QnA qna = QnA.builder()
+                        .title(qnaForm.getTitle())
+                        .product(Product.builder().productId(productId).build())
+                        .creator(user).build();
+
+        qna = qnaService.createQnA(qna);
+        URI uri = linkTo(ProductController.class).slash("/qna/"+qna.getQnaId()).toUri();
+
+        return ResponseEntity.created(uri).build();
     }
 
-    @DeleteMapping("/qnas/{qnaId}")
+    @PostMapping("/{productId}/qna/{qnaId}/reply")
     @ResponseBody
-    public ResponseEntity deleteQna(@PathVariable Long qnaId,
-                                    @AuthenticationPrincipal SessionUser user) {
+    public ResponseEntity createReply(@RequestBody QnaReplyForm replyForm,
+                                      @PathVariable Long productId,
+                                      @PathVariable Long qnaId,
+                                      @AuthenticationPrincipal SessionUser sessionUser) {
 
-        Board oldQnA = boardService.getBoard(qnaId);
-        if(!UserUtils.isOwner(oldQnA.getCreator().getUserId(),user)) {
-            return ResponseEntity.badRequest().build();
-        }
+        Product product = productService.getProduct(productId);
+        if(sessionUser.getUserId() != replyForm.getUserId() || (product.getSeller().getUserId() != replyForm.getUserId()))
+            return ResponseEntity.badRequest().body("유저 아이디가 일치하지 않습니다.");
 
-        boardService.deleteBoard(qnaId);
-        return ResponseEntity.ok().build();
+        User user = userService.getUser(replyForm.getUserId());
+        QnA qna = qnaService.getQna(qnaId);
+
+        QnA reply = QnA.builder()
+                .title(replyForm.getTitle())
+                .product(product)
+                .parent(qna)
+                .creator(user).build();
+
+        qnaService.createReply(qnaId, reply);
+
+        URI uri = linkTo(ProductController.class).slash("/qna/"+reply.getQnaId()).toUri();
+
+        return ResponseEntity.created(uri).build();
     }
 
 
-    @GetMapping("/{productId}/reivews/form")
-    public String getReviewForm(@PathVariable Long productId) {
-        return "";
-    }
 }

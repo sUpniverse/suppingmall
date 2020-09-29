@@ -41,16 +41,22 @@
     </ul>
 </div>
 </body>
-<script>
+<script th:inline="javascript">
     function submit() {
-        var qna = $("form[role='form']").serializeObject();
         var productId = [[${productId}]];
+        var header = [[${_csrf.headerName}]];
+        var token = [[${_csrf.token}]];
+
+        var qna = $("form[role='form']").serializeObject();
         $.ajax({
             type: 'POST',
-            url: "/products/"+productId+"/qnas",
+            url: "/products/"+productId+"/qna",
             dataType: 'text',
             data: JSON.stringify(qna),
-            contentType: 'application/json',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Content-type","application/json");
+                xhr.setRequestHeader(header,token);
+            },
             success: () => {
                 alert("Q&A가 등록되었습니다.");
                 window.opener.location.reload();

@@ -5,7 +5,7 @@ import lombok.*;
 @Getter @Setter
 @Builder @ToString
 @NoArgsConstructor @AllArgsConstructor
-public class QnaForm {
+public class QnaReplyForm {
 
     private long userId;
     private String title;

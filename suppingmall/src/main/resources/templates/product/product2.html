@@ -5,6 +5,18 @@
 <head>
 <meta name="_csrf" th:content="${_csrf.token}"/>
 <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<style>
+    .qna {display: table; width: 100%; border-bottom: solid 1px #dee2e6; border-top: 2px solid #000000;}
+        .tableRow {display: table; width: 100%; table-layout: fixed}
+        .tableHeader {display: table; width: 100%; table-layout: fixed}
+         li.body > div.cell.qnaTitle {display: table-cell; padding: 16px; text-align: left; vertical-align: middle}
+        .tableHeader > .cell {border-bottom: solid 1px #dee2e6; display: table-cell; padding: 16px; text-align: center; vertical-align: middle; font-weight: bold}
+        .body > .cell {display: table-cell; padding: 16px; text-align: center; vertical-align: middle}
+        .replyYn { width: 10%;}
+        .qnaTitle {width: 70%;}
+        .creator {width: 10%;}
+        .createdDate {width: 10%;}
+</style>
 </head>
 <body>
 <div class="page-wrapper">
@@ -46,7 +58,7 @@
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                 <input type="hidden" name="productId" id="productId" th:value="${product.productId}">
                                 <input type="hidden" sec:authorize="isAuthenticated()" name="buyerId" id="userId" th:value="${#authentication.principal?.userId}">
-                                <input type="hidden" name="sellerId" th:value="${product.seller.userId}">
+                                <input type="hidden" name="sellerId" id="sellerId" th:value="${product.seller.userId}">
                                 <input type="hidden" name="orderItems" id="orderItemJson">
                                 <!-- manufacturer -->
                                 <div class="font-weight-bold">
@@ -95,7 +107,7 @@
     <div class="container">
         <nav class="nav nav-pills nav-justified sticky-top bg-white">
             <a class="nav-item nav-link text-dark" href="#contents"><h3>상품정보</h3></a>
-            <a class="nav-item nav-link text-dark" href="#review"><h3>상품리뷰 <span class="badge badge-secondary" th:text="${reviews.size()}"></span></h3></a>
+            <a class="nav-item nav-link text-dark" href="#review"><h3>상품리뷰 <span class="badge badge-secondary" th:text="${reviews?.size()}"></span></h3></a>
             <a class="nav-item nav-link text-dark" href="#qna"><h3>Q&A <span class="badge badge-secondary" th:text="${qnaList.size()}"></span></h3></a>
             <a class="nav-item nav-link text-dark" href="#sellerInfo"><h3>판매자정보</h3></a>
         </nav>
@@ -114,31 +126,82 @@
         <div class="mt-5" th:id="qna">
             <h4>Q&A</h4>
             <p>구매하시려는 상품에 궁금하신 점이 있으신 경우 문의해 주세요</p>
-            <a class="btn btn-dark" href="#" th:href="'javascript:getCreateQnaFom('+${product.productId}+')'" sec:authorize="isAuthenticated()">상품 Q&A 작성하기</a>
-            <hr>
-            <table class="mt-3 table table-small">
-                <thead class="thead-light">
-                <tr>
-                    <th>답변상태</th>
-                    <th>제목</th>
-                    <th>작성자</th>
-                    <th>작성일</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="qna : ${qnaList}" th:id="'qna'+${qna.boardId}">
-                    <td>
-
-                    </td>
-                    <td>
-                        <a th:text="${qna.title}" sec:authorize="isAuthenticated()" href="#" th:href="'javascript:getQna('+${qna.boardId}+','+${#authentication.principal.userId}+')'"></a>
-                        <a th:text="${qna.title}" sec:authorize="!isAuthenticated()" href="#" th:href="'javascript:getQna('+${qna.boardId}+',undefined)'"></a>
-                    </td>
-                    <td th:text="${qna.creator.nickName}"></td>
-                    <td th:text="${qna.createdDate}"></td>
-                </tr>
-                </tbody>
-            </table>
+            <a class="btn btn-dark" href="#" id="createQnaBtn">상품 Q&A 작성하기</a>
+            <div class="qna">
+                <div class="tableRow">
+                    <div class="tableHeader">
+                        <div class="cell replyYn">답변상태</div>
+                        <div class="cell qnaTitle">제목</div>
+                        <div class="cell creator">작성자</div>
+                        <div class="cell createdDate">작성일</div>
+                    </div>
+                </div>
+                <ul class="tableRow" th:each="qna : ${qnaList}">
+                    <li class="body">
+                        <div class="cell replyYn" th:text="${qna.isReplyExist()}"></div>
+                        <div class="cell qnaTitle">
+                            <a role="button" data-toggle="collapse" th:href="@{'#qna-'+${qna.qnaId}}" aria-expanded="false" th:text="${qna.title}"></a>
+                        </div>
+                        <div class="cell creator" th:text="${qna.creator.nickName}"></div>
+                        <div class="cell createdDate" th:text="${#temporals.format(qna.createdDate,'yyyy-MM-dd')}"></div>
+                    </li>
+                    <li th:id="${'qna-'+qna.qnaId}" class="bg-light collapse border-top border-bottom p-3">
+                        <div class="row p-3">
+                            <div class="cell replyYn text-center">
+                                <svg width="3em" height="3em" viewBox="0 0 16 16" class="bi bi-patch-question" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM8.05 9.6c.336 0 .504-.24.554-.627.04-.534.198-.815.847-1.26.673-.475 1.049-1.09 1.049-1.986 0-1.325-.92-2.227-2.262-2.227-1.02 0-1.792.492-2.1 1.29A1.71 1.71 0 0 0 6 5.48c0 .393.203.64.545.64.272 0 .455-.147.564-.51.158-.592.525-.915 1.074-.915.61 0 1.03.446 1.03 1.084 0 .563-.208.885-.822 1.325-.619.433-.926.914-.926 1.64v.111c0 .428.208.745.585.745z"/>
+                                    <path fill-rule="evenodd" d="M10.273 2.513l-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911l-1.318.016z"/>
+                                </svg>
+                            </div>
+                            <div class="cell qnaTitle" th:text="${qna.title}"></div>
+                            <div class="cell creator"> </div>
+                            <div class="cell createdDate"></div>
+                        </div>
+                        <div class="row border-top p-3" th:if="${qna.isReplyExist()}">
+                            <div class="cell replyYn text-center">
+                                <svg width="3em" height="3em" viewBox="0 0 16 16" class="bi bi-info-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                    <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
+                                    <circle cx="8" cy="4.5" r="1"/>
+                                </svg>
+                            </div>
+                            <div class="cell qnaTitle" th:text="${qna.reply.title}"></div>
+                            <div class="cell creator">판매자</div>
+                            <div class="cell createdDate" th:text="${#temporals.format(qna.reply.createdDate,'yyyy-MM-dd')}"></div>
+                        </div>
+                        <div class="row border-top p-3" sec:authorize="isAuthenticated()" th:if="not ${qna.isReplyExist()} and ${#authentication.principal.userId} == ${product.seller.userId}" th:data-rno="${qna.qnaId}">
+                            <div class="cell replyYn text-center">
+                            </div>
+                            <div class="cell qnaTitle">
+                                <textarea class="form-control replyTitle"></textarea>
+                            </div>
+                            <div class="cell creator">
+                                <button class="btn-primary btn-sm replyButton p-3">작성하기</button>
+                            </div>
+                            <div class="cell createdDate"></div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="container d-flex justify-content-center mb-3 text-small">
+                    <nav aria-label="Page navigation example">
+                        <ul class="qnaPagination mx-auto">
+                            <li class="page-item">
+                                <a class="page-link" th:if="${qnaPageMaker.prev}" th:href="@{${qnaPageMaker.startPage - 1}}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item" th:each="idx : ${#numbers.sequence(qnaPageMaker.startPage,qnaPageMaker.endPage)}" th:classappend="${qnaPageMaker.criteria.page} == ${idx} ? active">
+                                <a class="page-link" th:href="@{${idx}}" th:text="${idx}"></a>
+                            </li>
+                            <li class="page-item" th:if="${qnaPageMaker.next && qnaPageMaker.endPage > 0}">
+                                <a class="page-link" th:href="@{${qnaPageMaker.endPage + 1}}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
         </div>
 
         <div class="mt-5" th:id="sellerInfo">
@@ -179,8 +242,21 @@
     </div>
 </div>
 </body>
+<script th:inline="javascript">
+    $(document).on('click',"#createQnaBtn",() => {
+        if([[${#authentication.principal}]] === "anonymousUser") {
+            var check = confirm("로그인 하시겠습니까?");
+            if(check == true) {
+                window.location.href='/users/loginform';
+            }
+            return;
+        }
+        const productId = document.getElementById('productId').value;
+        getCreateQnaFom(productId);
+    });
+
+</script>
 <script type="text/javascript" th:inline="javascript" th:src="@{/js/product/createBuyingList2.js}"></script>
 <script type="text/javascript" th:inline="javascript" th:src="@{/js/product/setForm.js}"></script>
 <script type="text/javascript" th:inline="javascript" th:src="@{/js/product/qna.js}"></script>
-<script type="text/javascript" th:inline="javascript" th:src="@{/js/product/editQna.js}"></script>
 </html>

@@ -24,16 +24,16 @@ public class Product {
     private String name;
     private int price;
     private int deliveryPrice;
-    private Delivery.DeliveryVendor deliveryVendor;
+    private Category category;
+    private String contents;
+    private String thumbnail;
     private ProductDetail detail;
     private List<ProductOption> options;
+    private Delivery.DeliveryVendor deliveryVendor;
     private int rating;
-    private String contents;
-    private LocalDateTime registeredDate;
     private User seller;
-    private Category category;
     private ProductStatus status;
-    private String thumbnail;
+    private LocalDateTime registeredDate;
 
 
     @Getter

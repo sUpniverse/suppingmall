@@ -2,10 +2,7 @@ package com.supshop.suppingmall.product;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.supshop.suppingmall.category.Category;
-import com.supshop.suppingmall.product.Form.DetailForm;
-import com.supshop.suppingmall.product.Form.OptionForm;
-import com.supshop.suppingmall.product.Form.ProductForm;
-import com.supshop.suppingmall.user.Role;
+import com.supshop.suppingmall.product.Form.*;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserFactory;
 import org.junit.Test;
@@ -13,7 +10,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,6 +23,7 @@ import org.springframework.util.MultiValueMap;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -37,6 +37,7 @@ public class ProductControllerTest {
     @Autowired MockMvc mockMvc;
     @Autowired ObjectMapper objectMapper;
     @Autowired UserFactory userFactory;
+    @Autowired ProductFactory productFactory;
 
     private MockHttpSession session;
 
@@ -168,6 +169,60 @@ public class ProductControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(model().attribute("user",user))
                 .andDo(print());
+
+        //then
+
+    }
+
+
+    @Test
+    @WithUserDetails(value = "suppingmall", userDetailsServiceBeanName = "userDetailsService")
+    @Transactional
+    public void createQna() throws Exception {
+        //given
+        User kevin = userFactory.createUser("suppingmall");
+        User seller = userFactory.createSeller("seller");
+
+        Product macBook = productFactory.createProduct("맥북", seller);
+
+
+        QnaForm qnaForm = QnaForm.builder().title("이거 좋나요?????")
+                                            .userId(kevin.getUserId())
+                                            .build();
+
+        //when
+
+        mockMvc.perform(post("/products/{id}/qna",macBook.getProductId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(qnaForm))
+                .with(csrf()))
+                .andDo(print())
+                .andExpect(status().isCreated());
+        //then
+
+    }
+
+    @Test
+    @WithUserDetails(value = "seller", userDetailsServiceBeanName = "userDetailsService")
+    @Transactional
+    public void createReply() throws Exception {
+        //given
+        QnA qna = productFactory.createQna();
+        User seller = userFactory.createSeller("seller");
+
+        QnaReplyForm reply = QnaReplyForm.builder()
+                .title("네 아주 좋습니다.")
+                .userId(seller.getUserId())
+                .build();
+
+        //when
+        mockMvc.perform(post("/products/{productId}/qna/{qnaId}/reply", qna.getProduct().getProductId(), qna.getQnaId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reply))
+                        .with(csrf()))
+                        .andDo(print())
+                        .andExpect(status().isCreated());
+
 
         //then
 

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.supshop.suppingmall.mapper.QnAMapper">
+    <resultMap id="QnA" type="com.supshop.suppingmall.product.QnA" autoMapping="true">
+        <id property="qnaId" column="QnAId" />
+        <result property="title" column="QnATitle" />
+        <result property="createdDate" column="QnACreatedDate" />
+        <association property="creator" javaType="com.supshop.suppingmall.user.User">
+            <id property="userId" column="UserId" />
+            <result property="email" column="UserEmail" />
+            <result property="nickName" column="UserNickName" />
+            <result property="createdDate" column="UserCreatedDate" />
+        </association>
+        <association property="reply" javaType="com.supshop.suppingmall.product.QnA">
+            <id property="qnaId" column="ReplyId" />
+            <result property="title" column="ReplyTitle" />
+            <result property="createdDate" column="ReplyCreatedDate" />
+        </association>
+        <association property="product" javaType="com.supshop.suppingmall.product.Product">
+            <id property="productId" column="ProductId"></id>
+        </association>
+    </resultMap>
+
+    <sql id="conditionalSearch">
+        <if test="productId != null">
+            AND Q.product_id = #{productId}
+        </if>
+        <if test="type != null and searchValue != null">
+            <if test='type.equals("productId")'>
+                <bind name="searchValue" value="'%'+searchValue+'%'"/>
+                AND Q.product_id LIKE #{searchValue}
+            </if>
+            <if test='type.equals("contents")'>
+                <bind name="searchValue" value="'%'+searchValue+'%'"/>
+                AND Q.title LIKE #{searchValue}
+            </if>
+            <if test='type.equals("creator")'>
+                AND Q.craetor = #{searchValue}
+            </if>
+        </if>
+    </sql>
+
+    <sql id="paging">
+        <if test="criteria != null">
+            limit #{criteria.pageStart}, #{criteria.perPageNum}
+        </if>
+    </sql>
+
+    <select id="findQnACount" resultType="int">
+        SELECT count(*)
+        From QnA AS Q
+        LEFT OUTER JOIN User AS U on (Q.user_id = U.user_id)
+        <include refid="conditionalSearch"></include>
+    </select>
+
+
+    <select id="findAll" resultMap="QnA">
+        SELECT Q.qna_id AS "QnAId", Q.title AS "QnATitle",Q.created_date AS "QnACreatedDate",
+        Q.user_id AS "UserId",Q.email AS "UserEmail", Q.nickname AS "UserNickName",
+        R.qna_id AS "ReplyId", R.title AS "ReplyTitle", R.created_date AS "ReplyCreatedDate"
+        FROM
+        (
+        SELECT Q.qna_id, Q.title, Q.created_date , Q.user_id,Q.reply_id, U.email, U.nickname
+        FROM QnA AS Q
+        LEFT OUTER JOIN User AS U on (Q.user_id = U.user_id)
+        WHERE Q.parent_id is null
+        <include refid="conditionalSearch"></include>
+        ORDER BY Q.QnA_id desc
+        <include refid="paging"></include>
+        ) AS Q
+        LEFT OUTER JOIN QnA AS R on (Q.reply_id = R.qna_id)
+    </select>
+
+
+    <select id="findOne" resultMap="QnA">
+        SELECT Q.qna_id AS "QnAId", Q.title AS "QnATitle",Q.created_date AS "QnACreatedDate",
+        U.user_id AS "UserId", U.email AS "UserEmail", U.nickname AS "UserNickName",
+        R.qna_id AS "ReplyId", R.title AS "ReplyTitle", P.product_id AS "ProductId"
+        FROM Qna AS Q
+        LEFT OUTER JOIN User AS U on (Q.user_id = U.user_id)
+        LEFT OUTER JOIN QnA AS R on (Q.reply_id = R.qna_id)
+        LEFT OUTER JOIN Product AS P on (Q.product_id = P.product_id)
+        WHERE Q.qna_id = #{qnaId}
+    </select>
+
+    <insert id="save" parameterType="com.supshop.suppingmall.product.QnA" useGeneratedKeys="true" keyProperty="qnaId">
+        INSERT INTO QnA (
+        title,
+        user_id,
+        product_id,
+        parent_id,
+        created_date
+        )
+        VALUES (
+        #{title},
+        #{creator.userId},
+        #{product.productId},
+        #{parent.qnaId},
+        now()
+        )
+    </insert>
+
+    <update id="update" parameterType="com.supshop.suppingmall.product.QnA">
+        UPDATE QNA SET
+        title = #{title},
+        user_id = #{creator.userId},
+        product_id =#{product.productId},
+        reply_id = #{reply.qnaId}
+        WHERE qna_id = #{qnaId}
+    </update>
+
+
+</mapper>
+
