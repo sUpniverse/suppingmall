@@ -3,7 +3,7 @@ package com.supshop.suppingmall.user;
 import com.supshop.suppingmall.common.TokenGenerator;
 import com.supshop.suppingmall.event.EventType;
 import com.supshop.suppingmall.mapper.UserMapper;
-import com.supshop.suppingmall.page.BoardCriteria;
+import com.supshop.suppingmall.page.ThirtyItemsCriteria;
 import com.supshop.suppingmall.event.UserEvent;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -29,12 +29,12 @@ public class UserService implements UserDetailsService {
     private final ModelMapper modelMapper;
     private final ApplicationEventPublisher eventPublisher;
 
-    public List<User> getAllUser(BoardCriteria boardCriteria, String type, String searchValue) {
-        return userMapper.selectAllUser(boardCriteria,type,searchValue);
+    public List<User> getAllUser(ThirtyItemsCriteria thirtyItemsCriteria, String type, String searchValue) {
+        return userMapper.selectAllUser(thirtyItemsCriteria,type,searchValue);
     }
 
-    public List<User> getApplySellerUsers(BoardCriteria boardCriteria) {
-        return userMapper.findApplySeller(boardCriteria);
+    public List<User> getApplySellerUsers(ThirtyItemsCriteria thirtyItemsCriteria) {
+        return userMapper.findApplySeller(thirtyItemsCriteria);
     }
 
 

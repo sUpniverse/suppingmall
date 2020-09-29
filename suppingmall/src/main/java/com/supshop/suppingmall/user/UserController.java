@@ -1,7 +1,7 @@
 package com.supshop.suppingmall.user;
 
 import com.supshop.suppingmall.common.UserUtils;
-import com.supshop.suppingmall.page.BoardCriteria;
+import com.supshop.suppingmall.page.ThirtyItemsCriteria;
 import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.user.Form.*;
 import lombok.RequiredArgsConstructor;
@@ -51,12 +51,12 @@ public class UserController {
 
     @GetMapping("")
     public String getAllUser(Model model,
-                             BoardCriteria boardCriteria,
+                             ThirtyItemsCriteria thirtyItemsCriteria,
                              @RequestParam(required = false) String type,
                              @RequestParam(required = false) String searchValue) {
 
-        model.addAttribute(userService.getAllUser(boardCriteria,type,searchValue));
-        PageMaker pageMaker = new PageMaker(userService.getUserCount(type,searchValue),pagingCount,boardCriteria);
+        model.addAttribute(userService.getAllUser(thirtyItemsCriteria,type,searchValue));
+        PageMaker pageMaker = new PageMaker(userService.getUserCount(type,searchValue),pagingCount, thirtyItemsCriteria);
         model.addAttribute("pageMaker", pageMaker);
         return "/user/list";
     }

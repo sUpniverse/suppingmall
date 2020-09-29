@@ -14,11 +14,12 @@
             <result property="name" column="ProductName" />
             <result property="price" column="ProductPrice" />
             <result property="thumbnail" column="ProductThumbnail" />
-            <association property="seller" javaType="com.supshop.suppingmall.user.User">
-                <id property="userId" column="UserId" />
+            <association property="seller" javaType="com.supshop.suppingmall.user.User" >
+                <id property="userId" column="SellerId" />
                 <association property="storeVO" javaType="com.supshop.suppingmall.user.StoreVO">
                     <result property="storeName" column="StoreName" />
                     <result property="storePhoneNumber" column="StorePhoneNumber" />
+                    <result property="storeZipCode" column="StoreZipCode" />
                     <result property="storeAddress" column="StoreAddress" />
                     <result property="storeAddressDetail" column="StoreAddressDetail" />
                 </association>

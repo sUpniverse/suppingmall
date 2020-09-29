@@ -21,6 +21,4 @@ public interface BoardMapper {
     int selectBoardCount(Long categoryId, String type, String searchValue);
 
     void updateBoardHit(Long id);
-
-    List<Board> findBoardsByProductId(Long productId,Long categoryId);
 }

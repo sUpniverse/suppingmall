@@ -95,10 +95,10 @@
     </div>
     <div class="py-3 text-center">
         <button class="btn btn-default border" type="button">쇼핑 홈 가기</button>
-        <button class="btn btn-success" type="button">주문하기</button>
+        <button class="btn btn-success" id="order" type="button">주문하기</button>
     </div>
 </div>
-<footer class="cusFooter" th:replace="fragments/footer :: footer" />
+<footer th:include="fragments/footer :: footer" />
 </body>
 <script th:inline="javascript">
 
@@ -159,27 +159,54 @@
 
         $(document).on('click','#removeProduct',function () {
 
-            $('.table').find('input:checkbox').not('#th_checkAll').each(function() {
-                if($(this).prop('checked') === true) {
-                    var idx = $(this).prop('value');
-                    console.log(idx);
-                    // $.ajax({
-                    //     url: '/cart/'+idx,
-                    //     type: 'delete',
-                    //     contentType: 'application/json',
-                    //     success: ()=> {
-                    //         $('.table').find('body > div.container.mt-5 > table > tbody > tr:nth-child(idx+1)').remove();
-                    //     },
-                    //     error: ()=> {
-                    //
-                    //     }
-                    // });
+            // $.ajax({
+            //     url: '/cart/'+idx,
+            //     type: 'delete',
+            //     contentType: 'application/json',
+            //     success: ()=> {
+            //         $('.table').find('body > div.container.mt-5 > table > tbody > tr:nth-child(idx+1)').remove();
+            //     },
+            //     error: ()=> {
+            //
+            //     }
+            // });
 
-                }
-            });
 
         });
 
+
+        $(document).on('click','#order',function () {
+
+            // $.ajax({
+            //     url: '/cart/'+idx,
+            //     type: 'delete',
+            //     contentType: 'application/json',
+            //     success: ()=> {
+            //         $('.table').find('body > div.container.mt-5 > table > tbody > tr:nth-child(idx+1)').remove();
+            //     },
+            //     error: ()=> {
+            //
+            //     }
+            // });
+
+        });
+
+
+        function getSelectedItems() {
+
+            $('.table').find('input:checkbox').not('#th_checkAll').each(function() {
+
+                if($(this).prop('checked') === true) {
+                    var idx = $(this).prop('value');
+                    console.log(idx);
+                }
+
+            });
+
+        }
+
     });
+
+
 </script>
 </html>

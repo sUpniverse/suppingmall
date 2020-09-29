@@ -7,7 +7,7 @@ import com.supshop.suppingmall.mapper.OrderItemMapper;
 import com.supshop.suppingmall.mapper.OrderMapper;
 import com.supshop.suppingmall.order.Form.OrderForm;
 import com.supshop.suppingmall.order.Form.TempOrderForm;
-import com.supshop.suppingmall.page.OrderCriteria;
+import com.supshop.suppingmall.page.TenItemsCriteria;
 import com.supshop.suppingmall.payModule.ModuleController;
 import com.supshop.suppingmall.payment.Payment;
 import com.supshop.suppingmall.payment.PaymentService;
@@ -52,7 +52,7 @@ public class OrderService {
         return orderMapper.findCount(type, id);
     }
 
-    public List<Orders> findOrders(LocalDate fromDate, LocalDate toDate,Orders.OrderStatus orderStatus, OrderCriteria criteria) {
+    public List<Orders> findOrders(LocalDate fromDate, LocalDate toDate,Orders.OrderStatus orderStatus, TenItemsCriteria criteria) {
         LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
         LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
 
@@ -79,7 +79,7 @@ public class OrderService {
     }
 
     //판매자의 관점에서 주문을 조회
-    public List<Orders> findOrderBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Delivery.DeliveryStatus deliveryStatus, Orders.OrderStatus orderStatus, OrderCriteria criteria) {
+    public List<Orders> findOrderBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Delivery.DeliveryStatus deliveryStatus, Orders.OrderStatus orderStatus, TenItemsCriteria criteria) {
         LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
         LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
 
@@ -261,7 +261,7 @@ public class OrderService {
     public Orders createOrder(TempOrderForm tempOrderForm) {
 
         //임시 주문 생성
-        Orders orders = this.setTempOrder(tempOrderForm);
+        Orders orders = setTempOrder(tempOrderForm);
         orderMapper.save(orders);
 
         //주문상품 생성
@@ -281,8 +281,9 @@ public class OrderService {
 
         // 1. 상품조회
         Product product = productService.getProduct(tempOrderForm.getProductId());
+
         // 2. 주문생성
-        List<OrderItem> orderItems = this.setOrderItemsInfo(tempOrderForm, product);
+        List<OrderItem> orderItems = setOrderItemsInfo(tempOrderForm,product);
 
         // 3. 주문자 및 구매자 정보 조회
         User buyer = userService.getUser(tempOrderForm.getBuyerId());
@@ -300,6 +301,7 @@ public class OrderService {
      * @return List<OrderItem>
      */
     private List<OrderItem> setOrderItemsInfo(TempOrderForm tempOrderForm, Product product){
+
         List<OrderItem> orderItems = tempOrderForm.getOrderItems();
         for (OrderItem orderItem : orderItems) {
             int optionId = orderItem.getProductOption().getOptionId();

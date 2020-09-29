@@ -43,8 +43,7 @@
                             </td>
                             <td class="text-center" th:text="${board.creator.nickName}" />
                             <td class="text-center" th:text="${board.hit}"/>
-<!--                            <td th:text="${#temporals.format(board.createdDate,'yyyy-MM-dd HH:mm:ss')}" />-->
-                            <td  th:text="${#temporals.format(board.createdDate,'yyyy-MM-dd') == #dates.format(#dates.createToday(),'yyyy-MM-dd')? #temporals.format(board.createdDate,'HH:mm') : #temporals.format(board.createdDate,'MM-dd')}" />
+                            <td th:text="${#temporals.format(board.createdDate,'yyyy-MM-dd') == #dates.format(#dates.createToday(),'yyyy-MM-dd')? #temporals.format(board.createdDate,'HH:mm') : #temporals.format(board.createdDate,'MM-dd')}" />
                         </tr>
                         </tbody>
                     </table>

@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,7 +57,7 @@ public class OrdersServiceTest {
     @Transactional
     public void createTempOrder(){
         //given
-        User tester = userFactory.createAdmin("tester");
+        User tester = userFactory.createUser("tester");
         TempOrderForm tempOrderForm = orderFactory.buildTempOrderForm(tester);
 
         //when
@@ -73,6 +74,8 @@ public class OrdersServiceTest {
             assertThat(orderNewItem.getOrderItems().get(i).getProductOption().getOptionId()).isEqualTo(tempOrder.getOrderItems().get(i).getProductOption().getOptionId());
         }
     }
+
+
 
     // 임시주문 -> 주문완료 테스트
     @Test

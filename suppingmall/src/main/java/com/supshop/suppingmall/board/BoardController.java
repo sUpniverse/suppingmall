@@ -4,7 +4,7 @@ import com.supshop.suppingmall.board.form.BoardCreateForm;
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryService;
 import com.supshop.suppingmall.common.UserUtils;
-import com.supshop.suppingmall.page.BoardCriteria;
+import com.supshop.suppingmall.page.ThirtyItemsCriteria;
 import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +31,7 @@ public class BoardController {
     private static final int boardDisplayPagingNum = 5;
 
     @GetMapping("/form")
-    public String form(@RequestParam(required = false) Long categoryId,
-                       Model model) {
+    public String form(Model model) {
         log.debug("'form'가 실행됨");
         List<Category> child = categoryService.getCategoryToGrandChildren(boardCategoryId).getChild();
         model.addAttribute("categories",child);
@@ -41,7 +40,7 @@ public class BoardController {
 
     @GetMapping("")
     public String getAllBoard(Model model,
-                              BoardCriteria boardCriteria,
+                              ThirtyItemsCriteria thirtyItemsCriteria,
                               @RequestParam(required = false) Long categoryId,
                               @RequestParam(required = false) String type,
                               @RequestParam(required = false) String searchValue) {
@@ -50,8 +49,8 @@ public class BoardController {
         if(categoryId == null) categoryId = boardCategoryId;
 
         int boardCount = boardService.getBoardCount(categoryId, type, searchValue);
-        PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum,boardCriteria);
-        List<Board> boards = boardService.getBoards(boardCriteria, categoryId, type, searchValue);
+        PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum, thirtyItemsCriteria);
+        List<Board> boards = boardService.getBoards(thirtyItemsCriteria, categoryId, type, searchValue);
         Category category = categoryService.getCategory(categoryId);
 
         model.addAttribute("boardList",boards);
@@ -60,14 +59,14 @@ public class BoardController {
         model.addAttribute("category", category);
         model.addAttribute("type", type);
         model.addAttribute("searchValue", searchValue);
-        model.addAttribute("pageNum", boardCriteria.getPage());
+        model.addAttribute("pageNum", thirtyItemsCriteria.getPage());
 
         return "/board/list";
     }
 
     @GetMapping("/{id}")
     public String getBoard(@PathVariable Long id,
-                           BoardCriteria boardCriteria,
+                           ThirtyItemsCriteria thirtyItemsCriteria,
                            Model model,
                            @RequestParam(required = false) Long categoryId,
                            @RequestParam(required = false) String type,
@@ -80,9 +79,9 @@ public class BoardController {
         }
         if(categoryId == null) categoryId = boardCategoryId;
 
-        List<Board> boards = boardService.getBoards(boardCriteria, board.getCategory().getId(), type, searchValue);
+        List<Board> boards = boardService.getBoards(thirtyItemsCriteria, board.getCategory().getId(), type, searchValue);
         int boardCount = boardService.getBoardCount(categoryId, type, searchValue);
-        PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum,boardCriteria);
+        PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum, thirtyItemsCriteria);
 
         model.addAttribute("boardList",boards);
         model.addAttribute("board",board);
@@ -91,7 +90,7 @@ public class BoardController {
         model.addAttribute("category", board.getCategory());
         model.addAttribute("type", type);
         model.addAttribute("searchValue", searchValue);
-        model.addAttribute("pageNum", boardCriteria.getPage());
+        model.addAttribute("pageNum", thirtyItemsCriteria.getPage());
 
         return "/board/board";
     }

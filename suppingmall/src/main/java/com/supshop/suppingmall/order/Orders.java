@@ -34,7 +34,7 @@ public class Orders {
         WAIT("결제대기","O000"),
         ORDER("주문완료","O001"),
         DELIVERY("배송","O002"),
-        COMPLETE("구매완료","O003"),
+        COMPLETE("구매확정","O003"),
         CANCEL("구매취소","O004"),
         REFUND("반품접수","O005"),
         CHANGE("교환접수","O006");

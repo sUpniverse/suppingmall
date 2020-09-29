@@ -46,7 +46,7 @@
         FROM User AS U
         <include refid="conditionalSearch"></include>
         ORDER BY U.user_id asc
-        limit #{boardCriteria.pageStart}, #{boardCriteria.perPageNum}
+        limit #{thirtyItemsCriteria.pageStart}, #{thirtyItemsCriteria.perPageNum}
     </select>
 
     <sql id="conditionalSearch">

@@ -1,11 +1,11 @@
 package com.supshop.suppingmall.page;
 
-public class BoardCriteria extends Criteria{
+public class ThirtyItemsCriteria extends Criteria{
 
-    private static final int boardPerPageNum = 30;
+    private static final int PerPageNum = 30;
 
-    public BoardCriteria() {
-        super(boardPerPageNum);
+    public ThirtyItemsCriteria() {
+        super(PerPageNum);
     }
 
     @Override

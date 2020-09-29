@@ -1,15 +1,13 @@
 package com.supshop.suppingmall.user;
 
 import com.supshop.suppingmall.common.UserUtils;
-import com.supshop.suppingmall.page.BoardCriteria;
+import com.supshop.suppingmall.page.ThirtyItemsCriteria;
 import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.user.Form.ApplySellerForm;
 import com.supshop.suppingmall.user.Form.PasswordCheckForm;
 import com.supshop.suppingmall.user.Form.UpdateSellerForm;
-import com.supshop.suppingmall.user.Form.UpdateUserForm;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -17,7 +15,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RequestMapping("/users/seller")
@@ -100,14 +97,14 @@ public class SellerController {
     }
 
     @GetMapping("/applicants")
-    public String getApplySeller(BoardCriteria boardCriteria,
+    public String getApplySeller(ThirtyItemsCriteria thirtyItemsCriteria,
                                  Model model,
                                  @AuthenticationPrincipal SessionUser sessionUser) {
 
         if(UserUtils.isAdmin(sessionUser)) {
 
-            List<User> applySellerUsers = userService.getApplySellerUsers(boardCriteria);
-            PageMaker pageMaker = new PageMaker(applySellerUsers.size(),pagingCount,boardCriteria);
+            List<User> applySellerUsers = userService.getApplySellerUsers(thirtyItemsCriteria);
+            PageMaker pageMaker = new PageMaker(applySellerUsers.size(),pagingCount, thirtyItemsCriteria);
 
             model.addAttribute("userList",applySellerUsers);
             model.addAttribute("pageMaker", pageMaker);

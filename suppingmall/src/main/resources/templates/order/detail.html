@@ -18,7 +18,7 @@
 </head>
 <body>
 <header th:replace="product/product-nav-dark :: product-nav-dark" />
-<div class="container-fluid  mt-5">
+<div class="container-fluid p-5">
     <div>
         <h3>배송/주문상세정보</h3>
     </div>
@@ -40,11 +40,11 @@
                     <td class="text-center align-middle" th:text="${item.orderItemId}"></td>
                     <td>
                         <div class="row">
-                            <a th:href="@{'/orders/'+${order.orderId}}">
+                            <a th:href="@{'/products/'+${item.product.productId}}">
                                 <img th:src="${item.product.thumbnail}" style="width: 90px; height: 90px">
                             </a>
                             <div class="ml-3">
-                                <a th:href="@{'/orders/'+${order.orderId}}" th:text="${item.product.name}" class="text-dark" style="font-size: 16px">
+                                <a th:href="@{'/products/'+${item.product.productId}}" th:text="${item.product.name}" class="text-dark" style="font-size: 16px">
                                 </a>
                                 <br>
                                 <span class="text-muted" th:text="@{'옵션명 : '+${item.productOption.optionName}}" style="font-size: 13px"></span>
@@ -209,6 +209,6 @@
         <a class="btn btn-info" href="/orders/main">목록</a>
     </div>
 </div>
-<footer th:replace="fragments/footer :: footer" />
+<footer th:include="fragments/footer :: footer" />
 </body>
 </html>

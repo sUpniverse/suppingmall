@@ -30,18 +30,22 @@ public class OrderFactory {
     @Autowired private ProductFactory productFactory;
 
 
-    private Product setUpTest() {
+    private Product setUpTest(String productName) {
         User seller = userFactory.createSeller("seller");
         seller.setCreatedDate(null);
-        Product apple = productFactory.createProduct("apple", seller);
-        return apple;
+
+        Product product = productFactory.createProduct(productName, seller);
+
+        return product;
     }
 
 
-    // 임시주문을 위한 form을 return, 구매할 물품들의 정보와 갯수 가격등을 포함함
+    // 임시주문을 위한 form을 return, 구매할 물품들의 정보와 갯수 가격등을 포함함 , 물품 페이지에서 단일 물품을 구매할 때
     public TempOrderForm buildTempOrderForm(User user){
+        Product product = setUpTest("notebook");
+
         List<OrderItem> orderItems = new ArrayList<>();
-        Product product = setUpTest();
+
         int count = 2;
         OrderItem orderItem = OrderItem.builder()
                 .product(product)
@@ -52,15 +56,52 @@ public class OrderFactory {
         orderItems.add(orderItem);
 
         TempOrderForm tempOrderForm = new TempOrderForm();
-        tempOrderForm.setBuyerId(user.getUserId());
 
+        tempOrderForm.setBuyerId(user.getUserId());
         tempOrderForm.setSellerId(product.getSeller().getUserId());
         tempOrderForm.setProductId(product.getProductId());
         tempOrderForm.setOrderItems(orderItems);
 
 
+
         return tempOrderForm;
     }
+
+    // 임시주문을 위한 form을 return, 구매할 물품들의 정보와 갯수 가격등을 포함함 , 물품 페이지에서 다중 물품을 구매할 때
+    public TempOrderForm buildTempOrderFormWithTwoProducts(User user){
+        Product product = setUpTest("notebook");
+        Product product2 = setUpTest("tablet");
+
+        List<OrderItem> orderItems = new ArrayList<>();
+
+        int count = 2;
+        OrderItem orderItem = OrderItem.builder()
+                .product(product)
+                .productOption(product.getOptions().get(0))
+                .count(count)
+                .price(product.getOptions().get(0).getPrice())
+                .build();
+        orderItems.add(orderItem);
+
+        OrderItem orderItem2 = OrderItem.builder()
+                .product(product2)
+                .productOption(product.getOptions().get(0))
+                .count(count)
+                .price(product.getOptions().get(0).getPrice())
+                .build();
+        orderItems.add(orderItem2);
+
+
+        TempOrderForm tempOrderForm = new TempOrderForm();
+
+        tempOrderForm.setBuyerId(user.getUserId());
+        tempOrderForm.setSellerId(product.getSeller().getUserId());
+        tempOrderForm.setProductId(product.getProductId());
+        tempOrderForm.setOrderItems(orderItems);
+
+        return tempOrderForm;
+    }
+
 
     //임시주문을 가져와 배송정보와 결제정보등을 담은 form 상태 반환함
     public OrderForm buildOrderForm() {

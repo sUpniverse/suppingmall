@@ -50,14 +50,6 @@ public class BoardService {
         return null;
     }
 
-    public Board getBoardByProduct(Long id) {
-        Optional<Board> board = boardMapper.findOne(id);
-        if(!board.isEmpty()) {
-            return board.get();
-        }
-        return null;
-    }
-
     @Transactional
     public void createBoard(Board board, Set<String> urls) {
         int imageCount = urls.size();
@@ -94,8 +86,4 @@ public class BoardService {
         boardMapper.deleteBoard(id);
     }
 
-    public List<Board> getBoardsByProduct(Long productId,Long categoryId) {
-        List<Board> boards = boardMapper.findBoardsByProductId(productId,categoryId);
-        return boards;
-    }
 }

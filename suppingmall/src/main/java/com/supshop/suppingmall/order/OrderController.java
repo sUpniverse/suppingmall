@@ -4,7 +4,7 @@ import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.order.Form.OrderForm;
 import com.supshop.suppingmall.order.Form.TempOrderForm;
-import com.supshop.suppingmall.page.OrderCriteria;
+import com.supshop.suppingmall.page.TenItemsCriteria;
 import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.user.Role;
 import com.supshop.suppingmall.user.SessionUser;
@@ -98,7 +98,7 @@ public class OrderController {
                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
                             @RequestParam(required = false) Orders.OrderStatus orderStatus,
                             @AuthenticationPrincipal SessionUser user,
-                            OrderCriteria criteria,
+                            TenItemsCriteria criteria,
                             Model model) {
 
 
@@ -168,7 +168,7 @@ public class OrderController {
                                      @RequestParam(required = false) Delivery.DeliveryStatus deliveryStatus,
                                      @RequestParam(required = false) Orders.OrderStatus orderStatus,
                                      @AuthenticationPrincipal SessionUser user,
-                                     OrderCriteria criteria,
+                                     TenItemsCriteria criteria,
                                      Model model) {
 
 
@@ -192,7 +192,7 @@ public class OrderController {
 
 
         model.addAttribute("status",Arrays.asList(wait,delivery,complete,change));
-        model.addAttribute("statusList", Arrays.asList(Delivery.DeliveryStatus.values()));
+        model.addAttribute("statusList", Delivery.DeliveryStatus.values());
 
         return "/order/seller/list";
     }

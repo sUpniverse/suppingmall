@@ -67,10 +67,22 @@
                     <div class="col-md-auto text-center align-items-center">
                         <span th:text="${order.seller.storeVO?.storeName}"></span>
                         <br>
-                        <span th:text="${order.seller.storeVO?.storePhoneNumber}"></span>
+                        <span class="text-muted" th:text="${order.seller.storeVO?.storePhoneNumber}"></span>
                     </div>
-                    <div class="col col-lg-2  d-flex align-items-center">
-                        <a class="form-control text-center" th:href="@{'/products/'+${order.orderItems[0].product.productId}}" th:text="재구매"></a>
+                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(order.delivery.status,'WAIT')}">
+                        <a class="form-control text-center" th:href="@{'/orders/'+${order.orderId}+'/cancelForm'}" th:text="구매취소"></a>
+                    </div>
+                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(order.delivery.status,'DELIVERY')}">
+                        <a class="form-control text-center" th:href="@{'/products/'+${order.orderId}+'/'}" th:text="교환요청"></a>
+                        <a class="form-control text-center" th:href="@{'/orders/'+${order.orderId}+'/refundForm'}" th:text="환불요청"></a>
+                        <a class="form-control text-center" th:href="@{'/products/'+${order.orderId}+'/complete'}" th:text="구매확정"></a>
+                    </div>
+                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(order.delivery.status,'COMPLTE')}">
+                        <a class="form-control text-center" th:href="@{'/products/'+${order.orderItems[0].product.productId}+'/review'}" th:text="리뷰작성"></a>
+                        <a class="form-control text-center" th:href="@{'/products/'+${order.orderItems[0].product.productId}+'/reorder'}" th:text="재구매"></a>
+                    </div>
+                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(order.delivery.status,'REFUND') and #strings.equals(order.delivery.status,'CHANGE')}">
+
                     </div>
                 </li>
             </ul>
