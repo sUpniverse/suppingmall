@@ -3,11 +3,11 @@ package com.supshop.suppingmall.page;
 import lombok.Getter;
 
 @Getter
-public class ProductCriteria extends Criteria {
+public class EightItemsCriteria extends Criteria {
 
     private static final int productPerPageNum = 8;
 
-    public ProductCriteria() {
+    public EightItemsCriteria() {
         super(productPerPageNum);
     }
 

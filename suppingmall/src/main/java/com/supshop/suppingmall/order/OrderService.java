@@ -5,8 +5,8 @@ import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.delivery.DeliveryService;
 import com.supshop.suppingmall.mapper.OrderItemMapper;
 import com.supshop.suppingmall.mapper.OrderMapper;
-import com.supshop.suppingmall.order.Form.OrderForm;
-import com.supshop.suppingmall.order.Form.TempOrderForm;
+import com.supshop.suppingmall.order.form.OrderForm;
+import com.supshop.suppingmall.order.form.TempOrderForm;
 import com.supshop.suppingmall.page.TenItemsCriteria;
 import com.supshop.suppingmall.payModule.ModuleController;
 import com.supshop.suppingmall.payment.Payment;
@@ -37,9 +37,10 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private final ProductService productService;
     private final UserService userService;
-    private final OrderItemMapper orderItemMapper;
     private final PaymentService paymentService;
     private final DeliveryService deliveryService;
+    private final OrderItemService orderItemService;
+
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
     private final ModuleController moduleController;
@@ -52,7 +53,7 @@ public class OrderService {
         return orderMapper.findCount(type, id);
     }
 
-    public List<Orders> findOrders(LocalDate fromDate, LocalDate toDate,Orders.OrderStatus orderStatus, TenItemsCriteria criteria) {
+    public List<Orders> getOrderList(LocalDate fromDate, LocalDate toDate, Orders.OrderStatus orderStatus, TenItemsCriteria criteria) {
         LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
         LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
 
@@ -62,14 +63,13 @@ public class OrderService {
         return ordersList;
     }
 
-    @Transactional
-    public Orders findOrder(Long orderId) {
+    public Orders getOrder(Long orderId) {
         Optional<Orders> order = orderMapper.findOne(orderId);
         return order.orElseThrow(NoSuchElementException::new);
     }
 
     //구매자의 관점에서 주문을 조회
-    public List<Orders> findOrderByBuyerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Orders.OrderStatus status) {
+    public List<Orders> getOrderByBuyerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Orders.OrderStatus status) {
         LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
         LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
         //code : orderStatus Value
@@ -79,7 +79,7 @@ public class OrderService {
     }
 
     //판매자의 관점에서 주문을 조회
-    public List<Orders> findOrderBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Delivery.DeliveryStatus deliveryStatus, Orders.OrderStatus orderStatus, TenItemsCriteria criteria) {
+    public List<Orders> getOrderBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Delivery.DeliveryStatus deliveryStatus, Orders.OrderStatus orderStatus, TenItemsCriteria criteria) {
         LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
         LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
 
@@ -94,28 +94,85 @@ public class OrderService {
         return ordersList;
     }
 
-    public Orders findOrderByDeliveryId(Long deliveryId) {
+    public Orders getOrderByDeliveryId(Long deliveryId) {
         return orderMapper.findOneByDeliveryId(deliveryId);
+    }
+
+    /**
+     * 임시 주문 상태로 DB에 데이터 생성
+     * @param tempOrderForm
+     * @return orders
+     */
+    @Transactional
+    public Orders createOrder(TempOrderForm tempOrderForm) {
+
+        //임시 주문 생성
+        Orders orders = setTempOrder(tempOrderForm);
+        orderMapper.save(orders);
+
+        //주문상품 생성
+        for(OrderItem orderItem : orders.getOrderItems()) {
+            orderItem.setOrders(orders);
+        }
+        orderItemService.saveList(orders.getOrderItems());
+        return orders;
+    }
+
+    /**
+     * 임시 주문 생성을 위한 정보 셋팅
+     * @param tempOrderForm
+     * @return Order
+     */
+    private Orders setTempOrder(TempOrderForm tempOrderForm) {
+
+        // 1. 상품조회
+        Product product = productService.getProduct(tempOrderForm.getProductId());
+
+        // 2. 주문생성
+        List<OrderItem> orderItems = setOrderItemsInfo(tempOrderForm,product);
+
+        // 3. 주문자 및 구매자 정보 조회
+        User buyer = userService.getUser(tempOrderForm.getBuyerId());
+        User seller = userService.getUser(tempOrderForm.getSellerId());
+
+        //임시 주문 생성 (주문상품, 구매자, 판매자)
+        Orders tempOrder = Orders.buildTempOrder(orderItems,buyer,seller);
+
+        return tempOrder;
+    }
+
+    /**
+     * 가져온 상품정보를 이용해 상품 옵션의 필요내용 설정
+     * @param tempOrderForm
+     * @return List<OrderItem>
+     */
+    private List<OrderItem> setOrderItemsInfo(TempOrderForm tempOrderForm, Product product){
+
+        List<OrderItem> orderItems = tempOrderForm.getOrderItems();
+        for (OrderItem orderItem : orderItems) {
+            int optionId = orderItem.getProductOption().getOptionId();
+            orderItem.setProductOption(product.getOptions().get(optionId - 1));
+            orderItem.setProduct(product);
+        }
+        return orderItems;
     }
 
     @Transactional
     public Long order(Orders order) {
-
-        //임시 주문상태를 실제 주문 상태로 변경
-        order.setStatus(Orders.OrderStatus.DELIVERY);
-
-        //결제 내용 추가
-        Payment payment = order.getPayment();
-        Long paymentId = paymentService.save(payment);
-
-        //배송 내용 추가
-        Delivery delivery = order.getDelivery();
-        delivery.setStatus(Delivery.DeliveryStatus.WAIT);
-        Long deliveryId = deliveryService.save(delivery);
-
-        //상품 수량 변경
-        List<OrderItem> orderItemList = order.getOrderItems();
+        List<OrderItem> orderItems = order.getOrderItems();
         List<ProductOption> productOptionList = new ArrayList<>();
+
+        for(OrderItem orderItem : orderItems) {
+            //임시 주문상태를 실제 주문 상태로 변경
+            orderItem.setStatus(Orders.OrderStatus.DELIVERY);
+
+            //상품 수량 변경
+            ProductOption productOption = orderItem.getProductOption();
+            productOption.removeStock(orderItem.getCount());
+            productOptionList.add(productOption);
+        }
+
+        List<OrderItem> orderItemList = order.getOrderItems();
         for(OrderItem orderItem : orderItemList) {
             ProductOption productOption = orderItem.getProductOption();
             productOption.removeStock(orderItem.getCount());
@@ -125,24 +182,13 @@ public class OrderService {
         productService.updateProductOption(productOptionList);
 
         //주문상태 변경, 결제, 배송 내용 수정
-        orderMapper.updateOrder(order.getOrderId(),order.getStatus(),deliveryId,paymentId);
+        orderItemService.updateOrderItemList(orderItems);
 
         return order.getOrderId();
     }
 
-    public Orders getOrderInForm(OrderForm orderForm) throws Exception {
-        Orders orders = orderMapper.findOne(orderForm.getOrderId()).orElseThrow(Exception::new);
-        orders.setPayment(orderForm.getPayment());
-        orders.setDelivery(orderForm.getDelivery());
-        return orders;
-    }
-
-    private void updateOrderStatus(Long orderId, Orders.OrderStatus orderStatus) {
-        orderMapper.updateOrder(orderId, orderStatus, null, null);
-    }
-
     //상품 교환 or 환불 시 상태변경 및 택배 요청
-    @Transactional
+    /*@Transactional
     public Long updateOrderByRefundOrChangeRequest(Long orderId, Orders.OrderStatus orderStatus) {
         Optional<Orders> one = orderMapper.findOne(orderId);
         //Todo : not found exception 처리로 수정
@@ -158,9 +204,9 @@ public class OrderService {
         //Todo : 택배사에게 수거 요청 (to, from)
         deliveryService.update(delivery);
         //Todo : 캡슐화
-        updateOrderStatus(orderId, orderStatus);
+//        updateOrderStatus(orderId, orderStatus);
         return orderId;
-    }
+    }*/
 
     /*
     //상품환불 확정 시
@@ -210,14 +256,14 @@ public class OrderService {
     */
 
     //주문 취소 (제품 보내기 전 결제 취소 시)
-    @Transactional
+    /*@Transactional
     public Long cancelOrder(Long orderId) {
 
         // 주문 가져오기
         Orders order = orderMapper.findOne(orderId).get();
 
         //결제 취소
-        Long paymentId = order.getPayment().getPaymentId();
+//        Long paymentId = order.getPayment().getPaymentId();
         Payment payment = paymentService.findPayment(paymentId);
         String vendorCheckNumber = payment.getVendorCheckNumber();
 
@@ -250,83 +296,11 @@ public class OrderService {
         productService.updateProductOption(productOptionList);
 
         //주문상태 수정
-        orderMapper.updateOrder(order.getOrderId(), order.getStatus(),null,null);
+        orderMapper.updateOrder(order.getOrderId());
 
         // 결제 취소
         return order.getOrderId();
-    }
-
-    // 임시 주문 상태로 DB에 데이터 생성
-    @Transactional
-    public Orders createOrder(TempOrderForm tempOrderForm) {
-
-        //임시 주문 생성
-        Orders orders = setTempOrder(tempOrderForm);
-        orderMapper.save(orders);
-
-        //주문상품 생성
-        for(OrderItem orderItem : orders.getOrderItems()) {
-            orderItem.setOrders(orders);
-        }
-        orderItemMapper.saveList(orders.getOrderItems());
-        return orders;
-    }
-
-    /**
-     * 임시 주문 생성을 위한 정보 셋팅
-     * @param tempOrderForm
-     * @return Order
-     */
-    private Orders setTempOrder(TempOrderForm tempOrderForm) {
-
-        // 1. 상품조회
-        Product product = productService.getProduct(tempOrderForm.getProductId());
-
-        // 2. 주문생성
-        List<OrderItem> orderItems = setOrderItemsInfo(tempOrderForm,product);
-
-        // 3. 주문자 및 구매자 정보 조회
-        User buyer = userService.getUser(tempOrderForm.getBuyerId());
-        User seller = userService.getUser(tempOrderForm.getSellerId());
-
-        //임시 주문 생성 (주문상품, 구매자, 판매자)
-        Orders tempOrder = Orders.createTempOrder(orderItems,buyer,seller);
-
-        return tempOrder;
-    }
-
-    /**
-     * 가져온 상품정보를 이용해 상품 옵션의 필요내용 설정
-     * @param tempOrderForm
-     * @return List<OrderItem>
-     */
-    private List<OrderItem> setOrderItemsInfo(TempOrderForm tempOrderForm, Product product){
-
-        List<OrderItem> orderItems = tempOrderForm.getOrderItems();
-        for (OrderItem orderItem : orderItems) {
-            int optionId = orderItem.getProductOption().getOptionId();
-            orderItem.setProductOption(product.getOptions().get(optionId - 1));
-            orderItem.setProduct(product);
-        }
-        return orderItems;
-    }
-
-//    /**
-//     * Json To OrderItem List
-//     * @param orderItems
-//     * @return List<OrderItem>
-//     */
-//    private List<OrderItem> setJsonToOrderItem(String orderItems) {
-//        List<OrderItem> items = null;
-//
-//        try {
-//            items = Arrays.asList(objectMapper.readValue(orderItems, OrderItem[].class));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return items;
-//    }
-
+    }*/
 
 
 }

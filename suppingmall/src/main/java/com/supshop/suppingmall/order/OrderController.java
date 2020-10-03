@@ -2,10 +2,11 @@ package com.supshop.suppingmall.order;
 
 import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.delivery.Delivery;
-import com.supshop.suppingmall.order.Form.OrderForm;
-import com.supshop.suppingmall.order.Form.TempOrderForm;
+import com.supshop.suppingmall.order.form.OrderForm;
+import com.supshop.suppingmall.order.form.TempOrderForm;
 import com.supshop.suppingmall.page.TenItemsCriteria;
 import com.supshop.suppingmall.page.PageMaker;
+import com.supshop.suppingmall.payment.Payment;
 import com.supshop.suppingmall.user.Role;
 import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
@@ -64,25 +65,28 @@ public class OrderController {
 
 
     @PostMapping("")
-    //Todo : REST API 형태로 변경, 결제
     public String createOrder(OrderForm orderForm,
                               @AuthenticationPrincipal SessionUser user){
 
         Orders orders = null;
         try {
-            orders = orderService.getOrderInForm(orderForm);
+            orders = orderService.getOrder(orderForm.getOrderId());
+
+            // 주문자와 현재 세션의 유저가 같지 않은지 && 이미 주문이 완료된 주문인지
+            if(!UserUtils.isOwner(orders.getOrderItems().get(0).getBuyer().getUserId(),user) && orders.getStatus().equals(Orders.OrderStatus.ORDER)) {
+                return "/order/fail";
+            }
+
+            for (OrderItem orderItem : orders.getOrderItems()) {
+                for (Payment payment : orderForm.getPayment()) {
+                    orderItem.setPayment(payment);
+                    orderItem.setDelivery(orderForm.getDelivery());
+                }
+            }
+            orderService.order(orders);
+
         } catch (Exception e) {
             // 주문 실패
-            return "/order/fail";
-        }
-        // 주문자와 현재 세션의 유저가 같지 않은지 && 이미 주문이 완료된 주문인지
-        if(!UserUtils.isOwner(orders.getBuyer().getUserId(),user) && !orders.getStatus().equals(Orders.OrderStatus.WAIT)) {
-            return "/order/fail";
-        }
-
-        try {
-            orderService.order(orders);
-        } catch (Exception e){
             // Todo : 주문의 실패 혹은 상품수량의 부족등 여러 가지 이유를 세분화 해서 에러처리
             return "/order/fail";
         }
@@ -104,7 +108,7 @@ public class OrderController {
 
         int count = orderService.findCount("seller", user.getUserId());
         PageMaker pageMaker = new PageMaker(count, orderDisplayPagingNum, criteria);
-        List<Orders> orders = orderService.findOrders(fromDate,toDate,orderStatus,null);
+        List<Orders> orders = orderService.getOrderList(fromDate,toDate,orderStatus,null);
 
         model.addAttribute("orders",orders);
         model.addAttribute("pageMaker",pageMaker);
@@ -117,7 +121,7 @@ public class OrderController {
     public String getOrder(@PathVariable Long id,
                            @AuthenticationPrincipal SessionUser user,
                            Model model) {
-        Orders order = orderService.findOrder(id);
+        Orders order = orderService.getOrder(id);
         model.addAttribute("order",order);
         if(user.getRole().equals(Role.SELLER)) {
             return "/order/seller/detail";
@@ -132,8 +136,8 @@ public class OrderController {
                                 @AuthenticationPrincipal SessionUser user,
                                 Model model) {
 
-        Orders order = orderService.findOrder(id);
-        if(!UserUtils.isOwner(order.getBuyer().getUserId(), user)) {
+        Orders order = orderService.getOrder(id);
+        if(!UserUtils.isOwner(order.getOrderItems().get(0).getBuyer().getUserId(), user)) {
             return "redirect:/products/";
         }
 
@@ -153,7 +157,7 @@ public class OrderController {
                                     @AuthenticationPrincipal SessionUser user,
                                     Model model) {
 
-        List<Orders> orders = orderService.findOrderByBuyerId(user.getUserId(),fromDate,toDate,type,status);
+        List<Orders> orders = orderService.getOrderByBuyerId(user.getUserId(),fromDate,toDate,type,status);
         model.addAttribute("orders",orders);
         model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.values()));
 
@@ -174,7 +178,7 @@ public class OrderController {
 
         int count = orderService.findCount("seller", user.getUserId());
         PageMaker pageMaker = new PageMaker(count, orderDisplayPagingNum, criteria);
-        List<Orders> pagingOrders = orderService.findOrderBySellerId(user.getUserId(),fromDate,toDate,type,deliveryStatus,orderStatus,criteria);
+        List<Orders> pagingOrders = orderService.getOrderBySellerId(user.getUserId(),fromDate,toDate,type,deliveryStatus,orderStatus,criteria);
 
         model.addAttribute("orders",pagingOrders);
         model.addAttribute("pageMaker",pageMaker);
@@ -185,13 +189,13 @@ public class OrderController {
             return "/order/seller/refund-list";
         }
 
-        int wait = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.WAIT)).count();
-        int delivery = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.DELIVERY)).count();
-        int complete = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.COMPLETE)).count();
-        int change = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.CHANGE)).count();
+//        int wait = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.WAIT)).count();
+//        int delivery = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.DELIVERY)).count();
+//        int complete = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.COMPLETE)).count();
+//        int change = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.CHANGE)).count();
 
 
-        model.addAttribute("status",Arrays.asList(wait,delivery,complete,change));
+//        model.addAttribute("status",Arrays.asList(wait,delivery,complete,change));
         model.addAttribute("statusList", Delivery.DeliveryStatus.values());
 
         return "/order/seller/list";
@@ -200,37 +204,37 @@ public class OrderController {
 
     @GetMapping("/{id}/seller")
     public String getOrderBySellerId(@PathVariable Long id, Model model) {
-        Orders order = orderService.findOrder(id);
+        Orders order = orderService.getOrder(id);
         model.addAttribute("order",order);
         return "/order/seller/detail";
     }
 
     @GetMapping("/{id}/cancelForm")
     public String getCancelForm(@PathVariable Long id, Model model) {
-        Orders order = orderService.findOrder(id);
+        Orders order = orderService.getOrder(id);
         model.addAttribute("order",order);
         return "/order/cancel-form";
     }
 
     @PostMapping("/{id}/cancel")
     public String cancelOrder(@PathVariable Long id, Model model) {
-        orderService.cancelOrder(id);
-        Orders order = orderService.findOrder(id);
+//        orderService.cancelOrder(id);
+        Orders order = orderService.getOrder(id);
         model.addAttribute("order",order);
         return "/order/cancel";
     }
 
     @GetMapping("/{id}/refundForm")
     public String getRefundForm(@PathVariable Long id, Model model) {
-        Orders order = orderService.findOrder(id);
+        Orders order = orderService.getOrder(id);
         model.addAttribute("order",order);
         return "/order/refund-form";
     }
 
     @PostMapping("/{id}/refund")
     public String refundOrder(@PathVariable Long id, Model model) {
-        orderService.updateOrderByRefundOrChangeRequest(id, Orders.OrderStatus.REFUND);
-        Orders order = orderService.findOrder(id);
+//        orderService.updateOrderByRefundOrChangeRequest(id, Orders.OrderStatus.REFUND);
+        Orders order = orderService.getOrder(id);
         model.addAttribute("order",order);
         return "/order/refund";
     }

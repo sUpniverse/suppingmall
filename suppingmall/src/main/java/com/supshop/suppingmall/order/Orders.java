@@ -1,8 +1,5 @@
 package com.supshop.suppingmall.order;
 
-import com.supshop.suppingmall.delivery.Delivery;
-import com.supshop.suppingmall.payment.Payment;
-import com.supshop.suppingmall.user.SessionUser;
 import com.supshop.suppingmall.user.User;
 import lombok.*;
 
@@ -20,10 +17,6 @@ public class Orders {
     private OrderStatus status;
     private LocalDateTime orderDate;
     private LocalDateTime updateDate;
-    private User buyer;
-    private User seller;
-    private Delivery delivery;
-    private Payment payment;
     private List<OrderItem> orderItems = new ArrayList<>();
 
 
@@ -53,12 +46,14 @@ public class Orders {
     }
 
     // 임시주문 생성 (결제 시스템의 식별)
-    public static Orders createTempOrder(List<OrderItem> orderItemList, User buyer, User seller) {
+    public static Orders buildTempOrder(List<OrderItem> orderItemList, User buyer, User seller) {
+        for (OrderItem orderItem : orderItemList) {
+            orderItem.setStatus(OrderStatus.WAIT);
+            orderItem.setBuyer(buyer);
+            orderItem.setSeller(seller);
+        }
         Orders orders = Orders.builder()
-                            .buyer(buyer)
-                            .seller(seller)
                             .orderItems(orderItemList)
-                            .orderDate(LocalDateTime.now())
                             .orderDate(LocalDateTime.now())
                             .status(OrderStatus.WAIT)
                             .build();

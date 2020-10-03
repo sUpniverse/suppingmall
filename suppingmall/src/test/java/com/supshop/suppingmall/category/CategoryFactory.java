@@ -13,7 +13,7 @@ public class CategoryFactory {
     @Autowired CategoryService categoryService;
 
     public Category createCategory(String categoryName) {
-        Category category = Category.builder().name(categoryName).build();
+        Category category = Category.builder().name(categoryName).enName(categoryName).build();
         categoryService.saveCategory(category);
         return category;
     }

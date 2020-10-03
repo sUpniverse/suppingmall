@@ -2,8 +2,8 @@ package com.supshop.suppingmall.order;
 
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.delivery.DeliveryFactory;
-import com.supshop.suppingmall.order.Form.OrderForm;
-import com.supshop.suppingmall.order.Form.TempOrderForm;
+import com.supshop.suppingmall.order.form.OrderForm;
+import com.supshop.suppingmall.order.form.TempOrderForm;
 import com.supshop.suppingmall.payment.Payment;
 import com.supshop.suppingmall.payment.PaymentFactory;
 import com.supshop.suppingmall.product.Product;
@@ -47,13 +47,15 @@ public class OrderFactory {
         List<OrderItem> orderItems = new ArrayList<>();
 
         int count = 2;
-        OrderItem orderItem = OrderItem.builder()
-                .product(product)
-                .productOption(product.getOptions().get(0))
-                .count(count)
-                .price(product.getOptions().get(0).getPrice())
-                .build();
-        orderItems.add(orderItem);
+        for(int i = 0; i < product.getOptions().size(); i++) {
+            OrderItem orderItem = OrderItem.builder()
+                    .product(product)
+                    .productOption(product.getOptions().get(0))
+                    .count(count)
+                    .price(product.getOptions().get(0).getPrice())
+                    .build();
+            orderItems.add(orderItem);
+        }
 
         TempOrderForm tempOrderForm = new TempOrderForm();
 
@@ -62,13 +64,11 @@ public class OrderFactory {
         tempOrderForm.setProductId(product.getProductId());
         tempOrderForm.setOrderItems(orderItems);
 
-
-
         return tempOrderForm;
     }
 
     // 임시주문을 위한 form을 return, 구매할 물품들의 정보와 갯수 가격등을 포함함 , 물품 페이지에서 다중 물품을 구매할 때
-    public TempOrderForm buildTempOrderFormWithTwoProducts(User user){
+    public TempOrderForm buildTempOrderFormWithMoreThanTwoProduct(User user){
         Product product = setUpTest("notebook");
         Product product2 = setUpTest("tablet");
 
@@ -115,12 +115,12 @@ public class OrderFactory {
         Delivery delivery = deliveryFactory.buildDelivery(user);
 
         // 결제정보
-        Payment payment = paymentFactory.buildPayment(order);
+        List<Payment> paymentList = paymentFactory.buildPayment(order.getOrderItems());
 
         OrderForm orderForm = new OrderForm();
         orderForm.setOrderId(order.getOrderId());
         orderForm.setDelivery(delivery);
-        orderForm.setPayment(payment);
+        orderForm.setPayment(paymentList);
 
         return orderForm;
     }
@@ -128,7 +128,7 @@ public class OrderFactory {
     //실제 주문이 완료된 상태의 주문 반환
     public Orders buildOrder() throws Exception {
         OrderForm orderForm = this.buildOrderForm();
-        Orders order = orderService.getOrderInForm(orderForm);
+        Orders order = orderService.getOrder(orderForm.getOrderId());
         orderService.order(order);
         return order;
     }

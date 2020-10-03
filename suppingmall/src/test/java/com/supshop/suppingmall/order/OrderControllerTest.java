@@ -1,7 +1,7 @@
 package com.supshop.suppingmall.order;
 
-import com.supshop.suppingmall.order.Form.OrderForm;
-import com.supshop.suppingmall.order.Form.TempOrderForm;
+import com.supshop.suppingmall.order.form.OrderForm;
+import com.supshop.suppingmall.order.form.TempOrderForm;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserFactory;
 import org.codehaus.jackson.map.ObjectMapper;
