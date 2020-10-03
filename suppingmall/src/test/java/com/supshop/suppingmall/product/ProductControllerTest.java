@@ -2,7 +2,7 @@ package com.supshop.suppingmall.product;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.supshop.suppingmall.category.Category;
-import com.supshop.suppingmall.product.Form.*;
+import com.supshop.suppingmall.product.form.*;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserFactory;
 import org.junit.Test;

@@ -1,7 +1,6 @@
 package com.supshop.suppingmall.mapper;
 
 import com.supshop.suppingmall.page.Criteria;
-import com.supshop.suppingmall.page.ProductCriteria;
 import com.supshop.suppingmall.product.Product;
 import com.supshop.suppingmall.product.ProductDetail;
 import com.supshop.suppingmall.product.ProductOption;

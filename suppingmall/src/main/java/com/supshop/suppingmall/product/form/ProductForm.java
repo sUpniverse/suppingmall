@@ -1,9 +1,7 @@
-package com.supshop.suppingmall.product.Form;
+package com.supshop.suppingmall.product.form;
 
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.delivery.Delivery;
-import com.supshop.suppingmall.product.ProductDetail;
-import com.supshop.suppingmall.product.ProductOption;
 import com.supshop.suppingmall.user.User;
 import lombok.*;
 

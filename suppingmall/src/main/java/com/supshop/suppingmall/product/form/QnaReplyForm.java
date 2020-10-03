@@ -1,13 +1,13 @@
-package com.supshop.suppingmall.product.Form;
+package com.supshop.suppingmall.product.form;
 
 import lombok.*;
 
 @Getter @Setter
 @Builder @ToString
 @NoArgsConstructor @AllArgsConstructor
-public class QnaForm {
+public class QnaReplyForm {
 
-    private long userId;
+    private Long userId;
     private String title;
 
 }

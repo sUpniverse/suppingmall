@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Component
-@RequiredArgsConstructor
 @ActiveProfiles("test")
 public class UserFactory {
 

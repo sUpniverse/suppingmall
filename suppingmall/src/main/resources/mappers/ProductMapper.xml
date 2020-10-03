@@ -111,7 +111,6 @@
         LEFT OUTER JOIN user AS U on (P.seller_id = U.user_id)
         LEFT OUTER JOIN category AS C on (P.category_id = C.category_id)
         <include refid="conditionalSearch"/>
-        ORDER BY P.product_id DESC
         <include refid="paging"></include>
         )
         AS P
@@ -159,11 +158,11 @@
         LEFT OUTER JOIN Product_Detail AS PD on (P.product_id = PD.product_id)
         LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
         <include refid="conditionalSearch"/>
-        ORDER BY P.product_id ASC, PO.product_option_id ASC
         <include refid="paging"/>
         )
         AS P
         LEFT OUTER JOIN Product_Option AS PO on (P.product_id = PO.product_id)
+        ORDER BY P.product_id ASC, PO.product_option_id ASC
     </select>
 
     <select id="findOne" resultMap="product">
@@ -316,7 +315,7 @@
     <update id="deleteProduct" parameterType="com.supshop.suppingmall.product.Product">
         UPDATE Product
         SET
-        status = 'PS04',
+        status = 'PS04'
         WHERE product_id = #{id}
     </update>
 

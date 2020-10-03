@@ -3,7 +3,7 @@ package com.supshop.suppingmall.main;
 import com.supshop.suppingmall.board.Board;
 import com.supshop.suppingmall.board.BoardService;
 import com.supshop.suppingmall.page.Criteria;
-import com.supshop.suppingmall.page.ProductCriteria;
+import com.supshop.suppingmall.page.EightItemsCriteria;
 import com.supshop.suppingmall.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -23,7 +23,7 @@ public class MainController {
     @RequestMapping("")
     public String mainPage(Model model){
 
-        Criteria productCriteria = new ProductCriteria();
+        Criteria productCriteria = new EightItemsCriteria();
         model.addAttribute("latestComputerList",productService.getOnSaleProductsByParentCategoryOnMenu(4l,productCriteria));
         model.addAttribute("latestMobileList",productService.getOnSaleProductsByParentCategoryOnMenu(5l,productCriteria));
 

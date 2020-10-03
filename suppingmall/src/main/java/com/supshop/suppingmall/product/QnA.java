@@ -19,8 +19,8 @@ public class QnA {
     private LocalDateTime createdDate;
 
 
-    public boolean isReplyExist() {
-        if(this.reply == null) return false;
-        return true;
+    public String isReplyExist() {
+        if(this.reply == null) return "미답변";
+        return "답변완료";
     }
 }

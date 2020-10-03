@@ -16,6 +16,7 @@ public interface QnAMapper {
 
     void save(QnA qna);
 
-
     void update(QnA qna);
+
+    void delete(Long qnaId);
 }

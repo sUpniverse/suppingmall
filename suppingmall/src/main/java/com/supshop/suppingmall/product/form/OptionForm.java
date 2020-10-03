@@ -1,4 +1,4 @@
-package com.supshop.suppingmall.product.Form;
+package com.supshop.suppingmall.product.form;
 
 import lombok.*;
 

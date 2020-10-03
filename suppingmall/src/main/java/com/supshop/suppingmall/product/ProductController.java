@@ -9,12 +9,11 @@ import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.image.ImageController;
 import com.supshop.suppingmall.image.ImageService;
 import com.supshop.suppingmall.page.*;
-import com.supshop.suppingmall.product.Form.ProductForm;
-import com.supshop.suppingmall.product.Form.QnaForm;
-import com.supshop.suppingmall.product.Form.QnaReplyForm;
+import com.supshop.suppingmall.product.form.ProductForm;
+import com.supshop.suppingmall.product.form.QnaForm;
+import com.supshop.suppingmall.product.form.QnaReplyForm;
 import com.supshop.suppingmall.review.Review;
 import com.supshop.suppingmall.review.ReviewService;
-import com.supshop.suppingmall.user.Role;
 import com.supshop.suppingmall.user.SessionUser;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserService;
@@ -97,7 +96,7 @@ public class ProductController {
         model.addAttribute("electronics",categoryService.getCategoryToGrandChildren(electronicsCategoryId));
         model.addAttribute("clothing",categoryService.getCategoryToGrandChildren(clothingCategoryId));
 
-        Criteria criteria = new ProductCriteria();
+        Criteria criteria = new EightItemsCriteria();
         model.addAttribute("latestComputerList",productService.getOnSaleProductsByParentCategoryOnMenu(4l,criteria));
         model.addAttribute("latestMobileList",productService.getOnSaleProductsByParentCategoryOnMenu(5l,criteria));
         model.addAttribute("productList",productService.getOnSaleProductsOnMenu(null, null, criteria));
@@ -111,7 +110,7 @@ public class ProductController {
     public String getProductOnSaleInCategory(Model model,
                                        @AuthenticationPrincipal SessionUser user,
                                        @PathVariable Long id,
-                                       ProductCriteria criteria) {
+                                       EightItemsCriteria criteria) {
 
 
         int productsCount = productService.getProductsCount(id, null, null, Product.ProductStatus.SALE);
@@ -153,11 +152,15 @@ public class ProductController {
 
         Criteria qnaCriteria = new TenItemsCriteria();
         List<QnA> qnaList = qnaService.getQnAList(qnaCriteria,id,null, null);
-        List<Review> reviewList = reviewService.getReviewList();
+
+
+//        Criteria reviewCriteria = new TenItemsCriteria();
+//        List<Review> reviewList = reviewService.getReviewList(reviewCriteria,id,null,null);
+
 
         model.addAttribute("product",product);
         model.addAttribute("qnaList",qnaList);
-        model.addAttribute("reviews",reviewList);
+//        model.addAttribute("reviews",reviewList);
 
         int qnaCount = qnaService.getQnACount(id, null, null);
         PageMaker qnaPageMaker = new PageMaker(qnaCount, 10, qnaCriteria);

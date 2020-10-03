@@ -26,6 +26,7 @@ public class SignUpForm {
     private String password;
 
     @NotEmpty
+    @Pattern(regexp = "^[가-힣]{2,8}$")
     private String name;
 
     @NotEmpty

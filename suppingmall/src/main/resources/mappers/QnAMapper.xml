@@ -28,16 +28,12 @@
             AND Q.product_id = #{productId}
         </if>
         <if test="type != null and searchValue != null">
-            <if test='type.equals("productId")'>
-                <bind name="searchValue" value="'%'+searchValue+'%'"/>
-                AND Q.product_id LIKE #{searchValue}
-            </if>
             <if test='type.equals("contents")'>
                 <bind name="searchValue" value="'%'+searchValue+'%'"/>
                 AND Q.title LIKE #{searchValue}
             </if>
             <if test='type.equals("creator")'>
-                AND Q.craetor = #{searchValue}
+                AND Q.user_id = #{searchValue}
             </if>
         </if>
     </sql>
@@ -110,6 +106,11 @@
         reply_id = #{reply.qnaId}
         WHERE qna_id = #{qnaId}
     </update>
+
+    <delete id="delete" parameterType="com.supshop.suppingmall.product.QnA">
+        DELETE FROM QNA
+        WHERE qna_id = #{qnaId}
+    </delete>
 
 
 </mapper>

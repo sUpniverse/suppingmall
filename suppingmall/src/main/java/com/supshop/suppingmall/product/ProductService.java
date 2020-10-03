@@ -4,7 +4,6 @@ import com.mysql.cj.util.StringUtils;
 import com.supshop.suppingmall.image.ImageService;
 import com.supshop.suppingmall.mapper.ProductMapper;
 import com.supshop.suppingmall.page.Criteria;
-import com.supshop.suppingmall.page.ProductCriteria;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +12,6 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeoutException;
 
 @Service
 @Transactional(readOnly = true)

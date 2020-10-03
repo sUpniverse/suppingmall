@@ -82,10 +82,10 @@
         LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
         WHERE B.category_id = #{categoryId}
         <include refid="conditionalSearch"></include>
-        ORDER BY B.board_id desc
         <include refid="paging"></include>
         ) AS B
         LEFT OUTER JOIN comment AS CM on (B.board_id = CM.board_id)
+        ORDER BY B.board_id desc
     </select>
 
 
