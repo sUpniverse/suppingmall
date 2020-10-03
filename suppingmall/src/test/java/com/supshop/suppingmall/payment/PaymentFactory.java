@@ -1,6 +1,5 @@
 package com.supshop.suppingmall.payment;
 
-import com.supshop.suppingmall.order.Orders;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -10,14 +9,14 @@ import java.time.LocalDateTime;
 @ActiveProfiles("test")
 public class PaymentFactory {
 
-    public Payment buildPayment(Orders order) {
+    public Payment buildPaymentList(int price) {
 
         return Payment.builder()
-                .paymentType(Payment.PayGroupType.CARD)
-                .price(order.getAmountPrice())
-                .status(Payment.PaymentStatus.COMPLETE)
-                .payDate(LocalDateTime.now())
-                .vendorCheckNumber("vaf00")
-                .build();
+                    .paymentType(Payment.PayGroupType.CARD)
+                    .price(price)
+                    .status(Payment.PaymentStatus.COMPLETE)
+                    .payDate(LocalDateTime.now())
+                    .vendorCheckNumber("vaf00")
+                    .build();
     }
 }

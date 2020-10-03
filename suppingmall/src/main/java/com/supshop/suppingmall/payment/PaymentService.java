@@ -15,15 +15,18 @@ public class PaymentService {
     private final PaymentMapper paymentMapper;
 
     @Transactional
-    public Long save(Payment payment) {
-        Payment.PayGroupType paymentType = payment.getPaymentType();
-        if(paymentType.equals(Payment.PayGroupType.CARD)) {
-            payment.setStatus(Payment.PaymentStatus.COMPLETE);
-        } else if(paymentType.equals(Payment.PayGroupType.CASH)) {
-            payment.setStatus(Payment.PaymentStatus.BACKING_CHECKED);
+    public List<Payment> save(List<Payment> paymentList) {
+        for(Payment payment : paymentList) {
+            Payment.PayGroupType paymentType = payment.getPaymentType();
+            if(paymentType.equals(Payment.PayGroupType.CARD)) {
+                payment.setStatus(Payment.PaymentStatus.COMPLETE);
+            } else if(paymentType.equals(Payment.PayGroupType.CASH)) {
+                payment.setStatus(Payment.PaymentStatus.BACKING_CHECKED);
+            }
         }
-        paymentMapper.save(payment);
-        return payment.getPaymentId();
+
+        paymentMapper.save(paymentList);
+        return paymentList;
     }
 
     public Payment findPayment(Long id) {

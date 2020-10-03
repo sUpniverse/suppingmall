@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/payments")
 public class PaymentController {
@@ -16,8 +18,8 @@ public class PaymentController {
     }
 
     @PostMapping("")
-    public ResponseEntity<String> createPayment(Payment payment) {
-        paymentService.save(payment);
+    public ResponseEntity<String> createPayment(List<Payment> paymentList) {
+        paymentService.save(paymentList);
         return ResponseEntity.ok().build();
     }
 

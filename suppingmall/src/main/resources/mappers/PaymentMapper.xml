@@ -14,9 +14,8 @@
     </resultMap>
 
     <select id="findAll" resultMap="Payment">
-        SELECT P.payment_id AS "PaymentId", P.price AS "PaymentPrice" ,P.type AS "PaymentType", P.vendor AS "PaymentCardVendor",
-        P.installment_month AS "PaymentInstallmentMonth", P.vendor_check_number AS "vendorCheckNumber", P.account_number AS "PaymentAccountNumber",
-        P.status AS "PaymentStatus", P.payed_date AS "PaymentPayedDate", P.updated_date AS "PaymentUpdatedDate"
+        SELECT P.payment_id AS "PaymentId", P.price AS "PaymentPrice", P.type AS "PaymentType", P.vendor_check_number AS "vendorCheckNumber",
+        P.status AS "PaymentStatus", P.pay_date AS "PaymentPayDate", P.updated_date AS "PaymentUpdatedDate"
         FROM Payment AS P
     </select>
 
@@ -29,19 +28,24 @@
 
     <insert id="save" parameterType="com.supshop.suppingmall.payment.Payment" useGeneratedKeys="true" keyProperty="paymentId">
         INSERT INTO Payment(
+        orderitem_id,
         price,
         type,
         vendor_check_number,
         status,
         pay_date
         )
-        VALUES (
-        #{price},
-        #{paymentType, typeHandler=com.supshop.suppingmall.payment.PaymentGroupTypeHandler},
-        #{vendorCheckNumber},
-        #{status, typeHandler=com.supshop.suppingmall.payment.PaymentStatusTypeHandler},
-        #{payDate}
-        )
+        VALUES
+        <foreach item="payment" collection="list" separator=",">
+            (
+            #{payment.orderItem.orderItemId},
+            #{payment.price},
+            #{payment.paymentType, typeHandler=com.supshop.suppingmall.payment.PaymentGroupTypeHandler},
+            #{payment.vendorCheckNumber},
+            #{payment.status, typeHandler=com.supshop.suppingmall.payment.PaymentStatusTypeHandler},
+            #{payment.payDate}
+            )
+        </foreach>
     </insert>
     
     <update id="updateStatus" parameterType="com.supshop.suppingmall.payment.Payment">

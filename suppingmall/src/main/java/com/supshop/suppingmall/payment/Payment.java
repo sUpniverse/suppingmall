@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.payment;
 
+import com.supshop.suppingmall.order.OrderItem;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -13,9 +14,8 @@ public class Payment {
     private Long paymentId;
     private int price;
     private PayGroupType paymentType;
-
     private String vendorCheckNumber;
-
+    private OrderItem orderItem;
     private PaymentStatus status;
     private LocalDateTime payDate;
     private LocalDateTime updatedDate; // 결제에 따른 상태 변경날짜
