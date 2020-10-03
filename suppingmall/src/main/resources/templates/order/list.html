@@ -41,47 +41,50 @@
                 </tr>
             </table>
             <ul class="mt-5">
-                <li th:each="order : ${orders}" class="row border-bottom mt-4 pb-4">
+                <li th:each="orderItem : ${orderItemList}" class="row border-bottom mt-4 pb-4">
                     <div class="col row">
-                        <a th:href="@{'/orders/'+${order.orderId}}">
-                            <img th:src="${order.orderItems[0].product.thumbnail}" style="width: 90px; height: 90px">
+                        <a th:href="@{'/orders/'+${orderItem.orders.orderId}}">
+                            <img th:src="${orderItem.product.thumbnail}" style="width: 90px; height: 90px">
                         </a>
                         <div class="ml-3">
-                            <a th:href="@{'/orders/'+${order.orderId}}" style="text-decoration: none;">
-                                <span th:text="${order.orderItems[0].product.name}" class="text-dark" style="font-size: 16px"></span>
+                            <a th:href="@{'/orders/'+${orderItem.orders.orderId}}" style="text-decoration: none;">
+                                <span th:text="${orderItem.product.name}" class="text-dark" style="font-size: 16px"></span>
                                 <ul class="container row">
                                     <li>
-                                        <span th:text="@{${#numbers.formatInteger(order.getAmountPrice(),3,'COMMA')}+'원'}" class="text-dark" style="font-size: 13px;"></span>
+                                        <span th:text="@{${#numbers.formatInteger(orderItem.price,3,'COMMA')}+'원'}" class="text-dark" style="font-size: 13px;"></span>
                                     </li>
                                     <li>
-                                        <span th:text="${#temporals.format(order.orderDate,'yyyy-MM-dd HH:mm')}" class="text-muted" style="font-size: 13px; display: inline-block; padding-left: 11px"></span>
+                                        <span th:text="${#temporals.format(orderItem.orderedDate,'yyyy-MM-dd HH:mm')}" class="text-muted" style="font-size: 13px; display: inline-block; padding-left: 11px"></span>
                                     </li>
                                 </ul>
                                 <div>
-                                    <span th:if="${not #strings.equals(order.status,'DELIVERY')}" th:text="${order.status.title}" class="text-dark" style="font-size: 16px"></span>
-                                    <span th:if="${#strings.equals(order.status,'DELIVERY')}" th:text="${order.delivery.status.title}" class="text-dark" style="font-size: 16px"></span>
+                                    <span th:if="${not #strings.equals(orderItem.status,'DELIVERY')}" th:text="${orderItem.status.title}" class="text-dark" style="font-size: 16px"></span>
+                                    <span th:if="${#strings.equals(orderItem.status,'DELIVERY')}" th:text="${orderItem.delivery.status.title}" class="text-dark" style="font-size: 16px"></span>
                                 </div>
                             </a>
                         </div>
                     </div>
                     <div class="col-md-auto text-center align-items-center">
-                        <span th:text="${order.seller.storeVO?.storeName}"></span>
+                        <span th:text="${orderItem.seller.storeVO?.storeName}"></span>
                         <br>
-                        <span class="text-muted" th:text="${order.seller.storeVO?.storePhoneNumber}"></span>
+                        <span class="text-muted" th:text="${orderItem.seller.storeVO?.storePhoneNumber}"></span>
                     </div>
-                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(order.delivery.status,'WAIT')}">
-                        <a class="form-control text-center" th:href="@{'/orders/'+${order.orderId}+'/cancelForm'}" th:text="구매취소"></a>
+                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(orderItem.status,'ORDER')}">
+                        <a class="form-control text-center" th:href="'javascript:cancel('+${orderItem.orderItemId}+')'" th:id="${orderItem.orderItemId}" th:text="구매취소"></a>
                     </div>
-                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(order.delivery.status,'DELIVERY')}">
-                        <a class="form-control text-center" th:href="@{'/products/'+${order.orderId}+'/'}" th:text="교환요청"></a>
-                        <a class="form-control text-center" th:href="@{'/orders/'+${order.orderId}+'/refundForm'}" th:text="환불요청"></a>
-                        <a class="form-control text-center" th:href="@{'/products/'+${order.orderId}+'/complete'}" th:text="구매확정"></a>
+                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(orderItem.status,'DELIVERY')}">
+                        <a class="form-control text-center" th:href="@{'/products/'+${orderItem.orderItemId}+'/'}" th:text="교환요청"></a>
+                        <a class="form-control text-center" th:href="@{'/orders/'+${orderItem.orderItemId}+'/refundForm'}" th:text="환불요청"></a>
+                        <a class="form-control text-center" th:href="@{'/products/'+${orderItem.orderItemId}+'/complete'}" th:text="구매확정"></a>
                     </div>
-                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(order.delivery.status,'COMPLTE')}">
-                        <a class="form-control text-center" th:href="@{'/products/'+${order.orderItems[0].product.productId}+'/review'}" th:text="리뷰작성"></a>
-                        <a class="form-control text-center" th:href="@{'/products/'+${order.orderItems[0].product.productId}+'/reorder'}" th:text="재구매"></a>
+                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(orderItem.status,'COMPLTE')}">
+                        <a class="form-control text-center" th:href="@{'/orders/'+${orderItem.orderItemId}+'/review'}" th:text="리뷰작성"></a>
+                        <a class="form-control text-center" th:href="@{'/products/'+${orderItem.product.productId}+'/reorder'}" th:text="재구매"></a>
                     </div>
-                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(order.delivery.status,'REFUND') and #strings.equals(order.delivery.status,'CHANGE')}">
+                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(orderItem.status,'REFUND') and #strings.equals(orderItem.status,'CHANGE')}">
+
+                    </div>
+                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(orderItem.status,'CANCEL')}">
 
                     </div>
                 </li>
@@ -91,15 +94,44 @@
         </div>
     </div>
 </div>
-<script>
+<script th:inline="javascript">
 
    function search() {
         var fromDate = document.getElementById('fromDate').value;
         var toDate = document.getElementById('toDate').value;
        var status = document.getElementById('status').value;
-        console.log("1 : " +fromDate +" 2 :" +toDate);
         $(location).attr('href','/orders/main?fromDate=' + fromDate + '&toDate=' + toDate + '&type=order&status=' + status);
     }
+
+    function cancel(orderItemId) {
+
+       var header = [[${_csrf.headerName}]];
+       var token = [[${_csrf.token}]];
+
+        if (confirm("삭제하시겠습니까?")) {
+
+            $.ajax({
+                type: 'POST',
+                url: '/orders/'+orderItemId+'/cancel',
+                dataType: 'text',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader(header,token);
+                },
+                success: () => {
+                    alert("주문취소 되었습니다.");
+                    document.getElementById(orderItemId).remove();
+                },
+                error: (response, error) => {
+                    alert("주문취소에 실패했습니다.")
+                }
+            });
+
+        }
+
+
+    }
+
 </script>
 </body>
 </html>

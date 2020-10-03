@@ -31,23 +31,9 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderItemService orderItemService;
 
     private static final int orderDisplayPagingNum = 5;
-
-//    @PostMapping("/orderSheet")
-//    public String getOrderSheet(TempOrderForm tempOrderForm,
-//                                @ModelAttribute(value = "orderForm") OrderForm orderForm,
-//                                Model model) {
-//
-//        // 임시주문
-//        Orders tempOrder = orderService.createOrder(tempOrderForm);
-//
-//        // 반영된 주문 표시
-//        model.addAttribute("orderItems", tempOrder.getOrderItems());
-//        model.addAttribute("product",tempOrder.getOrderItems().get(0).getProduct());
-//        model.addAttribute("tempOrder",tempOrder);
-//        return "/order/form";
-//    }
 
     @PostMapping("/orderSheet")
     @ResponseBody
@@ -140,6 +126,14 @@ public class OrderController {
         return "/order/detail";
     }
 
+    @GetMapping("/orderItems/{id}")
+    @ResponseBody
+    public ResponseEntity getOrderItem(@PathVariable Long id,
+                               @AuthenticationPrincipal SessionUser user) {
+        OrderItem orderItem = orderItemService.getOrderItem(id);
+        return ResponseEntity.ok(orderItem);
+    }
+
 
 
     @GetMapping("/main")
@@ -150,8 +144,8 @@ public class OrderController {
                                     @AuthenticationPrincipal SessionUser user,
                                     Model model) {
 
-        List<Orders> orders = orderService.getOrderByBuyerId(user.getUserId(),fromDate,toDate,type,status);
-        model.addAttribute("orders",orders);
+        List<OrderItem> orderItemList = orderItemService.getOrderByBuyerId(user.getUserId(), fromDate, toDate, type, status);
+        model.addAttribute("orderItemList",orderItemList);
         model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.values()));
 
         return "/order/list";
@@ -202,19 +196,21 @@ public class OrderController {
         return "/order/seller/detail";
     }
 
-    @GetMapping("/{id}/cancelForm")
-    public String getCancelForm(@PathVariable Long id, Model model) {
-        Orders order = orderService.getOrder(id);
-        model.addAttribute("order",order);
-        return "/order/cancel-form";
-    }
-
     @PostMapping("/{id}/cancel")
-    public String cancelOrder(@PathVariable Long id, Model model) {
-//        orderService.cancelOrder(id);
-        Orders order = orderService.getOrder(id);
-        model.addAttribute("order",order);
-        return "/order/cancel";
+    @ResponseBody
+    public ResponseEntity cancelOrder(@PathVariable Long id,
+                              @AuthenticationPrincipal SessionUser sessionUser) {
+        OrderItem orderItem = orderItemService.getOrderItem(id);
+
+        if(orderItem == null && !UserUtils.isOwner(orderItem.getBuyer().getUserId(),sessionUser)){
+            new IllegalArgumentException();
+            return ResponseEntity.badRequest().body("존재하지 않습니다.");
+        }
+
+        orderItem.getProductOption().setProductId(orderItem.getProduct().getProductId());
+        orderItemService.cancelOrderItem(orderItem);
+        URI uri = linkTo(OrderController.class).slash("/orderItems" + orderItem.getOrderItemId()).toUri();
+        return ResponseEntity.created(uri).build();
     }
 
     @GetMapping("/{id}/refundForm")

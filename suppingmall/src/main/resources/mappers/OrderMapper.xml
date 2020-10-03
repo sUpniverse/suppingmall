@@ -5,13 +5,14 @@
 <mapper namespace="com.supshop.suppingmall.mapper.OrderMapper">
     <resultMap id="order" type="com.supshop.suppingmall.order.Orders" autoMapping="true">
         <id property="orderId" column="OrderId" />
-        <result property="status" column="OrderStatus" typeHandler="com.supshop.suppingmall.order.OrderStatusTypeHandler" />
+        <result property="status" column="OrderStatus" typeHandler="com.supshop.suppingmall.order.OrderStatusTypeHandler"/>
         <result property="orderDate" column="OrderDate"/>
         <result property="updateDate" column="OrderUpdateDate"/>
         <collection property="orderItems" column="OrderId" ofType="com.supshop.suppingmall.order.OrderItem">
             <id property="orderItemId" column="OrderItemId" />
             <result property="count" column="OrderItemCount" />
             <result property="price" column="OrderItemPrice" />
+            <result property="status" column="OrderItemStatus" typeHandler="com.supshop.suppingmall.order.OrderStatusTypeHandler"/>
             <association property="product" javaType="com.supshop.suppingmall.product.Product">
                 <id property="productId" column="ProductId" />
                 <result property="name" column="ProductName" />
@@ -20,8 +21,7 @@
                 <result property="deliveryPrice" column="ProductDeliveryPrice" />
                 <result property="deliveryVendor" column="ProductDeliveryVendor" typeHandler="com.supshop.suppingmall.delivery.DeliveryVendorHandler"/>
             </association>
-            <association property="productOption" javaType="com.supshop.suppingmall.product.ProductOption">
-                <id property="productId" column="ProductId" />
+            <association property="productOption" column="ProductId" javaType="com.supshop.suppingmall.product.ProductOption">
                 <id property="optionId" column="ProductOptionId" />
                 <result property="optionName" column="ProductOptionName" />
                 <result property="price" column="ProductOptionPrice" />
@@ -147,7 +147,7 @@
 
     <select id="findAll" resultMap="order">
         SELECT O.order_id AS "OrderId", O.status AS "OrderStatus", O.order_date AS "OrderDate", O.update_date AS "OrderUpdateDate",
-        OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice",
+        OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice", OI.status AS "OrderItemStatus",
         P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail",
         B.user_id AS "BuyerId", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber", B.nickName AS "BuyerNickName", S.user_id AS "SellerId", S.store_name AS "StoreName",
         S.store_phone_number AS "StorePhoneNumber", D.delivery_id AS "DeliveryId", D.name AS "DeliveryName",
@@ -166,16 +166,16 @@
 
     <select id="findOne" resultMap="order">
         SELECT O.order_id AS "OrderId", O.status AS "OrderStatus", O.order_date AS "OrderDate", O.update_date AS "OrderUpdateDate",
+        OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice", OI.status AS "OrderItemStatus",
         S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
-        OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice",
         P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail",
         PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity",
         B.user_id AS "BuyerId", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber",
         S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
         D.delivery_id AS "DeliveryId", D.name AS "DeliveryName", D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode",
         D.phone AS "DeliveryPhone", D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
-        PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus",
-        PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor"
+        PM.payment_id AS "PaymentId", PM.price AS "PaymentPrice", PM.type AS "PaymentType", PM.status AS "PaymentStatus",
+        PM.pay_date AS "PaymentPayedDate", PM.updated_date AS "PaymentUpdatedDate", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor"
         FROM Orders AS O
         LEFT OUTER JOIN OrderItem AS OI on (O.order_id = OI.order_id)
         LEFT OUTER JOIN User AS B on (OI.buyer_id = B.user_id)
@@ -183,82 +183,8 @@
         LEFT OUTER JOIN Product AS P on (OI.product_id = P.product_id)
         LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
         LEFT OUTER JOIN Delivery AS D on (OI.orderitem_id = D.orderitem_id)
-        LEFT OUTER JOIN Payment AS PA on (OI.orderitem_id = PA.orderitem_id)
+        LEFT OUTER JOIN Payment AS PM on (OI.orderitem_id = PM.orderitem_id)
         WHERE O.order_id = #{orderId}
-    </select>
-
-    <select id="findByBuyerId" resultMap="order">
-        SELECT O.order_id AS "OrderId", O.status AS "OrderStatus", O.order_date AS "OrderDate", O.update_date AS "OrderUpdateDate",
-        B.user_id AS "BuyerId", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber", S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
-        S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
-        D.delivery_id AS "DeliveryId", D.name AS "DeliveryName", D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail",
-        D.zipcode AS "DeliveryZipCode", D.phone AS "DeliveryPhone", D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber",
-        D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
-        PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus",
-        PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
-        OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice",
-        P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
-        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity"
-        FROM Orders AS O
-        LEFT OUTER JOIN User AS B on (O.buyer_id = B.user_id)
-        LEFT OUTER JOIN User AS S on (O.seller_id = S.user_id)
-        LEFT OUTER JOIN Delivery AS D on (O.delivery_id = D.delivery_id)
-        LEFT OUTER JOIN Payment AS PA on (O.payment_id = PA.payment_id)
-        LEFT OUTER JOIN OrderItem AS OI on (O.order_id = OI.order_id)
-        LEFT OUTER JOIN Product AS P on (OI.product_id = P.product_id)
-        LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
-        WHERE O.buyer_id = ${userId} AND NOT O.status = 'O000'
-        <include refid="conditionalSearch"></include>
-        ORDER BY O.order_date desc
-    </select>
-
-    <select id="findBySellerId" resultMap="order">
-        SELECT O.order_id AS "OrderId", O.status AS "OrderStatus", O.order_date AS "OrderDate", O.update_date AS "OrderUpdateDate",
-        B.user_id AS "BuyerId", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber",
-        D.delivery_id AS "DeliveryId", D.name AS "DeliveryName", D.address AS "DeliveryAddress",
-        D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode", D.phone AS "DeliveryPhone",
-        D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
-        PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus",
-        PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
-        OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice",
-        P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail",
-        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity"
-        FROM Orders AS O
-        LEFT OUTER JOIN User AS B on (O.buyer_id = B.user_id)
-        LEFT OUTER JOIN User AS S on (O.seller_id = S.user_id)
-        LEFT OUTER JOIN Delivery AS D on (O.delivery_id = D.delivery_id)
-        LEFT OUTER JOIN Payment AS PA on (O.payment_id = PA.payment_id)
-        LEFT OUTER JOIN OrderItem AS OI on (O.order_id = OI.order_id)
-        LEFT OUTER JOIN Product AS P on (OI.product_id = P.product_id)
-        LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
-        WHERE O.seller_id = ${userId} AND NOT O.status = 'O000'
-        <include refid="conditionalSearch"></include>
-        ORDER BY O.order_date desc
-        <include refid="paging"></include>
-    </select>
-
-    <select id="findOneBySellerId" resultMap="order">
-        SELECT O.order_id AS "OrderId", O.status AS "OrderStatus", O.order_date AS "OrderDate", O.update_date AS "OrderUpdateDate",
-        B.user_id AS "BuyerId", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber",
-        D.delivery_id AS "DeliveryId", D.name AS "DeliveryName", D.address AS "DeliveryAddress",
-        D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode", D.phone AS "DeliveryPhone",
-        D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
-        PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus",
-        PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
-        OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice",
-        P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail",
-        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity"
-        FROM Orders AS O
-        LEFT OUTER JOIN User AS B on (O.buyer_id = B.user_id)
-        LEFT OUTER JOIN User AS S on (O.seller_id = S.user_id)
-        LEFT OUTER JOIN Delivery AS D on (O.delivery_id = D.delivery_id)
-        LEFT OUTER JOIN Payment AS PA on (O.payment_id = PA.payment_id)
-        LEFT OUTER JOIN OrderItem AS OI on (O.order_id = OI.order_id)
-        LEFT OUTER JOIN Product AS P on (OI.product_id = P.product_id)
-        LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
-        WHERE O.order_id = ${orderId}
-        ORDER BY O.order_date desc
-        <include refid="paging"></include>
     </select>
 
 

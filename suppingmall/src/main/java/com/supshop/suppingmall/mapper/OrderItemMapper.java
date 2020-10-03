@@ -23,4 +23,6 @@ public interface OrderItemMapper {
     List<OrderItem> findBySellerId(Long userId, LocalDateTime fromDate, LocalDateTime toDate, String type, String searchValue, TenItemsCriteria criteria);
 
     void updateList(List<OrderItem> orderItems);
+
+    void updateStatus(OrderItem orderItem);
 }

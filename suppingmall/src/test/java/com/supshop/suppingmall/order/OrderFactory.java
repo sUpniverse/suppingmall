@@ -141,8 +141,9 @@ public class OrderFactory {
     public Orders createOrder() throws Exception {
         OrderForm orderForm = this.buildOrderForm();
         Orders order = orderService.getOrder(orderForm.getOrderId());
-        orderService.order(order,null,null);
-        return order;
+        orderService.order(order,orderForm.getPayment(),orderForm.getDelivery());
+        Orders newOrder = orderService.getOrder(order.getOrderId());
+        return newOrder;
     }
 
 

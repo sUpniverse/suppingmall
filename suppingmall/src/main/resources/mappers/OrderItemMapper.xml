@@ -145,10 +145,10 @@
         S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
         S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
         P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail",
-        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity"
+        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity",
         D.delivery_id AS "DeliveryId", D.name AS "DeliveryName", D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode",
         D.phone AS "DeliveryPhone", D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
-        PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus", PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
+        PM.payment_id AS "PaymentId", PM.price AS "PaymentPrice", PM.type AS "PaymentType", PM.status AS "PaymentStatus", PM.pay_date AS "PaymentPayedDate", PM.updated_date AS "PaymentUpdatedDate"
         FROM OrderItem AS OI
         LEFT OUTER JOIN Orders AS O on (OI.order_id = O.order_id)
         LEFT OUTER JOIN User AS B on (OI.buyer_id = B.user_id)
@@ -156,7 +156,7 @@
         LEFT OUTER JOIN Product AS P on (OI.product_id = P.product_id)
         LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
         LEFT OUTER JOIN Delivery AS D on (OI.orderItem_id = D.orderItem_id)
-        LEFT OUTER JOIN Payment AS PM on (OI.orderItem_id = PA.orderItem_id)
+        LEFT OUTER JOIN Payment AS PM on (OI.orderItem_id = PM.orderItem_id)
         <include refid="adminConditionalSearch"></include>
         ORDER BY OI.ordered_date desc
     </select>
@@ -168,10 +168,10 @@
         S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
         S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
         P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail",
-        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity"
+        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity",
         D.delivery_id AS "DeliveryId", D.name AS "DeliveryName", D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode",
         D.phone AS "DeliveryPhone", D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
-        PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus", PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
+        PM.payment_id AS "PaymentId", PM.price AS "PaymentPrice", PM.type AS "PaymentType", PM.status AS "PaymentStatus", PM.pay_date AS "PaymentPayedDate", PM.updated_date AS "PaymentUpdatedDate"
         FROM OrderItem AS OI
         LEFT OUTER JOIN Orders AS O on (OI.order_id = O.order_id)
         LEFT OUTER JOIN User AS B on (OI.buyer_id = B.user_id)
@@ -179,8 +179,8 @@
         LEFT OUTER JOIN Product AS P on (OI.product_id = P.product_id)
         LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
         LEFT OUTER JOIN Delivery AS D on (OI.orderItem_id = D.orderItem_id)
-        LEFT OUTER JOIN Payment AS PM on (OI.orderItem_id = PA.orderItem_id)
-        WHERE O.orderitem_id = #{orderItemId}
+        LEFT OUTER JOIN Payment AS PM on (OI.orderItem_id = PM.orderItem_id)
+        WHERE OI.orderitem_id = #{orderItemId}
     </select>
 
     <select id="findByBuyerId" resultMap="OrderItem">
@@ -189,10 +189,10 @@
         S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
         S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
         P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail",
-        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity"
+        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity",
         D.delivery_id AS "DeliveryId", D.name AS "DeliveryName", D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode",
         D.phone AS "DeliveryPhone", D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
-        PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus", PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
+        PM.payment_id AS "PaymentId", PM.price AS "PaymentPrice", PM.type AS "PaymentType", PM.status AS "PaymentStatus", PM.pay_date AS "PaymentPayedDate", PM.updated_date AS "PaymentUpdatedDate"
         FROM OrderItem AS OI
         LEFT OUTER JOIN Orders AS O on (OI.order_id = O.order_id)
         LEFT OUTER JOIN User AS B on (OI.buyer_id = B.user_id)
@@ -200,7 +200,7 @@
         LEFT OUTER JOIN Product AS P on (OI.product_id = P.product_id)
         LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
         LEFT OUTER JOIN Delivery AS D on (OI.orderItem_id = D.orderItem_id)
-        LEFT OUTER JOIN Payment AS PM on (OI.orderItem_id = PA.orderItem_id)
+        LEFT OUTER JOIN Payment AS PM on (OI.orderItem_id = PM.orderItem_id)
         WHERE OI.buyer_id = #{userId} AND NOT OI.status = 'O000'
         <include refid="conditionalSearch"></include>
         ORDER BY OI.ordered_date desc
@@ -212,10 +212,10 @@
         S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
         S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
         P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail",
-        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity"
+        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity",
         D.delivery_id AS "DeliveryId", D.name AS "DeliveryName", D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode",
         D.phone AS "DeliveryPhone", D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
-        PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus", PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
+        PM.payment_id AS "PaymentId", PM.price AS "PaymentPrice", PM.type AS "PaymentType", PM.status AS "PaymentStatus", PM.pay_date AS "PaymentPayedDate", PM.updated_date AS "PaymentUpdatedDate"
         FROM OrderItem AS OI
         LEFT OUTER JOIN Orders AS O on (OI.order_id = O.order_id)
         LEFT OUTER JOIN User AS B on (OI.buyer_id = B.user_id)
@@ -223,7 +223,7 @@
         LEFT OUTER JOIN Product AS P on (OI.product_id = P.product_id)
         LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
         LEFT OUTER JOIN Delivery AS D on (OI.orderItem_id = D.orderItem_id)
-        LEFT OUTER JOIN Payment AS PM on (OI.orderItem_id = PA.orderItem_id)
+        LEFT OUTER JOIN Payment AS PM on (OI.orderItem_id = PM.orderItem_id)
         WHERE OI.seller_id = #{userId} AND NOT OI.status = 'O000'
         <include refid="conditionalSearch"></include>
         ORDER BY OI.ordered_date desc
@@ -236,10 +236,10 @@
         S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
         S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
         P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail",
-        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity"
+        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity",
         D.delivery_id AS "DeliveryId", D.name AS "DeliveryName", D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode",
         D.phone AS "DeliveryPhone", D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo", D.status AS "DeliveryStatus",
-        PA.payment_id AS "PaymentId", PA.price AS "PaymentPrice", PA.type AS "PaymentType", PA.status AS "PaymentStatus", PA.pay_date AS "PaymentPayedDate", PA.updated_date AS "PaymentUpdatedDate",
+        PM.payment_id AS "PaymentId", PM.price AS "PaymentPrice", PM.type AS "PaymentType", PM.status AS "PaymentStatus", PM.pay_date AS "PaymentPayedDate", PM.updated_date AS "PaymentUpdatedDate"
         FROM OrderItem AS OI
         LEFT OUTER JOIN Orders AS O on (OI.order_id = O.order_id)
         LEFT OUTER JOIN User AS B on (OI.buyer_id = B.user_id)
@@ -247,7 +247,7 @@
         LEFT OUTER JOIN Product AS P on (OI.product_id = P.product_id)
         LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
         LEFT OUTER JOIN Delivery AS D on (OI.orderItem_id = D.orderItem_id)
-        LEFT OUTER JOIN Payment AS PM on (OI.orderItem_id = PA.orderItem_id)
+        LEFT OUTER JOIN Payment AS PM on (OI.orderItem_id = PM.orderItem_id)
         WHERE OI.orderitem_id = #{orderItemId}
         ORDER BY O.order_date desc
         <include refid="paging"></include>
@@ -263,6 +263,7 @@
         count,
         buyer_id,
         seller_id,
+        status,
         ordered_date
         )
         values
@@ -275,6 +276,7 @@
             #{orderItem.count},
             #{orderItem.buyer.userId},
             #{orderItem.seller.userId},
+            #{orderItem.status, typeHandler=com.supshop.suppingmall.order.OrderStatusTypeHandler},
             now()
             )
         </foreach>
@@ -289,7 +291,7 @@
         <if test="deliveryId != null">
             delivery_id = #{deliveryId},
         </if>
-        update_date = now()
+        updated_date = now()
         where orderitem_id = #{orderItemId};
     </update>
 
@@ -298,15 +300,26 @@
             UPDATE OrderItem
             SET
             order_id = #{orderItem.orders.orderId},
-            status = #{orderItem.status, typeHandler=com.supshop.suppingmall.order.OrderStatusTypeHandler},
             product_id = #{orderItem.product.productId},
             product_option_id = #{orderItem.productOption.optionId},
             price = #{orderItem.price},
             count = #{orderItem.count},
             buyer_id = #{orderItem.buyer.userId},
-            seller_id = #{orderItem.seller.userId}
+            seller_id = #{orderItem.seller.userId},
+            status = #{orderItem.status, typeHandler=com.supshop.suppingmall.order.OrderStatusTypeHandler},
+            updated_date = now()
             WHERE orderitem_id = #{orderItem.orderItemId}
         </foreach>
+    </update>
+
+    <update id="updateStatus" parameterType="com.supshop.suppingmall.order.Orders">
+        update OrderItem
+        set
+        <if test="status != null">
+            status = #{status, typeHandler=com.supshop.suppingmall.order.OrderStatusTypeHandler},
+        </if>
+        updated_date = now()
+        where orderitem_id = #{orderItemId};
     </update>
 
 </mapper>

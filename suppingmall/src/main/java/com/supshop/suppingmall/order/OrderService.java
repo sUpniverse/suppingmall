@@ -39,7 +39,6 @@ public class OrderService {
     private final DeliveryService deliveryService;
     private final OrderItemService orderItemService;
 
-    private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
     private final ModuleController moduleController;
@@ -160,7 +159,7 @@ public class OrderService {
      * @return
      */
     @Transactional
-    public Long order(Orders orders,Payment payment, Delivery delivery) {
+    public Orders order(Orders orders,Payment payment, Delivery delivery) {
         //임시 주문상태를 주문 상태로 변경
         orders.setStatus(Orders.OrderStatus.COMPLETE);
 
@@ -172,22 +171,33 @@ public class OrderService {
         for(OrderItem orderItem : orderItems) {
             //임시 주문상태를 실제 주문 상태로 변경
             orderItem.setOrders(orders);
-            orderItem.setStatus(Orders.OrderStatus.DELIVERY);
+            orderItem.setStatus(Orders.OrderStatus.ORDER);
 
             //상품 수량 감소
             ProductOption productOption = orderItem.getProductOption();
+            productOption.setProductId(orderItem.getProduct().getProductId());
             productOption.removeStock(orderItem.getCount());
             productOptionList.add(productOption);
 
             // 결제 정보 생성
-            Payment mappedPayment = modelMapper.map(payment, Payment.class);
+            Payment mappedPayment = new Payment();
+            mappedPayment.setPaymentType(payment.getPaymentType());
+            mappedPayment.setVendorCheckNumber(payment.getVendorCheckNumber());
+            mappedPayment.setStatus(payment.getStatus());
             mappedPayment.setOrderItem(orderItem);
             mappedPayment.setPrice(orderItem.getPrice());
             paymentList.add(mappedPayment);
 
             // 배송 정보 생성
-            Delivery mappedDelivery = modelMapper.map(delivery, Delivery.class);
+            Delivery mappedDelivery = new Delivery();
             mappedDelivery.setOrderItem(orderItem);
+            mappedDelivery.setName(delivery.getName());
+            mappedDelivery.setPhone(delivery.getPhone());
+            mappedDelivery.setZipCode(delivery.getZipCode());
+            mappedDelivery.setAddress(delivery.getAddress());
+            mappedDelivery.setAddressDetail(delivery.getAddressDetail());
+            mappedDelivery.setVendor(delivery.getVendor());
+            mappedDelivery.setMemo(delivery.getMemo());
             mappedDelivery.setStatus(Delivery.DeliveryStatus.WAIT);
             deliveryList.add(mappedDelivery);
         }
@@ -199,9 +209,10 @@ public class OrderService {
         productService.updateProductOption(productOptionList);
         paymentService.save(paymentList);
         deliveryService.save(deliveryList);
+        orders.setOrderItems(orderItems);
 
 
-        return orders.getOrderId();
+        return orders;
     }
 
     //상품 교환 or 환불 시 상태변경 및 택배 요청
@@ -273,51 +284,7 @@ public class OrderService {
     */
 
     //주문 취소 (제품 보내기 전 결제 취소 시)
-    /*@Transactional
-    public Long cancelOrder(Long orderId) {
 
-        // 주문 가져오기
-        Orders order = orderMapper.findOne(orderId).get();
-
-        //결제 취소
-//        Long paymentId = order.getPayment().getPaymentId();
-        Payment payment = paymentService.findPayment(paymentId);
-        String vendorCheckNumber = payment.getVendorCheckNumber();
-
-        //실제 모듈 적용시
-//        HttpHeaders headers = new HttpHeaders();
-//        HttpEntity entity = new HttpEntity(headers);
-//        URI payModuleURI = UriComponentsBuilder.fromHttpUrl(payModuleUrl + "/" + vendorCheckNumber).build().toUri();
-//        ResponseEntity<String> response = restTemplate.exchange(payModuleURI, HttpMethod.DELETE, entity, String.class);
-
-        // 테스트용 모듈
-        ResponseEntity<String> response = moduleController.cancelPay(vendorCheckNumber);
-        if(!response.getStatusCode().is2xxSuccessful()) {
-            //재 전송 RetryTemplate 같은걸 사용 예정
-            new RuntimeException("결제모듈 오류");
-        }
-        payment.setStatus(Payment.PaymentStatus.CANCEL);
-        paymentService.cancelPayment(payment);
-
-        // 주문 상태 변경
-        order.setStatus(Orders.OrderStatus.CANCEL);
-
-        // 물품 수량 변경
-        List<OrderItem> orderItems = order.getOrderItems();
-        List<ProductOption> productOptionList = new ArrayList<>();
-        for(OrderItem orderItem : orderItems) {
-            ProductOption productOption = orderItem.getProductOption();
-            productOption.addStock(orderItem.getCount());
-            productOptionList.add(productOption);
-        }
-        productService.updateProductOption(productOptionList);
-
-        //주문상태 수정
-        orderMapper.updateOrder(order.getOrderId());
-
-        // 결제 취소
-        return order.getOrderId();
-    }*/
 
 
 }

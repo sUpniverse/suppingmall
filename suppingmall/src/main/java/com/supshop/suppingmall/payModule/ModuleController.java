@@ -33,8 +33,8 @@ public class ModuleController {
         return ResponseEntity.created(uri).body(result);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> cancelPay(@PathVariable String id) {
+    @DeleteMapping("/{id}/{price}")
+    public ResponseEntity<String> cancelPay(@PathVariable String id,@PathVariable int price) {
 
         return ResponseEntity.ok().build();
     }

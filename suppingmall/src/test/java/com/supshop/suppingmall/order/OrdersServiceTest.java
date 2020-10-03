@@ -2,6 +2,7 @@ package com.supshop.suppingmall.order;
 
 import com.supshop.suppingmall.order.form.OrderForm;
 import com.supshop.suppingmall.order.form.TempOrderForm;
+import com.supshop.suppingmall.payment.Payment;
 import com.supshop.suppingmall.payment.PaymentService;
 import com.supshop.suppingmall.product.Product;
 import com.supshop.suppingmall.product.ProductService;
@@ -31,6 +32,7 @@ public class OrdersServiceTest {
     @Autowired private OrderFactory orderFactory;
     @Autowired private UserFactory userFactory;
     @Autowired private ProductService productService;
+    @Autowired private OrderItemService orderItemService;
 
     //주문확인 테스트
     @Test
@@ -93,48 +95,46 @@ public class OrdersServiceTest {
         orderService.order(order,orderForm.getPayment(),orderForm.getDelivery());
         Orders newOrder = orderService.getOrder(order.getOrderId());
         Product afterOrderProduct = productService.getProduct(order.getOrderItems().get(0).getProduct().getProductId());
-
-        //then
         OrderItem orderItem = order.getOrderItems().get(0);
         OrderItem newOrderItem = newOrder.getOrderItems().get(0);
 
+        //then
         assertEquals(Orders.OrderStatus.COMPLETE,newOrder.getStatus());
-        assertEquals(orderForm.getPayment().getPrice(),newOrderItem.getPayment().getPrice());
+        assertEquals(orderItem.getProductOption().getPrice(),newOrderItem.getPayment().getPrice());
         assertEquals(orderForm.getDelivery().getAddress(),newOrderItem.getDelivery().getAddress());
         assertEquals(orderItem.getProductOption().getQuantity(),newOrderItem.getProductOption().getQuantity());
         // 주문전 수량 - 주문한 수량  = 현재 수량
-       assertEquals(beforeOrderProduct.getOptions().get(orderItem.getProductOption().getOptionId()-1).getQuantity() - order.getOrderItems().get(0).getCount(),afterOrderProduct.getOptions().get(orderItem.getProductOption().getOptionId()-1).getQuantity());
+        assertEquals(beforeOrderProduct.getOptions().get(orderItem.getProductOption().getOptionId()-1).getQuantity() - order.getOrderItems().get(0).getCount(),afterOrderProduct.getOptions().get(orderItem.getProductOption().getOptionId()-1).getQuantity());
 
 
     }
 
-
-
-    /*@Test
-    @Transactional
+    @Test
     public void cancelOrder() throws Exception {
 
         //given
-        Orders orders = orderFactory.buildOrder();
+        Orders orders = orderFactory.createOrder();
         OrderItem originOrderItem = orders.getOrderItems().get(0);
+        Product beforeOrderProduct = productService.getProduct(originOrderItem.getProduct().getProductId());
 
         //when
-        orderService.cancelOrder(orders.getOrderId());
-        Orders order = orderService.getOrder(orders.getOrderId());
-        Long paymentId = order.getPayment().getPaymentId();
+        orderItemService.cancelOrderItem(originOrderItem);
+        Long paymentId = originOrderItem.getPayment().getPaymentId();
+        OrderItem orderItem = orderItemService.getOrderItem(originOrderItem.getOrderItemId());
         Payment payment = paymentService.findPayment(paymentId);
-        OrderItem orderItem = order.getOrderItems().get(0);
+        Product afterOrderProduct = productService.getProduct(orderItem.getProduct().getProductId());
 
 
         //then
-        assertEquals(Orders.OrderStatus.CANCEL,order.getStatus());
+        assertEquals(Orders.OrderStatus.CANCEL,orderItem.getStatus());
         assertEquals(Payment.PaymentStatus.CANCEL,payment.getStatus());
-        assertEquals(originOrderItem.getProductOption().getQuantity() + orderItem.getCount(), orderItem.getProductOption().getQuantity());
+        // 취소전 수량 + 취소 수량  = 현재 수량
+        assertEquals(beforeOrderProduct.getOptions().get(orderItem.getProductOption().getOptionId()-1).getQuantity() + originOrderItem.getCount(),afterOrderProduct.getOptions().get(orderItem.getProductOption().getOptionId()-1).getQuantity());
 
 
-    }*/
+    }
 
-    //Todo : order 상태 변경에 대한 해당 조건에 맞는 테스트 세분화
+    //Todo : order 상태 변경에 대한 해당 조건에 맞는 테스트 세분화(환불,교환,취소)
     /*@Test
     @Transactional
     public void changeOrderStatus() throws Exception {
