@@ -6,8 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
-
 @Controller
 @RequestMapping("/delivery")
 @RequiredArgsConstructor
@@ -17,7 +15,7 @@ public class DeliveryController {
 
     @GetMapping("/{id}/form")
     public String getDeliveryForm(@PathVariable Long id, Model model) {
-        Delivery delivery = deliveryService.findDelivery(id);
+        Delivery delivery = deliveryService.getDelivery(id);
         model.addAttribute("delivery",delivery);
         model.addAttribute("vendors", Delivery.DeliveryVendor.values());
         return "/delivery/form";

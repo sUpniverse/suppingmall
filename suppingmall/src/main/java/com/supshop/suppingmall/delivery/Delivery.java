@@ -1,6 +1,7 @@
 package com.supshop.suppingmall.delivery;
 
 
+import com.supshop.suppingmall.order.OrderItem;
 import lombok.*;
 
 import java.util.Arrays;
@@ -19,6 +20,7 @@ public class Delivery {
     private String zipCode;
     private String phone;
     private String memo;
+    private OrderItem orderItem;
     private DeliveryVendor vendor; // 배송사
     private String trackingNumber; // 송장번호
     private DeliveryStatus status; // 배송상태

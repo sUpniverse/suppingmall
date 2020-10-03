@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -15,14 +17,17 @@ public class DeliveryService {
 
     private final DeliveryMapper deliveryMapper;
 
-    public Delivery findDelivery(Long deliveryId) {
+    public List<Delivery> getDeliveryList() {
+        return deliveryMapper.findAll();
+    }
+
+    public Delivery getDelivery(Long deliveryId) {
         return deliveryMapper.findOne(deliveryId);
     }
 
     @Transactional
-    public Long save(Delivery delivery) {
-        deliveryMapper.save(delivery);
-        return delivery.getDeliveryId();
+    public void save(List<Delivery> deliveryList) {
+        deliveryMapper.save(deliveryList);
     }
 
     @Transactional
@@ -44,4 +49,6 @@ public class DeliveryService {
         //결제 취소시 배송기록 삭제
         deliveryMapper.delete(delivery);
     }
+
+
 }
