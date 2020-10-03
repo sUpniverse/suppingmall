@@ -1,7 +1,10 @@
 package com.supshop.suppingmall.order;
 
+import com.supshop.suppingmall.order.form.OrderForm;
 import com.supshop.suppingmall.order.form.TempOrderForm;
 import com.supshop.suppingmall.payment.PaymentService;
+import com.supshop.suppingmall.product.Product;
+import com.supshop.suppingmall.product.ProductService;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserFactory;
 import org.junit.Test;
@@ -12,30 +15,32 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 public class OrdersServiceTest {
 
     @Autowired private OrderService orderService;
     @Autowired private PaymentService paymentService;
     @Autowired private OrderFactory orderFactory;
     @Autowired private UserFactory userFactory;
+    @Autowired private ProductService productService;
 
     //주문확인 테스트
     @Test
-    @Transactional
     public void getOrder() throws Exception {
         //given
-        Orders orders = orderFactory.buildOrder();
+        Orders orders = orderFactory.createOrder();
 
         //when
         Orders findOrder = orderService.getOrder(orders.getOrderId());
 
-
-        //then
         //then
         assertThat(findOrder.getStatus()).isEqualTo(Orders.OrderStatus.DELIVERY);
         assertThat(findOrder.getAmountProductCount()).isEqualTo(orders.getAmountProductCount());
@@ -50,7 +55,6 @@ public class OrdersServiceTest {
 
     //임시 주문 생성 테스트
     @Test
-    @Transactional
     public void createTempOrder(){
         //given
         int size = orderService.getOrderList(null, null, null, null).size();
@@ -58,7 +62,7 @@ public class OrdersServiceTest {
         TempOrderForm tempOrderForm = orderFactory.buildTempOrderForm(tester);
 
         //when
-        Orders tempOrder = orderService.createOrder(tempOrderForm);
+        Orders tempOrder = orderService.createTempOrder(tempOrderForm);
         Orders orderNewItem = orderService.getOrder(tempOrder.getOrderId());
         int addedSize = orderService.getOrderList(null, null, null, null).size();
 
@@ -77,28 +81,32 @@ public class OrdersServiceTest {
 
 
     // 임시주문 -> 주문완료 테스트
-    /*@Test
-    @Transactional
+    @Test
     public void orderProduct() throws Exception {
         //given
         OrderForm orderForm = orderFactory.buildOrderForm();
+        Orders order = orderService.getOrder(orderForm.getOrderId());
+        Product beforeOrderProduct = productService.getProduct(order.getOrderItems().get(0).getProduct().getProductId());
+
 
         //when
-        Orders order = orderService.getTempOrder(orderForm);
-        Long orderId = orderService.order(order);
-        Orders newOrder = orderService.getOrder(orderId);
+        orderService.order(order,orderForm.getPayment(),orderForm.getDelivery());
+        Orders newOrder = orderService.getOrder(order.getOrderId());
+        Product afterOrderProduct = productService.getProduct(order.getOrderItems().get(0).getProduct().getProductId());
 
-        assertEquals(newOrder.getStatus(), Orders.OrderStatus.DELIVERY);
-        assertEquals(newOrder.getPayment().getPaymentType(), order.getPayment().getPaymentType());
-        assertEquals(newOrder.getPayment().getPrice(), order.getPayment().getPrice());
-        assertEquals(newOrder.getPayment().getStatus(), order.getPayment().getStatus());
-        assertEquals(newOrder.getDelivery().getAddress(), order.getDelivery().getAddress());
-        assertEquals(newOrder.getDelivery().getAddressDetail(), order.getDelivery().getAddressDetail());
-        assertEquals(newOrder.getDelivery().getPhone(), order.getDelivery().getPhone());
-        assertEquals(newOrder.getDelivery().getVendor(), order.getDelivery().getVendor());
-        assertEquals(newOrder.getOrderItems().get(0).getProductOption().getQuantity(), order.getOrderItems().get(0).getProductOption().getQuantity());
+        //then
+        OrderItem orderItem = order.getOrderItems().get(0);
+        OrderItem newOrderItem = newOrder.getOrderItems().get(0);
 
-    }*/
+        assertEquals(Orders.OrderStatus.COMPLETE,newOrder.getStatus());
+        assertEquals(orderForm.getPayment().getPrice(),newOrderItem.getPayment().getPrice());
+        assertEquals(orderForm.getDelivery().getAddress(),newOrderItem.getDelivery().getAddress());
+        assertEquals(orderItem.getProductOption().getQuantity(),newOrderItem.getProductOption().getQuantity());
+        // 주문전 수량 - 주문한 수량  = 현재 수량
+       assertEquals(beforeOrderProduct.getOptions().get(orderItem.getProductOption().getOptionId()-1).getQuantity() - order.getOrderItems().get(0).getCount(),afterOrderProduct.getOptions().get(orderItem.getProductOption().getOptionId()-1).getQuantity());
+
+
+    }
 
 
 

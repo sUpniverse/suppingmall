@@ -17,6 +17,14 @@
         <result property="status" column="DeliveryStatus" typeHandler="com.supshop.suppingmall.delivery.DeliveryStatusHandler" />
     </resultMap>
 
+    <select id="findAll" resultMap="delivery">
+        SELECT
+        D.delivery_id AS "DeliveryId",
+        D.name AS "DeliveryName",D.address AS "DeliveryAddress", D.address_detail AS "DeliveryAddressDetail", D.zipcode AS "DeliveryZipCode",
+        D.phone AS "DeliveryPhone", D.vendor AS "DeliveryVendor", D.tracking_number AS "DeliveryTrackingNumber", D.memo AS "DeliveryMemo"
+        FROM delivery AS D
+    </select>
+
     <select id="findOne" resultMap="delivery">
         SELECT
         D.delivery_id AS "DeliveryId",
@@ -28,7 +36,8 @@
 
     <insert id="save" useGeneratedKeys="true" keyProperty="deliveryId">
         INSERT INTO Delivery (
-        name ,
+        orderitem_id,
+        name,
         address,
         address_detail,
         zipcode,
@@ -39,18 +48,22 @@
         status,
         create_date
         )
-        VALUES (
-        #{name},
-        #{address},
-        #{addressDetail},
-        #{zipCode},
-        #{phone},
-        #{memo},
-        #{vendor, typeHandler=com.supshop.suppingmall.delivery.DeliveryVendorHandler},
-        #{trackingNumber},
-        #{status, typeHandler=com.supshop.suppingmall.delivery.DeliveryStatusHandler},
-        now()
-        );
+        VALUES
+        <foreach item="delivery" collection="list" separator=",">
+            (
+            #{delivery.orderItem.orderItemId},
+            #{delivery.name},
+            #{delivery.address},
+            #{delivery.addressDetail},
+            #{delivery.zipCode},
+            #{delivery.phone},
+            #{delivery.memo},
+            #{delivery.vendor, typeHandler=com.supshop.suppingmall.delivery.DeliveryVendorHandler},
+            #{delivery.trackingNumber},
+            #{delivery.status, typeHandler=com.supshop.suppingmall.delivery.DeliveryStatusHandler},
+            now()
+            )
+        </foreach>
     </insert>
 
     <update id="saveVendor">

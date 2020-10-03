@@ -8,7 +8,7 @@
         <result property="status" column="OrderStatus" typeHandler="com.supshop.suppingmall.order.OrderStatusTypeHandler" />
         <result property="orderDate" column="OrderDate"/>
         <result property="updateDate" column="OrderUpdateDate"/>
-        <collection property="orderItems" column="OrderItemId" ofType="com.supshop.suppingmall.order.OrderItem">
+        <collection property="orderItems" column="OrderId" ofType="com.supshop.suppingmall.order.OrderItem">
             <id property="orderItemId" column="OrderItemId" />
             <result property="count" column="OrderItemCount" />
             <result property="price" column="OrderItemPrice" />
@@ -278,12 +278,6 @@
         set
         <if test="status != null">
             status = #{status, typeHandler=com.supshop.suppingmall.order.OrderStatusTypeHandler},
-        </if>
-        <if test="deliveryId != null">
-            delivery_id = #{deliveryId},
-        </if>
-        <if test="paymentId != null">
-            payment_id = #{paymentId},
         </if>
         update_date = now()
         where order_id = #{orderId};

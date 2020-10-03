@@ -7,7 +7,7 @@ import lombok.*;
 import java.util.Arrays;
 
 @Getter @Setter
-@Builder @ToString
+@Builder @ToString @EqualsAndHashCode(of = "deliveryId")
 @AllArgsConstructor @NoArgsConstructor
 public class Delivery {
 

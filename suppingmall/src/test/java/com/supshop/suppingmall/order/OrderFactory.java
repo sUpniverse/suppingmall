@@ -106,32 +106,45 @@ public class OrderFactory {
     //임시주문을 가져와 배송정보와 결제정보등을 담은 form 상태 반환함
     public OrderForm buildOrderForm() {
 
-        //임시상품정보
+        // 임시상품정보
         User user = userFactory.createUser("tester");
         TempOrderForm tempOrderForm = buildTempOrderForm(user);
-        Orders order = orderService.createOrder(tempOrderForm);
+        Orders order = orderService.createTempOrder(tempOrderForm);
 
-        //배송입력정보
+        // 배송입력정보
         Delivery delivery = deliveryFactory.buildDelivery(user);
 
         // 결제정보
-        List<Payment> paymentList = paymentFactory.buildPayment(order.getOrderItems());
+        Payment payment = paymentFactory.buildPaymentList(15000);
 
         OrderForm orderForm = new OrderForm();
         orderForm.setOrderId(order.getOrderId());
         orderForm.setDelivery(delivery);
-        orderForm.setPayment(paymentList);
+        orderForm.setPayment(payment);
 
         return orderForm;
     }
 
-    //실제 주문이 완료된 상태의 주문 반환
-    public Orders buildOrder() throws Exception {
-        OrderForm orderForm = this.buildOrderForm();
-        Orders order = orderService.getOrder(orderForm.getOrderId());
-        orderService.order(order);
+    //임시주문을 가져와 배송정보와 결제정보등을 담은 form 상태 반환함
+    public Orders createTempOrder() {
+
+        // 임시상품정보
+        User user = userFactory.createUser("tester");
+        TempOrderForm tempOrderForm = buildTempOrderForm(user);
+        Orders order = orderService.createTempOrder(tempOrderForm);
+
         return order;
     }
+
+
+    //실제 주문이 완료된 상태의 주문 반환
+    public Orders createOrder() throws Exception {
+        OrderForm orderForm = this.buildOrderForm();
+        Orders order = orderService.getOrder(orderForm.getOrderId());
+        orderService.order(order,null,null);
+        return order;
+    }
+
 
 
 

@@ -262,7 +262,8 @@
         price,
         count,
         buyer_id,
-        seller_id
+        seller_id,
+        ordered_date
         )
         values
         <foreach item="orderItem" collection="list" separator=",">
@@ -273,7 +274,8 @@
             #{orderItem.price},
             #{orderItem.count},
             #{orderItem.buyer.userId},
-            #{orderItem.seller.userId}
+            #{orderItem.seller.userId},
+            now()
             )
         </foreach>
     </insert>
@@ -292,18 +294,17 @@
     </update>
 
     <update id="updateList" parameterType="com.supshop.suppingmall.order.OrderItem">
-        <foreach item="orderItem" collection="list" separator=",">
+        <foreach item="orderItem" collection="list" separator=";">
             UPDATE OrderItem
             SET
-            (
             order_id = #{orderItem.orders.orderId},
+            status = #{orderItem.status, typeHandler=com.supshop.suppingmall.order.OrderStatusTypeHandler},
             product_id = #{orderItem.product.productId},
             product_option_id = #{orderItem.productOption.optionId},
-            product_option_id = #{orderItem.price},
+            price = #{orderItem.price},
             count = #{orderItem.count},
             buyer_id = #{orderItem.buyer.userId},
             seller_id = #{orderItem.seller.userId}
-            )
             WHERE orderitem_id = #{orderItem.orderItemId}
         </foreach>
     </update>

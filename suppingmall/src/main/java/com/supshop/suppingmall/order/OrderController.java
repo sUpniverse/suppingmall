@@ -6,7 +6,6 @@ import com.supshop.suppingmall.order.form.OrderForm;
 import com.supshop.suppingmall.order.form.TempOrderForm;
 import com.supshop.suppingmall.page.TenItemsCriteria;
 import com.supshop.suppingmall.page.PageMaker;
-import com.supshop.suppingmall.payment.Payment;
 import com.supshop.suppingmall.user.Role;
 import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +55,7 @@ public class OrderController {
                                            @ModelAttribute(value = "orderForm") OrderForm orderForm) {
 
         // 임시주문
-        Orders tempOrder = orderService.createOrder(tempOrderForm);
+        Orders tempOrder = orderService.createTempOrder(tempOrderForm);
         URI link = linkTo(OrderController.class).slash("/orderSheet").slash(tempOrder.getOrderId()).toUri();
 
         // 반영된 주문 표시
@@ -77,13 +76,7 @@ public class OrderController {
                 return "/order/fail";
             }
 
-            for (OrderItem orderItem : orders.getOrderItems()) {
-                for (Payment payment : orderForm.getPayment()) {
-                    orderItem.setPayment(payment);
-                    orderItem.setDelivery(orderForm.getDelivery());
-                }
-            }
-            orderService.order(orders);
+            orderService.order(orders,orderForm.getPayment(),orderForm.getDelivery());
 
         } catch (Exception e) {
             // 주문 실패
@@ -96,6 +89,22 @@ public class OrderController {
 
     }
 
+    @GetMapping("/orderSheet/{id}")
+    public String getOrderSheet(@PathVariable Long id,
+                                @AuthenticationPrincipal SessionUser user,
+                                Model model) {
+
+        Orders order = orderService.getOrder(id);
+        if(!UserUtils.isOwner(order.getOrderItems().get(0).getBuyer().getUserId(), user)) {
+            return "redirect:/products/";
+        }
+
+        // 반영된 주문 표시
+        model.addAttribute("orderItems", order.getOrderItems());
+        model.addAttribute("product",order.getOrderItems().get(0).getProduct());
+        model.addAttribute("tempOrder",order);
+        return "/order/form";
+    }
 
     @GetMapping("")
     public String getOrders(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
@@ -131,22 +140,6 @@ public class OrderController {
         return "/order/detail";
     }
 
-    @GetMapping("/orderSheet/{id}")
-    public String getOrderSheet(@PathVariable Long id,
-                                @AuthenticationPrincipal SessionUser user,
-                                Model model) {
-
-        Orders order = orderService.getOrder(id);
-        if(!UserUtils.isOwner(order.getOrderItems().get(0).getBuyer().getUserId(), user)) {
-            return "redirect:/products/";
-        }
-
-        // 반영된 주문 표시
-        model.addAttribute("orderItems", order.getOrderItems());
-        model.addAttribute("product",order.getOrderItems().get(0).getProduct());
-        model.addAttribute("tempOrder",order);
-        return "/order/form";
-    }
 
 
     @GetMapping("/main")

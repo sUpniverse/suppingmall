@@ -3,9 +3,7 @@ package com.supshop.suppingmall.order;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.delivery.DeliveryService;
-import com.supshop.suppingmall.mapper.OrderItemMapper;
 import com.supshop.suppingmall.mapper.OrderMapper;
-import com.supshop.suppingmall.order.form.OrderForm;
 import com.supshop.suppingmall.order.form.TempOrderForm;
 import com.supshop.suppingmall.page.TenItemsCriteria;
 import com.supshop.suppingmall.payModule.ModuleController;
@@ -17,7 +15,7 @@ import com.supshop.suppingmall.product.ProductService;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -41,6 +39,7 @@ public class OrderService {
     private final DeliveryService deliveryService;
     private final OrderItemService orderItemService;
 
+    private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
     private final ModuleController moduleController;
@@ -94,17 +93,13 @@ public class OrderService {
         return ordersList;
     }
 
-    public Orders getOrderByDeliveryId(Long deliveryId) {
-        return orderMapper.findOneByDeliveryId(deliveryId);
-    }
-
     /**
      * 임시 주문 상태로 DB에 데이터 생성
      * @param tempOrderForm
      * @return orders
      */
     @Transactional
-    public Orders createOrder(TempOrderForm tempOrderForm) {
+    public Orders createTempOrder(TempOrderForm tempOrderForm) {
 
         //임시 주문 생성
         Orders orders = setTempOrder(tempOrderForm);
@@ -157,34 +152,56 @@ public class OrderService {
         return orderItems;
     }
 
+    /**
+     * 실제 주문 : 주문, 결제, 배송 정보 생성
+     * @param orders
+     * @param payment
+     * @param delivery
+     * @return
+     */
     @Transactional
-    public Long order(Orders order) {
-        List<OrderItem> orderItems = order.getOrderItems();
+    public Long order(Orders orders,Payment payment, Delivery delivery) {
+        //임시 주문상태를 주문 상태로 변경
+        orders.setStatus(Orders.OrderStatus.COMPLETE);
+
+        List<OrderItem> orderItems = orders.getOrderItems();
         List<ProductOption> productOptionList = new ArrayList<>();
+        List<Payment> paymentList = new ArrayList<>();
+        List<Delivery> deliveryList = new ArrayList<>();
 
         for(OrderItem orderItem : orderItems) {
             //임시 주문상태를 실제 주문 상태로 변경
+            orderItem.setOrders(orders);
             orderItem.setStatus(Orders.OrderStatus.DELIVERY);
 
-            //상품 수량 변경
+            //상품 수량 감소
             ProductOption productOption = orderItem.getProductOption();
             productOption.removeStock(orderItem.getCount());
             productOptionList.add(productOption);
+
+            // 결제 정보 생성
+            Payment mappedPayment = modelMapper.map(payment, Payment.class);
+            mappedPayment.setOrderItem(orderItem);
+            mappedPayment.setPrice(orderItem.getPrice());
+            paymentList.add(mappedPayment);
+
+            // 배송 정보 생성
+            Delivery mappedDelivery = modelMapper.map(delivery, Delivery.class);
+            mappedDelivery.setOrderItem(orderItem);
+            mappedDelivery.setStatus(Delivery.DeliveryStatus.WAIT);
+            deliveryList.add(mappedDelivery);
         }
 
-        List<OrderItem> orderItemList = order.getOrderItems();
-        for(OrderItem orderItem : orderItemList) {
-            ProductOption productOption = orderItem.getProductOption();
-            productOption.removeStock(orderItem.getCount());
-            productOptionList.add(productOption);
-        }
 
-        productService.updateProductOption(productOptionList);
-
-        //주문상태 변경, 결제, 배송 내용 수정
+        //주문상태 변경, 물품갯수 감소, 결제 및 배송정보 생성
+        orderMapper.updateOrder(orders);
         orderItemService.updateOrderItemList(orderItems);
+        productService.updateProductOption(productOptionList);
+        paymentService.save(paymentList);
+        deliveryService.save(deliveryList);
 
-        return order.getOrderId();
+
+        return orders.getOrderId();
     }
 
     //상품 교환 or 환불 시 상태변경 및 택배 요청

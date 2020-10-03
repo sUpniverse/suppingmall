@@ -43,7 +43,7 @@
             #{payment.paymentType, typeHandler=com.supshop.suppingmall.payment.PaymentGroupTypeHandler},
             #{payment.vendorCheckNumber},
             #{payment.status, typeHandler=com.supshop.suppingmall.payment.PaymentStatusTypeHandler},
-            #{payment.payDate}
+            now()
             )
         </foreach>
     </insert>

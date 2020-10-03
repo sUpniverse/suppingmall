@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 
 @Getter @Setter
-@Builder @ToString
+@Builder @ToString @EqualsAndHashCode(of = "paymentId")
 @AllArgsConstructor @NoArgsConstructor
 public class Payment {
 

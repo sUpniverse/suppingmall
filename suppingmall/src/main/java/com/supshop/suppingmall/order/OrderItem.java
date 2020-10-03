@@ -7,6 +7,8 @@ import com.supshop.suppingmall.product.ProductOption;
 import com.supshop.suppingmall.user.User;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Setter @Getter
 @Builder @ToString
 @AllArgsConstructor @NoArgsConstructor
@@ -24,4 +26,6 @@ public class OrderItem {
     private Payment payment;
     private Orders.OrderStatus status;
     private String reviewYn;
+    private LocalDateTime orderedDate;
+    private LocalDateTime updatedDate;
 }
