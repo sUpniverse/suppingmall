@@ -1,6 +1,7 @@
 package com.supshop.suppingmall.order;
 
 import com.supshop.suppingmall.delivery.Delivery;
+import com.supshop.suppingmall.delivery.DeliveryService;
 import com.supshop.suppingmall.exception.AlreadyCanceledException;
 import com.supshop.suppingmall.mapper.OrderItemMapper;
 import com.supshop.suppingmall.page.TenItemsCriteria;
@@ -14,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.rmi.AlreadyBoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,27 +30,47 @@ public class OrderItemService {
     private final PaymentService paymentService;
     private final ModuleController moduleController;
     private final ProductService productService;
+    private final DeliveryService deliveryService;
 
     private static final int hour = 23;
     private static final int minute = 59;
 
-    public OrderItem getOrderItem(Long orderItemId) {
+    public int getOrderItemCount(String type, Long id) {
+        return orderItemMapper.findCount(type, id);
+    }
 
+    public OrderItem getOrderItem(Long orderItemId) {
         return orderItemMapper.findOne(orderItemId);
     }
 
+    /**
+     * 주문상품 bulk insert
+     * @param orderItems
+     */
     @Transactional
     public void saveList(List<OrderItem> orderItems) {
         orderItemMapper.saveList(orderItems);
     }
 
+    /**
+     * 주문 상품 bulk update
+     * @param orderItems
+     */
     @Transactional
     public void updateOrderItemList(List<OrderItem> orderItems) {
         orderItemMapper.updateList(orderItems);
     }
 
-    //구매자의 관점에서 주문을 조회
-    public List<OrderItem> getOrderByBuyerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Orders.OrderStatus status) {
+    /**
+     * 구매자의 관점에서 주문을 조회
+     * @param userId
+     * @param fromDate
+     * @param toDate
+     * @param type
+     * @param status
+     * @return List<OrderItem>, 구매자가 구매한 주문 목록
+     */
+    public List<OrderItem> getOrderItemByBuyerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Orders.OrderStatus status) {
         LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
         LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
         //code : orderStatus Value
@@ -59,8 +79,18 @@ public class OrderItemService {
         return orderItemList;
     }
 
-    //판매자의 관점에서 주문을 조회
-    public List<OrderItem> getOrderBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Delivery.DeliveryStatus deliveryStatus, Orders.OrderStatus orderStatus, TenItemsCriteria criteria) {
+    /**
+     * 판매자의 관점에서 주문을 조회
+     * @param userId
+     * @param fromDate
+     * @param toDate
+     * @param type
+     * @param deliveryStatus
+     * @param orderStatus
+     * @param criteria
+     * @return List<OrderItem>, 판매자에게 요청된 주문 목록
+     */
+    public List<OrderItem> getOrderItemBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Delivery.DeliveryStatus deliveryStatus, Orders.OrderStatus orderStatus, TenItemsCriteria criteria) {
         LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
         LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
 
@@ -75,7 +105,11 @@ public class OrderItemService {
         return orderItemList;
     }
 
-    //주문 취소 (제품 보내기 전 결제 취소 시)
+
+    /**
+     * 주문 취소 (제품 보내기 전 결제 취소 시)
+     * @param orderItem
+     */
     @Transactional
     public void cancelOrderItem(OrderItem orderItem) {
 
@@ -120,4 +154,59 @@ public class OrderItemService {
         //주문상태 수정
         orderItemMapper.updateStatus(orderItem);
     }
+
+    /**
+     * OrderItem의 상태변경 로직, orderStatus에 따른 로직이 분기 됌
+     * @param orderItem
+     * @param orderStatus
+     */
+    @Transactional
+    public void changeStatus(OrderItem orderItem, Orders.OrderStatus orderStatus) {
+
+        // 배송준비
+        if(orderStatus.equals(Orders.OrderStatus.DELIVERY)) {
+            Delivery delivery = orderItem.getDelivery();
+            delivery.setStatus(Delivery.DeliveryStatus.WAIT);
+            deliveryService.update(delivery);
+
+        } else if(orderStatus.equals(Orders.OrderStatus.REFUND)) {   //환불 요청시 상태변경 및 택배 요청
+
+//            Delivery delivery = orderItem.getDelivery();
+//            delivery.setStatus(Delivery.DeliveryStatus.WAIT);
+//            //Todo : 택배사에게 수거 요청 (to, from)
+//            deliveryService.update(delivery);
+        }
+
+        orderItem.setStatus(orderStatus);
+        orderItemMapper.updateStatus(orderItem);
+
+
+    }
+
+
+
+    /*
+    //상품교환 확정 시
+    @Transactional
+    public Long updateOrderAfterCheckingChange(Long orderId) {
+        // 주문 가져오기
+        Orders order = orderMapper.findOne(orderId).get();
+
+        // 상품 개수에 반환된 물품개수 추가
+        List<OrderItem> orderItems = order.getOrderItems();
+        List<ProductOption> productOptionList = new ArrayList<>();
+        for(OrderItem orderItem : orderItems) {
+            ProductOption productOption = orderItem.getProductOption();
+            productOption.addStock(orderItem.getCount());
+            productOptionList.add(productOption);
+        }
+        productService.updateProductOption(productOptionList);
+
+        // 다시 보내야할 상품 개수를 통해 물품개수 감소
+
+
+        return orderId;
+    }
+    */
+
 }

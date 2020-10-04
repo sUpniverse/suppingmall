@@ -81,7 +81,7 @@
                         <a class="form-control text-center" th:href="@{'/orders/'+${orderItem.orderItemId}+'/review'}" th:text="리뷰작성"></a>
                         <a class="form-control text-center" th:href="@{'/products/'+${orderItem.product.productId}+'/reorder'}" th:text="재구매"></a>
                     </div>
-                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(orderItem.status,'REFUND') and #strings.equals(orderItem.status,'CHANGE')}">
+                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(orderItem.status,'REFUND') or #strings.equals(orderItem.status,'CHANGE')}">
 
                     </div>
                     <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(orderItem.status,'CANCEL')}">
@@ -108,7 +108,7 @@
        var header = [[${_csrf.headerName}]];
        var token = [[${_csrf.token}]];
 
-        if (confirm("삭제하시겠습니까?")) {
+        if (confirm("취소하시겠습니까?")) {
 
             $.ajax({
                 type: 'POST',

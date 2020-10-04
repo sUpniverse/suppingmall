@@ -6,8 +6,8 @@
 </head>
 <body>
     <header th:replace="product/product-nav-dark :: product-nav-dark" />
-    <div class="mt-2">
-        <h1>반품접수가 완료 되었습니다.</h1>
+    <div class="p-5">
+        <h1 class="p-3">반품접수가 완료 되었습니다.</h1>
         <table class="table table-default border-bottom">
             <thead>
             <tr class="text-center">
@@ -19,35 +19,33 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="item : ${order.getOrderItems()}">
-                <td class="text-center align-middle" th:text="${item.orderItemId}"></td>
+            <tr>
+                <td class="text-center align-middle" th:text="${orderItem.orderItemId}"></td>
                 <td>
                     <div class="row">
-                        <a th:href="@{'/products/'+${item.product.productId}}">
-                            <img th:src="${item.product.thumbnail}" style="width: 90px; height: 90px">
+                        <a th:href="@{'/products/'+${orderItem.product.productId}}">
+                            <img th:src="${orderItem.product.thumbnail}" style="width: 90px; height: 90px">
                         </a>
                         <div class="ml-3">
-                            <a th:href="@{'/products/'+${item.product.productId}}" th:text="${item.product.name}" class="text-dark" style="font-size: 16px">
+                            <a th:href="@{'/products/'+${orderItem.product.productId}}" th:text="${orderItem.product.name}" class="text-dark" style="font-size: 16px">
                             </a>
                             <br>
-                            <span class="text-muted" th:text="@{'옵션명 : '+${item.productOption.optionName}}" style="font-size: 13px"></span>
+                            <span class="text-muted" th:text="@{'옵션명 : '+${orderItem.productOption.optionName}}" style="font-size: 13px"></span>
                         </div>
                     </div>
                 </td>
                 <td class="text-center align-middle">
-                    <span th:text="@{${#numbers.formatInteger(item.price,3,'COMMA')}+'원'}" class="text-dark" style="font-size: 13px;"></span>
-                    <br>
-                    <span th:text="@{'('+${item.count}+'개)'}" style="font-size: 13px;"></span>
+                    <span th:text="@{${#numbers.formatInteger(orderItem.price,3,'COMMA')}+'원'}" class="text-dark" style="font-size: 13px;"></span>
                 </td>
-                <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${item.productOption.optionId} > 1">
-                    <span th:text="@{${#numbers.formatInteger(item.product?.deliveryPrice,3,'COMMA')}+'원'}"></span>
+                <td class="bg-light border align-middle text-center">
+                    <span th:text="@{${#numbers.formatInteger(orderItem.product?.deliveryPrice,3,'COMMA')}+'원'}"></span>
                     <br>
-                    <span class="text-muted" th:text="${order.seller.storeVO?.storeName}"></span>
+                    <span class="text-muted" th:text="${orderItem.seller.storeVO?.storeName}"></span>
                     <br>
-                    <span class="text-muted" th:text="@{'('+${order.seller.storeVO?.storePhoneNumber}+')'}" style="font-size: 13px;"></span>
+                    <span class="text-muted" th:text="@{'('+${orderItem.seller.storeVO?.storePhoneNumber}+')'}" style="font-size: 13px;"></span>
                 </td>
-                <td class="align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${item.productOption.optionId} > 1">
-                    <strong th:text="@{${#numbers.formatInteger(order.getAmountPrice(),3,'COMMA')}+'원'}"></strong>
+                <td class="align-middle text-center">
+                    <strong th:text="@{${#numbers.formatInteger(orderItem.price,3,'COMMA')}+'원'}"></strong>
                 </td>
             </tr>
             </tbody>

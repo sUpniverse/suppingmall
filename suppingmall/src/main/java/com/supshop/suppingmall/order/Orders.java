@@ -74,19 +74,16 @@ public class Orders {
 
     //물품 가격 + 배송비
     public int getAmountPrice() {
-        int deliveryPrice = getDeliveryPrice();
-        return this.getAmountProductPrice() + deliveryPrice;
+        return this.getAmountProductPrice() + getAmountDeliveryPrice();
     }
 
-    public int getDeliveryPrice() {
-        return this.orderItems.get(0).getProduct().getDeliveryPrice();
+    public int getAmountDeliveryPrice() {
+        int sum = this.getOrderItems().stream().mapToInt(orderItem -> orderItem.getProduct().getDeliveryPrice()).sum();
+        return sum;
     }
 
     public int getAmountProductCount() {
-        int count = 0;
-        for(OrderItem orderItem : this.orderItems) {
-            count += orderItem.getCount();
-        }
+        int count = this.orderItems.stream().mapToInt(OrderItem::getCount).sum();
         return count;
     }
 

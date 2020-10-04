@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.order;
 
+import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.order.form.OrderForm;
 import com.supshop.suppingmall.order.form.TempOrderForm;
 import com.supshop.suppingmall.payment.Payment;
@@ -134,21 +135,22 @@ public class OrdersServiceTest {
 
     }
 
-    //Todo : order 상태 변경에 대한 해당 조건에 맞는 테스트 세분화(환불,교환,취소)
-    /*@Test
+    @Test
     @Transactional
-    public void changeOrderStatus() throws Exception {
+    public void changeOrderStatusBySeller() throws Exception {
         //given
-        Orders orders = orderFactory.buildOrder();
+        Orders orders = orderFactory.createOrder();
+        OrderItem originOrderItem = orders.getOrderItems().get(0);
 
         //when
-        orderService.updateOrderByRefundOrChangeRequest(orders.getOrderId(), Orders.OrderStatus.REFUND);
-        Orders changedOrder = orderService.getOrder(orders.getOrderId());
+        orderItemService.changeStatus(originOrderItem, Orders.OrderStatus.DELIVERY);
+        OrderItem orderItem = orderItemService.getOrderItem(originOrderItem.getOrderItemId());
 
         //then
-        assertEquals(Orders.OrderStatus.REFUND, changedOrder.getStatus());
+        assertEquals(Orders.OrderStatus.DELIVERY, orderItem.getStatus());
+        assertEquals(Delivery.DeliveryStatus.WAIT, orderItem.getDelivery().getStatus());
 
-    }*/
+    }
 
 
 

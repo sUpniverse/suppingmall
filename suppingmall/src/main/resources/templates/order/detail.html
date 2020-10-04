@@ -31,8 +31,7 @@
                     <th>상품정보</th>
                     <th>상품금액(수량)</th>
                     <th class="bg-light border">배송비/판매자정보</th>
-                    <th class="bg-light border">진행상황</th>
-                    <th class="bg-light border">확인/취소</th>
+                    <th class="bg-light border" colspan="2">진행상황</th>
                 </tr>
             </thead>
             <tbody>
@@ -56,29 +55,29 @@
                         <br>
                         <span th:text="@{'('+${item.count}+'개)'}" style="font-size: 13px;"></span>
                     </td>
-                    <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${iter.index} > 0">
+                    <td class="bg-light border align-middle text-center">
                         <span th:text="@{${#numbers.formatInteger(item.product?.deliveryPrice,3,'COMMA')}+'원'}"></span>
                         <br>
-                        <span class="text-muted" th:text="${order.seller.storeVO.storeName}"></span>
+                        <span class="text-muted" th:text="${item.seller.storeVO.storeName}"></span>
                         <br>
-                        <span class="text-muted" th:text="@{'('+${order.seller.storeVO.storePhoneNumber}+')'}" style="font-size: 13px;"></span>
+                        <span class="text-muted" th:text="@{'('+${item.seller.storeVO.storePhoneNumber}+')'}" style="font-size: 13px;"></span>
                     </td>
-                    <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${iter.index} > 0">
-                        <span th:if="${not #strings.equals(order.status,order.status.DELIVERY)}" th:text="${order.status.title}"></span>
-                        <div th:if="${#strings.equals(order.status,order.status.DELIVERY)}">
-                            <span th:text="${order.delivery.status.title}"></span>
+                    <td class="bg-light border align-middle text-center">
+                        <span th:if="${not #strings.equals(item.status,order.status.DELIVERY)}" th:text="${item.status.title}"></span>
+                        <div th:if="${#strings.equals(item.status,order.status.DELIVERY)}">
+                            <span th:text="${item.delivery.status.title}"></span>
                             <br>
-                            <button th:if="${not #strings.equals(order.delivery.status,order.status.WAIT)}" class="btn btn-success btn-sm" href="#">배송조회</button>
+                            <button th:if="${not #strings.equals(item.delivery.status,order.status.WAIT)}" class="btn btn-success btn-sm" href="#">배송조회</button>
                         </div>
                     </td>
-                    <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${iter.index} > 0">
-                        <div th:if="${#strings.equals(order.delivery.status ,order.status.DELIVERY)}">
-                            <a class="btn btn-danger btn-sm" th:href="@{'/orders/'+${order.orderId} +'/refundForm/'}">반품신청</a>
+                    <td class="bg-light border align-middle text-center">
+                        <div th:if="${#strings.equals(item.status ,order.status.DELIVERY)}">
+                            <a class="btn btn-danger btn-sm" th:href="@{'/orders/'+${item.orderItemId} +'/refundForm/'}">반품신청</a>
                             <br>
                             <a class="btn btn-warning btn-sm mt-1" href="#">교환신청</a>
                         </div>
-                        <div th:if="${#strings.equals(order.delivery.status,order.status.WAIT)}">
-                            <a class="btn btn-danger btn-sm" th:href="@{'/orders/'+${order.orderId} +'/cancelForm/'}">결제취소</a>
+                        <div th:if="${#strings.equals(item.status,order.status.ORDER)}">
+                            <a class="btn btn-danger btn-sm" th:id="${item.orderItemId}" th:href="'javascript:cancel('+${item.orderItemId}+')'">결제취소</a>
                         </div>
                     </td>
                 </tr>
@@ -90,23 +89,23 @@
             <table class="table table-default">
                 <tr>
                     <th>수령인</th>
-                    <td th:text="${order.delivery.name}"></td>
+                    <td th:text="${order.orderItems.get(0).delivery.name}"></td>
                 </tr>
                 <tr>
                     <th>연락처</th>
-                    <td th:text="${order.delivery.phone}"></td>
+                    <td th:text="${order.orderItems.get(0).delivery.phone}"></td>
                 </tr>
                 <tr>
                     <th>배송지</th>
                     <td>
-                        <span th:text="${order.delivery.zipCode}"></span>
-                        <span th:text="${order.delivery.address}"></span>
-                        <span th:text="${order.delivery?.addressDetail}"></span>
+                        <span th:text="${order.orderItems.get(0).delivery.zipCode}"></span>
+                        <span th:text="${order.orderItems.get(0).delivery.address}"></span>
+                        <span th:text="${order.orderItems.get(0).delivery?.addressDetail}"></span>
                     </td>
                 </tr>
                 <tr>
                     <th>배송메모</th>
-                    <td th:text="${order.delivery?.memo}"></td>
+                    <td th:text="${order.orderItems.get(0).delivery?.memo}"></td>
                 </tr>
             </table>
         </div>
@@ -132,7 +131,7 @@
                                     </li>
                                     <li class="text-muted">
                                         <span>배송비</span>
-                                        <span class="align-right" th:text="@{${#numbers.formatInteger(order.getDeliveryPrice(),3,'COMMA')}+'원'}"></span>
+                                        <span class="align-right" th:text="@{${#numbers.formatInteger(order.getAmountDeliveryPrice(),3,'COMMA')}+'원'}"></span>
                                     </li>
                                 </ul>
                             </dl>
@@ -198,8 +197,8 @@
                 </tr>
                 <tr>
                     <td colspan="3">
-                        <span th:text="@{'결제수단' + ${order.payment.paymentType.title}}"></span>
-                        <span class="text-danger" th:if="${#strings.equals(order.status,'CANCEL')}" th:text="${order.payment.status.title}"></span>
+                        <span th:text="@{'결제수단 : ' + ${order.orderItems.get(0).payment.paymentType.title}}"></span>
+                        <span class="text-danger" th:if="${#strings.equals(order.orderItems.get(0).status,'CANCEL')}" th:text="${order.orderItems.get(0).payment.status.title}"></span>
                     </td>
                 </tr>
             </table>
@@ -210,5 +209,33 @@
     </div>
 </div>
 <footer th:include="fragments/footer :: footer" />
+<script th:inline="javascript">
+    function cancel(orderItemId) {
+
+        var header = [[${_csrf.headerName}]];
+        var token = [[${_csrf.token}]];
+
+        if (confirm("취소하시겠습니까?")) {
+
+            $.ajax({
+                type: 'POST',
+                url: '/orders/'+orderItemId+'/cancel',
+                dataType: 'text',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader(header,token);
+                },
+                success: () => {
+                    alert("주문취소 되었습니다.");
+                    document.getElementById(orderItemId).remove();
+                },
+                error: (response, error) => {
+                    alert("주문취소에 실패했습니다.")
+                }
+            });
+
+        }
+    }
+</script>
 </body>
 </html>

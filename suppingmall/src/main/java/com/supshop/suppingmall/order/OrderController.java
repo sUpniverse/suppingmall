@@ -19,21 +19,23 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RequestMapping("/orders")
-@RequiredArgsConstructor
 @Controller
-@Slf4j
+@RequiredArgsConstructor @Slf4j
 public class OrderController {
 
     private final OrderService orderService;
     private final OrderItemService orderItemService;
 
     private static final int orderDisplayPagingNum = 5;
+    private static final String redirectUrl = "redirect:/orders/main";
+
 
     @PostMapping("/orderSheet")
     @ResponseBody
@@ -52,7 +54,6 @@ public class OrderController {
     @PostMapping("")
     public String createOrder(OrderForm orderForm,
                               @AuthenticationPrincipal SessionUser user){
-
         Orders orders = null;
         try {
             orders = orderService.getOrder(orderForm.getOrderId());
@@ -137,14 +138,14 @@ public class OrderController {
 
 
     @GetMapping("/main")
-    public String getOrdersByBuyerId(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-                                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
-                                    @RequestParam(required = false) String type,
-                                    @RequestParam(required = false) Orders.OrderStatus status,
-                                    @AuthenticationPrincipal SessionUser user,
-                                    Model model) {
+    public String getOrderItemByBuyerId(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+                                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+                                        @RequestParam(required = false) String type,
+                                        @RequestParam(required = false) Orders.OrderStatus status,
+                                        @AuthenticationPrincipal SessionUser user,
+                                        Model model) {
 
-        List<OrderItem> orderItemList = orderItemService.getOrderByBuyerId(user.getUserId(), fromDate, toDate, type, status);
+        List<OrderItem> orderItemList = orderItemService.getOrderItemByBuyerId(user.getUserId(), fromDate, toDate, type, status);
         model.addAttribute("orderItemList",orderItemList);
         model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.values()));
 
@@ -153,21 +154,21 @@ public class OrderController {
 
 
     @GetMapping("/seller/main")
-    public String getOrdersBySellerIdOnDelivery(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
-                                     @RequestParam(required = false) String type,
-                                     @RequestParam(required = false) Delivery.DeliveryStatus deliveryStatus,
-                                     @RequestParam(required = false) Orders.OrderStatus orderStatus,
-                                     @AuthenticationPrincipal SessionUser user,
-                                     TenItemsCriteria criteria,
-                                     Model model) {
+    public String getOrderItemBySellerIdOnDelivery(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+                                                   @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+                                                   @RequestParam(required = false) String type,
+                                                   @RequestParam(required = false) Delivery.DeliveryStatus deliveryStatus,
+                                                   @RequestParam(required = false) Orders.OrderStatus orderStatus,
+                                                   @AuthenticationPrincipal SessionUser user,
+                                                   TenItemsCriteria criteria,
+                                                   Model model) {
 
 
-        int count = orderService.findCount("seller", user.getUserId());
+        int count = orderItemService.getOrderItemCount("seller", user.getUserId());
         PageMaker pageMaker = new PageMaker(count, orderDisplayPagingNum, criteria);
-        List<Orders> pagingOrders = orderService.getOrderBySellerId(user.getUserId(),fromDate,toDate,type,deliveryStatus,orderStatus,criteria);
+        List<OrderItem> orderItemList = orderItemService.getOrderItemBySellerId(user.getUserId(), fromDate, toDate, type, deliveryStatus, orderStatus, criteria);
 
-        model.addAttribute("orders",pagingOrders);
+        model.addAttribute("orderItemList",orderItemList);
         model.addAttribute("pageMaker",pageMaker);
 
         // type이 order일시에는 환불관련 페이지로
@@ -176,13 +177,22 @@ public class OrderController {
             return "/order/seller/refund-list";
         }
 
-//        int wait = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.WAIT)).count();
-//        int delivery = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.DELIVERY)).count();
-//        int complete = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.COMPLETE)).count();
-//        int change = (int) pagingOrders.stream().filter(orders -> orders.getDelivery().getStatus().equals(Delivery.DeliveryStatus.CHANGE)).count();
+        int check = (int) orderItemList.stream().filter(orderItem -> orderItem.getStatus().equals(Orders.OrderStatus.ORDER)).count();
+        int wait = (int) orderItemList.stream().filter(orderItem -> orderItem.getStatus().equals(Orders.OrderStatus.DELIVERY) && orderItem.getDelivery().getStatus().equals(Delivery.DeliveryStatus.WAIT)).count();
+        int delivery = (int) orderItemList.stream().filter(orderItem -> orderItem.getStatus().equals(Orders.OrderStatus.DELIVERY) && orderItem.getDelivery().getStatus().equals(Delivery.DeliveryStatus.DELIVERY)).count();
+        int complete = (int) orderItemList.stream().filter(orderItem -> orderItem.getStatus().equals(Orders.OrderStatus.DELIVERY) && orderItem.getDelivery().getStatus().equals(Delivery.DeliveryStatus.COMPLETE)).count();
+        int change = (int) orderItemList.stream().filter(orderItem -> orderItem.getStatus().equals(Orders.OrderStatus.CHANGE) && orderItem.getDelivery().getStatus().equals(Delivery.DeliveryStatus.CHANGE)).count();
+        int refund = (int) orderItemList.stream().filter(orderItem -> orderItem.getStatus().equals(Orders.OrderStatus.REFUND) && orderItem.getDelivery().getStatus().equals(Delivery.DeliveryStatus.CHANGE)).count();
 
 
-//        model.addAttribute("status",Arrays.asList(wait,delivery,complete,change));
+        Map<String,Integer> status = new HashMap<>();
+        status.put("check", check);
+        status.put("wait", wait);
+        status.put("delivery", delivery);
+        status.put("complete",complete);
+        status.put("change", change+refund);
+
+        model.addAttribute("status", status);
         model.addAttribute("statusList", Delivery.DeliveryStatus.values());
 
         return "/order/seller/list";
@@ -190,10 +200,37 @@ public class OrderController {
 
 
     @GetMapping("/{id}/seller")
-    public String getOrderBySellerId(@PathVariable Long id, Model model) {
+    public String getOrderBySellerId(@PathVariable Long id,
+                                     @AuthenticationPrincipal SessionUser sessionUser,
+                                     Model model) {
         Orders order = orderService.getOrder(id);
-        model.addAttribute("order",order);
+        if(order == null && !UserUtils.isOwner(order.getOrderItems().get(0).getSeller().getUserId(), sessionUser)){
+            new IllegalArgumentException();
+            return redirectUrl;
+        }
+
+        List<OrderItem> orderItemListBySeller = order.getOrderItems().stream().filter(orderItem -> orderItem.getSeller().getUserId().equals(sessionUser.getUserId())).collect(Collectors.toList());
+        model.addAttribute("orderItemList",orderItemListBySeller);
         return "/order/seller/detail";
+    }
+
+    @PostMapping("/{id}/seller/status/check")
+    @ResponseBody
+    public ResponseEntity getOrderCheckBySeller(@PathVariable Long id,
+                                                @AuthenticationPrincipal SessionUser sessionUser) {
+
+        OrderItem orderItem = orderItemService.getOrderItem(id);
+
+        try {
+            if(!UserUtils.isOwner(orderItem.getSeller().getUserId(), sessionUser)) new IllegalArgumentException("해당 셀러가 아닙니다.");
+            if(orderItem == null) new IllegalArgumentException("해당 주문이 존재하지 않습니다.");
+            orderItemService.changeStatus(orderItem, Orders.OrderStatus.DELIVERY);
+        } catch (Exception e){
+            ResponseEntity.badRequest().body(e.getLocalizedMessage());
+        }
+
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/cancel")
@@ -202,7 +239,7 @@ public class OrderController {
                               @AuthenticationPrincipal SessionUser sessionUser) {
         OrderItem orderItem = orderItemService.getOrderItem(id);
 
-        if(orderItem == null && !UserUtils.isOwner(orderItem.getBuyer().getUserId(),sessionUser)){
+        if(orderItem == null || !UserUtils.isOwner(orderItem.getBuyer().getUserId(),sessionUser)){
             new IllegalArgumentException();
             return ResponseEntity.badRequest().body("존재하지 않습니다.");
         }
@@ -214,17 +251,30 @@ public class OrderController {
     }
 
     @GetMapping("/{id}/refundForm")
-    public String getRefundForm(@PathVariable Long id, Model model) {
-        Orders order = orderService.getOrder(id);
-        model.addAttribute("order",order);
+    public String getRefundForm(@PathVariable Long id,
+                                @AuthenticationPrincipal SessionUser sessionUser,
+                                Model model) {
+
+        OrderItem orderItem = orderItemService.getOrderItem(id);
+        if(orderItem == null || Orders.OrderStatus.REFUND.equals(orderItem.getStatus()) || !UserUtils.isOwner(orderItem.getBuyer().getUserId(),sessionUser)){
+            new IllegalArgumentException();
+            return redirectUrl;
+        }
+        model.addAttribute("orderItem",orderItem);
         return "/order/refund-form";
     }
 
     @PostMapping("/{id}/refund")
-    public String refundOrder(@PathVariable Long id, Model model) {
-//        orderService.updateOrderByRefundOrChangeRequest(id, Orders.OrderStatus.REFUND);
-        Orders order = orderService.getOrder(id);
-        model.addAttribute("order",order);
+    public String refundOrder(@PathVariable Long id,
+                              @AuthenticationPrincipal SessionUser sessionUser,
+                              Model model) {
+        OrderItem orderItem = orderItemService.getOrderItem(id);
+        if(orderItem == null || Orders.OrderStatus.REFUND.equals(orderItem.getStatus()) || !UserUtils.isOwner(orderItem.getBuyer().getUserId(),sessionUser)){
+            new IllegalArgumentException();
+            return redirectUrl;
+        }
+        orderItemService.changeStatus(orderItem, Orders.OrderStatus.REFUND);
+        model.addAttribute("orderItem",orderItem);
         return "/order/refund";
     }
 

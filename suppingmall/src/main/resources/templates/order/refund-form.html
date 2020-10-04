@@ -25,25 +25,25 @@
             <td>
                 스토어이름
             </td>
-            <td th:text="${order.seller.storeVO.storeName}"></td>
+            <td th:text="${orderItem.seller.storeVO.storeName}"></td>
         </tr>
         <tr>
             <td>
                 스토어 전화번호
             </td>
-            <td th:text="${order.seller.storeVO.storePhoneNumber}"></td>
+            <td th:text="${orderItem.seller.storeVO.storePhoneNumber}"></td>
         </tr>
         <tr>
             <td>
                 스토어 우편번호
             </td>
-            <td th:text="${order.seller.storeVO.storeZipCode}"></td>
+            <td th:text="${orderItem.seller.storeVO.storeZipCode}"></td>
         </tr>
         <tr>
             <td>
                 스토어 주소
             </td>
-            <td th:text="@{${order.seller.storeVO.storeAddress} +' '+${order.seller.storeVO.storeAddressDetail}}"></td>
+            <td th:text="@{${orderItem.seller.storeVO.storeAddress} +' '+${orderItem.seller.storeVO.storeAddressDetail}}"></td>
         </tr>
     </table>
     <form role="form">
@@ -59,42 +59,40 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="item,iter : ${order.getOrderItems()}">
-                <td class="text-center align-middle" th:text="${item.orderItemId}"></td>
+            <tr>
+                <td class="text-center align-middle" th:text="${orderItem.orderItemId}"></td>
                 <td>
                     <div class="row">
-                        <a th:href="@{'/product/'+${item.product.productId}}">
-                            <img th:src="${item.product.thumbnail}" style="width: 90px; height: 90px">
+                        <a th:href="@{'/product/'+${orderItem.product.productId}}">
+                            <img th:src="${orderItem.product.thumbnail}" style="width: 90px; height: 90px">
                         </a>
                         <div class="ml-3">
-                            <a th:href="@{'/product/'+${item.product.productId}}" th:text="${item.product.name}" class="text-dark" style="font-size: 16px">
+                            <a th:href="@{'/product/'+${orderItem.product.productId}}" th:text="${orderItem.product.name}" class="text-dark" style="font-size: 16px">
                             </a>
                             <br>
-                            <span class="text-muted" th:text="@{'옵션명 : '+${item.productOption.optionName}}" style="font-size: 13px"></span>
+                            <span class="text-muted" th:text="@{'옵션명 : '+${orderItem.productOption.optionName}}" style="font-size: 13px"></span>
                         </div>
                     </div>
                 </td>
                 <td class="text-center align-middle">
-                    <span th:text="@{${#numbers.formatInteger(item.price,3,'COMMA')}+'원'}" class="text-dark" style="font-size: 13px;"></span>
-                    <br>
-                    <span th:text="@{'('+${item.count}+'개)'}" style="font-size: 13px;"></span>
+                    <span th:text="@{${#numbers.formatInteger(orderItem.price,3,'COMMA')}+'원'}" class="text-dark" style="font-size: 13px;"></span>
                 </td>
-                <td class="bg-light border align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${iter.index} > 0">
-                    <span th:text="@{${#numbers.formatInteger(item.product?.deliveryPrice,3,'COMMA')}+'원'}"></span>
+                <td class="bg-light border align-middle text-center">
+                    <span th:text="@{${#numbers.formatInteger(orderItem.product?.deliveryPrice,3,'COMMA')}+'원'}"></span>
                     <br>
-                    <span class="text-muted" th:text="${order.seller.storeVO?.storeName}"></span>
+                    <span class="text-muted" th:text="${orderItem.seller.storeVO?.storeName}"></span>
                     <br>
-                    <span class="text-muted" th:text="@{'('+${order.seller.storeVO?.storePhoneNumber}+')'}" style="font-size: 13px;"></span>
+                    <span class="text-muted" th:text="@{'('+${orderItem.seller.storeVO?.storePhoneNumber}+')'}" style="font-size: 13px;"></span>
                 </td>
-                <td class="align-middle text-center" th:rowspan="${order.getAmountProductCount()}" th:unless="${iter.index} > 0">
-                    <strong th:text="@{${#numbers.formatInteger(order.getAmountPrice(),3,'COMMA')}+'원'}"></strong>
+                <td class="align-middle text-center">
+                    <strong th:text="@{${#numbers.formatInteger(orderItem.getPrice(),3,'COMMA')}+'원'}"></strong>
                 </td>
             </tr>
             </tbody>
         </table>
         <div class="mt-5 align-middle text-center">
-            <button class="btn btn-danger" id="cancelOrder">취소하기</button>
-            <a class="btn btn-primary" th:href="@{'/orders/'+${order.orderId}}">되돌아가기</a>
+            <button class="btn btn-danger" id="cancelOrder">반품요청</button>
+            <a class="btn btn-primary" th:href="@{'/orders/'+${orderItem.orders.orderId}}">되돌아가기</a>
         </div>
     </form>
 </div>
@@ -104,7 +102,7 @@
     $(document).on('click','#cancelOrder',() => {
         var formObj = $("form[role='form']");
         formObj.attr("method","post");
-        formObj.attr("action","/orders/"+[[${order.orderId}]]+"/refund");
+        formObj.attr("action","/orders/"+[[${orderItem.orderItemId}]]+"/refund");
         formObj.submit();
     });
 
