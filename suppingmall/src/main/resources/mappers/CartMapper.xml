@@ -5,6 +5,11 @@
 <mapper namespace="com.supshop.suppingmall.mapper.CartMapper">
     <resultMap id="cart" type="com.supshop.suppingmall.cart.Cart" autoMapping="true">
         <id property="cartId" column="CartId" />
+        <association property="buyer" javaType="com.supshop.suppingmall.user.User" >
+            <id property="userId" column="BuyerId" />
+            <result property="name" column="BuyerName" />
+            <result property="nickName" column="BuyerNickName" />
+        </association>
         <collection property="cartItemList" column="CartItemId" ofType="com.supshop.suppingmall.cart.CartItem">
             <id property="cartItemId" column="CartItemId" />
             <result property="price" column="CartItemPrice" />
@@ -37,13 +42,30 @@
         </collection>
     </resultMap>
 
-    <select id="findByBuyerId" resultMap="cart">
-        SELECT C.cart_id AS "CartId", CI.cartItem_id AS "CartItemId", CI.price AS "CartItemPrice", CI.quantity AS "CartItemQuantity",
+    <select id="findOne" resultMap="cart">
+        SELECT C.cart_id AS "CartId", CI.cartItem_id AS "CartItemId", CI.price AS "CartItemPrice", CI.quantity AS "CartItemQuantity", B.user_id AS "BuyerId", B.name AS "BuyerName", B.nickName AS "BuyerNickName",
         P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
         S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode", S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
         PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity"
         FROM Cart AS C
         LEFT OUTER JOIN CartItem AS CI on (C.cart_id = CI.cart_id)
+        LEFT OUTER JOIN User AS B on (C.buyer_id = B.user_id)
+        LEFT OUTER JOIN Product AS P on (CI.product_id = P.product_id)
+        LEFT OUTER JOIN User AS S on (P.seller_id = S.user_id)
+        LEFT OUTER JOIN Product_option AS PO on (CI.product_id = PO.product_id) and (CI.product_option_id = PO.product_option_id)
+        WHERE C.cart_id = #{Id}
+        ORDER BY C.create_date
+    </select>
+
+
+    <select id="findAllByBuyerId" resultMap="cart">
+        SELECT C.cart_id AS "CartId", CI.cartItem_id AS "CartItemId", CI.price AS "CartItemPrice", CI.quantity AS "CartItemQuantity", B.user_id AS "BuyerId", B.name AS "BuyerName", B.nickName AS "BuyerNickName",
+        P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.thumbnail AS "ProductThumbnail", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
+        S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode", S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
+        PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.price AS "ProductOptionPrice", PO.quantity AS "ProductOptionQuantity"
+        FROM Cart AS C
+        LEFT OUTER JOIN CartItem AS CI on (C.cart_id = CI.cart_id)
+        LEFT OUTER JOIN User AS B on (C.buyer_id = B.user_id)
         LEFT OUTER JOIN Product AS P on (CI.product_id = P.product_id)
         LEFT OUTER JOIN User AS S on (P.seller_id = S.user_id)
         LEFT OUTER JOIN Product_option AS PO on (CI.product_id = PO.product_id) and (CI.product_option_id = PO.product_option_id)
@@ -62,4 +84,9 @@
         now()
         )
     </insert>
+
+    <delete id="delete" parameterType="com.supshop.suppingmall.cart.Cart">
+        DELETE FROM Cart
+        WHERE cart_id = #{id};
+    </delete>
 </mapper>

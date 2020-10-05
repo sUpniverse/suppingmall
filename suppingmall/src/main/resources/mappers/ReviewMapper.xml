@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.supshop.suppingmall.mapper.ReviewMapper">
+    <resultMap id="Review" type="com.supshop.suppingmall.review.Review" autoMapping="true">
+        <id property="reviewId" column="ReviewId" />
+        <result property="title" column="ReviewTitle" />
+        <result property="contents" column="ReviewContents" />
+        <result property="createdDate" column="ReviewCreatedDate" />
+        <association property="creator" javaType="com.supshop.suppingmall.user.User">
+            <id property="userId" column="UserId" />
+            <result property="email" column="UserEmail" />
+            <result property="nickName" column="UserNickName" />
+            <result property="createdDate" column="UserCreatedDate" />
+        </association>
+        <association property="product" javaType="com.supshop.suppingmall.product.Product">
+            <id property="productId" column="ProductId"></id>
+        </association>
+        <association property="orderItem" javaType="com.supshop.suppingmall.order.OrderItem">
+            <id property="orderItemId" column="OrderItemId" />
+            <result property="count" column="OrderItemCount" />
+            <result property="price" column="OrderItemPrice" />
+            <association property="productOption" javaType="com.supshop.suppingmall.product.ProductOption">
+                <id property="optionId" column="ProductOptionId" />
+                <result property="optionName" column="ProductOptionName" />
+                <result property="price" column="ProductOptionPrice" />
+                <result property="quantity" column="ProductOptionQuantity" />
+            </association>
+        </association>
+    </resultMap>
+
+    <sql id="conditionalSearch">
+        <if test="productId != null">
+            AND R.product_id = #{productId}
+        </if>
+        <if test="orderItemId != null">
+            AND R.orderItem_id = #{orderItemId}
+        </if>
+        <if test="type != null and searchValue != null">
+            <if test='type.equals("contents")'>
+                <bind name="searchValue" value="'%'+searchValue+'%'"/>
+                AND R.title LIKE #{searchValue}
+            </if>
+            <if test='type.equals("creator")'>
+                AND R.user_id = #{searchValue}
+            </if>
+        </if>
+    </sql>
+
+    <sql id="paging">
+        <if test="criteria != null">
+            limit #{criteria.pageStart}, #{criteria.perPageNum}
+        </if>
+    </sql>
+
+    <select id="findReviewCount" resultType="int">
+        SELECT count(*)
+        From Review AS R
+        LEFT OUTER JOIN User AS U on (R.user_id = U.user_id)
+        <include refid="conditionalSearch"></include>
+    </select>
+
+
+    <select id="findAll" resultMap="Review">
+        SELECT R.review_id AS "reviewId", R.title AS "ReviewTitle",R.contents AS "ReviewContents", R.created_date AS "ReviewCreatedDate",
+        U.user_id AS "UserId",U.email AS "UserEmail", U.nickname AS "UserNickName"
+        FROM Review AS R
+        LEFT OUTER JOIN User AS U on (R.user_id = U.user_id)
+        LEFT OUTER JOIN Product AS P on (P.product_id = O.orderItem_id)
+        LEFT OUTER JOIN OrderItem AS O on (R.orderItem_id = O.orderItem_id)
+        LEFT OUTER JOIN ProductOpiton AS PO on (O.product_option_id = PO.product_option_id)
+        <include refid="conditionalSearch"></include>
+        ORDER BY R.review_id desc
+        <include refid="paging"></include>
+    </select>
+
+
+    <select id="findOne" resultMap="Review">
+        SELECT R.review_id AS "reviewId", R.title AS "reviewTitle",R.created_date AS "reviewCreatedDate",
+        U.user_id AS "UserId", U.email AS "UserEmail", U.nickname AS "UserNickName"
+        FROM Review AS R
+        LEFT OUTER JOIN User AS U on (R.user_id = U.user_id)
+        LEFT OUTER JOIN Product AS P on (R.product_id = P.product_id)
+        WHERE R.review_id = #{reviewId}
+    </select>
+
+    <insert id="save" parameterType="com.supshop.suppingmall.review.Review" useGeneratedKeys="true" keyProperty="reviewId">
+        INSERT INTO Review (
+        title,
+        contents,
+        user_id,
+        product_id,
+        created_date
+        )
+        VALUES (
+        #{title},
+        #{contents},
+        #{creator.userId},
+        #{orderItem.product.productId},
+        #{orderItem.orderItemId},
+        now()
+        )
+    </insert>
+
+    <update id="update" parameterType="com.supshop.suppingmall.review.Review">
+        UPDATE review SET
+        title = #{title},
+        user_id = #{creator.userId},
+        product_id =#{product.productId},
+        reply_id = #{reply.reviewId}
+        WHERE review_id = #{reviewId}
+    </update>
+
+    <update id="delete" parameterType="com.supshop.suppingmall.review.Review">
+        DELETE FROM Review
+        WHERE review_id = #{reviewId}
+    </update>
+
+
+</mapper>
+

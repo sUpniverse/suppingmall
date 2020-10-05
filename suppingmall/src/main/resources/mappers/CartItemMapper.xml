@@ -9,9 +9,8 @@
         <result property="price" column="CartItemPrice" />
     </resultMap>
 
-
     <insert id="save" useGeneratedKeys="true" keyProperty="cartItemId">
-        insert into cartItem (
+        INSERT INTO cartItem (
         cart_id,
         product_id,
         product_option_id,
@@ -29,5 +28,10 @@
             )
         </foreach>
     </insert>
+
+    <delete id="delete" parameterType="com.supshop.suppingmall.cart.CartItem">
+        DELETE FROM CartItem
+        WHERE cart_id = #{cartId}
+    </delete>
 
 </mapper>

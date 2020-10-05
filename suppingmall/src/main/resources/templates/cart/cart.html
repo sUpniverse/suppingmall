@@ -30,16 +30,20 @@
             </tr>
         </thead>
         <tbody>
-            <tr th:each="cart,iter : ${carts}" class="border-bottom">
+            <tr th:each="cart,iter : ${carts}" class="border-bottom itemList">
                 <td class="text-center align-middle">
                     <input type="checkbox" name="checkRow" th:value="${iter.index}" checked>
                 </td>
                 <td class="border-right">
                     <div class="media">
-                        <img th:src="${cart.cartItemList.get(0).product.thumbnail}" class="align-self-center mr-3" width="100" height="100">
+                        <a th:href="@{'/products/'+${cart.cartItemList.get(0).product.productId}}">
+                            <img th:src="${cart.cartItemList.get(0).product.thumbnail}" class="align-self-center mr-3" width="100" height="100">
+                        </a>
                         <div class="media-body">
                             <div th:text="${cart.cartItemList.get(0).product.seller.storeVO.storeName}"></div>
-                            <strong class="mt-0" th:text="${cart.cartItemList.get(0).product.name}"></strong>
+                            <a th:href="@{'/products/'+${cart.cartItemList.get(0).product.productId}}">
+                                <strong class="mt-0" th:text="${cart.cartItemList.get(0).product.name}"></strong>
+                            </a>
                             <div class="mb-0" th:text="@{${#numbers.formatInteger(cart.cartItemList.get(0).product.price,3,'COMMA')}+'원'}"></div>
                         </div>
                     </div>
@@ -103,8 +107,12 @@
 <script th:inline="javascript">
 
     $(document).ready(() => {
+        var header = [[${_csrf.headerName}]];
+        var token = [[${_csrf.token}]];
+        var userId = [[${#authentication.principal.userId}]];
 
         var cartList = [[${carts}]];
+
         $(document).on('change',"#th_checkAll", () => {
             if( $("#th_checkAll").is(':checked') ){
                 $("input[name=checkRow]").prop("checked", true);
@@ -157,53 +165,112 @@
             return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
-        $(document).on('click','#removeProduct',function () {
-
-            // $.ajax({
-            //     url: '/cart/'+idx,
-            //     type: 'delete',
-            //     contentType: 'application/json',
-            //     success: ()=> {
-            //         $('.table').find('body > div.container.mt-5 > table > tbody > tr:nth-child(idx+1)').remove();
-            //     },
-            //     error: ()=> {
-            //
-            //     }
-            // });
-
-
+        $(document).on('click','#removeProduct',function (){
+            removeItem();
         });
 
 
         $(document).on('click','#order',function () {
-
-            // $.ajax({
-            //     url: '/cart/'+idx,
-            //     type: 'delete',
-            //     contentType: 'application/json',
-            //     success: ()=> {
-            //         $('.table').find('body > div.container.mt-5 > table > tbody > tr:nth-child(idx+1)').remove();
-            //     },
-            //     error: ()=> {
-            //
-            //     }
-            // });
+            var tempordeForm = setForm();
+            $.ajax({
+                url: "/orders/orderSheet",
+                type: 'POST',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("Content-type","application/json");
+                    xhr.setRequestHeader(header,token);
+                },
+                data: JSON.stringify(tempordeForm),
+                success: (data, status, xhr) => {
+                    removeItem(xhr.getResponseHeader('Location'));
+                },
+                error: () => {
+                    alert("잠시후 다시 시도해 주세요");
+                }
+            });
 
         });
 
+        function removeItem(location) {
+            var indexList = getCheckedIndex();
 
-        function getSelectedItems() {
+            indexList.forEach(idx => {
+                $.ajax({
+                    url: '/cart/'+cartList[idx].cartId,
+                    type: 'DELETE',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("Content-type","application/json");
+                        xhr.setRequestHeader(header,token);
+                    },
+                    success: ()=> {
+                        document.getElementsByClassName('itemList')[idx].remove();
+                        if(location !== undefined)
+                            location.href = location;
+                    },
+                    error: ()=> {
+                        if(location !== undefined)
+                            location.href = location;
+                    }
+                });
+            });
+        }
 
+        function setForm() {
+            var indexList = getCheckedIndex();
+            var tempOrderFormList = new Array();
+
+            indexList.forEach(idx => {
+
+                var tempOrderForm = {
+                    productId : "",
+                    sellerId : "",
+                    buyerId : userId,
+                    orderItems : []
+                };
+
+                var cartItemList = cartList[idx].cartItemList;
+
+                var temp = new Array();
+                for(var i = 0; i < cartItemList.length; i++) {
+                    var id = cartItemList[i].productOption.optionId;
+                    var price = cartItemList[i].productOption.price;
+                    var count = cartItemList[i].quantity;
+                    var orderItem = {
+                        productOption : {
+                            optionId : id,
+                        },
+                        price : price,
+                        count : count
+                    };
+                    temp[id] = orderItem;
+                }
+                for(var i = 0; i < temp.length; i++) {
+                    if(temp[i] !== undefined) {
+                        tempOrderForm.orderItems.push(temp[i]);
+                    }
+                }
+                tempOrderForm.productId = cartItemList[0].product.productId;
+                tempOrderForm.sellerId = cartItemList[0].product.seller.userId;
+
+                tempOrderFormList.push(tempOrderForm);
+            });
+
+            return tempOrderFormList;
+        }
+
+        function getCheckedIndex() {
+            var indexList = new Array();
             $('.table').find('input:checkbox').not('#th_checkAll').each(function() {
 
                 if($(this).prop('checked') === true) {
                     var idx = $(this).prop('value');
-                    console.log(idx);
+                    indexList.push(idx);
                 }
-
             });
 
+            return indexList;
         }
+
+
 
     });
 

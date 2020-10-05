@@ -23,8 +23,13 @@ public class CartService {
     private final ProductService productService;
     private final UserService userService;
 
-    public List<Cart> findCartByBuyerId(Long id) {
-        return cartMapper.findByBuyerId(id);
+
+    public Cart getCart(Long id){
+        return cartMapper.findOne(id);
+    }
+
+    public List<Cart> getCartByBuyerId(Long id) {
+        return cartMapper.findAllByBuyerId(id);
     }
 
     @Transactional
@@ -58,5 +63,11 @@ public class CartService {
                 .build();
 
         return cart;
+    }
+
+    @Transactional
+    public void delete(Long cartId) {
+        cartItemMapper.delete(cartId);
+        cartMapper.delete(cartId);
     }
 }

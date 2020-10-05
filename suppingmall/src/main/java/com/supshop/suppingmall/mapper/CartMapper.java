@@ -7,7 +7,11 @@ import java.util.List;
 
 public interface CartMapper {
 
-    List<Cart> findByBuyerId(Long id);
+    Cart findOne(Long id);
+
+    List<Cart> findAllByBuyerId(Long id);
 
     void save(Cart cart);
+
+    void delete(Long cartId);
 }

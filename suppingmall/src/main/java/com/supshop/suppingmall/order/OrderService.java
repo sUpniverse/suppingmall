@@ -94,17 +94,17 @@ public class OrderService {
 
     /**
      * 임시 주문 상태로 DB에 데이터 생성
-     * @param tempOrderForm
+     * @param tempOrderFormList
      * @return orders
      */
     @Transactional
-    public Orders createTempOrder(TempOrderForm tempOrderForm) {
+    public Orders createTempOrder(List<TempOrderForm> tempOrderFormList) {
 
         //임시 주문 생성
-        Orders orders = setTempOrder(tempOrderForm);
+        Orders orders = setTempOrder(tempOrderFormList);
         orderMapper.save(orders);
 
-        //주문상품 생성
+        //주문상품에 생성된 주문 정보를 첨부
         for(OrderItem orderItem : orders.getOrderItems()) {
             orderItem.setOrders(orders);
         }
@@ -114,23 +114,28 @@ public class OrderService {
 
     /**
      * 임시 주문 생성을 위한 정보 셋팅
-     * @param tempOrderForm
+     * @param tempOrderFormList
      * @return Order
      */
-    private Orders setTempOrder(TempOrderForm tempOrderForm) {
+    private Orders setTempOrder(List<TempOrderForm> tempOrderFormList) {
+        List<OrderItem> orderItemList = new ArrayList<>();
+        for(TempOrderForm form : tempOrderFormList) {
+            // 1. 상품조회
+            Product product = productService.getProduct(form.getProductId());
 
-        // 1. 상품조회
-        Product product = productService.getProduct(tempOrderForm.getProductId());
+            // 2. 주문자 및 구매자 정보 조회
+            User buyer = userService.getUser(form.getBuyerId());
+            User seller = userService.getUser(form.getSellerId());
 
-        // 2. 주문생성
-        List<OrderItem> orderItems = setOrderItemsInfo(tempOrderForm,product);
+            // 3. 주문상품 목록 생성
+            setOrderItemsInfo(form,product,buyer,seller,orderItemList);
+        }
 
-        // 3. 주문자 및 구매자 정보 조회
-        User buyer = userService.getUser(tempOrderForm.getBuyerId());
-        User seller = userService.getUser(tempOrderForm.getSellerId());
-
-        //임시 주문 생성 (주문상품, 구매자, 판매자)
-        Orders tempOrder = Orders.buildTempOrder(orderItems,buyer,seller);
+        //임시 주문 생성
+        Orders tempOrder = Orders.builder()
+                                    .orderItems(orderItemList)
+                                    .status(Orders.OrderStatus.WAIT)
+                                    .build();
 
         return tempOrder;
     }
@@ -140,15 +145,22 @@ public class OrderService {
      * @param tempOrderForm
      * @return List<OrderItem>
      */
-    private List<OrderItem> setOrderItemsInfo(TempOrderForm tempOrderForm, Product product){
+    private void setOrderItemsInfo(TempOrderForm tempOrderForm, Product product,User buyer,User seller, List<OrderItem> orderItemList){
 
         List<OrderItem> orderItems = tempOrderForm.getOrderItems();
         for (OrderItem orderItem : orderItems) {
+            // 추가정보 입력
             int optionId = orderItem.getProductOption().getOptionId();
             orderItem.setProductOption(product.getOptions().get(optionId - 1));
+            orderItem.setPrice(product.getOptions().get(optionId - 1).getPrice());
             orderItem.setProduct(product);
+            orderItem.setStatus(Orders.OrderStatus.WAIT);
+            orderItem.setBuyer(buyer);
+            orderItem.setSeller(seller);
+
+            //하나의 orderItemList에 담아서 order에 넣어주기 위함
+            orderItemList.add(orderItem);
         }
-        return orderItems;
     }
 
     /**

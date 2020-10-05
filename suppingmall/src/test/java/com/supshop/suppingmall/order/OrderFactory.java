@@ -41,7 +41,9 @@ public class OrderFactory {
 
 
     // 임시주문을 위한 form을 return, 구매할 물품들의 정보와 갯수 가격등을 포함함 , 물품 페이지에서 단일 물품을 구매할 때
-    public TempOrderForm buildTempOrderForm(User user){
+    public List<TempOrderForm> buildTempOrderForm(User user){
+        List<TempOrderForm> tempOrderFormList = new ArrayList<>();
+
         Product product = setUpTest("notebook");
 
         List<OrderItem> orderItems = new ArrayList<>();
@@ -64,7 +66,8 @@ public class OrderFactory {
         tempOrderForm.setProductId(product.getProductId());
         tempOrderForm.setOrderItems(orderItems);
 
-        return tempOrderForm;
+        tempOrderFormList.add(tempOrderForm);
+        return tempOrderFormList;
     }
 
     // 임시주문을 위한 form을 return, 구매할 물품들의 정보와 갯수 가격등을 포함함 , 물품 페이지에서 다중 물품을 구매할 때
@@ -108,8 +111,8 @@ public class OrderFactory {
 
         // 임시상품정보
         User user = userFactory.createUser("tester");
-        TempOrderForm tempOrderForm = buildTempOrderForm(user);
-        Orders order = orderService.createTempOrder(tempOrderForm);
+        List<TempOrderForm> tempOrderFormList = buildTempOrderForm(user);
+        Orders order = orderService.createTempOrder(tempOrderFormList);
 
         // 배송입력정보
         Delivery delivery = deliveryFactory.buildDelivery(user);
@@ -130,8 +133,8 @@ public class OrderFactory {
 
         // 임시상품정보
         User user = userFactory.createUser("tester");
-        TempOrderForm tempOrderForm = buildTempOrderForm(user);
-        Orders order = orderService.createTempOrder(tempOrderForm);
+        List<TempOrderForm> tempOrderFormList = buildTempOrderForm(user);
+        Orders order = orderService.createTempOrder(tempOrderFormList);
 
         return order;
     }

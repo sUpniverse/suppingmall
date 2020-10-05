@@ -53,7 +53,9 @@ public class UserFactory {
 
         Optional<User> userByEmail = userMapper.findUserByEmail(email);
         if(userByEmail.isPresent()) {
-            return userByEmail.get();
+            User user = userByEmail.get();
+            user.setCreatedDate(null);
+            return user;
         }
 
         User user = User.builder()
@@ -88,7 +90,9 @@ public class UserFactory {
         String email = name+"@email.com";
         Optional<User> userByEmail = userMapper.findUserByEmail(email);
         if(userByEmail.isPresent()) {
-            return userByEmail.get();
+            User user = userByEmail.get();
+            user.setCreatedDate(null);
+            return user;
         }
         StoreVO store = StoreVO.builder()
                 .storeName("섭프라이즈스토어")
@@ -123,7 +127,9 @@ public class UserFactory {
         String email = name+"@email.com";
         Optional<User> userByEmail = userMapper.findUserByEmail(email);
         if(userByEmail.isPresent()) {
-            return userByEmail.get();
+            User user = userByEmail.get();
+            user.setCreatedDate(null);
+            return user;
         }
 
         User user = User.builder()

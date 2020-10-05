@@ -1,6 +1,7 @@
 package com.supshop.suppingmall.cart;
 
 import com.supshop.suppingmall.cart.Form.CartForm;
+import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -22,11 +23,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 public class CartController {
 
     private final CartService cartService;
-    private final ModelMapper modelMapper;
 
     @GetMapping("")
     public String getCart(@AuthenticationPrincipal SessionUser user, Model model) {
-        List<Cart> carts = cartService.findCartByBuyerId(user.getUserId());
+        List<Cart> carts = cartService.getCartByBuyerId(user.getUserId());
         model.addAttribute("carts",carts);
 
         int totalPrice = 0;
@@ -50,13 +50,28 @@ public class CartController {
     @PostMapping("")
     @ResponseBody
     public ResponseEntity createCart(@RequestBody CartForm cartForm) {
-        System.out.println(cartForm.toString());
-
-
-        Cart cart = cartService.save(cartForm);
-        WebMvcLinkBuilder link = linkTo(CartController.class).slash(1l);
+        Cart cart;
+        try {
+            cart = cartService.save(cartForm);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getLocalizedMessage());
+        }
+        WebMvcLinkBuilder link = linkTo(CartController.class).slash(cart.getCartId());
         URI uri = link.toUriComponentsBuilder().build().toUri();
         return ResponseEntity.created(uri).build();
     }
+
+    @DeleteMapping("/{id}")
+    @ResponseBody ResponseEntity deleteCart(@PathVariable Long id,
+                                            @AuthenticationPrincipal SessionUser sessionUser){
+
+        Cart cart = cartService.getCart(id);
+        if(cart == null || !UserUtils.isOwner(cart.getBuyer().getUserId(), sessionUser))
+            ResponseEntity.badRequest().body("존재하지 않습니다.");
+
+        cartService.delete(cart.getCartId());
+        return ResponseEntity.ok().build();
+    }
+
 
 }

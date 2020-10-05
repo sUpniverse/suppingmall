@@ -15,7 +15,6 @@ public class Cart {
     private LocalDateTime createDate;
     private List<CartItem> cartItemList;
 
-
     public int getAmountProductPrice() {
         int price = 0;
         for(CartItem cartItem : this.cartItemList) {

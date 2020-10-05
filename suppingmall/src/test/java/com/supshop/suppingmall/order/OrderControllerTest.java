@@ -18,6 +18,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -40,12 +42,12 @@ public class OrderControllerTest {
     @WithUserDetails(value = "tester", userDetailsServiceBeanName = "userDetailsService")
     public void createOrderSheet() throws Exception {
         User tester = userFactory.createUser("tester");
-        TempOrderForm tempOrderForm = orderFactory.buildTempOrderForm(tester);
+        List<TempOrderForm> tempOrderFormList = orderFactory.buildTempOrderForm(tester);
         ObjectMapper objectMapper = new ObjectMapper();
 
         mockMvc.perform(post("/orders/orderSheet")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsString(tempOrderForm))
+                .content(objectMapper.writeValueAsString(tempOrderFormList))
                 .with(csrf()))
                 .andExpect(status().isCreated())
                 .andDo(print())
@@ -56,12 +58,12 @@ public class OrderControllerTest {
     @Test
     public void createOrderSheet_Without_Authorities() throws Exception {
         User tester = userFactory.createAdmin("tester");
-        TempOrderForm tempOrderForm = orderFactory.buildTempOrderForm(tester);
+        List<TempOrderForm> tempOrderFormList = orderFactory.buildTempOrderForm(tester);
         ObjectMapper objectMapper = new ObjectMapper();
 
         mockMvc.perform(post("/orders/orderSheet2")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsString(tempOrderForm))
+                .content(objectMapper.writeValueAsString(tempOrderFormList))
                 .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andDo(print())
@@ -73,12 +75,12 @@ public class OrderControllerTest {
     @WithUserDetails(value = "tester", userDetailsServiceBeanName = "userDetailsService")
     public void createOrderSheet_Without_CsrfToken() throws Exception {
         User tester = userFactory.createAdmin("tester");
-        TempOrderForm tempOrderForm = orderFactory.buildTempOrderForm(tester);
+        List<TempOrderForm> tempOrderFormList = orderFactory.buildTempOrderForm(tester);
         ObjectMapper objectMapper = new ObjectMapper();
 
         mockMvc.perform(post("/orders/orderSheet2")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsString(tempOrderForm))
+                .content(objectMapper.writeValueAsString(tempOrderFormList))
         )
                 .andExpect(status().isForbidden())
                 .andDo(print())
@@ -92,12 +94,12 @@ public class OrderControllerTest {
 
         //given
         User tester = userFactory.createAdmin("tester");
-        TempOrderForm tempOrderForm = orderFactory.buildTempOrderForm(tester);
+        List<TempOrderForm> tempOrderFormList = orderFactory.buildTempOrderForm(tester);
         ObjectMapper objectMapper = new ObjectMapper();
 
         MockHttpServletResponse response = mockMvc.perform(post("/orders/orderSheet")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(objectMapper.writeValueAsString(tempOrderForm))
+                .content(objectMapper.writeValueAsString(tempOrderFormList))
                 .with(csrf()))
                 .andReturn().getResponse();
         String redirectedUrl = response.getRedirectedUrl();

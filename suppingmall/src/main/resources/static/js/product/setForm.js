@@ -42,20 +42,6 @@ $(document).ready(function() {
             return;
         }
 
-        // var formObj = $("form[role='form']");
-
-        // var orderItemJson = setOrderItemJsonInOrderForm();
-        // if(orderItemJson == undefined) {
-        //     alert("선택된 품목이 없습니다.");
-        //     return;
-        // }
-
-        // document.getElementById("orderItemJson").setAttribute('value',JSON.stringify(orderItemJson));
-        // formObj.attr("action","/orders/orderSheet");
-        // formObj.attr("method","post");
-        // formObj.submit();
-
-
         var tempOrder = setOrders();
         if (tempOrder == undefined) {
             alert("선택된 품목이 없습니다.");
@@ -99,6 +85,8 @@ function setOrders() {
     var sellerId = document.getElementById('sellerId').value;
     var productId = document.getElementById('productId').value;
 
+    var tempOrderFormList = new Array();
+
     var tempOrderForm = {
         productId : productId,
         sellerId : sellerId,
@@ -127,39 +115,10 @@ function setOrders() {
         }
     }
 
-    return tempOrderForm;
+    tempOrderFormList.push(tempOrderForm);
+
+    return tempOrderFormList;
 }
-//
-// function setOrderItemJsonInOrderForm() {
-//     var optionItems = document.getElementById('add_option_area').getElementsByTagName('li');
-//     var optionLength = optionItems.length;
-//
-//     if(optionLength === 0) {
-//         return ;
-//     }
-//
-//     var orderItems = [];
-//     var temp = new Array();
-//     for(var i = 0; i < optionLength; i++) {
-//         var id = getOptionIdInList(optionItems,i);
-//         var price = getPriceInList(optionItems,i);
-//         var count = getCountInList(optionItems,i);
-//         var orderItem = {
-//             productOption : {
-//                 optionId : id,
-//             },
-//             price : price,
-//             count : count
-//         };
-//         temp[id] = orderItem;
-//     }
-//     for(var i = 0; i < temp.length; i++) {
-//         if(temp[i] !== undefined) {
-//             orderItems.push(temp[i]);
-//         }
-//     }
-//     return orderItems;
-// }
 
 function setCartForm() {
     var cartItems = document.getElementById('add_option_area').getElementsByTagName('li');

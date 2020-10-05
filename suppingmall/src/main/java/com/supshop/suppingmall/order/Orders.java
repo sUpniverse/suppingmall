@@ -1,6 +1,5 @@
 package com.supshop.suppingmall.order;
 
-import com.supshop.suppingmall.user.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -43,21 +42,6 @@ public class Orders {
                     .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + code + "]"));
         }
 
-    }
-
-    // 임시주문 생성 (결제 시스템의 식별)
-    public static Orders buildTempOrder(List<OrderItem> orderItemList, User buyer, User seller) {
-        for (OrderItem orderItem : orderItemList) {
-            orderItem.setStatus(OrderStatus.WAIT);
-            orderItem.setBuyer(buyer);
-            orderItem.setSeller(seller);
-        }
-        Orders orders = Orders.builder()
-                            .orderItems(orderItemList)
-                            .orderDate(LocalDateTime.now())
-                            .status(OrderStatus.WAIT)
-                            .build();
-        return orders;
     }
 
     public void addOrderItem(OrderItem orderItem) {

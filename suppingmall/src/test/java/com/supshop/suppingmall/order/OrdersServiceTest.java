@@ -62,10 +62,10 @@ public class OrdersServiceTest {
         //given
         int size = orderService.getOrderList(null, null, null, null).size();
         User tester = userFactory.createUser("tester");
-        TempOrderForm tempOrderForm = orderFactory.buildTempOrderForm(tester);
+        List<TempOrderForm> tempOrderFormList = orderFactory.buildTempOrderForm(tester);
 
         //when
-        Orders tempOrder = orderService.createTempOrder(tempOrderForm);
+        Orders tempOrder = orderService.createTempOrder(tempOrderFormList);
         Orders orderNewItem = orderService.getOrder(tempOrder.getOrderId());
         int addedSize = orderService.getOrderList(null, null, null, null).size();
 

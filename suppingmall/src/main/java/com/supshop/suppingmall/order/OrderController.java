@@ -6,6 +6,7 @@ import com.supshop.suppingmall.order.form.OrderForm;
 import com.supshop.suppingmall.order.form.TempOrderForm;
 import com.supshop.suppingmall.page.TenItemsCriteria;
 import com.supshop.suppingmall.page.PageMaker;
+import com.supshop.suppingmall.product.Product;
 import com.supshop.suppingmall.user.Role;
 import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
@@ -39,12 +40,12 @@ public class OrderController {
 
     @PostMapping("/orderSheet")
     @ResponseBody
-    public ResponseEntity createOrderSheet(@RequestBody TempOrderForm tempOrderForm,
+    public ResponseEntity createOrderSheet(@RequestBody List<TempOrderForm> tempOrderFormList,
                                            @ModelAttribute(value = "orderForm") OrderForm orderForm) {
 
         // 임시주문
-        Orders tempOrder = orderService.createTempOrder(tempOrderForm);
-        URI link = linkTo(OrderController.class).slash("/orderSheet").slash(tempOrder.getOrderId()).toUri();
+        Orders tempOrder = orderService.createTempOrder(tempOrderFormList);
+        URI link = linkTo(OrderController.class).slash(tempOrder.getOrderId()).slash("/orderSheet").toUri();
 
         // 반영된 주문 표시
         return ResponseEntity.created(link).build();
@@ -76,7 +77,7 @@ public class OrderController {
 
     }
 
-    @GetMapping("/orderSheet/{id}")
+    @GetMapping("/{id}/orderSheet")
     public String getOrderSheet(@PathVariable Long id,
                                 @AuthenticationPrincipal SessionUser user,
                                 Model model) {
@@ -86,10 +87,29 @@ public class OrderController {
             return "redirect:/products/";
         }
 
+        Map<Long,List<OrderItem>> map = new HashMap<>();
+
+        for (OrderItem orderItem : order.getOrderItems()) {
+            Long productId = orderItem.getProduct().getProductId();
+            orderItem.getProduct().setSeller(orderItem.getSeller());
+            if (map.containsKey(productId)) {
+                map.get(productId).add(orderItem);
+                continue;
+            }
+            ArrayList<OrderItem> list = new ArrayList<>();
+            list.add(orderItem);
+            map.put(productId, list);
+        }
+
+        Set<Product> productList = order.getOrderItems().stream().map(OrderItem::getProduct).collect(Collectors.toSet());
+        int totalDeliveryPrice = productList.stream().mapToInt(Product::getDeliveryPrice).sum();
+
+
         // 반영된 주문 표시
-        model.addAttribute("orderItems", order.getOrderItems());
-        model.addAttribute("product",order.getOrderItems().get(0).getProduct());
+        model.addAttribute("itemList", map);
+        model.addAttribute("productList",productList);
         model.addAttribute("tempOrder",order);
+        model.addAttribute("totalDeliveryPrice",totalDeliveryPrice);
         return "/order/form";
     }
 

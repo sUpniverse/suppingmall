@@ -9,7 +9,6 @@ import java.util.List;
 @Getter @Setter
 public class TempOrderForm {
 
-    private Long orderId;
     private Long productId;
     private Long buyerId;
     private Long sellerId;

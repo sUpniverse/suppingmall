@@ -8,4 +8,5 @@ public interface CartItemMapper {
 
     void save(List<CartItem> cartItemList);
 
+    void delete(Long cartId);
 }
