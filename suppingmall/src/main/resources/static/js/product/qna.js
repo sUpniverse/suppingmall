@@ -25,7 +25,10 @@ function getReplyList(page) {
 function setReplyList(list){
     var str = "";
     let sellerId = document.getElementById('sellerId').value;
-    let userId = document.getElementById('userId').value;
+    let userId = null;
+    if(document.getElementById('userId') !== null){
+        userId = document.getElementById('userId').value;
+    }
 
     list.forEach(function (qna) {
 
@@ -55,7 +58,7 @@ function setReplyList(list){
                 '              </div>\n' +
                 '              <div class="cell qnaTitle">'+qna.reply.title+'</div>\n' +
                 '              <div class="cell creator">판매자</div>\n' +
-                '             <div class="cell createdDate">'+qna.reply.createdDate.toISOString().split('T')[0]+'</div>\n' +
+                '             <div class="cell createdDate">'+qna.reply.createdDate+'</div>\n' +
                 '           </div>';
         } else if(userId === sellerId){
             str += '        <div class="row border-top p-3" data-rno="'+qna.qnaId+'">\n' +

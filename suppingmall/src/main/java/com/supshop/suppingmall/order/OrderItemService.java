@@ -61,6 +61,11 @@ public class OrderItemService {
         orderItemMapper.updateList(orderItems);
     }
 
+    @Transactional
+    public void updateOrderItem(OrderItem orderItem) {
+        orderItemMapper.update(orderItem);
+    }
+
     /**
      * 구매자의 관점에서 주문을 조회
      * @param userId
@@ -162,27 +167,23 @@ public class OrderItemService {
      */
     @Transactional
     public void changeStatus(OrderItem orderItem, Orders.OrderStatus orderStatus) {
+        Delivery delivery = orderItem.getDelivery();
 
-        // 배송준비
-        if(orderStatus.equals(Orders.OrderStatus.DELIVERY)) {
-            Delivery delivery = orderItem.getDelivery();
+        //Todo : 반품, 교환에 따른 택배사에 요청 로직
+        if(Orders.OrderStatus.DELIVERY.equals(orderStatus)) {         // 배송준비
             delivery.setStatus(Delivery.DeliveryStatus.WAIT);
-            deliveryService.update(delivery);
-
-        } else if(orderStatus.equals(Orders.OrderStatus.REFUND)) {   //환불 요청시 상태변경 및 택배 요청
-
-//            Delivery delivery = orderItem.getDelivery();
-//            delivery.setStatus(Delivery.DeliveryStatus.WAIT);
-//            //Todo : 택배사에게 수거 요청 (to, from)
-//            deliveryService.update(delivery);
+        } else if(Orders.OrderStatus.REFUND.equals(orderStatus)) {   // 환불 요청시 택배사에 반품요청
+            delivery.setStatus(Delivery.DeliveryStatus.REFUND);
+        } else if(Orders.OrderStatus.CHANGE.equals(orderStatus)) {  // 교환 요청시 택배사에 교환요청
+            delivery.setStatus(Delivery.DeliveryStatus.CHANGE);
+        } else if(Orders.OrderStatus.COMPLETE.equals(orderStatus)) {
+            delivery.setStatus(Delivery.DeliveryStatus.COMPLETE);
         }
 
+        deliveryService.update(delivery);
         orderItem.setStatus(orderStatus);
         orderItemMapper.updateStatus(orderItem);
-
-
     }
-
 
 
     /*

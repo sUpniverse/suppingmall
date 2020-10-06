@@ -24,5 +24,9 @@ public interface OrderItemMapper {
 
     void updateList(List<OrderItem> orderItems);
 
+    void update(OrderItem orderItem);
+
     void updateStatus(OrderItem orderItem);
+
+
 }

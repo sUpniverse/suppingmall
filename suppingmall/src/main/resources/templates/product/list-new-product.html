@@ -58,9 +58,9 @@
                         </div><!-- End .product-price -->
                         <div class="ratings-container">
                             <div class="ratings">
-                                <div class="ratings-val" style="width: 100%;"></div><!-- End .ratings-val -->
+                                <div class="ratings-val" th:style="'width:'+${computer.getRating() * 20}+'%;'"></div><!-- End .ratings-val -->
                             </div><!-- End .ratings -->
-                            <span class="ratings-text">( 4 Reviews )</span>
+                            <span class="ratings-text" th:text="${'( '+computer.reviewList.size()+' 개 리뷰 )'}"></span>
                         </div><!-- End .rating-container -->
                     </div><!-- End .product-body -->
                 </div><!-- End .product -->
@@ -107,9 +107,9 @@
                         </div><!-- End .product-price -->
                         <div class="ratings-container">
                             <div class="ratings">
-                                <div class="ratings-val" style="width: 100%;"></div><!-- End .ratings-val -->
+                                <div class="ratings-val" th:style="'width:'+${mobile.getRating() * 20}+'%;'"></div><!-- End .ratings-val -->
                             </div><!-- End .ratings -->
-                            <span class="ratings-text">( 4 Reviews )</span>
+                            <span class="ratings-text" th:text="${'( '+mobile.reviewList.size()+' 개 리뷰 )'}"></span>
                         </div><!-- End .rating-container -->
                     </div><!-- End .product-body -->
                 </div><!-- End .product -->

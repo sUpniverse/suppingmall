@@ -10,7 +10,6 @@
         <result property="registeredDate" column="ProductRegisteredDate" />
         <result property="status" column="ProductStatus" typeHandler="com.supshop.suppingmall.product.ProductStatusTypeHandler" />
         <result property="thumbnail" column="ProductThumbnail" />
-        <result property="rating" column="ProductRating" />
         <result property="contents" column="ProductContents" />
         <result property="deliveryPrice" column="ProductDeliveryPrice" />
         <result property="deliveryVendor" column="ProductDeliveryVendor" typeHandler="com.supshop.suppingmall.delivery.DeliveryVendorHandler"/>
@@ -41,6 +40,13 @@
             <id property="id" column="CategoryId" />
             <result property="name" column="CategoryName" />
         </association>
+        <collection property="reviewList" ofType="com.supshop.suppingmall.review.Review">
+            <id property="reviewId" column="ReviewId" />
+            <result property="title" column="ReviewTitle" />
+            <result property="contents" column="ReviewContents" />
+            <result property="rating" column="ReviewRating"/>
+            <result property="createdDate" column="ReviewCreatedDate" />
+        </collection>
         <collection property="options" column="ProductId" ofType="com.supshop.suppingmall.product.ProductOption" >
             <id property="optionId" column="ProductOptionId" />
             <result property="optionName" column="ProductOptionName" />
@@ -92,7 +98,7 @@
     <select id="findAll" resultMap="product">
         SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.registered_date AS "ProductRegisteredDate",
         P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
-        P.thumbnail AS "ProductThumbnail", P.rating AS "ProductRating", P.contents AS "ProductContents", P.status AS "ProductStatus",
+        P.thumbnail AS "ProductThumbnail", P.contents AS "ProductContents", P.status AS "ProductStatus",
         P.product_detail_id AS "ProductDetailId", P.as_number AS "ProductAsNumber", P.manuplated_date AS "PrdouctManuplatedDate",
         P.contry_of_origin AS "ProductOrigin", P.manufacturer AS "ProductManufacturer", P.spec_1 AS "ProductSpec1",
         P.spec_2 AS "ProductSpec2",P.spec_3 AS "ProductSpec3", P.spec_4 AS "ProductSpec4", P.spec_5 AS "ProductSpec5",
@@ -102,7 +108,7 @@
         FROM
         (
         SELECT
-        P.product_id, P.name, P.price, P.registered_date, P.seller_id, P.category_id, P.delivery_price, P.delivery_vendor, P.thumbnail, P.rating, P.contents, P.status,
+        P.product_id, P.name, P.price, P.registered_date, P.seller_id, P.category_id, P.delivery_price, P.delivery_vendor, P.thumbnail, P.contents, P.status,
         PD.product_detail_id, PD.as_number, PD.manuplated_date, PD.contry_of_origin, PD.manufacturer,
         PD.spec_1, PD.spec_2,PD.spec_3, PD.spec_4, PD.spec_5,
         U.store_name, U.store_phone_number, U.zipcode, U.store_address, U.store_address_detail, C.name AS "categoryName"
@@ -120,7 +126,7 @@
 
     <select id="findAllPart" resultMap="product">
         SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice",
-        P.registered_date AS "ProductRegisteredDate", P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory", P.thumbnail AS "ProductThumbnail",P.rating AS "ProductRating",
+        P.registered_date AS "ProductRegisteredDate", P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory", P.thumbnail AS "ProductThumbnail",
         C.category_id AS "CategoryId", C.name AS "CategoryName"
         FROM Product AS P
         LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
@@ -131,44 +137,48 @@
 
     <select id="findAllPartByParentCategory" resultMap="product">
         SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice",
-        P.registered_date AS "ProductRegisteredDate", P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory", P.thumbnail AS "ProductThumbnail",P.rating AS "ProductRating",
-        C.category_id AS "CategoryId", C.name AS "CategoryName"
-        FROM Product AS P
-        LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
-        WHERE C.parent_id = #{parentId} AND P.status ='PS01'
+        P.registered_date AS "ProductRegisteredDate", P.seller_id AS "ProductSellerId", P.thumbnail AS "ProductThumbnail",
+        P.category_id AS "CategoryId", CategoryName, R.review_id AS "ReviewId", R.rating AS "ReviewRating"
+        FROM
+        (
+            SELECT P.product_id, P.name, P.price, P.registered_date, P.seller_id, P.category_id, P.thumbnail, C.name AS "CategoryName"
+            FROM Product AS P
+            LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
+            WHERE C.parent_id = #{parentId} AND P.status ='PS01'
+            <include refid="paging"></include>
+        ) AS P
+        LEFT OUTER JOIN Review AS R on (P.product_id = R.product_id)
         ORDER BY P.product_id DESC
-        <include refid="paging"></include>
     </select>
 
     <select id="findOnSaleProducts" resultMap="product">
         SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.registered_date AS "ProductRegisteredDate",
-        P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
-        P.thumbnail AS "ProductThumbnail", P.rating AS "ProductRating", P.contents AS "ProductContents", P.status AS "ProductStatus",
+        P.seller_id AS "ProductSellerId", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
+        P.thumbnail AS "ProductThumbnail", P.contents AS "ProductContents", P.status AS "ProductStatus",
         P.product_detail_id AS "ProductDetailId", P.as_number AS "ProductAsNumber", P.manuplated_date AS "PrdouctManuplatedDate",
         P.contry_of_origin AS "ProductOrigin", P.manufacturer AS "ProductManufacturer", P.spec_1 AS "ProductSpec1",
         P.spec_2 AS "ProductSpec2",P.spec_3 AS "ProductSpec3", P.spec_4 AS "ProductSpec4", P.spec_5 AS "ProductSpec5",
         PO.product_option_id AS "ProductOptionId", PO.name AS "ProductOptionName", PO.quantity AS "ProductOptionQuantity", PO.price AS "ProductOptionPrice",
-        P.category_id AS "CategoryId", P.categoryName AS "CategoryName"
+        P.category_id AS "CategoryId", CategoryName, R.review_id AS "ReviewId", R.rating AS "ReviewRating"
         FROM
         (
-        P.product_id, P.name, P.price, P.registered_date, P.seller_id, P.category_id, P.delivery_price, P.delivery_vendor, P.thumbnail, P.rating, P.contents, P.status,
-        PD.product_detail_id, PD.as_number, PD.manuplated_date, PD.contry_of_origin, PD.manufacturer,
-        PD.spec_1, PD.spec_2,PD.spec_3, PD.spec_4, PD.spec_5, C.category_id, C.name, C.category_id, C.name AS "categoryName"
+        P.product_id, P.name, P.price, P.registered_date, P.seller_id, P.category_id, P.delivery_price, P.delivery_vendor, P.thumbnail, P.contents, P.status,
+        PD.product_detail_id, PD.as_number, PD.manuplated_date, PD.contry_of_origin, PD.manufacturer, PD.spec_1, PD.spec_2,PD.spec_3, PD.spec_4, PD.spec_5, C.category_id, CategoryName
         FROM Product AS P
         LEFT OUTER JOIN Product_Detail AS PD on (P.product_id = PD.product_id)
         LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
         <include refid="conditionalSearch"/>
         <include refid="paging"/>
-        )
-        AS P
+        ) AS P
         LEFT OUTER JOIN Product_Option AS PO on (P.product_id = PO.product_id)
+        LEFT OUTER JOIN Review AS R on (P.product_id = R.product_id)
         ORDER BY P.product_id ASC, PO.product_option_id ASC
     </select>
 
     <select id="findOne" resultMap="product">
         SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.registered_date AS "ProductRegisteredDate",
         P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
-        P.thumbnail AS "ProductThumbnail", P.rating AS "ProductRating", P.contents AS "ProductContents", P.status AS "ProductStatus",
+        P.thumbnail AS "ProductThumbnail",  P.contents AS "ProductContents", P.status AS "ProductStatus",
         PD.product_detail_id AS "ProductDetailId", PD.as_number AS "ProductAsNumber", PD.manuplated_date AS "PrdouctManuplatedDate",
         PD.contry_of_origin AS "ProductOrigin", PD.manufacturer AS "ProductManufacturer", PD.spec_1 AS "ProductSpec1",
         PD.spec_2 AS "ProductSpec2",PD.spec_3 AS "ProductSpec3", PD.spec_4 AS "ProductSpec4", PD.spec_5 AS "ProductSpec5",
@@ -187,7 +197,7 @@
     <select id="findAllOrderByOrdersQuantity" resultMap="product">
         SELECT P.product_id AS "ProductId", P.name AS "ProductName", P.price AS "ProductPrice", P.registered_date AS "ProductRegisteredDate",
         P.seller_id AS "ProductSellerId", P.category_id AS "ProductCategory", P.delivery_price AS "ProductDeliveryPrice", P.delivery_vendor AS "ProductDeliveryVendor",
-        P.thumbnail AS "ProductThumbnail", P.rating AS "ProductRating", P.status AS "ProductStatus",
+        P.thumbnail AS "ProductThumbnail",  P.status AS "ProductStatus",
         PD.product_detail_id AS "ProductDetailId", PD.as_number AS "ProductAsNumber", PD.manuplated_date AS "PrdouctManuplatedDate",
         PD.contry_of_origin AS "ProductOrigin", PD.manufacturer AS "ProductManufacturer", PD.spec_1 AS "ProductSpec1",
         PD.spec_2 AS "ProductSpec2",PD.spec_3 AS "ProductSpec3", PD.spec_4 AS "ProductSpec4", PD.spec_5 AS "ProductSpec5",

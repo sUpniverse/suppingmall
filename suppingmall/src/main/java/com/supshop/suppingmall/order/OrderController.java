@@ -150,8 +150,9 @@ public class OrderController {
     @GetMapping("/orderItems/{id}")
     @ResponseBody
     public ResponseEntity getOrderItem(@PathVariable Long id,
-                               @AuthenticationPrincipal SessionUser user) {
+                                       @AuthenticationPrincipal SessionUser user) {
         OrderItem orderItem = orderItemService.getOrderItem(id);
+
         return ResponseEntity.ok(orderItem);
     }
 
@@ -259,7 +260,7 @@ public class OrderController {
                               @AuthenticationPrincipal SessionUser sessionUser) {
         OrderItem orderItem = orderItemService.getOrderItem(id);
 
-        if(orderItem == null || !UserUtils.isOwner(orderItem.getBuyer().getUserId(),sessionUser)){
+        if(isAlreadyOnStatus(orderItem, Orders.OrderStatus.CANCEL,sessionUser)){
             new IllegalArgumentException();
             return ResponseEntity.badRequest().body("존재하지 않습니다.");
         }
@@ -276,7 +277,7 @@ public class OrderController {
                                 Model model) {
 
         OrderItem orderItem = orderItemService.getOrderItem(id);
-        if(orderItem == null || Orders.OrderStatus.REFUND.equals(orderItem.getStatus()) || !UserUtils.isOwner(orderItem.getBuyer().getUserId(),sessionUser)){
+        if(isAlreadyOnStatus(orderItem, Orders.OrderStatus.REFUND,sessionUser)){
             new IllegalArgumentException();
             return redirectUrl;
         }
@@ -289,7 +290,7 @@ public class OrderController {
                               @AuthenticationPrincipal SessionUser sessionUser,
                               Model model) {
         OrderItem orderItem = orderItemService.getOrderItem(id);
-        if(orderItem == null || Orders.OrderStatus.REFUND.equals(orderItem.getStatus()) || !UserUtils.isOwner(orderItem.getBuyer().getUserId(),sessionUser)){
+        if(isAlreadyOnStatus(orderItem, Orders.OrderStatus.REFUND,sessionUser)){
             new IllegalArgumentException();
             return redirectUrl;
         }
@@ -297,5 +298,29 @@ public class OrderController {
         model.addAttribute("orderItem",orderItem);
         return "/order/refund";
     }
+
+
+    @PostMapping("/{id}/complete")
+    public String completeOrder(@PathVariable Long id,
+                              @AuthenticationPrincipal SessionUser sessionUser,
+                              Model model) {
+        OrderItem orderItem = orderItemService.getOrderItem(id);
+        if(isAlreadyOnStatus(orderItem, Orders.OrderStatus.COMPLETE,sessionUser)){
+            new IllegalArgumentException();
+            return redirectUrl;
+        }
+        orderItemService.changeStatus(orderItem, Orders.OrderStatus.COMPLETE);
+        model.addAttribute("orderItem",orderItem);
+        return "/order/refund";
+    }
+
+    private boolean isAlreadyOnStatus(OrderItem orderItem, Orders.OrderStatus status,SessionUser user){
+        if(orderItem == null || status.equals(orderItem.getStatus())
+                || !UserUtils.isOwner(orderItem.getBuyer().getUserId(),user)) {
+            return true;
+        }
+        return false;
+    }
+
 
 }

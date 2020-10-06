@@ -3,6 +3,7 @@ package com.supshop.suppingmall.product;
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.order.Orders;
+import com.supshop.suppingmall.review.Review;
 import com.supshop.suppingmall.user.User;
 import lombok.*;
 
@@ -12,7 +13,9 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Builder
 @Getter @Setter
@@ -30,7 +33,8 @@ public class Product {
     private ProductDetail detail;
     private List<ProductOption> options;
     private Delivery.DeliveryVendor deliveryVendor;
-    private int rating;
+    private List<QnA> qnAList;
+    private List<Review> reviewList;
     private User seller;
     private ProductStatus status;
     private LocalDateTime registeredDate;
@@ -57,5 +61,9 @@ public class Product {
                     .findAny()
                     .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + code + "]"));
         }
+    }
+
+    public double getRating() {
+        return reviewList.stream().collect(Collectors.averagingInt(Review::getRating));
     }
 }

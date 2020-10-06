@@ -73,13 +73,13 @@
                         <a class="form-control text-center" th:href="'javascript:cancel('+${orderItem.orderItemId}+')'" th:id="${orderItem.orderItemId}" th:text="구매취소"></a>
                     </div>
                     <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(orderItem.status,'DELIVERY')}">
-                        <a class="form-control text-center" th:href="@{'/products/'+${orderItem.orderItemId}+'/'}" th:text="교환요청"></a>
-                        <a class="form-control text-center" th:href="@{'/orders/'+${orderItem.orderItemId}+'/refundForm'}" th:text="환불요청"></a>
-                        <a class="form-control text-center" th:href="@{'/products/'+${orderItem.orderItemId}+'/complete'}" th:text="구매확정"></a>
+                        <a class="form-control text-center m-2" th:href="@{'/orders/'+${orderItem.orderItemId}+'/changeForm'}" th:text="교환요청"></a>
+                        <a class="form-control text-center m-2" th:href="@{'/orders/'+${orderItem.orderItemId}+'/refundForm'}" th:text="환불요청"></a>
+                        <a class="form-control text-center m-2" th:href="'javascript:complete('+${orderItem.orderItemId}+')'" th:text="구매확정"></a>
                     </div>
-                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(orderItem.status,'COMPLTE')}">
-                        <a class="form-control text-center" th:href="@{'/orders/'+${orderItem.orderItemId}+'/review'}" th:text="리뷰작성"></a>
-                        <a class="form-control text-center" th:href="@{'/products/'+${orderItem.product.productId}+'/reorder'}" th:text="재구매"></a>
+                    <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(orderItem.status,'COMPLETE')}">
+                        <a class="form-control text-center m-2" th:if="${#strings.equals(orderItem.reviewYn,'N')}" th:href="'javascript:getReviewForm('+${orderItem.orderItemId}+')'" th:text="리뷰작성"></a>
+                        <a class="form-control text-center m-2" th:href="@{'/products/'+${orderItem.product.productId}+'/reorder'}" th:text="재구매"></a>
                     </div>
                     <div class="col col-lg-2  align-items-center" th:if="${#strings.equals(orderItem.status,'REFUND') or #strings.equals(orderItem.status,'CHANGE')}">
 
@@ -131,6 +131,35 @@
 
 
     }
+
+   function complete(orderItemId) {
+
+       var header = [[${_csrf.headerName}]];
+       var token = [[${_csrf.token}]];
+
+       if (confirm("구매를 확정 하시겠습니까?")) {
+
+           $.ajax({
+               type: 'POST',
+               url: '/orders/'+orderItemId+'/complete',
+               dataType: 'text',
+               beforeSend: function (xhr) {
+                   xhr.setRequestHeader("Content-type","application/json");
+                   xhr.setRequestHeader(header,token);
+               },
+               success: () => {
+                    getReviewForm(orderItemId);
+               },
+               error: (response, error) => {
+                   alert("구매확정에 실패했습니다.")
+               }
+           });
+       }
+   }
+
+   function getReviewForm(orderItemId){
+       window.open("/reviews/form?orderItemId="+orderItemId,"_blank","width=500,height=600,left=500,top=100,menubar=no,toolbar=no,location=no");
+   }
 
 </script>
 </body>

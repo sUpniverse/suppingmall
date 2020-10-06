@@ -73,32 +73,26 @@ public class ProductController {
     }
 
     //판매상태의 모든 물품들
-    @GetMapping("/main2")
-    public String getAllOnSaleProduct2(Model model,
-                                      @RequestParam(required = false)String name) {
-        List<Product> products = productService.getOnSaleProductsOnMenu(null,name,null);
-        model.addAttribute("products",products);
-        model.addAttribute("categories",categoryService.getCategoryToGrandChildren(productCategoryId).getChild());
-        return "/product/list";
-    }
-
-    //판매상태의 모든 물품들
     @GetMapping("/main")
     public String getAllOnSaleProduct(Model model,
                                        @AuthenticationPrincipal SessionUser user,
                                        @RequestParam(required = false)String name) {
 
         List<Cart> cart = null;
-        if(user != null) cart = cartService.findCartByBuyerId(user.getUserId());
+        if(user != null) cart = cartService.getCartByBuyerId(user.getUserId());
 
         if(cart != null) model.addAttribute("cart",cart.size());
 
+        //카테고리 목록
         model.addAttribute("electronics",categoryService.getCategoryToGrandChildren(electronicsCategoryId));
         model.addAttribute("clothing",categoryService.getCategoryToGrandChildren(clothingCategoryId));
 
+        //물품 목록
         Criteria criteria = new EightItemsCriteria();
+        // 상위 카테고리를 이용해 물품 목록 불러오기
         model.addAttribute("latestComputerList",productService.getOnSaleProductsByParentCategoryOnMenu(4l,criteria));
         model.addAttribute("latestMobileList",productService.getOnSaleProductsByParentCategoryOnMenu(5l,criteria));
+        // 전체 물품 목록 가져오기
         model.addAttribute("productList",productService.getOnSaleProductsOnMenu(null, null, criteria));
 
 
@@ -124,25 +118,6 @@ public class ProductController {
         return "/product/list-category";
     }
 
-
-    @GetMapping("/{id}/2")
-    public String getProduct2(@PathVariable Long id, Model model) {
-        Product product = productService.getProduct(id);
-
-        Category category = categoryService.getGrandParentByGrandChildren(product.getCategory().getId());
-        product.setCategory(category);
-
-        Criteria qnaCriteria = new TenItemsCriteria();
-        List<QnA> qnaList = qnaService.getQnAList(qnaCriteria,id,null, null);
-//        List<Board> reviews = boardService.getBoardsByProduct(id,reviewCategoryId);
-
-        model.addAttribute("product",product);
-        model.addAttribute("qnaList",qnaList);
-//        model.addAttribute("reviews",reviews);
-
-        return "/product/product";
-    }
-
     @GetMapping("/{id}")
     public String getProduct(@PathVariable Long id, Model model) {
         Product product = productService.getProduct(id);
@@ -150,23 +125,28 @@ public class ProductController {
         Category category = categoryService.getGrandParentByGrandChildren(product.getCategory().getId());
         product.setCategory(category);
 
-        Criteria qnaCriteria = new TenItemsCriteria();
-        List<QnA> qnaList = qnaService.getQnAList(qnaCriteria,id,null, null);
-
-
-//        Criteria reviewCriteria = new TenItemsCriteria();
-//        List<Review> reviewList = reviewService.getReviewList(reviewCriteria,id,null,null);
+        Criteria criteria = new TenItemsCriteria();
+        List<QnA> qnaList = qnaService.getQnAList(criteria,id,null, null);
+        List<Review> reviewList = reviewService.getReviewList(criteria,id,null,null);
 
 
         model.addAttribute("product",product);
         model.addAttribute("qnaList",qnaList);
-//        model.addAttribute("reviews",reviewList);
+        model.addAttribute("reviews",reviewList);
 
-        int qnaCount = qnaService.getQnACount(id, null, null);
-        PageMaker qnaPageMaker = new PageMaker(qnaCount, 10, qnaCriteria);
+        int reviewCount = reviewService.getReviewCount(product.getProductId(), null, null, null);
+        PageMaker reviewPageMaker = new PageMaker(reviewCount, 10, criteria);
+        model.addAttribute("reviewPageMaker",reviewPageMaker);
+        model.addAttribute("reviewCount",reviewCount);
+
+        int qnaCount = qnaService.getQnACount(product.getProductId(), null, null);
+        PageMaker qnaPageMaker = new PageMaker(qnaCount, 10, criteria);
         model.addAttribute("qnaPageMaker",qnaPageMaker);
+        model.addAttribute("qnaCount",qnaCount);
 
-        return "/product/product2";
+
+
+        return "/product/product";
     }
 
 

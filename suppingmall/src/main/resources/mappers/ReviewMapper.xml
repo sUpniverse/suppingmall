@@ -7,6 +7,7 @@
         <id property="reviewId" column="ReviewId" />
         <result property="title" column="ReviewTitle" />
         <result property="contents" column="ReviewContents" />
+        <result property="rating" column="ReviewRating"/>
         <result property="createdDate" column="ReviewCreatedDate" />
         <association property="creator" javaType="com.supshop.suppingmall.user.User">
             <id property="userId" column="UserId" />
@@ -31,21 +32,23 @@
     </resultMap>
 
     <sql id="conditionalSearch">
-        <if test="productId != null">
-            AND R.product_id = #{productId}
-        </if>
-        <if test="orderItemId != null">
-            AND R.orderItem_id = #{orderItemId}
-        </if>
-        <if test="type != null and searchValue != null">
-            <if test='type.equals("contents")'>
-                <bind name="searchValue" value="'%'+searchValue+'%'"/>
-                AND R.title LIKE #{searchValue}
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="productId != null">
+                AND R.product_id = #{productId}
             </if>
-            <if test='type.equals("creator")'>
-                AND R.user_id = #{searchValue}
+            <if test="orderItemId != null">
+                AND R.orderItem_id = #{orderItemId}
             </if>
-        </if>
+            <if test="type != null and searchValue != null">
+                <if test='type.equals("contents")'>
+                    <bind name="searchValue" value="'%'+searchValue+'%'"/>
+                    AND R.title LIKE #{searchValue}
+                </if>
+                <if test='type.equals("creator")'>
+                    AND R.user_id = #{searchValue}
+                </if>
+            </if>
+        </trim>
     </sql>
 
     <sql id="paging">
@@ -63,13 +66,12 @@
 
 
     <select id="findAll" resultMap="Review">
-        SELECT R.review_id AS "reviewId", R.title AS "ReviewTitle",R.contents AS "ReviewContents", R.created_date AS "ReviewCreatedDate",
-        U.user_id AS "UserId",U.email AS "UserEmail", U.nickname AS "UserNickName"
+        SELECT R.review_id AS "reviewId", R.title AS "ReviewTitle",R.contents AS "ReviewContents", R.created_date AS "ReviewCreatedDate", R.rating AS "ReviewRating",
+        U.user_id AS "UserId",U.email AS "UserEmail", U.nickname AS "UserNickName", O.orderitem_id AS "OrderItemId"
         FROM Review AS R
         LEFT OUTER JOIN User AS U on (R.user_id = U.user_id)
-        LEFT OUTER JOIN Product AS P on (P.product_id = O.orderItem_id)
+        LEFT OUTER JOIN Product AS P on (R.product_id = P.product_id)
         LEFT OUTER JOIN OrderItem AS O on (R.orderItem_id = O.orderItem_id)
-        LEFT OUTER JOIN ProductOpiton AS PO on (O.product_option_id = PO.product_option_id)
         <include refid="conditionalSearch"></include>
         ORDER BY R.review_id desc
         <include refid="paging"></include>
@@ -77,8 +79,8 @@
 
 
     <select id="findOne" resultMap="Review">
-        SELECT R.review_id AS "reviewId", R.title AS "reviewTitle",R.created_date AS "reviewCreatedDate",
-        U.user_id AS "UserId", U.email AS "UserEmail", U.nickname AS "UserNickName"
+        SELECT R.review_id AS "reviewId", R.title AS "ReviewTitle",R.contents AS "ReviewContents", R.created_date AS "ReviewCreatedDate", R.rating AS "ReviewRating",
+        U.user_id AS "UserId",U.email AS "UserEmail", U.nickname AS "UserNickName", O.orderitem_id AS "OrderItemId"
         FROM Review AS R
         LEFT OUTER JOIN User AS U on (R.user_id = U.user_id)
         LEFT OUTER JOIN Product AS P on (R.product_id = P.product_id)
@@ -91,14 +93,17 @@
         contents,
         user_id,
         product_id,
+        orderitem_id,
+        rating,
         created_date
         )
         VALUES (
         #{title},
         #{contents},
         #{creator.userId},
-        #{orderItem.product.productId},
+        #{product.productId},
         #{orderItem.orderItemId},
+        #{rating},
         now()
         )
     </insert>

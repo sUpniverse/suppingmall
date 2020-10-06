@@ -154,6 +154,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.POST,"/category/**").hasAnyRole(MASTER,ADMIN)
                 .mvcMatchers(HttpMethod.PUT,"/category/**").hasAnyRole(MASTER,ADMIN)
                 .mvcMatchers(HttpMethod.DELETE,"/category/**").hasAnyRole(MASTER,ADMIN)
+                .mvcMatchers("/reviews/**").authenticated()
 
 
         ;

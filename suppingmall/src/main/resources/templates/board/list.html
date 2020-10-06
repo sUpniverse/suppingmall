@@ -58,7 +58,7 @@
                                     </a>
                                 </li>
                                 <li class="page-item" th:each="idx : ${#numbers.sequence(boardPageMaker.startPage,boardPageMaker.endPage)}" th:classappend="${boardPageMaker.criteria.page} == ${idx} ? active">
-                                    <a class="page-link" th:href="@{'/boards?page='+${idx}+'&&categoryId='+${category.id}+'&&type='+${type}+'&&searchValue='+${searchValue}}" th:text="${idx}"></a>
+                                    <a class="page-link" th:href="@{'/boards?page='+${idx}+'&&categoryId='+${category.id}+'&&type='+${type}+'&&searchValue='+${searchValue}}" th:text="${idx}" th:if="${idx} > 0"></a>
                                 </li>
                                 <li class="page-item" th:if="${boardPageMaker.next && boardPageMaker.endPage > 0}">
                                     <a class="page-link" th:href="@{'/boards?page='+${boardPageMaker.endPage + 1}+'&&categoryId='+${category.id}+'&&type='+${type}+'&&searchValue='+${searchValue}}" aria-label="Next">

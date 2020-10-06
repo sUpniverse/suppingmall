@@ -282,7 +282,7 @@
         </foreach>
     </insert>
 
-    <update id="update" parameterType="com.supshop.suppingmall.order.OrderItem">
+    <update id="patch" parameterType="com.supshop.suppingmall.order.OrderItem">
         UPDATE OrderItem
         SET
         <if test="status != null">
@@ -291,6 +291,7 @@
         <if test="deliveryId != null">
             delivery_id = #{deliveryId},
         </if>
+        <if test=""></if>
         updated_date = now()
         where orderitem_id = #{orderItemId};
     </update>
@@ -310,6 +311,22 @@
             updated_date = now()
             WHERE orderitem_id = #{orderItem.orderItemId}
         </foreach>
+    </update>
+
+    <update id="update" parameterType="com.supshop.suppingmall.order.OrderItem">
+        UPDATE OrderItem
+        SET
+        order_id = #{orders.orderId},
+        product_id = #{product.productId},
+        product_option_id = #{productOption.optionId},
+        price = #{price},
+        count = #{count},
+        buyer_id = #{buyer.userId},
+        seller_id = #{seller.userId},
+        status = #{status, typeHandler=com.supshop.suppingmall.order.OrderStatusTypeHandler},
+        review_yes_or_no = #{reviewYn},
+        updated_date = now()
+        WHERE orderitem_id = #{orderItemId}
     </update>
 
     <update id="updateStatus" parameterType="com.supshop.suppingmall.order.Orders">

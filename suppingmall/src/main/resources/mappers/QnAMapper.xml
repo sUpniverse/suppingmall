@@ -24,18 +24,20 @@
     </resultMap>
 
     <sql id="conditionalSearch">
-        <if test="productId != null">
-            AND Q.product_id = #{productId}
-        </if>
-        <if test="type != null and searchValue != null">
-            <if test='type.equals("contents")'>
-                <bind name="searchValue" value="'%'+searchValue+'%'"/>
-                AND Q.title LIKE #{searchValue}
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="productId != null">
+                AND Q.product_id = #{productId}
             </if>
-            <if test='type.equals("creator")'>
-                AND Q.user_id = #{searchValue}
+            <if test="type != null and searchValue != null">
+                <if test='type.equals("contents")'>
+                    <bind name="searchValue" value="'%'+searchValue+'%'"/>
+                    AND Q.title LIKE #{searchValue}
+                </if>
+                <if test='type.equals("creator")'>
+                    AND Q.user_id = #{searchValue}
+                </if>
             </if>
-        </if>
+        </trim>
     </sql>
 
     <sql id="paging">
@@ -49,6 +51,7 @@
         From QnA AS Q
         LEFT OUTER JOIN User AS U on (Q.user_id = U.user_id)
         <include refid="conditionalSearch"></include>
+        AND Q.parent_id is null
     </select>
 
 
@@ -61,8 +64,8 @@
         SELECT Q.qna_id, Q.title, Q.created_date , Q.user_id,Q.reply_id, U.email, U.nickname
         FROM QnA AS Q
         LEFT OUTER JOIN User AS U on (Q.user_id = U.user_id)
-        WHERE Q.parent_id is null
         <include refid="conditionalSearch"></include>
+        AND Q.parent_id is null
         ORDER BY Q.QnA_id desc
         <include refid="paging"></include>
         ) AS Q

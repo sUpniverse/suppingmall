@@ -33,7 +33,8 @@ public class Delivery {
         WAIT("배송준비중","DS00"),
         DELIVERY("배송중","DS01"),
         COMPLETE("배송완료","DS02"),
-        CHANGE("교환","DS03"),
+        REFUND("반품","DS03"),
+        CHANGE("교환","DS04"),
         ;
 
         private String title;
