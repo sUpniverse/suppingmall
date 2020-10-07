@@ -14,7 +14,7 @@
             <div class="col-6 col-md-4 col-lg-3" th:each="product : ${productList}">
                 <div class="product product-2">
                     <figure class="product-media">
-                        <a href="product.html">
+                        <a th:href="@{'/products/'+${product.productId}}">
                             <img th:src="${product.thumbnail}" alt="Product image" class="product-image">
                         </a>
                     </figure><!-- End .product-media -->
@@ -23,7 +23,7 @@
                         <div class="product-cat">
                             <a href="#" th:text="${product.category.name}"></a>
                         </div><!-- End .product-cat -->
-                        <h3 class="product-title"><a th:href="@{'/product/'+${product.productId}}" th:text="${product.name}"></a></h3><!-- End .product-title -->
+                        <h3 class="product-title"><a th:href="@{'/products/'+${product.productId}}" th:text="${product.name}"></a></h3><!-- End .product-title -->
                         <div class="product-price">
                             <span class="new-price" th:text="@{${#numbers.formatInteger(product.price,3,'COMMA')}+'원'}"></span>
                         </div><!-- End .product-price -->

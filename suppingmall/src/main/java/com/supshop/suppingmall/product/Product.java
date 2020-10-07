@@ -64,6 +64,7 @@ public class Product {
     }
 
     public double getRating() {
+        if(reviewList == null) return 0;
         return reviewList.stream().collect(Collectors.averagingInt(Review::getRating));
     }
 }

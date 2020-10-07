@@ -78,7 +78,7 @@ public class BoardController {
         if(board == null) {
             return "redirect:/boards";
         }
-        if(categoryId == null) categoryId = boardCategoryId;
+        if(categoryId == null) categoryId = board.getCategory().getId();
 
         List<Board> boards = boardService.getBoards(thirtyItemsCriteria, board.getCategory().getId(), type, searchValue);
         int boardCount = boardService.getBoardCount(categoryId, type, searchValue);

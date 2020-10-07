@@ -116,14 +116,14 @@
         </div>
         <div class="container m-5 py-5" th:id="review">
             <h4 class="border-bottom border-gray pb-2 mb-0" th:text="'리뷰 ' +${reviewCount} + '건'"></h4>
-            <div class="media text-muted pt-3 border-bottom  border-gray" th:each="review : ${reviews}">
+            <div class="media text-muted pt-1 border-bottom  border-gray" th:each="review : ${reviews}">
                 <svg class="bd-placeholder-img mr-2 bi bi-person-circle py-2" width="5em" height="5em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                     <path d="M13.468 12.37C12.758 11.226 11.195 10 8 10s-4.757 1.225-5.468 2.37A6.987 6.987 0 0 0 8 15a6.987 6.987 0 0 0 5.468-2.63z"/>
                     <path fill-rule="evenodd" d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
                     <path fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"/>
                 </svg>
-                <div class="media-body pb-3 px-3 mb-0 small lh-125 border-bottom border-gray">
-                    <div class="ratings-container">
+                <div class="media-body pb-1 px-3 mb-0 small lh-125 border-bottom border-gray">
+                    <div class="ratings-container mb-1">
                         <div class="ratings">
                             <div class="ratings-val" th:style="'width:'+${review.rating * 20}+'%;'"></div><!-- End .ratings-val -->
                         </div>
@@ -131,7 +131,6 @@
                     </div>
                     <div class="px-3 row">
                         <strong class="d-block text-gray-dark mr-2" th:text="${review.creator.nickName}"></strong>
-
                         <div th:text="${#temporals.format(review.createdDate,'yyyy-MM-dd')}"></div>
                     </div>
                     <p th:text="${review.contents}"></p>
@@ -295,4 +294,5 @@
 <script type="text/javascript" th:inline="javascript" th:src="@{/js/product/createBuyingList2.js}"></script>
 <script type="text/javascript" th:inline="javascript" th:src="@{/js/product/setForm.js}"></script>
 <script type="text/javascript" th:inline="javascript" th:src="@{/js/product/qna.js}"></script>
+<script type="text/javascript" th:inline="javascript" th:src="@{/js/product/review.js}"></script>
 </html>
