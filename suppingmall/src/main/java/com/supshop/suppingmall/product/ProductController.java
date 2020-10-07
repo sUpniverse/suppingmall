@@ -63,12 +63,21 @@ public class ProductController {
         return "/product/form";
     }
 
-    //상태에 관계없이 모든 상품
+    //조건을 통한 모든 물품 조회
     @GetMapping("")
-    public String getAllProduct(Model model) {
-        List<Product> products = productService.getProducts();
-        model.addAttribute("products",products);
+    public String getAllProduct(Model model,
+                                @RequestParam(required = false) String name,
+                                EightItemsCriteria criteria) {
+
+
+        int productsCount = productService.getProductsCount(null, null, name, Product.ProductStatus.SALE);
+
+        model.addAttribute("count",productsCount);
+        model.addAttribute("productList",productService.getOnSaleProductsOnMenu(null, name, criteria));
+        model.addAttribute("productPageMaker",new PageMaker(productsCount, productPagingCount, criteria));
         model.addAttribute("categories",categoryService.getCategoryToGrandChildren(productCategoryId));
+
+
         return "/product/list";
     }
 
@@ -102,7 +111,6 @@ public class ProductController {
     //카테고리별 물품 조회
     @GetMapping("/category/{id}")
     public String getProductOnSaleInCategory(Model model,
-                                       @AuthenticationPrincipal SessionUser user,
                                        @PathVariable Long id,
                                        EightItemsCriteria criteria) {
 
@@ -117,6 +125,7 @@ public class ProductController {
 
         return "/product/list-category";
     }
+
 
     @GetMapping("/{id}")
     public String getProduct(@PathVariable Long id, Model model) {

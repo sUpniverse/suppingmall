@@ -15,7 +15,9 @@
     <div class="container">
         <form role="form" th:method="post" th:action="@{/boards/{id}(id=${board.boardId})}" >
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <input th:type="hidden" th:name="boardId" th:value="${board.boardId}" >
             <input th:type="hidden" th:name="creator.userId" th:value="${#authentication?.principal.userId}" >
+            <input th:type="hidden" th:name="imagesUrl" id="imagesUrl">
             <input type="hidden" name="_method" value="put">
             <table class="table">
                 <thead>
@@ -42,7 +44,7 @@
             <input class="btn btn-success" type="submit" value="수정하기">
         </form>
     </div>
-<footer class="cusFooter" th:replace="fragments/footer :: footer" />
+<footer class="cusFooter" th:include="fragments/footer :: footer" />
 </body>
 <script th:inline="javascript">
     $(document).ready(function () {
@@ -132,7 +134,6 @@
             images.forEach(element => console.log(element));
             let urls = document.getElementById('imagesUrl');
             urls.value = images;
-            console.log(document.getElementById('imagesUrl'));
 
             return true;
         });

@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -62,7 +63,6 @@ public class BoardService {
         }
     }
 
-    // image/{category}/{yyyyMMdd}/{userId}/fileName => image/{category}/{categoryId}/fileName
     // cloud storage의 경로 저장을 위해 이미지 url 변경
     public String setBoardImageUrl(Board board, Set<String> urls) {
         String originUrl;
@@ -71,13 +71,20 @@ public class BoardService {
         String[] splitUrl = imageUrl.split(File.separator);
         int fileIndex = imageUrl.indexOf(splitUrl[splitUrl.length-1]);
         originUrl = imageUrl.substring(0,fileIndex);
+        // image/{category}/{yyyyMMdd}/{userId}/fileName => image/{category}/{categoryId}/fileName 로 수정,
+        //         image/{category}/{yyyyMMdd}/{userId}가 originUrl에 해당
         contents = contents.replace(originUrl, boardImageUrl+board.getBoardId()+File.separator);
         board.setContents(contents);
         return originUrl;
     }
 
     @Transactional
-    public void updateBoard(Long id, Board board) {
+    public void updateBoard(Long id, Board board, Set<String> urls) {
+        Set<String> newImageUrl = urls.stream().filter(s -> s.split("/").length == 6).collect(Collectors.toSet());
+        if(newImageUrl.size() > 0){
+            String originUrl= setBoardImageUrl(board,newImageUrl);
+            imageService.saveInStorage(newImageUrl,originUrl,board.getBoardId(), boardName);
+        }
         boardMapper.updateBoard(id, board);
     }
 

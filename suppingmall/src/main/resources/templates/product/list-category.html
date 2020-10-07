@@ -345,26 +345,23 @@
                         <div class="col-6 col-md-4 col-xl-3" th:each="product : ${productList}">
                             <div class="product">
                                 <figure class="product-media">
-                                    <a href="product.html">
+                                    <a th:href="@{'/products/'+${product.productId}}">
                                         <img th:src="${product.thumbnail}" alt="Product image" class="product-image">
                                     </a>
-                                    <div class="product-action">
-                                        <a href="#" class="btn-product btn-cart" title="찜하기"><span>찜하기</span></a>
-                                    </div><!-- End .product-action -->
                                 </figure><!-- End .product-media -->
 
                                 <div class="product-body">
                                     <div class="product-cat">
-                                        <a href="#" th:text="${product.category.name}"></a>
+                                        <a th:href="@{'/products/category/'+${product.category.id}}" th:text="${product.category.name}"></a>
                                     </div><!-- End .product-cat -->
                                     <h3 class="product-title"><a th:href="@{'/products/'+${product.productId}}" th:text="${product.name}"></a></h3><!-- End .product-title -->
                                     <div class="product-price" th:text="@{${#numbers.formatInteger(product.price,3,'COMMA')}+'원'}">
                                     </div><!-- End .product-price -->
                                     <div class="ratings-container">
                                         <div class="ratings">
-                                            <div class="ratings-val" style="width: 80%;"></div><!-- End .ratings-val -->
+                                            <div class="ratings-val" th:style="'width:'+${product.getRating() * 20}+'%;'"></div><!-- End .ratings-val -->
                                         </div><!-- End .ratings -->
-                                        <span class="ratings-text">( 12 Reviews )</span>
+                                        <span class="ratings-text" th:text="${'( '+product.reviewList.size()+' 개 리뷰 )'}"></span>
                                     </div><!-- End .rating-container -->
                                 </div><!-- End .product-body -->
                             </div><!-- End .product -->

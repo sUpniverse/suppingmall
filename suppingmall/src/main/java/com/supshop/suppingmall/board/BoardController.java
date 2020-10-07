@@ -1,6 +1,7 @@
 package com.supshop.suppingmall.board;
 
 import com.supshop.suppingmall.board.form.BoardCreateForm;
+import com.supshop.suppingmall.board.form.BoardUpdateForm;
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryService;
 import com.supshop.suppingmall.common.UserUtils;
@@ -99,28 +100,34 @@ public class BoardController {
     public String createBoard(BoardCreateForm createForm, @AuthenticationPrincipal SessionUser sessionUser) {
         log.debug("'createBoard'가 실행됨");
 
-        if(sessionUser.getUserId().equals(createForm.getCreator().getUserId())) {
-            Board board = modelMapper.map(createForm, Board.class);
-            boardService.createBoard(board,createForm.getImagesUrl());
-        }
-        return "redirect:/boards";
+        if(!UserUtils.isOwner(createForm.getCreator().getUserId(), sessionUser)) return "redirect:/boards";
+
+        Board board = modelMapper.map(createForm, Board.class);
+        boardService.createBoard(board,createForm.getImagesUrl());
+        return "redirect:/boards/"+board.getBoardId();
     }
 
     @GetMapping("/{id}/form")
     public String updateBoardForm(@PathVariable Long id, Model model, @AuthenticationPrincipal SessionUser sessionUser) {
         log.debug("'modifyBoard'가 실행됨");
         Board board = boardService.getBoard(id);
-        if(!sessionUser.getUserId().equals(board.getCreator().getUserId())) return "redirect:/boards";
+        if(!UserUtils.isOwner(board.getCreator().getUserId(), sessionUser)) return "redirect:/boards";
 
         model.addAttribute("board",board);
         return "/board/updateform";
     }
 
     @PutMapping("/{id}")
-    public String updateBoard(@PathVariable Long id, Board board, @AuthenticationPrincipal SessionUser sessionUser) {
+    public String updateBoard(@PathVariable Long id, BoardUpdateForm form, @AuthenticationPrincipal SessionUser sessionUser) {
         log.debug("'updateBoard'가 실행됨");
-        if(!UserUtils.isOwner(id, sessionUser)) return "redirect:/boards";
-        boardService.updateBoard(id, board);
+        Board board = boardService.getBoard(id);
+        if(!id.equals(form.getBoardId()) || !UserUtils.isOwner(board.getCreator().getUserId(), sessionUser)) {
+            return "redirect:/boards";
+        }
+        board.setTitle(form.getTitle());
+        board.setContents(form.getContents());
+
+        boardService.updateBoard(id, board,form.getImagesUrl());
         return "redirect:/boards/"+id;
     }
 
@@ -129,7 +136,7 @@ public class BoardController {
         log.debug("'deleteBoard'가 실행됨");
 
         Board board = boardService.getBoard(id);
-        if(sessionUser.getUserId() != board.getCreator().getUserId()) {
+        if(!UserUtils.isOwner(board.getCreator().getUserId(), sessionUser)) {
             return "redirect:/boards";
         }
         boardService.deleteBoard(id);

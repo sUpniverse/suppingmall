@@ -12,7 +12,7 @@ import java.util.Set;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
-public class BoardCreateForm {
+public class BoardUpdateForm {
 
     private Long boardId;
     private String title;
