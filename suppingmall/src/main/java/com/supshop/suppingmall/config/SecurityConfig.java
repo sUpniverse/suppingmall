@@ -130,6 +130,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.PUT,"/boards/{id}").authenticated()
                 .mvcMatchers(HttpMethod.DELETE,"/boards/{id}").authenticated()
                 .mvcMatchers(HttpMethod.GET,"/boards/{id}/form").authenticated()
+                .mvcMatchers(HttpMethod.GET,"/comments/**").permitAll()
                 .mvcMatchers("/comments/**").authenticated()
                 .mvcMatchers(HttpMethod.GET,"/images/**").permitAll()
                 .mvcMatchers(HttpMethod.POST,"/images/**").authenticated()

@@ -62,7 +62,6 @@
     <select id="selectBoardCount" resultType="int">
         SELECT count(*)
         From Board AS B
-        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
         WHERE B.category_id = #{categoryId}
         <include refid="conditionalSearch"></include>
     </select>
@@ -82,10 +81,10 @@
         LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
         WHERE B.category_id = #{categoryId}
         <include refid="conditionalSearch"></include>
+        ORDER BY B.board_id desc
         <include refid="paging"></include>
         ) AS B
         LEFT OUTER JOIN comment AS CM on (B.board_id = CM.board_id)
-        ORDER BY B.board_id desc
     </select>
 
 
@@ -104,6 +103,7 @@
         LEFT OUTER JOIN comment AS CM on (B.board_id = CM.board_id)
         LEFT OUTER JOIN user AS CU on (CM.user_id = CU.user_id)
         WHERE B.board_id = #{id}
+        limit 0,10;
     </select>
 
 

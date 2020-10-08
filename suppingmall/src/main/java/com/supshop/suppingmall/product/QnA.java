@@ -1,5 +1,8 @@
 package com.supshop.suppingmall.product;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.supshop.suppingmall.user.User;
 import lombok.*;
 
@@ -16,11 +19,13 @@ public class QnA {
     private Product product;
     private QnA reply;
     private QnA parent;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createdDate;
 
 
-    public String isReplyExist() {
-        if(this.reply == null) return "미답변";
-        return "답변완료";
+    public boolean isReplyExist() {
+        if(this.reply == null) return false;
+        return true;
     }
 }

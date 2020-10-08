@@ -4,7 +4,10 @@ import com.supshop.suppingmall.board.form.BoardCreateForm;
 import com.supshop.suppingmall.board.form.BoardUpdateForm;
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryService;
+import com.supshop.suppingmall.comment.CommentService;
 import com.supshop.suppingmall.common.UserUtils;
+import com.supshop.suppingmall.page.Criteria;
+import com.supshop.suppingmall.page.TenItemsCriteria;
 import com.supshop.suppingmall.page.ThirtyItemsCriteria;
 import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.user.SessionUser;
@@ -27,6 +30,7 @@ public class BoardController {
     private final BoardService boardService;
     private final CategoryService categoryService;
     private final ModelMapper modelMapper;
+    private final CommentService  commentService;
 
     private static final Long boardCategoryId = 21l;
     private static final int boardDisplayPagingNum = 5;
@@ -70,8 +74,8 @@ public class BoardController {
                            ThirtyItemsCriteria thirtyItemsCriteria,
                            Model model,
                            @RequestParam(required = false) Long categoryId,
-                           @RequestParam(required = false) String type,
-                           @RequestParam(required = false) String searchValue) {
+                           @RequestParam(required = false) @ModelAttribute String type,
+                           @RequestParam(required = false) @ModelAttribute String searchValue) {
         log.debug("'getBoard'가 실행됨");
 
         Board board = boardService.getBoard(id);
@@ -84,13 +88,16 @@ public class BoardController {
         int boardCount = boardService.getBoardCount(categoryId, type, searchValue);
         PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum, thirtyItemsCriteria);
 
+        int commentCount = commentService.getCommentCount(id);
+        Criteria criteria = new TenItemsCriteria();
+        PageMaker commentPageMaker = new PageMaker(commentCount,10,criteria);
+
         model.addAttribute("boardList",boards);
         model.addAttribute("board",board);
         model.addAttribute("boardPageMaker", pageMaker);
+        model.addAttribute("commentPageMaker",commentPageMaker);
 
         model.addAttribute("category", board.getCategory());
-        model.addAttribute("type", type);
-        model.addAttribute("searchValue", searchValue);
         model.addAttribute("pageNum", thirtyItemsCriteria.getPage());
 
         return "/board/board";

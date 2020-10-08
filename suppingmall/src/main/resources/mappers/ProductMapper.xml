@@ -118,6 +118,7 @@
         LEFT OUTER JOIN user AS U on (P.seller_id = U.user_id)
         LEFT OUTER JOIN category AS C on (P.category_id = C.category_id)
         <include refid="conditionalSearch"/>
+        ORDER BY P.product_id DESC
         <include refid="paging"></include>
         )
         AS P
@@ -136,6 +137,7 @@
         FROM Product AS P
         LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
         <include refid="conditionalSearch"/>
+        ORDER BY P.product_id DESC
         <include refid="paging"></include>
         ) AS P
         LEFT OUTER JOIN Review AS R on (P.product_id = R.product_id)
@@ -152,10 +154,10 @@
             FROM Product AS P
             LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
             WHERE P.status ='PS01' AND C.parent_id = #{parentId}
+            ORDER BY P.product_id DESC
             <include refid="paging"></include>
         ) AS P
         LEFT OUTER JOIN Review AS R on (P.product_id = R.product_id)
-        ORDER BY P.product_id DESC
     </select>
 
     <select id="findOnSaleProducts" resultMap="product">
@@ -175,6 +177,7 @@
         LEFT OUTER JOIN Product_Detail AS PD on (P.product_id = PD.product_id)
         LEFT OUTER JOIN category AS C on (p.category_id = C.category_id)
         <include refid="conditionalSearch"/>
+        ORDER BY P.product_id DESC
         <include refid="paging"/>
         ) AS P
         LEFT OUTER JOIN Product_Option AS PO on (P.product_id = PO.product_id)

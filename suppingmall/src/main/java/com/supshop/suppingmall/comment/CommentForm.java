@@ -3,10 +3,8 @@ package com.supshop.suppingmall.comment;
 import com.supshop.suppingmall.board.Board;
 import lombok.*;
 
-@Getter
-@Setter
-@Builder
-@ToString
+@Getter @Setter
+@Builder @ToString
 @EqualsAndHashCode(of = "commentId")
 @NoArgsConstructor @AllArgsConstructor
 public class CommentForm {

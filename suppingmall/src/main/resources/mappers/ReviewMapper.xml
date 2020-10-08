@@ -60,7 +60,6 @@
     <select id="findReviewCount" resultType="int">
         SELECT count(*)
         From Review AS R
-        LEFT OUTER JOIN User AS U on (R.user_id = U.user_id)
         <include refid="conditionalSearch"></include>
     </select>
 

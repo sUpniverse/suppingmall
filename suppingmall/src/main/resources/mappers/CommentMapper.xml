@@ -20,17 +20,39 @@
         </association>
     </resultMap>
 
-    <select id="selectAllComments" resultMap="Comment">
+    <sql id="paging">
+        <if test="criteria != null">
+            limit #{criteria.pageStart}, #{criteria.perPageNum}
+        </if>
+    </sql>
+
+
+    <sql id="conditionalSearch">
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="boardId != null">
+                AND C.board_id = #{boardId}
+            </if>
+        </trim>
+    </sql>
+
+    <select id="findCommentCount" resultType="int">
+        SELECT count(*)
+        From Comment AS C
+        <include refid="conditionalSearch"></include>
+    </select>
+
+    <select id="findAll" resultMap="Comment">
         SELECT C.comment_id AS "CommentId", C.title AS "CommentTitle", C.contents AS "CommentContents", C.level AS "CommentLevel",
         C.created_date AS "CommentCreatedDate", C.updated_date AS "CommentUpdatedDate", U.user_id AS "UserId",
         U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole"
         FROM Comment AS C
         LEFT OUTER JOIN User AS U on (C.user_id = U.user_id)
-        where C.board_id = #{boardId}
-        ORDER BY C.comment_id asc;
+        <include refid="conditionalSearch"></include>
+        ORDER BY C.comment_id asc
+        <include refid="paging"></include>
     </select>
 
-    <select id="selectComment" resultMap="Comment">
+    <select id="findOne" resultMap="Comment">
         SELECT C.comment_id AS "CommentId", B.title AS "CommentTitle", B.contents AS "CommentContents",
         B.created_date AS "CommentCreatedDate", B.updated_date AS "CommentUpdatedDate", U.user_id AS "UserId",
         U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",

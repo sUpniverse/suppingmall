@@ -1,7 +1,9 @@
 package com.supshop.suppingmall.comment;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.supshop.suppingmall.board.Board;
-import com.supshop.suppingmall.user.SessionUser;
 import com.supshop.suppingmall.user.User;
 import lombok.*;
 
@@ -19,6 +21,8 @@ public class Comment {
     private String contents;
     private int score;
     private User creator;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 

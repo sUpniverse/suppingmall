@@ -1,5 +1,8 @@
 package com.supshop.suppingmall.review;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.supshop.suppingmall.order.OrderItem;
 import com.supshop.suppingmall.product.Product;
 import com.supshop.suppingmall.user.User;
@@ -19,6 +22,8 @@ public class Review {
     private Product product;
     private OrderItem orderItem;
     private User creator;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createdDate;
 
 }

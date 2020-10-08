@@ -45,12 +45,11 @@ public class ReviewController {
                                 @AuthenticationPrincipal SessionUser sessionUser,
                                 Model model){
         //해당 주문상품에 해당하는 구매자인지 or 구매확정이 된 주문상품인지 or 이미 작성된 리뷰가 있는지 확인
-        System.out.println(orderItemId);
         OrderItem orderItem = orderItemService.getOrderItem(orderItemId);
-//        if(!UserUtils.isOwner(orderItem.getBuyer().getUserId(), sessionUser) ||
-//                !Orders.OrderStatus.COMPLETE.equals(orderItem.getStatus()) || "Y".equals(orderItem.getReviewYn())) {
-//            return "";
-//        }
+        if(!UserUtils.isOwner(orderItem.getBuyer().getUserId(), sessionUser) ||
+                !Orders.OrderStatus.COMPLETE.equals(orderItem.getStatus()) || "Y".equals(orderItem.getReviewYn())) {
+            return "";
+        }
 
         model.addAttribute("orderItem",orderItem);
 

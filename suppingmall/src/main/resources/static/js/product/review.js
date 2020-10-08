@@ -6,6 +6,7 @@ function getReviewList(page) {
         type: 'GET',
         contentType: 'application/json',
         success: (dataList) => {
+            setReviewList(dataList.list);
             setReviewPageList(dataList.reviewPageMaker);
         },
         error: () => {
@@ -34,13 +35,14 @@ function setReviewList(list){
             '               </div>\n' +
             '               <div class="px-3 row">\n' +
             '                    <strong class="d-block text-gray-dark mr-2">'+review.creator.nickName+'</strong>\n' +
-            '                            <div>'+review.createdDate+'</div>\n' +
+            '                            <div>'+convertLocalDateTime(review.createdDate)+'</div>\n' +
             '               </div>\n' +
-            '               <p th:text="${review.contents}"></p>\n' +
+            '               <p>'+review.contents+'</p>\n' +
             '         </div>\n' +
             '    </div>'
     });
 
+    $('#review > h4').empty();
     $('#review > h4').after(str);
 
 }

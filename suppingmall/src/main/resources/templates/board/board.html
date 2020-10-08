@@ -2,7 +2,13 @@
 <html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: header" />
 <head>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <style>
+        ul{
+            list-style:none;
+            padding: unset;
+        }
         div.pd-5.ml-2  img {
             max-width: 750px;
             width: auto;
@@ -19,6 +25,8 @@
             <div>
                 <form role="form" th:method="post">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="hidden" th:id="userId" th:value="${#authentication.principal.userId}" sec:authorize="isAuthenticated()"/>
+                    <input type="hidden" th:id="boardId" th:value="${board.boardId}"/>
                 </form>
                 <div class="pt-5 pd-3 border-bottom">
                     <!-- Category -->
@@ -79,6 +87,26 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Comment Pagination-->
+                    <div class="container d-flex justify-content-center my-5 text-small">
+                        <nav aria-label="Page navigation example">
+                            <ul class="commentPagination pagination mx-auto">
+                                <li class="page-item">
+                                    <a class="page-link" th:if="${commentPageMaker.prev}" th:href="@{${commentPageMaker.startPage - 1}}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item" th:each="idx : ${#numbers.sequence(commentPageMaker.startPage,commentPageMaker.endPage)}" th:classappend="${commentPageMaker.criteria.page} == ${idx} ? active">
+                                    <a class="page-link" th:href="@{${idx}}" th:text="${idx}" th:if="${idx} > 0"></a>
+                                </li>
+                                <li class="page-item" th:if="${commentPageMaker.next && commentPageMaker.endPage > 0}">
+                                    <a class="page-link" th:href="@{${commentPageMaker.endPage + 1}}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
                 </div>
 
                 <!-- Comments Form -->
@@ -102,8 +130,8 @@
 <script th:inline="javascript">
     $(document).ready(function() {
         var formObj = $("form[role='form']");
-        var boardId = [[${board.boardId}]];
 
+        const boardId = document.getElementById('boardId');
         var pageNum = [[${pageNum}]];
         var categoryId = [[${category.id}]];
         var type = [[${type}]];
@@ -127,142 +155,6 @@
         });
     });
 </script>
-
-<script th:inline="javascript">
-
-    $(document).ready(function (){
-
-        var header = [[${_csrf.headerName}]];
-        var token = [[${_csrf.token}]];
-
-        $("#comment-button").on('click',(e,xhr,options) => {
-            var boardId = [[${board.boardId}]];
-            var contents = $('#comment-text').val();
-            $.ajax({
-                type:"POST",
-                url:"/comments",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Content-type","application/json");
-                    xhr.setRequestHeader(header,token);
-                },
-                dataType: 'text',
-                data: JSON.stringify({
-                    "board" : {
-                        "boardId": boardId
-                    },
-                    "contents": contents
-                }),
-                contentType: 'application/json',
-                success: (data) => {
-                    var response = JSON.parse(data);
-                    var comment_div = '<div id="comments"> </div>';
-                    var comment_contents = response.contents;
-                    var comment_user_name = response.creator.nickName;
-                    var comment =
-                        '<div class="media pb-3" data-no="'+response.commentId+'">\n' +
-                        '<img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">\n' +
-                        '<div class="media-body">\n' +
-                        '<h5 class="mt-0">'+comment_user_name+'</h5>\n' +
-                        '<div class="btn-group float-right">\n' +
-                        '<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\n' +
-                        '수정 / 삭제 / 신고\n' +
-                        '</button>\n' +
-                        '<div class="dropdown-menu">\n' +
-                        '<button type="button" class="dropdown-item" id="comment-update-button">수정</button>\n' +
-                        '<button type="button" class="dropdown-item" id="comment-delete-button">삭제</button>\n' +
-                        '</div>\n' +
-                        '</div>' +
-                        '<p>'+comment_contents+'</p>\n' +
-                        '</div>\n' +
-                        '</div>';
-
-                    $("#comments").append(comment);
-                },
-                error: () => {
-                    alert('댓글 생성오류');
-                }
-
-            });
-        });
-
-
-        $(document).on('click',"#comment-text",() => {
-            if([[${#authentication.principal}]] === "anonymousUser") {
-                var check = confirm("로그인 하시겠습니까?");
-                if(check == true) {
-                    window.location.href='/users/loginform';
-                }
-            }
-        });
-
-
-        var text = 0;
-
-        $(document).on('click',"#comment-update-button",(e)=> {
-            var comment = e.target.parentElement.parentElement.parentElement.parentElement;
-            var user_id = e.target.parentElement.parentElement.previousElementSibling.getAttribute('value');
-            var comment_text = comment.getElementsByTagName("p").item(0);
-            text = comment_text.innerText;
-            comment_text.innerHTML =
-                '<div class="form-group">' +
-                '<textarea class="form-control" id="update-comment-text" rows="3" >'+text+'</textarea>' +
-                '<button type="button" class="btn btn-success btn-sm mr-1" id="update-comment-button">수정하기</button>' +
-                '<button type="button" class="btn btn-light btn-sm" id="cancel-comment-button">취소하기</button>'
-            '</div>';
-        });
-
-
-        $(document).on('click',"#comment-delete-button",(e,xhr,options)=> {
-            var comment = e.target.parentElement.parentElement.parentElement.parentElement;
-            var comment_id = comment.getAttribute('data-no');
-            $.ajax({
-                type:"DELETE",
-                url:"/comments/"+comment_id,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Content-type","application/json");
-                    xhr.setRequestHeader(header,token);
-                },
-                success: () => {
-                    comment.remove();
-                }
-            });
-        });
-
-        $(document).on('click',"#update-comment-button",(e,xhr,options)=> {
-            var comment = e.target.parentElement.parentElement.parentElement.parentElement;
-            var comment_id = comment.getAttribute('data-no');
-            var comment_text = comment.getElementsByTagName("p").item(0);
-            var message = e.target.parentElement.getElementsByTagName("textarea").item(0).value;
-            $.ajax({
-                type:"PUT",
-                url:"/comments/"+comment_id,
-                dataType: 'text',
-                data: JSON.stringify({
-                    "contents": message
-                }),
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Content-type","application/json");
-                    xhr.setRequestHeader(header,token);
-                },
-                success: () => {
-                    comment_text.innerText = message;
-                }
-            });
-
-        });
-
-        $(document).on('click',"#cancel-comment-button",(e)=> {
-            var comment = e.target.parentElement.parentElement.parentElement.parentElement;
-            var comment_text = comment.getElementsByTagName("p").item(0);
-            comment_text.innerText = text;
-            text = "";
-        });
-
-        function setCSRFTokenInHeader(xhr) {
-            xhr.setRequestHeader(header,token);
-        }
-
-
-    });
-</script>
+<script type="text/javascript" th:inline="javascript" th:src="@{/js/board/comment.js}"></script>
+<script type="text/javascript" th:inline="javascript" th:src="@{/js/common/date.js}"></script>
 </html>

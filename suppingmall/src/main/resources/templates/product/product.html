@@ -138,7 +138,7 @@
             </div>
             <div class="container d-flex justify-content-center my-5 text-small">
                 <nav aria-label="Page navigation example">
-                    <ul class="reviewPagination mx-auto">
+                    <ul class="reviewPagination pagination mx-auto">
                         <li class="page-item">
                             <a class="page-link" th:if="${reviewPageMaker.prev}" th:href="@{${reviewPageMaker.startPage - 1}}" aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>
@@ -157,8 +157,10 @@
             </div>
         </div>
         <div class="container m-5" th:id="qna">
-            <div class="row p-2">
-                <h4 class="px-3">Q&A</h4>
+            <div>
+                <h4>Q&A</h4>
+            </div>
+            <div class="py-2">
                 <p>구매하시려는 상품에 궁금하신 점이 있으신 경우 문의해 주세요</p>
             </div>
             <a class="btn btn-dark" href="#" id="createQnaBtn">상품 Q&A 작성하기</a>
@@ -173,7 +175,7 @@
                 </div>
                 <ul class="tableRow" th:each="qna : ${qnaList}">
                     <li class="body">
-                        <div class="cell replyYn" th:text="${qna.isReplyExist()}"></div>
+                        <div class="cell replyYn" th:text="${qna.isReplyExist()} ? '답변완료' : '미답변'"></div>
                         <div class="cell qnaTitle">
                             <a role="button" data-toggle="collapse" th:href="@{'#qna-'+${qna.qnaId}}" aria-expanded="false" th:text="${qna.title}"></a>
                         </div>
@@ -220,7 +222,7 @@
             </div>
             <div class="container d-flex justify-content-center my-5 text-small">
                 <nav aria-label="Page navigation example">
-                    <ul class="qnaPagination mx-auto">
+                    <ul class="qnaPagination pagination mx-auto">
                         <li class="page-item">
                             <a class="page-link" th:if="${qnaPageMaker.prev}" th:href="@{${qnaPageMaker.startPage - 1}}" aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>
@@ -293,6 +295,7 @@
 </script>
 <script type="text/javascript" th:inline="javascript" th:src="@{/js/product/createBuyingList2.js}"></script>
 <script type="text/javascript" th:inline="javascript" th:src="@{/js/product/setForm.js}"></script>
+<script type="text/javascript" th:inline="javascript" th:src="@{/js/common/date.js}"></script>
 <script type="text/javascript" th:inline="javascript" th:src="@{/js/product/qna.js}"></script>
 <script type="text/javascript" th:inline="javascript" th:src="@{/js/product/review.js}"></script>
 </html>

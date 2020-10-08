@@ -49,7 +49,6 @@
     <select id="findQnACount" resultType="int">
         SELECT count(*)
         From QnA AS Q
-        LEFT OUTER JOIN User AS U on (Q.user_id = U.user_id)
         <include refid="conditionalSearch"></include>
         AND Q.parent_id is null
     </select>
