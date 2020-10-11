@@ -12,13 +12,13 @@ public interface BoardMapper {
     
     Optional<Board> findOne(Long id);
 
-    int insertBoard(Board board);
+    int save(Board board);
 
-    void updateBoard(Long id, Board board);
+    void update(Long id, Board board);
 
-    void deleteBoard(Long id);
+    void delete(Long id);
 
-    int selectBoardCount(Long categoryId, String type, String searchValue);
+    int findAllCount(Long categoryId, String type, String searchValue);
 
     void updateBoardHit(Long id);
 }

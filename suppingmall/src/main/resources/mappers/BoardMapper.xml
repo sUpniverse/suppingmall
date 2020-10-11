@@ -40,29 +40,34 @@
     </resultMap>
 
     <sql id="conditionalSearch">
-        <if test="type != null and searchValue != null">
-            <if test='type.equals("title")'>
-                <bind name="searchValue" value="'%'+searchValue+'%'"/>
-                AND B.title LIKE #{searchValue}
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="categoryId != null">
+                AND B.category_id = #{categoryId}
             </if>
-            <if test='type.equals("contents")'>
-                <bind name="searchValue" value="'%'+searchValue+'%'"/>
-                AND B.contents LIKE #{searchValue}
+            <if test="type != null and searchValue != null">
+                <if test='type.equals("title")'>
+                    <bind name="searchValue" value="'%'+searchValue+'%'"/>
+                    AND B.title LIKE #{searchValue}
+                </if>
+                <if test='type.equals("contents")'>
+                    <bind name="searchValue" value="'%'+searchValue+'%'"/>
+                    AND B.contents LIKE #{searchValue}
+                </if>
+                <if test='type.equals("creator")'>
+                    AND U.nickname = #{searchValue}
+                </if>
             </if>
-            <if test='type.equals("creator")'>
-                AND U.nickName = #{searchValue}
-            </if>
-        </if>
+        </trim>
     </sql>
 
     <sql id="paging">
         limit #{criteria.pageStart}, #{criteria.perPageNum}
     </sql>
 
-    <select id="selectBoardCount" resultType="int">
+    <select id="findAllCount" resultType="int">
         SELECT count(*)
         From Board AS B
-        WHERE B.category_id = #{categoryId}
+        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
         <include refid="conditionalSearch"></include>
     </select>
 
@@ -79,7 +84,6 @@
         FROM Board AS B
         LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
         LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
-        WHERE B.category_id = #{categoryId}
         <include refid="conditionalSearch"></include>
         ORDER BY B.board_id desc
         <include refid="paging"></include>
@@ -107,7 +111,7 @@
     </select>
 
 
-    <insert id="insertBoard" parameterType="com.supshop.suppingmall.board.Board" useGeneratedKeys="true" keyProperty="boardId">
+    <insert id="save" parameterType="com.supshop.suppingmall.board.Board" useGeneratedKeys="true" keyProperty="boardId">
         INSERT INTO Board (
         title,
         contents,
@@ -128,7 +132,7 @@
         )
     </insert>
 
-    <update id="updateBoard" parameterType="com.supshop.suppingmall.board.Board">
+    <update id="update" parameterType="com.supshop.suppingmall.board.Board">
         UPDATE Board
         SET
         title = #{board.title},
@@ -137,7 +141,7 @@
         WHERE board_id = #{id};
     </update>
 
-    <delete id="deleteBoard" parameterType="com.supshop.suppingmall.board.Board">
+    <delete id="delete" parameterType="com.supshop.suppingmall.board.Board">
         DELETE FROM Board
         WHERE board_id = #{id};
     </delete>

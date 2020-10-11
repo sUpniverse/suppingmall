@@ -123,6 +123,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.GET,"/users").hasAnyRole(MASTER,ADMIN)
                 .mvcMatchers(HttpMethod.GET,"/boards").permitAll()
                 .mvcMatchers(HttpMethod.POST,"/boards").authenticated()
+                .mvcMatchers(HttpMethod.GET,"/boards/main").authenticated()
                 .mvcMatchers(HttpMethod.GET,"/boards/form").authenticated()
                 .mvcMatchers(HttpMethod.POST,"/boards/form").authenticated()
                 .mvcMatchers(HttpMethod.GET,"/boards/{id}").permitAll()

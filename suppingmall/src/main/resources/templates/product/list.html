@@ -377,7 +377,7 @@
                             </a>
                         </li>
                         <li class="page-item" th:each="idx : ${#numbers.sequence(productPageMaker.startPage,productPageMaker.endPage)}" th:classappend="${productPageMaker.criteria.page} == ${idx} ? active" aria-current="page">
-                            <a class="page-link" th:href="@{'/products?page='+${idx}}" th:text="${idx}"></a>
+                            <a class="page-link" th:href="@{'/products?page='+${idx}}" th:text="${idx}" th:if="${idx > 0}"></a>
                         </li>
                         <li class="page-item" th:if="${productPageMaker.next && productPageMaker.endPage > 0}">
                             <a class="page-link page-link-next" href="#" aria-label="Next">

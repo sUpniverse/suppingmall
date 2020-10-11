@@ -30,15 +30,15 @@ public class BoardService {
     private static final String boardImageUrl = "/images/board/";
 
     public List<Board> getBoards(Criteria boardCriteria, Long categoryId, String type, String searchValue) {
-        if(categoryId == null) {
-            Category categoryByEnName = categoryService.getCategoryByEnName(boardName);
-            return boardMapper.findAll(boardCriteria,categoryByEnName.getId(), type, searchValue);
-        }
+//        if(categoryId == null) {
+//            Category categoryByEnName = categoryService.getCategoryByEnName(boardName);
+//            return boardMapper.findAll(boardCriteria,categoryByEnName.getId(), type, searchValue);
+//        }
         return boardMapper.findAll(boardCriteria,categoryId, type, searchValue);
     }
 
     public int getBoardCount(Long categoryId, String type, String searchValue) {
-        return boardMapper.selectBoardCount(categoryId,type,searchValue);
+        return boardMapper.findAllCount(categoryId,type,searchValue);
     }
 
     @Transactional
@@ -55,10 +55,10 @@ public class BoardService {
     public void createBoard(Board board, Set<String> urls) {
         int imageCount = urls.size();
         String originUrl = null;
-        int result = boardMapper.insertBoard(board);
+        int result = boardMapper.save(board);
         if(imageCount > 0 && result == 1){
             originUrl = setBoardImageUrl(board,urls);
-            boardMapper.updateBoard(board.getBoardId(), board);
+            boardMapper.update(board.getBoardId(), board);
             imageService.saveInStorage(urls,originUrl,board.getBoardId(), boardName);
         }
     }
@@ -85,12 +85,12 @@ public class BoardService {
             String originUrl= setBoardImageUrl(board,newImageUrl);
             imageService.saveInStorage(newImageUrl,originUrl,board.getBoardId(), boardName);
         }
-        boardMapper.updateBoard(id, board);
+        boardMapper.update(id, board);
     }
 
     @Transactional
     public void deleteBoard(Long id) {
-        boardMapper.deleteBoard(id);
+        boardMapper.delete(id);
     }
 
 }

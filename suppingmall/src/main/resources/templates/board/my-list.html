@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <div th:include="fragments/header :: header" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" />
+    <style>
+        ul{
+            list-style:none;
+            padding: unset;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="fragments/navigation-fix :: navigation-fix" />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 d-none d-md-block bg-light sidebar">
+            <nav th:replace="user/user-left-bar :: user-left-bar" th:if="${#strings.equals(#authentication.principal.role,'USER')}"/>
+        </div>
+        <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
+            <div class="py-3" th:text="${#authentication.principal.nickName+'님의 게시글 내역'}"></div>
+            <div class="container py-4">
+                <nav class="nav nav-pills nav-fill justify-content-center">
+                    <a class="nav-link" href="/boards/main?type=boards" th:classappend="${type} == null ? 'active' : (${type} == 'boards' ? 'active')">내 게시글</a>
+                    <a class="nav-link" href="/boards/main?type=comments" th:classappend="${type} == 'comments' ? 'active'">내 댓글</a>
+                    <a class="nav-link" href="/boards/main?type=like" th:classappend="${type} == 'comments' ? 'like'">좋아요 누른 글</a>
+                </nav>
+            </div>
+            <div>
+                <table class="table table-bordered table-hover text-small" th:unless="${type} == 'comments'">
+                    <thead>
+                    <tr>
+                        <th class="text-center">댓글</th>
+                        <th class="text-center">카테고리</th>
+                        <th>제목</th>
+                        <th class="text-center">작성자</th>
+                        <th class="text-center">조회수</th>
+                        <th class="text-center">작성일</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="board : ${boardList}">
+                        <td class="text-center" th:text="${board.comments.size()}"></td>
+                        <td class="text-center" th:text="${board?.category.name}"></td>
+                        <td>
+                            <a class="text-dark" th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}+'?page='+${pageNum}}" ></a>
+                        </td>
+                        <td class="text-center" th:text="${board.creator.nickName}" />
+                        <td class="text-center" th:text="${board.hit}"/>
+                        <td th:text="${#temporals.format(board.createdDate,'yyyy-MM-dd') == #dates.format(#dates.createToday(),'yyyy-MM-dd')? #temporals.format(board.createdDate,'HH:mm') : #temporals.format(board.createdDate,'MM-dd')}" />
+                    </tr>
+                    </tbody>
+                </table>
+                <table class="table table-bordered table-hover text-small" th:if="${type} == 'comments'">
+                    <thead>
+                    <tr>
+                        <th class="text-center">카테고리</th>
+                        <th class="text-center">댓글</th>
+                        <th class="text-center">작성자</th>
+                        <th class="text-center">작성일</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="comment : ${commentList}">
+                        <td class="text-center" th:text="${comment?.board.category.name}"></td>
+                        <td>
+                            <a class="text-dark" th:text="${comment.contents}" th:href="@{'/boards/'+${comment.board.boardId}+'?page='+${pageNum}}" ></a>
+                        </td>
+                        <td class="text-center" th:text="${comment.creator.nickName}" />
+                        <td th:text="${#temporals.format(comment.createdDate,'yyyy-MM-dd') == #dates.format(#dates.createToday(),'yyyy-MM-dd')? #temporals.format(comment.createdDate,'HH:mm') : #temporals.format(comment.createdDate,'MM-dd')}" />
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="container d-flex justify-content-center mb-3 text-small">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination mx-auto">
+                            <li class="page-item">
+                                <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/boards/main?page='+${pageMaker.startPage - 1}+'&&type='+${type}+'&&searchValue='+${searchValue}}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:classappend="${pageMaker.criteria.page} == ${idx} ? active">
+                                <a class="page-link" th:href="@{'/boards/main?page='+${idx}}" th:text="${idx}" th:if="${idx} > 0"></a>
+                            </li>
+                            <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">
+                                <a class="page-link" th:href="@{'/boards/main?page='+${pageMaker.endPage + 1}}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                <div class="container d-flex justify-content-center">
+                    <form method="get" th:action="@{/boards}">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <select class="btn btn-outline-secondary dropdown-toggle" th:name="type">
+                                    <option class="dropdown-item" th:value="title">제목검색</option>
+                                    <option class="dropdown-item" th:value="contents">내용검색</option>
+                                </select>
+                            </div>
+                            <input type="text" class="form-control" th:name="searchValue" aria-label="Text input with dropdown button">
+                            <div class="input-group-append">
+                                <button class="input-group-text" type="submit">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img" viewBox="0 0 24 24" focusable="false"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"/><path d="M21 21l-5.2-5.2"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

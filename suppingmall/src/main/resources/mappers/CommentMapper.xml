@@ -18,6 +18,19 @@
             <result property="createdDate" column="UserCreatedDate" />
             <result property="role" column="UserRole" typeHandler="com.supshop.suppingmall.user.RoleTypeHandler" />
         </association>
+        <association property="board" javaType="com.supshop.suppingmall.board.Board">
+            <id property="boardId" column="BoardId" />
+            <result property="title" column="BoardTitle" />
+            <result property="contents" column="BoardContents" />
+            <result property="hit" column="BoardHit" />
+            <result property="delYn" column="BoardDelYn" />
+            <result property="createdDate" column="BoardCreatedDate" />
+            <result property="updatedDate" column="BoardUpdatedDate" />
+            <association property="category" javaType="com.supshop.suppingmall.category.Category">
+                <id property="id" column="CategoryId" />
+                <result property="name" column="CategoryName" />
+            </association>
+        </association>
     </resultMap>
 
     <sql id="paging">
@@ -32,21 +45,31 @@
             <if test="boardId != null">
                 AND C.board_id = #{boardId}
             </if>
+            <if test="type != null and searchValue != null">
+                <if test='type.equals("creator")'>
+                    AND U.nickname = #{searchValue}
+                </if>
+            </if>
         </trim>
     </sql>
 
     <select id="findCommentCount" resultType="int">
         SELECT count(*)
         From Comment AS C
+        LEFT OUTER JOIN User AS U on (C.user_id = U.user_id)
         <include refid="conditionalSearch"></include>
     </select>
 
     <select id="findAll" resultMap="Comment">
         SELECT C.comment_id AS "CommentId", C.title AS "CommentTitle", C.contents AS "CommentContents", C.level AS "CommentLevel",
         C.created_date AS "CommentCreatedDate", C.updated_date AS "CommentUpdatedDate", U.user_id AS "UserId",
-        U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole"
+        U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",
+        B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents", B.hit AS "BoardHit",
+        B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate", CA.name AS "CategoryName"
         FROM Comment AS C
         LEFT OUTER JOIN User AS U on (C.user_id = U.user_id)
+        LEFT OUTER JOIN Board AS B on (C.board_id = B.board_id)
+        LEFT OUTER JOIN Category AS CA on (B.category_id = CA.category_id)
         <include refid="conditionalSearch"></include>
         ORDER BY C.comment_id asc
         <include refid="paging"></include>

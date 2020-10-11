@@ -4,6 +4,7 @@ import com.supshop.suppingmall.board.form.BoardCreateForm;
 import com.supshop.suppingmall.board.form.BoardUpdateForm;
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryService;
+import com.supshop.suppingmall.comment.Comment;
 import com.supshop.suppingmall.comment.CommentService;
 import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.page.Criteria;
@@ -33,7 +34,7 @@ public class BoardController {
     private final CommentService  commentService;
 
     private static final Long boardCategoryId = 21l;
-    private static final int boardDisplayPagingNum = 5;
+    private static final int boardDisplayPagingNum = 10;
 
     @GetMapping("/form")
     public String form(Model model) {
@@ -90,7 +91,7 @@ public class BoardController {
 
         int commentCount = commentService.getCommentCount(id);
         Criteria criteria = new TenItemsCriteria();
-        PageMaker commentPageMaker = new PageMaker(commentCount,10,criteria);
+        PageMaker commentPageMaker = new PageMaker(commentCount,boardDisplayPagingNum,criteria);
 
         model.addAttribute("boardList",boards);
         model.addAttribute("board",board);
@@ -148,6 +149,39 @@ public class BoardController {
         }
         boardService.deleteBoard(id);
         return "redirect:/boards";
+    }
+
+    @GetMapping("/main")
+    public String getMyBoard(@RequestParam(required = false) String type,
+                             TenItemsCriteria criteria,
+                             @AuthenticationPrincipal SessionUser sessionUser,
+                             Model model){
+
+        if(type == null || "boards".equals(type)) {
+            List<Board> boardList = boardService.getBoards(criteria, null, "creator", sessionUser.getUsername());
+            int boardCount = boardService.getBoardCount(null, "creator", sessionUser.getUsername());
+            PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum, criteria);
+
+            model.addAttribute("type",type);
+            model.addAttribute("boardList",boardList);
+            model.addAttribute("pageMaker", pageMaker);
+            model.addAttribute("pageNum", criteria.getPage());
+
+        } else if("comments".equals(type)){
+            int commentCount = commentService.getCommentCount(null, "creator", sessionUser.getUsername());
+            List<Comment> commentList = commentService.getAllComments(null, criteria, "creator", sessionUser.getUsername());
+            PageMaker pageMaker = new PageMaker(commentCount, boardDisplayPagingNum, criteria);
+
+            model.addAttribute("type",type);
+            model.addAttribute("commentList",commentList);
+            model.addAttribute("pageMaker", pageMaker);
+            model.addAttribute("pageNum", criteria.getPage());
+        } else if("like".equals(type)){
+
+        }
+
+
+        return "/board/my-list";
     }
 
 }

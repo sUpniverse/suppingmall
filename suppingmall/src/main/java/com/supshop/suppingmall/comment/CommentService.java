@@ -17,12 +17,21 @@ public class CommentService {
     private final CommentMapper commentMapper;
 
     public int getCommentCount(Long boardId){
-        return commentMapper.findCommentCount(boardId);
+        return commentMapper.findCommentCount(boardId,null,null);
+    }
+
+    public int getCommentCount(Long boardId, String type, String searchValue){
+        return commentMapper.findCommentCount(boardId,type,searchValue);
     }
 
     public List<Comment> getAllComments(Long boardId, Criteria criteria) {
-        return commentMapper.findAll(boardId, criteria);
+        return commentMapper.findAll(boardId, criteria,null,null);
     }
+
+    public List<Comment> getAllComments(Long boardId, Criteria criteria, String type, String searchValue) {
+        return commentMapper.findAll(boardId, criteria,type,searchValue);
+    }
+
 
     public int insertComment(Comment comment) {
         return commentMapper.insertComment(comment);
