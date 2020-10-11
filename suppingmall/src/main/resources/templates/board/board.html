@@ -57,7 +57,7 @@
                     </div>
                     <div class="box-footer text-center py-3">
                         <button sec:authorize="isAuthenticated()"  th:if="${board.creator.userId.equals(#authentication.principal.userId)}" type="submit" class="btn btn-warning">수정</button>
-                        <button sec:authorize="isAuthenticated()"  th:if="${board.creator.userId.equals(#authentication.principal.userId)}" type="submit" class="btn btn-danger">삭제</button>
+                        <button sec:authorize="isAuthenticated()"     th:if="${board.creator.userId.equals(#authentication.principal.userId)}" type="submit" class="btn btn-danger">삭제</button>
                         <button type="submit" class="btn btn-primary">목록</button>
                     </div>
                 </div>
