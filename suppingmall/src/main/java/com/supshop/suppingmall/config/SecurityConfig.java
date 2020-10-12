@@ -143,6 +143,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.GET,"/products/main").permitAll()
                 .mvcMatchers(HttpMethod.GET,"/products/{id}").permitAll()
                 .mvcMatchers(HttpMethod.PATCH,"/products/{id/status/{status}").permitAll()
+                .mvcMatchers(HttpMethod.GET,"/products/qna/main").authenticated()
                 .mvcMatchers(HttpMethod.GET,"/products/{productId}/qna/form").authenticated()
                 .mvcMatchers(HttpMethod.GET,"/products/qna/{qnaId}").permitAll()
                 .mvcMatchers(HttpMethod.GET,"/products/{productId}/qna/{page}").permitAll()

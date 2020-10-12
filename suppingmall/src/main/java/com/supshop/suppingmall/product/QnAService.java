@@ -15,12 +15,24 @@ public class QnAService {
 
     private final QnAMapper qnaMapper;
 
-    public int getQnACount(Long productId, String type, String searchValue) {
-        return qnaMapper.findQnACount(productId, type, searchValue);
+    public int getQnACount(String type, String searchValue) {
+        return qnaMapper.findCount(type, searchValue);
+    }
+    public int getQnACountByProductId(Long productId, String type, String searchValue) {
+        return qnaMapper.findCountByProductId(productId, type, searchValue);
+    }
+    public int getQnACountByUserId(Long userId, String type, String searchValue) {
+        return qnaMapper.findCountByUserId(userId, type, searchValue);
     }
 
-    public List<QnA> getQnAList(Criteria criteria,Long productId, String type, String searchValue){
-        return qnaMapper.findAll(criteria,productId,type,searchValue);
+    public List<QnA> getQnAList(Criteria criteria, String type, String searchValue){
+        return qnaMapper.findAll(criteria,type,searchValue);
+    }
+    public List<QnA> getQnAListByProductId(Criteria criteria, Long productId, String type, String searchValue){
+        return qnaMapper.findByProductId(criteria,productId,type,searchValue);
+    }
+    public List<QnA> getQnAListByUserId(Criteria criteria, Long userId, String type, String searchValue){
+        return qnaMapper.findByUserId(criteria,userId,type,searchValue);
     }
 
     public QnA getQna(Long id) {

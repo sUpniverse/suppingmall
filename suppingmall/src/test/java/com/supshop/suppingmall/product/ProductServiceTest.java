@@ -57,7 +57,7 @@ public class ProductServiceTest {
     @Transactional
     public void createQnA() throws Exception {
         //given
-        int find = qnaService.getQnAList(null,null,null,null).size();
+        int find = qnaService.getQnAListByProductId(null,null,null,null).size();
 
         User kevin = userFactory.createUser("kevin");
         User seller = userFactory.createSeller("seller");
@@ -73,7 +73,7 @@ public class ProductServiceTest {
         qnaService.createQnA(qna);
 
         //then
-        Assert.assertEquals(find+1,qnaService.getQnAList(null,null,null,null).size());
+        Assert.assertEquals(find+1,qnaService.getQnAListByProductId(null,null,null,null).size());
 
     }
 

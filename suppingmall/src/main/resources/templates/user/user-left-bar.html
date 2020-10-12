@@ -35,6 +35,9 @@
                 <li class="nav-item">
                     <a class="nav-link sidebar-heading" href="/cart">카트</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link sidebar-heading" th:href="@{'/products/qna/main'}">내 QnA 내역</a>
+                </li>
             </ul>
         </div>
         <div th:if="${#strings.equals(#authentication?.principal.role,'SELLER')}">

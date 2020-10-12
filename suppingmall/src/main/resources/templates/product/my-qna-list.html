@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <div th:include="fragments/header :: header" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" />
+    <style>
+        ul{
+            list-style:none;
+            padding: unset;
+        }
+
+        .qna {display: table; width: 100%; border-bottom: solid 1px #dee2e6; border-top: 2px solid #000000;}
+            .list-group {display: table; width: 100%; table-layout: fixed}
+            .tableHeader {display: table; width: 100%; table-layout: fixed}
+            li.list-group-item > div.cell.qnaTitle {display: table-cell; padding: 16px; text-align: left; vertical-align: middle}
+            .tableHeader > .cell {border-bottom: solid 1px #dee2e6; display: table-cell; padding: 16px; text-align: center; vertical-align: middle; font-weight: bold}
+            .list-group-item-action > .cell {display: table-cell; padding: 16px; text-align: center; vertical-align: middle;}
+            .replyYn { width: 10%;}
+            .productName { width: 10%;}
+            .qnaTitle {width: 60%;}
+            .creator {width: 10%;}
+            .createdDate {width: 10%;}
+    </style>
+</head>
+<body>
+
+<div th:replace="fragments/navigation-fix :: navigation-fix" />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 d-none d-md-block bg-light sidebar">
+            <nav th:replace="user/user-left-bar :: user-left-bar" th:if="${#strings.equals(#authentication.principal.role,'USER')}"/>
+        </div>
+        <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
+            <div class="py-3" th:text="${#authentication.principal.nickName+'님의 QnA 내역'}"></div>
+            <div class="qna">
+                <div class="list-group">
+                    <div class="tableHeader">
+                        <div class="cell replyYn">답변상태</div>
+                        <div class="cell productName">물품명</div>
+                        <div class="cell qnaTitle">제목</div>
+                        <div class="cell creator">작성자</div>
+                        <div class="cell createdDate">작성일</div>
+                    </div>
+                </div>
+                <ul class="list-group list-group-flush" th:each="qna : ${qnaList}">
+                    <li class="list-group-item-action">
+                        <div class="cell replyYn" th:text="${qna.isReplyExist()} ? '답변완료' : '미답변'"></div>
+                        <div class="cell productName">
+                            <a th:href="@{'/products/'+${qna.product.productId}}" th:text="${qna.product.name}"></a>
+                        </div>
+                        <div class="cell qnaTitle">
+                            <a role="button" data-toggle="collapse" th:href="@{'#qna-'+${qna.qnaId}}" aria-expanded="false" th:text="${qna.title}"></a>
+                        </div>
+                        <div class="cell creator" th:text="${qna.creator.nickName}"></div>
+                        <div class="cell createdDate" th:text="${#temporals.format(qna.createdDate,'yyyy-MM-dd')}"></div>
+                    </li>
+                    <li th:id="${'qna-'+qna.qnaId}" class="list-group-item collapse">
+                        <div class="row p-3">
+                            <div class="cell replyYn text-center">
+                                <svg width="3em" height="3em" viewBox="0 0 16 16" class="bi bi-patch-question" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM8.05 9.6c.336 0 .504-.24.554-.627.04-.534.198-.815.847-1.26.673-.475 1.049-1.09 1.049-1.986 0-1.325-.92-2.227-2.262-2.227-1.02 0-1.792.492-2.1 1.29A1.71 1.71 0 0 0 6 5.48c0 .393.203.64.545.64.272 0 .455-.147.564-.51.158-.592.525-.915 1.074-.915.61 0 1.03.446 1.03 1.084 0 .563-.208.885-.822 1.325-.619.433-.926.914-.926 1.64v.111c0 .428.208.745.585.745z"/>
+                                    <path fill-rule="evenodd" d="M10.273 2.513l-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911l-1.318.016z"/>
+                                </svg>
+                            </div>
+                            <div class="cell qnaTitle" th:text="${qna.title}"></div>
+                            <div class="cell creator"> </div>
+                            <div class="cell createdDate"></div>
+                        </div>
+                        <div class="row border-top p-3" th:if="${qna.isReplyExist()}">
+                            <div class="cell replyYn text-center">
+                                <svg width="3em" height="3em" viewBox="0 0 16 16" class="bi bi-info-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                    <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
+                                    <circle cx="8" cy="4.5" r="1"/>
+                                </svg>
+                            </div>
+                            <div class="cell qnaTitle" th:text="${qna.reply.title}"></div>
+                            <div class="cell creator">판매자</div>
+                            <div class="cell createdDate" th:text="${#temporals.format(qna.reply.createdDate,'yyyy-MM-dd')}"></div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="container d-flex justify-content-center py-3 text-small">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination mx-auto">
+                        <li class="page-item">
+                            <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/products/qna/main?page='+${pageMaker.startPage - 1}+'&&type='+${type}+'&&searchValue='+${searchValue}}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:classappend="${pageMaker.criteria.page} == ${idx} ? active">
+                            <a class="page-link" th:href="@{'/products/qna/main?page='+${idx}}" th:text="${idx}" th:if="${idx} > 0"></a>
+                        </li>
+                        <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">
+                            <a class="page-link" th:href="@{'/products/qna/main?page='+${pageMaker.endPage + 1}}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="container d-flex justify-content-center">
+                <form method="get" th:action="@{'/products/qna/main'}">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <select class="btn btn-outline-secondary dropdown-toggle" th:name="type">
+                                <option class="dropdown-item" th:value="contents">내용검색</option>
+                                <option class="dropdown-item" th:value="product">물품명</option>
+                            </select>
+                        </div>
+                        <input type="text" class="form-control" th:name="searchValue" aria-label="Text input with dropdown button">
+                        <div class="input-group-append">
+                            <button class="input-group-text" type="submit">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img" viewBox="0 0 24 24" focusable="false"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"/><path d="M21 21l-5.2-5.2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-2">
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

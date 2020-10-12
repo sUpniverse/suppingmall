@@ -135,7 +135,7 @@ public class ProductController {
         product.setCategory(category);
 
         Criteria criteria = new TenItemsCriteria();
-        List<QnA> qnaList = qnaService.getQnAList(criteria,id,null, null);
+        List<QnA> qnaList = qnaService.getQnAListByProductId(criteria,id,null, null);
         List<Review> reviewList = reviewService.getReviewList(criteria,id,null,null);
 
 
@@ -148,7 +148,7 @@ public class ProductController {
         model.addAttribute("reviewPageMaker",reviewPageMaker);
         model.addAttribute("reviewCount",reviewCount);
 
-        int qnaCount = qnaService.getQnACount(product.getProductId(), null, null);
+        int qnaCount = qnaService.getQnACountByProductId(product.getProductId(), null, null);
         PageMaker qnaPageMaker = new PageMaker(qnaCount, 10, criteria);
         model.addAttribute("qnaPageMaker",qnaPageMaker);
         model.addAttribute("qnaCount",qnaCount);
@@ -229,6 +229,13 @@ public class ProductController {
         return "";
     }
 
+
+
+
+
+
+    /* QnA 관련 로직 */
+
     @GetMapping("/{productId}/qna/form")
     public String getQnaForm(@PathVariable Long productId,
                              Model model) {
@@ -248,14 +255,14 @@ public class ProductController {
         TenItemsCriteria criteria = new TenItemsCriteria();
         criteria.setPage(page);
 
-        int qnACount = qnaService.getQnACount(productId, type, searchValue);
+        int qnACount = qnaService.getQnACountByProductId(productId, type, searchValue);
         PageMaker pageMaker = new PageMaker(qnACount,10,criteria);
 
         map.put("qnaPageMaker",pageMaker);
 
         List<QnA> qnAList = null;
         try {
-            qnAList = qnaService.getQnAList(criteria, productId, type, searchValue);
+            qnAList = qnaService.getQnAListByProductId(criteria, productId, type, searchValue);
             map.put("list",qnAList);
         } catch (Exception e){
             e.printStackTrace();
@@ -324,12 +331,22 @@ public class ProductController {
 
     @GetMapping("/qna/main")
     public String getMyQnaList(@RequestParam(required = false) String type,
-                                                           @RequestParam(required = false) String searchValue,
-                                                           TenItemsCriteria criteria,
-                                                           @AuthenticationPrincipal SessionUser sessionUser,
-                                                           Model model) {
+                               @RequestParam(required = false) String searchValue,
+                               TenItemsCriteria criteria,
+                               @AuthenticationPrincipal SessionUser sessionUser,
+                               Model model) {
 
-        return null;
+
+        List<QnA> qnaList = qnaService.getQnAListByUserId(criteria, sessionUser.getUserId(), type, searchValue);
+        int qnaCount = qnaService.getQnACountByUserId(sessionUser.getUserId(), type, searchValue);
+        PageMaker pageMaker = new PageMaker(qnaCount, 10, criteria);
+
+        model.addAttribute("type",type);
+        model.addAttribute("searchValue",searchValue);
+        model.addAttribute("qnaList",qnaList);
+        model.addAttribute("pageMaker",pageMaker);
+
+        return "/product/my-qna-list";
     }
 
 
