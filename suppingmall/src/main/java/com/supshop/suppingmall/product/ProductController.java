@@ -302,23 +302,22 @@ public class ProductController {
         return ResponseEntity.created(uri).build();
     }
 
-    @PostMapping("/{productId}/qna/{qnaId}/reply")
+    @PostMapping("/qna/{qnaId}/reply")
     @ResponseBody
     public ResponseEntity createReply(@RequestBody QnaReplyForm replyForm,
-                                      @PathVariable Long productId,
                                       @PathVariable Long qnaId,
                                       @AuthenticationPrincipal SessionUser sessionUser) {
 
-        Product product = productService.getProduct(productId);
-        if(sessionUser.getUserId() != replyForm.getUserId() || (product.getSeller().getUserId() != replyForm.getUserId()))
+
+        QnA qna = qnaService.getQna(qnaId);
+        if(!sessionUser.getUserId().equals(replyForm.getUserId()) || !qna.getProduct().getSeller().getUserId().equals(replyForm.getUserId()))
             return ResponseEntity.badRequest().body("유저 아이디가 일치하지 않습니다.");
 
         User user = userService.getUser(replyForm.getUserId());
-        QnA qna = qnaService.getQna(qnaId);
 
         QnA reply = QnA.builder()
                 .title(replyForm.getTitle())
-                .product(product)
+                .product(qna.getProduct())
                 .parent(qna)
                 .creator(user).build();
 
@@ -339,6 +338,26 @@ public class ProductController {
 
         List<QnA> qnaList = qnaService.getQnAListByUserId(criteria, sessionUser.getUserId(), type, searchValue);
         int qnaCount = qnaService.getQnACountByUserId(sessionUser.getUserId(), type, searchValue);
+        PageMaker pageMaker = new PageMaker(qnaCount, 10, criteria);
+
+        model.addAttribute("type",type);
+        model.addAttribute("searchValue",searchValue);
+        model.addAttribute("qnaList",qnaList);
+        model.addAttribute("pageMaker",pageMaker);
+
+        return "/product/my-qna-list";
+    }
+
+    @GetMapping("/qna/seller/main")
+    public String getSellerQnaList(@RequestParam(required = false) String type,
+                                   @RequestParam(required = false) String searchValue,
+                                   TenItemsCriteria criteria,
+                                   @AuthenticationPrincipal SessionUser sessionUser,
+                                   Model model) {
+
+
+        List<QnA> qnaList = qnaService.getQnAListBySellerId(criteria, sessionUser.getUserId(), type, searchValue);
+        int qnaCount = qnaService.getQnACountBySellerId(sessionUser.getUserId(), type, searchValue);
         PageMaker pageMaker = new PageMaker(qnaCount, 10, criteria);
 
         model.addAttribute("type",type);

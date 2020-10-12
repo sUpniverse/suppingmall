@@ -164,7 +164,7 @@ function createReply(qnaId,replyTitle){
     }
 
     $.ajax({
-        url: "/products/"+productId+"/qna/"+qnaId+"/reply",
+        url: "/products/qna/"+qnaId+"/reply",
         type: 'POST',
         contentType: 'application/json',
         beforeSend: function (xhr) {

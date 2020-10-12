@@ -81,7 +81,7 @@
                             <div class="cell creator">판매자</div>
                             <div class="cell createdDate" th:text="${#temporals.format(qna.reply.createdDate,'yyyy-MM-dd')}"></div>
                         </div>
-                        <div class="row border-top p-3" sec:authorize="isAuthenticated()" th:if="not ${qna.isReplyExist()} and ${#authentication.principal.userId} == ${qna.product.seller.userId}" th:data-rno="${qna.qnaId}">
+                        <div class="row border-top p-3" sec:authorize="isAuthenticated()" th:if="not ${qna.isReplyExist()} and ${#authentication.principal.userId} == ${product.seller.userId}" th:data-rno="${qna.qnaId}">
                             <div class="cell replyYn text-center">
                             </div>
                             <div class="cell qnaTitle">
@@ -99,15 +99,15 @@
                 <nav aria-label="Page navigation example">
                     <ul class="pagination mx-auto">
                         <li class="page-item">
-                            <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/products/qna/seller/main?page='+${pageMaker.startPage - 1}+'&&type='+${type}+'&&searchValue='+${searchValue}}" aria-label="Previous">
+                            <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/products/qna/main?page='+${pageMaker.startPage - 1}+'&&type='+${type}+'&&searchValue='+${searchValue}}" aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>
                             </a>
                         </li>
                         <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:classappend="${pageMaker.criteria.page} == ${idx} ? active">
-                            <a class="page-link" th:href="@{'/products/qna/seller/main?page='+${idx}}" th:text="${idx}" th:if="${idx} > 0"></a>
+                            <a class="page-link" th:href="@{'/products/qna/main?page='+${idx}}" th:text="${idx}" th:if="${idx} > 0"></a>
                         </li>
                         <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">
-                            <a class="page-link" th:href="@{'/products/qna/seller/main?page='+${pageMaker.endPage + 1}}" aria-label="Next">
+                            <a class="page-link" th:href="@{'/products/qna/main?page='+${pageMaker.endPage + 1}}" aria-label="Next">
                                 <span aria-hidden="true">&raquo;</span>
                             </a>
                         </li>
@@ -115,7 +115,7 @@
                 </nav>
             </div>
             <div class="container d-flex justify-content-center">
-                <form method="get" th:action="@{'/products/qna/seller/main'}">
+                <form method="get" th:action="@{'/products/qna/main'}">
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <select class="btn btn-outline-secondary dropdown-toggle" th:name="type">
@@ -137,66 +137,6 @@
         </div>
     </div>
 </div>
+
 </body>
-<script type="text/javascript" th:inline="javascript">
-
-    $(document).on("click",'.replyButton',function (event){
-        let button = event.target;
-        var qnaId = button.parentNode.parentElement.getAttribute('data-rno');
-        var replyTitle = button.parentNode.parentElement.getElementsByClassName('replyTitle')[0].value;
-
-        createReply(qnaId,replyTitle);
-    });
-
-    function createReply(qnaId,replyTitle){
-        let sellerId = [[${qnaList.get(0).product.seller.userId}]];
-
-        var header = [[${_csrf.headerName}]];
-        var token = [[${_csrf.token}]];
-
-        var reply = {
-            "userId" : sellerId,
-            "title" : replyTitle
-        }
-
-        $.ajax({
-            url: "/products/qna/"+qnaId+"/reply",
-            type: 'POST',
-            contentType: 'application/json',
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("Content-type","application/json");
-                xhr.setRequestHeader(header,token);
-            },
-            data : JSON.stringify(reply),
-            success: ()=> {
-                alert("답변 작성완료");
-                setReply(replyTitle,qnaId);
-            },
-            error: ()=> {
-                alert("답변 작성실패");
-            }
-        });
-
-    }
-
-    function setReply(title,qnaId) {
-
-        var str = "";
-
-        str +=
-            '             <div class="cell replyYn text-center">\n' +
-            '                  <svg width="3em" height="3em" viewBox="0 0 16 16" class="bi bi-info-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">\n' +
-            '                       <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>\n' +
-            '                       <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>\n' +
-            '                       <circle cx="8" cy="4.5" r="1"/>\n' +
-            '                   </svg>\n' +
-            '              </div>\n' +
-            '              <div class="cell qnaTitle">'+title+'</div>\n' +
-            '              <div class="cell creator">판매자</div>\n' +
-            '             <div class="cell createdDate">'+new Date()+'</div>';
-
-        document.getElementById('qna-'+qnaId).children[1].innerHTML = str;
-
-    }
-</script>
 </html>

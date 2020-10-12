@@ -24,6 +24,9 @@ public class QnAService {
     public int getQnACountByUserId(Long userId, String type, String searchValue) {
         return qnaMapper.findCountByUserId(userId, type, searchValue);
     }
+    public int getQnACountBySellerId(Long sellerId, String type, String searchValue) {
+        return qnaMapper.findCountByUserId(sellerId, type, searchValue);
+    }
 
     public List<QnA> getQnAList(Criteria criteria, String type, String searchValue){
         return qnaMapper.findAll(criteria,type,searchValue);
@@ -33,6 +36,9 @@ public class QnAService {
     }
     public List<QnA> getQnAListByUserId(Criteria criteria, Long userId, String type, String searchValue){
         return qnaMapper.findByUserId(criteria,userId,type,searchValue);
+    }
+    public List<QnA> getQnAListBySellerId(Criteria criteria, Long sellerId, String type, String searchValue){
+        return qnaMapper.findBySellerId(criteria,sellerId,type,searchValue);
     }
 
     public QnA getQna(Long id) {

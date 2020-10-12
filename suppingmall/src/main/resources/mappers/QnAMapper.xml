@@ -21,6 +21,9 @@
         <association property="product" javaType="com.supshop.suppingmall.product.Product">
             <id property="productId" column="ProductId"></id>
             <result property="name" column="ProductName" />
+            <association property="seller" javaType="com.supshop.suppingmall.user.User">
+                <id property="userId" column="ProductSellerId" />
+            </association>
         </association>
     </resultMap>
 
@@ -71,6 +74,15 @@
         LEFT OUTER JOIN User AS U on (Q.user_id = U.user_id)
         LEFT OUTER JOIN Product AS P on (Q.product_id = P.product_id)
         WHERE Q.user_id = #{userId}
+        <include refid="conditionalSearch"></include>
+        AND Q.parent_id is null
+    </select>
+    <select id="findCountBySellerId" resultType="int">
+        SELECT count(*)
+        From QnA AS Q
+        LEFT OUTER JOIN User AS U on (Q.user_id = U.user_id)
+        LEFT OUTER JOIN Product AS P on (Q.product_id = P.product_id)
+        WHERE P.seller_id = #{sellerId}
         <include refid="conditionalSearch"></include>
         AND Q.parent_id is null
     </select>
@@ -140,11 +152,33 @@
         LEFT OUTER JOIN QnA AS R on (Q.reply_id = R.qna_id)
     </select>
 
+    <select id="findBySellerId" resultMap="QnA">
+        SELECT Q.qna_id AS "QnAId", Q.title AS "QnATitle",Q.created_date AS "QnACreatedDate",
+        Q.user_id AS "UserId",Q.email AS "UserEmail", Q.nickname AS "UserNickName",
+        Q.product_id AS "ProductId", Q.name AS "ProductName", Q.seller_id AS "ProductSellerId",
+        R.qna_id AS "ReplyId", R.title AS "ReplyTitle", R.created_date AS "ReplyCreatedDate"
+        FROM
+        (
+        SELECT Q.qna_id, Q.title, Q.created_date , Q.user_id,Q.reply_id, U.email, U.nickname,
+        P.product_id, P.name, P.seller_id
+        FROM QnA AS Q
+        LEFT OUTER JOIN User AS U on (Q.user_id = U.user_id)
+        LEFT OUTER JOIN Product AS P on (Q.product_id = P.product_id)
+        WHERE P.seller_id = #{sellerId}
+        <include refid="conditionalSearch"></include>
+        AND Q.parent_id is null
+        ORDER BY Q.QnA_id desc
+        <include refid="paging"></include>
+        ) AS Q
+        LEFT OUTER JOIN QnA AS R on (Q.reply_id = R.qna_id)
+    </select>
+
+
 
     <select id="findOne" resultMap="QnA">
         SELECT Q.qna_id AS "QnAId", Q.title AS "QnATitle",Q.created_date AS "QnACreatedDate",
         U.user_id AS "UserId", U.email AS "UserEmail", U.nickname AS "UserNickName",
-        R.qna_id AS "ReplyId", R.title AS "ReplyTitle", P.product_id AS "ProductId", P.name AS "ProductName"
+        R.qna_id AS "ReplyId", R.title AS "ReplyTitle", P.product_id AS "ProductId", P.name AS "ProductName", P.seller_id AS "ProductSellerId"
         FROM Qna AS Q
         LEFT OUTER JOIN User AS U on (Q.user_id = U.user_id)
         LEFT OUTER JOIN QnA AS R on (Q.reply_id = R.qna_id)

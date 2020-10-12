@@ -59,6 +59,9 @@
                     <a class="nav-link sidebar-heading" th:href="@{'/orders/seller/main?type=order'}">교환/환불/취소관리</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link sidebar-heading" th:href="@{'/products/qna/seller/main'}">QnA 관리</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link sidebar-heading" th:href="@{'/users/seller/'+${#authentication?.principal.userId}+'/transfer'}">회원전환</a>
                 </li>
             </ul>
