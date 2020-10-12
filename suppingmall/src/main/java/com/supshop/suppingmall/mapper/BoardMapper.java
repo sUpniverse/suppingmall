@@ -8,8 +8,14 @@ import java.util.Optional;
 
 public interface BoardMapper {
 
-    List<Board> findAll(Criteria criteria, Long categoryId, String type, String searchValue);
-    
+    int findCount(String type, String searchValue);
+    int findCountByUserId(Long userId, String type, String searchValue);
+    int findCountByCategoryId(Long categoryId,String type, String searchValue);
+
+    List<Board> findAll(Criteria criteria,String type, String searchValue);
+    List<Board> findByUserId(Criteria criteria,Long userId, String type, String searchValue);
+    List<Board> findByCategoryId(Criteria criteria,Long categoryId, String type, String searchValue);
+
     Optional<Board> findOne(Long id);
 
     int save(Board board);
@@ -17,8 +23,6 @@ public interface BoardMapper {
     void update(Long id, Board board);
 
     void delete(Long id);
-
-    int findAllCount(Long categoryId, String type, String searchValue);
 
     void updateBoardHit(Long id);
 }

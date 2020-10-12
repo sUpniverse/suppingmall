@@ -3,7 +3,6 @@ package com.supshop.suppingmall.comment;
 import com.supshop.suppingmall.mapper.CommentMapper;
 import com.supshop.suppingmall.page.Criteria;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,22 +15,26 @@ public class CommentService {
 
     private final CommentMapper commentMapper;
 
-    public int getCommentCount(Long boardId){
-        return commentMapper.findCommentCount(boardId,null,null);
+    public int getCommentCount(String type, String searchValue){
+        return commentMapper.findCount(type,searchValue);
+    }
+    public int getCommentCountByBoardId(Long boardId, String type, String searchValue){
+        return commentMapper.findCountByBoardId(boardId,type,searchValue);
+    }
+    public int getCommentCountByUserId(Long userId, String type, String searchValue){
+        return commentMapper.findCountByUserId(userId,type,searchValue);
     }
 
-    public int getCommentCount(Long boardId, String type, String searchValue){
-        return commentMapper.findCommentCount(boardId,type,searchValue);
-    }
 
-    public List<Comment> getAllComments(Long boardId, Criteria criteria) {
-        return commentMapper.findAll(boardId, criteria,null,null);
+    public List<Comment> getComments(Criteria criteria, String type, String searchValue) {
+        return commentMapper.findAll(criteria,type,searchValue);
     }
-
-    public List<Comment> getAllComments(Long boardId, Criteria criteria, String type, String searchValue) {
-        return commentMapper.findAll(boardId, criteria,type,searchValue);
+    public List<Comment> getCommentsByUserId(Long userId, Criteria criteria, String type, String searchValue) {
+        return commentMapper.findByUserId(userId, criteria, type, searchValue);
     }
-
+    public List<Comment> getCommentsByBoardId(Long boardId, Criteria criteria, String type, String searchValue) {
+        return commentMapper.findByBoardId(boardId,criteria,type,searchValue);
+    }
 
     public int insertComment(Comment comment) {
         return commentMapper.insertComment(comment);

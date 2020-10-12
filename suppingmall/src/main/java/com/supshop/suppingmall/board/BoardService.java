@@ -29,16 +29,24 @@ public class BoardService {
     private static final String boardName = "board";
     private static final String boardImageUrl = "/images/board/";
 
-    public List<Board> getBoards(Criteria boardCriteria, Long categoryId, String type, String searchValue) {
-//        if(categoryId == null) {
-//            Category categoryByEnName = categoryService.getCategoryByEnName(boardName);
-//            return boardMapper.findAll(boardCriteria,categoryByEnName.getId(), type, searchValue);
-//        }
-        return boardMapper.findAll(boardCriteria,categoryId, type, searchValue);
+    public int getBoardCount(String type, String searchValue) {
+        return boardMapper.findCount(type,searchValue);
+    }
+    public int getBoardCountByCategoryId(Long categoryId, String type, String searchValue) {
+        return boardMapper.findCountByCategoryId(categoryId, type, searchValue);
+    }
+    public int getBoardCountByUserId(Long userId, String type, String searchValue) {
+        return boardMapper.findCountByUserId(userId, type, searchValue);
     }
 
-    public int getBoardCount(Long categoryId, String type, String searchValue) {
-        return boardMapper.findAllCount(categoryId,type,searchValue);
+    public List<Board> getBoards(Criteria boardCriteria, String type, String searchValue) {
+        return boardMapper.findAll(boardCriteria, type, searchValue);
+    }
+    public List<Board> getBoardsByCategoryId(Criteria boardCriteria, Long categoryId, String type, String searchValue) {
+        return boardMapper.findByCategoryId(boardCriteria,categoryId, type, searchValue);
+    }
+    public List<Board> getBoardByUserId(Criteria boardCriteria,Long userId, String type, String searchValue){
+        return boardMapper.findByUserId(boardCriteria, userId, type, searchValue);
     }
 
     @Transactional

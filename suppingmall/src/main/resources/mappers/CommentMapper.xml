@@ -41,22 +41,37 @@
 
 
     <sql id="conditionalSearch">
-        <trim prefix="WHERE" prefixOverrides="AND|OR">
-            <if test="boardId != null">
-                AND C.board_id = #{boardId}
+        <if test="type != null and searchValue != null">
+            <if test='type.equals("contents")'>
+                <bind name="searchValue" value="'%'+searchValue+'%'"/>
+                AND C.contents LIKE #{searchValue}
             </if>
-            <if test="type != null and searchValue != null">
-                <if test='type.equals("creator")'>
-                    AND U.nickname = #{searchValue}
-                </if>
+            <if test='type.equals("creator")'>
+                AND U.nickname = #{searchValue}
             </if>
-        </trim>
+        </if>
     </sql>
 
-    <select id="findCommentCount" resultType="int">
+    <select id="findCount" resultType="int">
         SELECT count(*)
         From Comment AS C
         LEFT OUTER JOIN User AS U on (C.user_id = U.user_id)
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <include refid="conditionalSearch"></include>
+        </trim>
+    </select>
+    <select id="findCountByBoardId" resultType="int">
+        SELECT count(*)
+        From Comment AS C
+        LEFT OUTER JOIN User AS U on (C.user_id = U.user_id)
+        WHERE C.board_id = #{boardId}
+        <include refid="conditionalSearch"></include>
+    </select>
+    <select id="findCountByUserId" resultType="int">
+        SELECT count(*)
+        From Comment AS C
+        LEFT OUTER JOIN User AS U on (C.user_id = U.user_id)
+        WHERE C.user_id = #{userId}
         <include refid="conditionalSearch"></include>
     </select>
 
@@ -70,6 +85,40 @@
         LEFT OUTER JOIN User AS U on (C.user_id = U.user_id)
         LEFT OUTER JOIN Board AS B on (C.board_id = B.board_id)
         LEFT OUTER JOIN Category AS CA on (B.category_id = CA.category_id)
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <include refid="conditionalSearch"></include>
+        </trim>
+        ORDER BY C.comment_id asc
+        <include refid="paging"></include>
+    </select>
+
+    <select id="findByBoardId" resultMap="Comment">
+        SELECT C.comment_id AS "CommentId", C.title AS "CommentTitle", C.contents AS "CommentContents", C.level AS "CommentLevel",
+        C.created_date AS "CommentCreatedDate", C.updated_date AS "CommentUpdatedDate", U.user_id AS "UserId",
+        U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",
+        B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents", B.hit AS "BoardHit",
+        B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate", CA.name AS "CategoryName"
+        FROM Comment AS C
+        LEFT OUTER JOIN User AS U on (C.user_id = U.user_id)
+        LEFT OUTER JOIN Board AS B on (C.board_id = B.board_id)
+        LEFT OUTER JOIN Category AS CA on (B.category_id = CA.category_id)
+        WHERE C.board_id = #{boardId}
+        <include refid="conditionalSearch"></include>
+        ORDER BY C.comment_id asc
+        <include refid="paging"></include>
+    </select>
+
+    <select id="findByUserId" resultMap="Comment">
+        SELECT C.comment_id AS "CommentId", C.title AS "CommentTitle", C.contents AS "CommentContents", C.level AS "CommentLevel",
+        C.created_date AS "CommentCreatedDate", C.updated_date AS "CommentUpdatedDate", U.user_id AS "UserId",
+        U.email AS "UserEmail", U.nickname AS "UserNickName", U.created_date AS "UserCreatedDate", U.role AS "UserRole",
+        B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents", B.hit AS "BoardHit",
+        B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate", CA.name AS "CategoryName"
+        FROM Comment AS C
+        LEFT OUTER JOIN User AS U on (C.user_id = U.user_id)
+        LEFT OUTER JOIN Board AS B on (C.board_id = B.board_id)
+        LEFT OUTER JOIN Category AS CA on (B.category_id = CA.category_id)
+        WHERE C.user_id = #{userId}
         <include refid="conditionalSearch"></include>
         ORDER BY C.comment_id asc
         <include refid="paging"></include>

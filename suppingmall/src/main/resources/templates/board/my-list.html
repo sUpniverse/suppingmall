@@ -23,13 +23,13 @@
             <div class="py-3" th:text="${#authentication.principal.nickName+'님의 게시글 내역'}"></div>
             <div class="container py-4">
                 <nav class="nav nav-pills nav-fill justify-content-center">
-                    <a class="nav-link" href="/boards/main?type=boards" th:classappend="${type} == null ? 'active' : (${type} == 'boards' ? 'active')">내 게시글</a>
-                    <a class="nav-link" href="/boards/main?type=comments" th:classappend="${type} == 'comments' ? 'active'">내 댓글</a>
-                    <a class="nav-link" href="/boards/main?type=like" th:classappend="${type} == 'comments' ? 'like'">좋아요 누른 글</a>
+                    <a class="nav-link" href="/boards/main?category=boards" th:classappend="${category} == null ? 'active' : (${category} == 'boards' ? 'active')">내 게시글</a>
+                    <a class="nav-link" href="/boards/main?category=comments" th:classappend="${category} == 'comments' ? 'active'">내 댓글</a>
+<!--                    <a class="nav-link" href="/boards/main?type=like" th:classappend="${type} == 'comments' ? 'like'">좋아요 누른 글</a>-->
                 </nav>
             </div>
             <div>
-                <table class="table table-bordered table-hover text-small" th:unless="${type} == 'comments'">
+                <table class="table table-bordered table-hover text-small" th:unless="${category} == 'comments'">
                     <thead>
                     <tr>
                         <th class="text-center">댓글</th>
@@ -45,7 +45,7 @@
                         <td class="text-center" th:text="${board.comments.size()}"></td>
                         <td class="text-center" th:text="${board?.category.name}"></td>
                         <td>
-                            <a class="text-dark" th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}+'?page='+${pageNum}}" ></a>
+                            <a class="text-dark" th:text="${board.title}" th:href="@{'/boards/'+${board.boardId}}" ></a>
                         </td>
                         <td class="text-center" th:text="${board.creator.nickName}" />
                         <td class="text-center" th:text="${board.hit}"/>
@@ -53,7 +53,7 @@
                     </tr>
                     </tbody>
                 </table>
-                <table class="table table-bordered table-hover text-small" th:if="${type} == 'comments'">
+                <table class="table table-bordered table-hover text-small" th:if="${category} == 'comments'">
                     <thead>
                     <tr>
                         <th class="text-center">카테고리</th>
@@ -92,13 +92,13 @@
                         </ul>
                     </nav>
                 </div>
-
                 <div class="container d-flex justify-content-center">
-                    <form method="get" th:action="@{/boards}">
+                    <form method="get" th:action="@{'/boards/main?category'}">
                         <div class="input-group mb-3">
+                            <input type="hidden" th:name="category" th:value="${category}">
                             <div class="input-group-prepend">
                                 <select class="btn btn-outline-secondary dropdown-toggle" th:name="type">
-                                    <option class="dropdown-item" th:value="title">제목검색</option>
+                                    <option class="dropdown-item" th:value="title" th:unless="${category} == 'comments'">제목검색</option>
                                     <option class="dropdown-item" th:value="contents">내용검색</option>
                                 </select>
                             </div>

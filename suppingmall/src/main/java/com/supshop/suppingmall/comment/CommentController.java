@@ -3,7 +3,6 @@ package com.supshop.suppingmall.comment;
 import com.supshop.suppingmall.page.Criteria;
 import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.page.TenItemsCriteria;
-import com.supshop.suppingmall.review.Review;
 import com.supshop.suppingmall.user.SessionUser;
 import com.supshop.suppingmall.user.User;
 import com.supshop.suppingmall.user.UserService;
@@ -11,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +31,7 @@ public class CommentController {
                                      @RequestParam(required = false) int page){
         Map<String,Object> map = new HashMap<>();
 
-        int commentCount = commentService.getCommentCount(boardId);
+        int commentCount = commentService.getCommentCountByBoardId(boardId,null,null);
 
         Criteria criteria = new TenItemsCriteria();
         criteria.setPage(page);
@@ -42,7 +40,7 @@ public class CommentController {
 
         map.put("pageMaker", pageMaker);
 
-        List<Comment> list = commentService.getAllComments(boardId, criteria);
+        List<Comment> list = commentService.getCommentsByBoardId(boardId, criteria,null,null);
         map.put("list", list);
 
         return ResponseEntity.ok(map);

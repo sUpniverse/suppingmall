@@ -54,9 +54,9 @@ public class BoardController {
         log.debug("'getAllBoard'가 실행됨");
         if(categoryId == null) categoryId = boardCategoryId;
 
-        int boardCount = boardService.getBoardCount(categoryId, type, searchValue);
+        int boardCount = boardService.getBoardCountByCategoryId(categoryId, type, searchValue);
         PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum, thirtyItemsCriteria);
-        List<Board> boards = boardService.getBoards(thirtyItemsCriteria, categoryId, type, searchValue);
+        List<Board> boards = boardService.getBoardsByCategoryId(thirtyItemsCriteria, categoryId, type, searchValue);
         Category category = categoryService.getCategory(categoryId);
 
         model.addAttribute("boardList",boards);
@@ -85,11 +85,11 @@ public class BoardController {
         }
         if(categoryId == null) categoryId = board.getCategory().getId();
 
-        List<Board> boards = boardService.getBoards(thirtyItemsCriteria, board.getCategory().getId(), type, searchValue);
-        int boardCount = boardService.getBoardCount(categoryId, type, searchValue);
+        List<Board> boards = boardService.getBoardsByCategoryId(thirtyItemsCriteria, board.getCategory().getId(), type, searchValue);
+        int boardCount = boardService.getBoardCountByCategoryId(categoryId, type, searchValue);
         PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum, thirtyItemsCriteria);
 
-        int commentCount = commentService.getCommentCount(id);
+        int commentCount = commentService.getCommentCountByBoardId(id,null,null);
         Criteria criteria = new TenItemsCriteria();
         PageMaker commentPageMaker = new PageMaker(commentCount,boardDisplayPagingNum,criteria);
 
@@ -152,34 +152,38 @@ public class BoardController {
     }
 
     @GetMapping("/main")
-    public String getMyBoard(@RequestParam(required = false) String type,
+    public String getMyBoard(@RequestParam(required = false) String category,
+                             @RequestParam(required = false) String type,
+                             @RequestParam(required = false) String searchValue,
                              TenItemsCriteria criteria,
                              @AuthenticationPrincipal SessionUser sessionUser,
                              Model model){
 
-        if(type == null || "boards".equals(type)) {
-            List<Board> boardList = boardService.getBoards(criteria, null, "creator", sessionUser.getUsername());
-            int boardCount = boardService.getBoardCount(null, "creator", sessionUser.getUsername());
-            PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum, criteria);
+        PageMaker pageMaker = null;
+        if(category == null)
+            category = "boards";
 
-            model.addAttribute("type",type);
+        if("boards".equals(category)) {
+            int boardCount = boardService.getBoardCountByUserId(sessionUser.getUserId(), type, searchValue);
+            List<Board> boardList = boardService.getBoardByUserId(criteria, sessionUser.getUserId(), type, searchValue);
+            pageMaker = new PageMaker(boardCount,boardDisplayPagingNum, criteria);
+
             model.addAttribute("boardList",boardList);
-            model.addAttribute("pageMaker", pageMaker);
-            model.addAttribute("pageNum", criteria.getPage());
+        } else if("comments".equals(category)){
+            int commentCount = commentService.getCommentCountByUserId(sessionUser.getUserId(), type, searchValue);
+            List<Comment> commentList = commentService.getCommentsByUserId(sessionUser.getUserId(), criteria, type, searchValue);
+            pageMaker = new PageMaker(commentCount, boardDisplayPagingNum, criteria);
 
-        } else if("comments".equals(type)){
-            int commentCount = commentService.getCommentCount(null, "creator", sessionUser.getUsername());
-            List<Comment> commentList = commentService.getAllComments(null, criteria, "creator", sessionUser.getUsername());
-            PageMaker pageMaker = new PageMaker(commentCount, boardDisplayPagingNum, criteria);
-
-            model.addAttribute("type",type);
             model.addAttribute("commentList",commentList);
-            model.addAttribute("pageMaker", pageMaker);
-            model.addAttribute("pageNum", criteria.getPage());
-        } else if("like".equals(type)){
+        } else if("like".equals(category)){
 
         }
 
+        model.addAttribute("category",category);
+        model.addAttribute("type",type);
+        model.addAttribute("searchValue",searchValue);
+        model.addAttribute("pageMaker", pageMaker);
+        model.addAttribute("pageNum", criteria.getPage());
 
         return "/board/my-list";
     }

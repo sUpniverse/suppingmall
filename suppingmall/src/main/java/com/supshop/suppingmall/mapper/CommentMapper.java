@@ -7,8 +7,14 @@ import java.util.List;
 
 public interface CommentMapper {
 
-    int findCommentCount(Long boardId, String type, String searchValue);
-    List<Comment> findAll(Long boardId, Criteria criteria, String type, String searchValue);
+    int findCount(String type, String searchValue);
+    int findCountByBoardId(Long boardId,String type, String searchValue);
+    int findCountByUserId(Long userId, String type, String searchValue);
+
+    List<Comment> findAll(Criteria criteria, String type, String searchValue);
+    List<Comment> findByBoardId(Long boardId,Criteria criteria, String type, String searchValue);
+    List<Comment> findByUserId(Long userId, Criteria criteria, String type, String searchValue);
+
     int insertComment(Comment comment);
     int updateComment(Long id, Comment comment);
     int deleteComment(Long id);

@@ -322,5 +322,15 @@ public class ProductController {
         return ResponseEntity.created(uri).build();
     }
 
+    @GetMapping("/qna/main")
+    public String getMyQnaList(@RequestParam(required = false) String type,
+                                                           @RequestParam(required = false) String searchValue,
+                                                           TenItemsCriteria criteria,
+                                                           @AuthenticationPrincipal SessionUser sessionUser,
+                                                           Model model) {
+
+        return null;
+    }
+
 
 }

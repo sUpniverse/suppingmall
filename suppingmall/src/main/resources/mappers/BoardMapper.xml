@@ -40,34 +40,45 @@
     </resultMap>
 
     <sql id="conditionalSearch">
-        <trim prefix="WHERE" prefixOverrides="AND|OR">
-            <if test="categoryId != null">
-                AND B.category_id = #{categoryId}
+        <if test="type != null and searchValue != null">
+            <if test='type.equals("title")'>
+                <bind name="searchValue" value="'%'+searchValue+'%'"/>
+                AND B.title LIKE #{searchValue}
             </if>
-            <if test="type != null and searchValue != null">
-                <if test='type.equals("title")'>
-                    <bind name="searchValue" value="'%'+searchValue+'%'"/>
-                    AND B.title LIKE #{searchValue}
-                </if>
-                <if test='type.equals("contents")'>
-                    <bind name="searchValue" value="'%'+searchValue+'%'"/>
-                    AND B.contents LIKE #{searchValue}
-                </if>
-                <if test='type.equals("creator")'>
-                    AND U.nickname = #{searchValue}
-                </if>
+            <if test='type.equals("contents")'>
+                <bind name="searchValue" value="'%'+searchValue+'%'"/>
+                AND B.contents LIKE #{searchValue}
             </if>
-        </trim>
+            <if test='type.equals("creator")'>
+                AND U.nickname = #{searchValue}
+            </if>
+        </if>
     </sql>
 
     <sql id="paging">
         limit #{criteria.pageStart}, #{criteria.perPageNum}
     </sql>
 
-    <select id="findAllCount" resultType="int">
+    <select id="findCount" resultType="int">
         SELECT count(*)
         From Board AS B
         LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <include refid="conditionalSearch"></include>
+        </trim>
+    </select>
+    <select id="findCountByCategoryId" resultType="int">
+        SELECT count(*)
+        From Board AS B
+        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
+        WHERE B.category_id = #{categoryId}
+        <include refid="conditionalSearch"></include>
+    </select>
+    <select id="findCountByUserId" resultType="int">
+        SELECT count(*)
+        From Board AS B
+        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
+        WHERE B.user_id = #{userId}
         <include refid="conditionalSearch"></include>
     </select>
 
@@ -84,6 +95,48 @@
         FROM Board AS B
         LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
         LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <include refid="conditionalSearch"></include>
+        </trim>
+        ORDER BY B.board_id desc
+        <include refid="paging"></include>
+        ) AS B
+        LEFT OUTER JOIN comment AS CM on (B.board_id = CM.board_id)
+    </select>
+
+    <select id="findByCategoryId" resultMap="Board">
+        SELECT B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents", B.hit AS "BoardHit",
+        B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate",
+        B.user_id AS "UserId",B.email AS "UserEmail", B.nickname AS "UserNickName",
+        B.category_id AS "CategoryId", B.name AS "CategoryName", CM.comment_id AS "CommentId"
+        FROM
+        (
+        SELECT B.board_id, B.title, B.contents, B.hit, B.created_date , B.updated_date, B.user_id, B.category_id,
+        U.email, U.nickname, C.name
+        FROM Board AS B
+        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
+        LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
+        WHERE B.category_id = #{categoryId}
+        <include refid="conditionalSearch"></include>
+        ORDER BY B.board_id desc
+        <include refid="paging"></include>
+        ) AS B
+        LEFT OUTER JOIN comment AS CM on (B.board_id = CM.board_id)
+    </select>
+
+    <select id="findByUserId" resultMap="Board">
+        SELECT B.board_id AS "BoardId", B.title AS "BoardTitle", B.contents AS "BoardContents", B.hit AS "BoardHit",
+        B.created_date AS "BoardCreatedDate", B.updated_date AS "BoardUpdatedDate",
+        B.user_id AS "UserId",B.email AS "UserEmail", B.nickname AS "UserNickName",
+        B.category_id AS "CategoryId", B.name AS "CategoryName", CM.comment_id AS "CommentId"
+        FROM
+        (
+        SELECT B.board_id, B.title, B.contents, B.hit, B.created_date , B.updated_date, B.user_id, B.category_id,
+        U.email, U.nickname, C.name
+        FROM Board AS B
+        LEFT OUTER JOIN User AS U on (B.user_id = U.user_id)
+        LEFT OUTER JOIN category AS C on (B.category_id = C.category_id)
+        WHERE B.user_id = #{userId}
         <include refid="conditionalSearch"></include>
         ORDER BY B.board_id desc
         <include refid="paging"></include>
