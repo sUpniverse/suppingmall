@@ -14,6 +14,10 @@ public class CategoryService {
 
     private final CategoryMapper categoryMapper;
 
+    /* Todo : 카테고리의 변형은 거의 없음, 따라서 서비스 구동 시 HashMap에 미리 담아서 DB가 아닌, HasMap에서 주는건 어떨지..? 혹은 MemCache 나 redis에
+       또, Create 혹은 Update가 발생시 다시 갱신만 해주면 되도록 구현
+     */
+
     public Category getCategory(Long id) {
         return categoryMapper.findOne(id);
     }

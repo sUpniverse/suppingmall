@@ -60,7 +60,7 @@ public class ProductController {
     public String form(Model model) {
         model.addAttribute("categories",categoryService.getCategory(productCategoryId).getChild());
         model.addAttribute("vendors", Delivery.DeliveryVendor.values());
-        return "/product/form";
+        return "/product/seller/form";
     }
 
     //조건을 통한 모든 물품 조회
@@ -109,27 +109,31 @@ public class ProductController {
     }
 
     //카테고리별 물품 조회
-    @GetMapping("/category/{id}")
+    @GetMapping("/category/{category}")
     public String getProductOnSaleInCategory(Model model,
-                                       @PathVariable Long id,
+                                       @PathVariable String categoryName,
                                        EightItemsCriteria criteria) {
 
 
-        int productsCount = productService.getProductsCount(id, null, null, Product.ProductStatus.SALE);
+        Category category = categoryService.getCategoryByEnName(categoryName);
+        int productsCount = productService.getProductsCount(category.getId(), null, null, Product.ProductStatus.SALE);
 
         model.addAttribute("count",productsCount);
-        model.addAttribute("productList",productService.getOnSaleProductsOnMenu(id, null, criteria));
-        model.addAttribute("categoryId",id);
+        model.addAttribute("productList",productService.getOnSaleProductsOnMenu(category.getId(), null, criteria));
+        model.addAttribute("categoryId",category.getId());
         model.addAttribute("productPageMaker",new PageMaker(productsCount, productPagingCount, criteria));
 
 
-        return "/product/list-category";
+        return "list-search";
     }
 
 
     @GetMapping("/{id}")
     public String getProduct(@PathVariable Long id, Model model) {
         Product product = productService.getProduct(id);
+
+        if(product == null)
+            return "redirect:/products/main";
 
         Category category = categoryService.getGrandParentByGrandChildren(product.getCategory().getId());
         product.setCategory(category);
@@ -217,6 +221,22 @@ public class ProductController {
             ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/updateform")
+    public String updateForm(@PathVariable Long productId,
+                             @AuthenticationPrincipal SessionUser sessionUser,
+                             Model model) {
+
+        Product product = productService.getProduct(productId);
+
+        if(!UserUtils.isOwner(product.getSeller().getUserId(),sessionUser) || !Product.ProductStatus.STOP.equals(product.getStatus())) {
+            return "redirect:/products/seller/main";
+        }
+
+        model.addAttribute("categories",categoryService.getCategory(productCategoryId).getChild());
+        model.addAttribute("vendors", Delivery.DeliveryVendor.values());
+        return "/product/seller/updateForm";
     }
 
     @PutMapping("/{id}")

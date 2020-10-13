@@ -5,6 +5,7 @@ import com.supshop.suppingmall.category.CategoryService;
 import com.supshop.suppingmall.image.ImageService;
 import com.supshop.suppingmall.mapper.BoardMapper;
 import com.supshop.suppingmall.page.Criteria;
+import com.supshop.suppingmall.page.ThirtyItemsCriteria;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,15 +39,21 @@ public class BoardService {
     public int getBoardCountByUserId(Long userId, String type, String searchValue) {
         return boardMapper.findCountByUserId(userId, type, searchValue);
     }
+    public int getBoardsCountByParentCategoryId(Long parentCategoryId, String type, String searchValue) {
+        return boardMapper.findCountByParentCategoryId(parentCategoryId, type, searchValue);
+    }
 
-    public List<Board> getBoards(Criteria boardCriteria, String type, String searchValue) {
-        return boardMapper.findAll(boardCriteria, type, searchValue);
+    public List<Board> getBoards(Criteria criteria, String type, String searchValue) {
+        return boardMapper.findAll(criteria, type, searchValue);
     }
-    public List<Board> getBoardsByCategoryId(Criteria boardCriteria, Long categoryId, String type, String searchValue) {
-        return boardMapper.findByCategoryId(boardCriteria,categoryId, type, searchValue);
+    public List<Board> getBoardsByCategoryId(Criteria criteria, Long categoryId, String type, String searchValue) {
+        return boardMapper.findByCategoryId(criteria,categoryId, type, searchValue);
     }
-    public List<Board> getBoardByUserId(Criteria boardCriteria,Long userId, String type, String searchValue){
-        return boardMapper.findByUserId(boardCriteria, userId, type, searchValue);
+    public List<Board> getBoardByUserId(Criteria criteria,Long userId, String type, String searchValue){
+        return boardMapper.findByUserId(criteria, userId, type, searchValue);
+    }
+    public List<Board> getBoardsByParentCategoryId(Criteria criteria, Long categoryId, String type, String searchValue) {
+        return boardMapper.findByParentCategoryId(criteria,categoryId, type, searchValue);
     }
 
     @Transactional
@@ -100,5 +107,7 @@ public class BoardService {
     public void deleteBoard(Long id) {
         boardMapper.delete(id);
     }
+
+
 
 }
