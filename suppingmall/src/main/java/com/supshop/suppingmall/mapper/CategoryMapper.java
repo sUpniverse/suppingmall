@@ -15,7 +15,6 @@ public interface CategoryMapper {
 
     //부모가 없는 최상단의 카테고리 목록 조회
     List<Category> findAllByTop();
-    List<Category> findChildByParent(Long id);
 
     // 손자가 조부모의 카테고리까지 조회
     Category findGrandParentByGrandChildren(Long id);

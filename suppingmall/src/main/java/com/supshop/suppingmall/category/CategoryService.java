@@ -2,8 +2,10 @@ package com.supshop.suppingmall.category;
 
 import com.supshop.suppingmall.mapper.CategoryMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import java.util.List;
 
@@ -14,28 +16,28 @@ public class CategoryService {
 
     private final CategoryMapper categoryMapper;
 
-    /* Todo : 카테고리의 변형은 거의 없음, 따라서 서비스 구동 시 HashMap에 미리 담아서 DB가 아닌, HasMap에서 주는건 어떨지..? 혹은 MemCache 나 redis에
-       또, Create 혹은 Update가 발생시 다시 갱신만 해주면 되도록 구현
-     */
-
+    // 기본적인 카테고리 가져오기
+    @Cacheable(value = "SEARCH_CATEGORY_BY_ID")
     public Category getCategory(Long id) {
         return categoryMapper.findOne(id);
     }
-    public Category getCategoryByEnName(String enName) {
-        return categoryMapper.findOneByEnName(enName);
-    }
-    public Category getCategoryToGrandChildren(Long id) {
-        return categoryMapper.findOneToGrandChildren(id);
-    }
 
+    // id가 아닌 카테고리의 영문명으로 카테고리 정보 가져오기
+    @Cacheable(value = "SEARCH_CATEGORY_BY_ENNAME")
+    public Category getCategoryByEnName(String enName) { return categoryMapper.findOneByEnName(enName); }
+
+    // 자기부터 자식, 손자 카테고리까지 정보 가져오기
+    @Cacheable(value = "SEARCH_CATEGORY_BY_GRANDPARENT")
+    public Category getCategoryToGrandChildren(Long id) { return categoryMapper.findOneToGrandChildren(id); }
+
+    // 최상단 카테고리부터 손자 카테고리까지 정보 가져오기
+    @Cacheable(value = "SEARCH_CATEGORY_BY_TOP")
     public List<Category> getCategories() {
         return categoryMapper.findAllByTop();
     }
 
-    public List<Category> getChildByParent(Long id) {
-        return categoryMapper.findChildByParent(id);
-    }
-
+    // 자기부터 부모, 조부모 까지 가져오기
+    @Cacheable(value = "SEARCH_CATEGORY_BY_GRANDCHILDREN")
     public Category getGrandParentByGrandChildren(Long id) {
         return categoryMapper.findGrandParentByGrandChildren(id);
     }

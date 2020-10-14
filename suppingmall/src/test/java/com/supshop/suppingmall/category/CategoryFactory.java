@@ -10,6 +10,11 @@ public class CategoryFactory {
 
     @Autowired CategoryService categoryService;
 
+    public Category buildCategory(String categoryName) {
+        Category category = Category.builder().name(categoryName).enName(categoryName).build();
+        return category;
+    }
+
     public Category createCategory(String categoryName) {
         Category category = Category.builder().name(categoryName).enName(categoryName).build();
         categoryService.saveCategory(category);

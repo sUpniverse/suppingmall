@@ -25,36 +25,28 @@ public class CategoryController {
     }
 
     @GetMapping("/list")
-    public String getAllCategories(@AuthenticationPrincipal SessionUser session, Model model) {
+    public String getAllCategories(Model model) {
         model.addAttribute("categories",categoryService.getCategories());
         return "/category/list";
     }
 
     @GetMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<Category> getCategories(@PathVariable Long id,
-                                                  @AuthenticationPrincipal SessionUser session,
-                                                  Model model) {
+    public ResponseEntity<Category> getCategories(@PathVariable Long id) {
         Category category = categoryService.getCategory(id);
         return ResponseEntity.ok(category);
     }
 
     @GetMapping("/{id}/children")
     @ResponseBody
-    public ResponseEntity<List<Category>> getChildCategories(@PathVariable Long id,
-                                                             @AuthenticationPrincipal SessionUser session,
-                                                             Model model) {
-        if (!UserUtils.isAdmin(session)) return ResponseEntity.badRequest().build();
-        List<Category> category = categoryService.getChildByParent(id);
+    public ResponseEntity<List<Category>> getChildCategories(@PathVariable Long id) {
+        List<Category> category = categoryService.getCategory(id).getChild();
         return ResponseEntity.ok(category);
     }
 
     @PostMapping("")
     @ResponseBody
-    public ResponseEntity createCategory(@RequestBody Category category,
-                                         @AuthenticationPrincipal SessionUser session,
-                                         Model model) {
-        if (!UserUtils.isAdmin(session)) return ResponseEntity.badRequest().build();
+    public ResponseEntity createCategory(@RequestBody Category category) {
         Long categoryId = categoryService.saveCategory(category);
         URI uri = linkTo(CategoryController.class).slash(categoryId).toUri();
         return ResponseEntity.created(uri).build();
@@ -63,18 +55,14 @@ public class CategoryController {
     @PutMapping("/{id}")
     @ResponseBody
     public ResponseEntity<String> updateCategory(@PathVariable Long id,
-                                                 @RequestBody Category category,
-                                                 @AuthenticationPrincipal SessionUser session,
-                                                 Model model) {
-        if (!UserUtils.isAdmin(session)) return ResponseEntity.badRequest().build();
+                                                 @RequestBody Category category) {
         categoryService.updateCategory(id,category);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<String> deleteCategory(@PathVariable Long id,@AuthenticationPrincipal SessionUser session) {
-        if (!UserUtils.isAdmin(session)) return ResponseEntity.badRequest().build();
+    public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.ok().build();
     }
