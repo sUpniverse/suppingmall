@@ -4,8 +4,6 @@ import com.supshop.suppingmall.cart.Form.CartForm;
 import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 @Controller
 @RequestMapping("/cart")
@@ -56,8 +54,8 @@ public class CartController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getLocalizedMessage());
         }
-        WebMvcLinkBuilder link = linkTo(CartController.class).slash(cart.getCartId());
-        URI uri = link.toUriComponentsBuilder().build().toUri();
+
+        URI uri = linkTo(CartController.class).slash(cart.getCartId()).toUri();
         return ResponseEntity.created(uri).build();
     }
 

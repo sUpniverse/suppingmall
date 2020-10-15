@@ -7,7 +7,6 @@ import com.supshop.suppingmall.order.Orders;
 import com.supshop.suppingmall.page.Criteria;
 import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.page.TenItemsCriteria;
-import com.supshop.suppingmall.product.Product;
 import com.supshop.suppingmall.product.ProductService;
 import com.supshop.suppingmall.review.form.ReviewForm;
 import com.supshop.suppingmall.user.SessionUser;
@@ -26,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 @Controller
 @RequestMapping("/reviews")

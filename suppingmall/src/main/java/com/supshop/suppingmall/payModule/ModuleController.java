@@ -1,16 +1,12 @@
 package com.supshop.suppingmall.payModule;
 
-import org.springframework.hateoas.server.mvc.ControllerLinkRelationProvider;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.UUID;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 @RestController
 @RequestMapping("/payModule")
@@ -28,8 +24,7 @@ public class ModuleController {
                 .apply_num(applyNumber)
                 .pay_method(payInitInfo.getPay_method())
                 .build();
-        WebMvcLinkBuilder link = linkTo(ModuleController.class).slash(result.getUid());
-        URI uri = link.toUriComponentsBuilder().build().toUri();
+        URI uri = linkTo(ModuleController.class).slash(result.getUid()).toUri();
         return ResponseEntity.created(uri).body(result);
     }
 

@@ -17,17 +17,17 @@ public class CategoryService {
     private final CategoryMapper categoryMapper;
 
     // 기본적인 카테고리 가져오기
-    @Cacheable(value = "SEARCH_CATEGORY_BY_ID")
+    @Cacheable(value = "SEARCH_CATEGORY_BY_ID", key = "#id")
     public Category getCategory(Long id) {
         return categoryMapper.findOne(id);
     }
 
     // id가 아닌 카테고리의 영문명으로 카테고리 정보 가져오기
-    @Cacheable(value = "SEARCH_CATEGORY_BY_ENNAME")
+    @Cacheable(value = "SEARCH_CATEGORY_BY_ENNAME", key = "#enName")
     public Category getCategoryByEnName(String enName) { return categoryMapper.findOneByEnName(enName); }
 
     // 자기부터 자식, 손자 카테고리까지 정보 가져오기
-    @Cacheable(value = "SEARCH_CATEGORY_BY_GRANDPARENT")
+    @Cacheable(value = "SEARCH_CATEGORY_BY_GRANDPARENT", key = "#id")
     public Category getCategoryToGrandChildren(Long id) { return categoryMapper.findOneToGrandChildren(id); }
 
     // 최상단 카테고리부터 손자 카테고리까지 정보 가져오기
@@ -37,7 +37,7 @@ public class CategoryService {
     }
 
     // 자기부터 부모, 조부모 까지 가져오기
-    @Cacheable(value = "SEARCH_CATEGORY_BY_GRANDCHILDREN")
+    @Cacheable(value = "SEARCH_CATEGORY_BY_GRANDCHILDREN", key = "#id")
     public Category getGrandParentByGrandChildren(Long id) {
         return categoryMapper.findGrandParentByGrandChildren(id);
     }

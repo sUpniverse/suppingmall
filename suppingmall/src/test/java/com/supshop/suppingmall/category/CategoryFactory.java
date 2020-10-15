@@ -16,7 +16,11 @@ public class CategoryFactory {
     }
 
     public Category createCategory(String categoryName) {
-        Category category = Category.builder().name(categoryName).enName(categoryName).build();
+        Category category = Category.builder()
+                                    .name(categoryName)
+                                    .enName(categoryName)
+                                    .memo("좋아요!!"+categoryName)
+                                    .build();
         categoryService.saveCategory(category);
         return category;
     }

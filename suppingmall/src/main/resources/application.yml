@@ -25,6 +25,14 @@ spring:
     username: root
     password: pass
 
+
+  # Redis & Cache
+  redis:
+    host: localhost
+    port: 6379
+  cache:
+    type: redis
+
   # NULL Field 제외
   jackson:
     default-property-inclusion: NON_NULL

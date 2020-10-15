@@ -1,25 +1,17 @@
 package com.supshop.suppingmall.category;
 
-import com.supshop.suppingmall.user.UserFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
-
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -83,7 +75,7 @@ public class CategoryServiceTest {
         for(int i = 0; i < 100; i++) {
             categoryFactory.createCategory("test"+i);
         }
-        StopWatch stopWatch = new StopWatch("category에 cache 적용 후");
+        StopWatch stopWatch = new StopWatch("category에 redis cache 적용 후");
         //when
         stopWatch.start("1차");
         categoryService.getCategoryByEnName("test45");
@@ -98,6 +90,9 @@ public class CategoryServiceTest {
 
         //then
         assertEquals("test45",test45.getEnName());
+        assertEquals("test45",test45.getName());
+        assertEquals("좋아요!!test45",test45.getMemo());
+        System.out.println(test45.toString());
     }
 
 

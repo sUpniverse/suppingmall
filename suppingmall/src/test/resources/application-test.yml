@@ -2,6 +2,13 @@ spring:
   profiles:
     include:
 
+  # Redis & Cache
+#  redis:
+#    host: localhost
+#    port: 6379
+#  cache:
+#    type: redis
+
   #DataSource
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
@@ -17,7 +24,7 @@ logging:
     com.supshop.suppingmall: debug
     org.hibernate.sql: debug
     org.type.descriptor.sql.BasicBinder: trace
-    org.springframework: debug
+#    org.springframework: debug
 
 
 

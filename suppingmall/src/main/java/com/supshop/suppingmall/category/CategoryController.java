@@ -1,18 +1,14 @@
 package com.supshop.suppingmall.category;
 
-import com.supshop.suppingmall.common.UserUtils;
-import com.supshop.suppingmall.user.SessionUser;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.net.URI;
 import java.util.List;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 @RequestMapping("/category")
 @Controller
