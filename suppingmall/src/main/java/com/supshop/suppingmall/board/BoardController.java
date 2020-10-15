@@ -47,26 +47,16 @@ public class BoardController {
     @GetMapping("")
     public String getAllBoard(Model model,
                               ThirtyItemsCriteria thirtyItemsCriteria,
-                              @RequestParam(required = false) String categoryName,
+                              @RequestParam(required = false, defaultValue = "farm") String categoryName,
                               @RequestParam(required = false) String type,
                               @RequestParam(required = false) String searchValue) {
 
         log.debug("'getAllBoard'가 실행됨");
-        Long categoryId = boardCategoryId;
         Category category = categoryService.getCategoryByEnName(categoryName);
-        int boardCount = 0;
-        List<Board> boards = null;
-        if(category == null){
-            category = categoryService.getCategory(categoryId);
-            boardCount = boardService.getBoardsCountByParentCategoryId(categoryId, type, searchValue);
-            boards = boardService.getBoardsByParentCategoryId(thirtyItemsCriteria, categoryId, type, searchValue);
 
-        } else {
-            categoryId = category.getId();
-            boardCount = boardService.getBoardCountByCategoryId(categoryId, type, searchValue);
-            boards = boardService.getBoardsByCategoryId(thirtyItemsCriteria, categoryId, type, searchValue);
-        }
-
+        Long categoryId = category.getId();
+        int boardCount = boardService.getBoardCountByCategoryId(categoryId, type, searchValue);
+        List<Board> boards = boardService.getBoardsByCategoryId(thirtyItemsCriteria, categoryId, type, searchValue);
         PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum, thirtyItemsCriteria);
 
         model.addAttribute("boardList",boards);

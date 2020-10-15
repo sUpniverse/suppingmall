@@ -45,8 +45,4 @@ public class MainController {
         return "main.html";
     }
 
-    @RequestMapping("/test")
-    public String testPage(){
-        return "test.html";
-    }
 }

@@ -27,7 +27,7 @@ public class CategoryService {
     public Category getCategoryByEnName(String enName) { return categoryMapper.findOneByEnName(enName); }
 
     // 자기부터 자식, 손자 카테고리까지 정보 가져오기
-    @Cacheable(value = "SEARCH_CATEGORY_BY_GRANDPARENT", key = "#id")
+    @Cacheable(value = "SEARCH_CATEGORY_BY_GRANDPARENT", key = "#id", unless = "#id > 0")
     public Category getCategoryToGrandChildren(Long id) { return categoryMapper.findOneToGrandChildren(id); }
 
     // 최상단 카테고리부터 손자 카테고리까지 정보 가져오기

@@ -278,6 +278,7 @@
         </div>
     </div>
 </div>
+<button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
 </body>
 <script th:inline="javascript">
     $(document).on('click',"#createQnaBtn",() => {
@@ -290,6 +291,25 @@
         }
         const productId = document.getElementById('productId').value;
         getCreateQnaFom(productId);
+    });
+
+    // Scroll Top Button - Show
+    var $scrollTop = $('#scroll-top');
+
+    $(window).on('load scroll', function() {
+        if ( $(window).scrollTop() >= 400 ) {
+            $scrollTop.addClass('show');
+        } else {
+            $scrollTop.removeClass('show');
+        }
+    });
+
+    // On click animate to top
+    $scrollTop.on('click', function (e) {
+        $('html, body').animate({
+            'scrollTop': 0
+        }, 800);
+        e.preventDefault();
     });
 
 </script>

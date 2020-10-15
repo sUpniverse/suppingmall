@@ -109,7 +109,7 @@ public class ProductController {
     }
 
     //카테고리별 물품 조회
-    @GetMapping("/category/{category}")
+    @GetMapping("/category/{categoryName}")
     public String getProductOnSaleInCategory(Model model,
                                        @PathVariable String categoryName,
                                        EightItemsCriteria criteria) {
@@ -124,7 +124,7 @@ public class ProductController {
         model.addAttribute("productPageMaker",new PageMaker(productsCount, productPagingCount, criteria));
 
 
-        return "list-search";
+        return "/product/list";
     }
 
 

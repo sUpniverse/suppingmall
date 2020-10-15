@@ -150,7 +150,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.POST,"/products/qna/{qnaId}/reply").permitAll()
                 .mvcMatchers(HttpMethod.GET,"/products/{productId}/qna/{page}").permitAll()
                 .mvcMatchers(HttpMethod.POST,"/products/{productId}/qna").authenticated()
-                .mvcMatchers(HttpMethod.GET,"/products/category/{category}").permitAll()
+                .mvcMatchers(HttpMethod.GET,"/products/category/{categoryName}").permitAll()
                 .mvcMatchers(HttpMethod.POST,"/products/**").hasAnyRole(MASTER,ADMIN,SELLER)
                 .mvcMatchers(HttpMethod.GET,"/products/**").hasAnyRole(MASTER,ADMIN,SELLER)
                 .mvcMatchers("/orders/**").authenticated()

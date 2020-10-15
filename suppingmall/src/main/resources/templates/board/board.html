@@ -131,14 +131,14 @@
     $(document).ready(function() {
         var formObj = $("form[role='form']");
 
-        const boardId = document.getElementById('boardId');
+        const boardId = document.getElementById('boardId').value;
         var pageNum = [[${pageNum}]];
         var categoryId = [[${category.id}]];
         var type = [[${type}]];
         var searchValue = [[${searchValue}]];
 
         $(document).on("click",".btn-warning",function() {
-            formObj.children().removeAttr("input");
+            formObj.children().remove();
             formObj.attr("action","/boards/"+boardId+"/form");
             formObj.attr("method","get");
             formObj.submit();
