@@ -385,7 +385,7 @@ public class ProductController {
         model.addAttribute("qnaList",qnaList);
         model.addAttribute("pageMaker",pageMaker);
 
-        return "/product/my-qna-list";
+        return "/product/seller/qna-list";
     }
 
 

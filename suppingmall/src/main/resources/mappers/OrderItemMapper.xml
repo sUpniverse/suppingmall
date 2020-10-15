@@ -72,15 +72,14 @@
         <if test="type != null and searchValue != null">
             <if test='type.equals("order")'>
                 AND OI.status = #{searchValue}
+                AND NOT OI.status = 'O000'
             </if>
             <if test='type.equals("delivery")'>
-                AND D.status = #{searchValue}
+                AND OI.status = 'O002' AND D.status = #{searchValue}
             </if>
         </if>
-        <if test="type != null and searchValue == null">
-            <if test='type.equals("order")'>
-                AND (OI.status = "O004" OR OI.status = "O005" OR OI.status = "O006")
-            </if>
+        <if test="type == null and searchValue == null">
+            AND NOT OI.status = 'O000'
         </if>
         <if test="fromDate != null and toDate != null">
             <![CDATA[
@@ -94,49 +93,25 @@
         </if>
     </sql>
 
-    <sql id="adminConditionalSearch">
-        <trim prefix="WHERE" prefixOverrides="AND|OR">
-            <if test="searchValue == null">
-                NOT OI.status = "O000"
-            </if>
-            <if test="searchValue != null">
-                OI.status = #{searchValue}
-            </if>
-
-            <if test="fromDate != null and toDate != null">
-                <![CDATA[
-            AND OI.order_date >= #{fromDate} AND OI.order_date < #{toDate}
-            ]]>
-            </if>
-            <if test="fromDate == null and toDate == null">
-                <![CDATA[
-            AND OI.order_date >= date_sub(now(), interval 180 day)
-            ]]>
-            </if>
-        </trim>
-    </sql>
-
-
-    <sql id="countCondition">
-        <trim prefix="WHERE" prefixOverrides="AND|OR">
-            <if test='type != null and type.equals("seller")'>
-                OI.seller_id = #{id}
-                AND NOT OI.status = 'O000'
-            </if>
-            <if test='type != null and type.equals("buyer")'>
-                OI.buyer_id = #{id}
-                AND NOT OI.status = 'O000'
-            </if>
-            <if test='type != null and type.equals("admin")'>
-                OI.buyer_id = #{id}
-            </if>
-        </trim>
-    </sql>
-
     <select id="findCount" resultType="int">
         SELECT count(*)
         FROM OrderItem AS OI
-        <include refid="countCondition"></include>
+        LEFT OUTER JOIN Delivery AS D on (OI.orderItem_id = D.orderItem_id)
+        <include refid="conditionalSearch"></include>
+    </select>
+    <select id="findCountByBuyerId" resultType="int">
+        SELECT count(*)
+        FROM OrderItem AS OI
+        LEFT OUTER JOIN Delivery AS D on (OI.orderItem_id = D.orderItem_id)
+        WHERE OI.buyer_id = #{id}
+        <include refid="conditionalSearch"></include>
+    </select>
+    <select id="findCountBySellerId" resultType="int">
+        SELECT count(*)
+        FROM OrderItem AS OI
+        LEFT OUTER JOIN Delivery AS D on (OI.orderItem_id = D.orderItem_id)
+        WHERE OI.seller_id = #{id}
+        <include refid="conditionalSearch"></include>
     </select>
 
     <select id="findAll" resultMap="OrderItem">
@@ -157,8 +132,9 @@
         LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
         LEFT OUTER JOIN Delivery AS D on (OI.orderItem_id = D.orderItem_id)
         LEFT OUTER JOIN Payment AS PM on (OI.orderItem_id = PM.orderItem_id)
-        <include refid="adminConditionalSearch"></include>
+        <include refid="conditionalSearch"></include>
         ORDER BY OI.ordered_date desc
+        <include refid="paging"></include>
     </select>
 
 
@@ -201,9 +177,10 @@
         LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
         LEFT OUTER JOIN Delivery AS D on (OI.orderItem_id = D.orderItem_id)
         LEFT OUTER JOIN Payment AS PM on (OI.orderItem_id = PM.orderItem_id)
-        WHERE OI.buyer_id = #{userId} AND NOT OI.status = 'O000'
+        WHERE OI.buyer_id = #{userId}
         <include refid="conditionalSearch"></include>
         ORDER BY OI.ordered_date desc
+        <include refid="paging"></include>
     </select>
 
     <select id="findBySellerId" resultMap="OrderItem">
@@ -224,7 +201,7 @@
         LEFT OUTER JOIN Product_option AS PO on (OI.product_id = PO.product_id) and (OI.product_option_id = PO.product_option_id)
         LEFT OUTER JOIN Delivery AS D on (OI.orderItem_id = D.orderItem_id)
         LEFT OUTER JOIN Payment AS PM on (OI.orderItem_id = PM.orderItem_id)
-        WHERE OI.seller_id = #{userId} AND NOT OI.status = 'O000'
+        WHERE OI.seller_id = #{userId}
         <include refid="conditionalSearch"></include>
         ORDER BY OI.ordered_date desc
         <include refid="paging"></include>

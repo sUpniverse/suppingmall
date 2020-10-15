@@ -208,7 +208,7 @@
         <a class="btn btn-info" href="/orders/main">목록</a>
     </div>
 </div>
-<footer th:include="fragments/footer :: footer" />
+<footer th:replace="fragments/footer :: footer" />
 <script th:inline="javascript">
     function cancel(orderItemId) {
 

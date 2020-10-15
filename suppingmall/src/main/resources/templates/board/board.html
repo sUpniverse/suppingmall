@@ -123,10 +123,9 @@
             <div class="container" th:replace="/board/list::list"></div>
         </div>
     </div>
-
 </div>
-<footer th:include="fragments/footer :: footer" />
 </body>
+<footer th:include="fragments/footer :: footer" />
 <script th:inline="javascript">
     $(document).ready(function() {
         var formObj = $("form[role='form']");

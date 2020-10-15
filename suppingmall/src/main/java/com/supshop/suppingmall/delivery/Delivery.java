@@ -5,6 +5,8 @@ import com.supshop.suppingmall.order.OrderItem;
 import lombok.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter @Setter
 @Builder @ToString @EqualsAndHashCode(of = "deliveryId")
@@ -39,16 +41,30 @@ public class Delivery {
 
         private String title;
         private String code;
+        public static final Map<String,String> mapValues = new HashMap<>();
+
+        static {
+            Arrays.stream(values()).forEach(status -> mapValues.put(status.toString(), status.getTitle()));
+        }
 
 
-        public static Delivery.DeliveryStatus getCode(String code) {
+        public static DeliveryStatus getStatusByCode(String code) {
             if(code == null) {
                 return null;
             }
-            return Arrays.stream(Delivery.DeliveryStatus.values())
-                    .filter(v -> v.getCode().equals(code))
+            return Arrays.stream(DeliveryStatus.values())
+                    .filter(v -> v.code.equals(code))
                     .findAny()
                     .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + code + "]"));
+        }
+
+        public static String getCodeByEnumString(String value) {
+            String code = null;
+            return Arrays.stream(DeliveryStatus.values())
+                    .filter(deliveryStatus -> deliveryStatus.toString().equals(value))
+                    .findFirst()
+                    .map(DeliveryStatus::getCode)
+                    .orElse(null);
         }
 
     }

@@ -28,7 +28,8 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 @RequestMapping("/orders")
 @Controller
-@RequiredArgsConstructor @Slf4j
+@Slf4j
+@RequiredArgsConstructor
 public class OrderController {
 
     private final OrderService orderService;
@@ -164,39 +165,37 @@ public class OrderController {
                                         @RequestParam(required = false) String type,
                                         @RequestParam(required = false) Orders.OrderStatus status,
                                         @AuthenticationPrincipal SessionUser user,
+                                        TenItemsCriteria criteria,
                                         Model model) {
 
-        List<OrderItem> orderItemList = orderItemService.getOrderItemByBuyerId(user.getUserId(), fromDate, toDate, type, status);
+        List<OrderItem> orderItemList = orderItemService.getOrderItemByBuyerId(user.getUserId(), fromDate, toDate, type, status, criteria);
+        model.addAttribute("fromDate",fromDate);
+        model.addAttribute("toDate",toDate);
+        model.addAttribute("type",type);
+        model.addAttribute("status",status);
         model.addAttribute("orderItemList",orderItemList);
-        model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.values()));
+        model.addAttribute("orderStatusList", Arrays.stream(Orders.OrderStatus.values()).filter(orderStatus -> !orderStatus.equals(Orders.OrderStatus.WAIT)).toArray());
 
         return "/order/list";
     }
 
 
     @GetMapping("/seller/main")
-    public String getOrderItemBySellerIdOnDelivery(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+    public String getOrderListBySellerId(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
                                                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
                                                    @RequestParam(required = false) String type,
-                                                   @RequestParam(required = false) Delivery.DeliveryStatus deliveryStatus,
-                                                   @RequestParam(required = false) Orders.OrderStatus orderStatus,
+                                                   @RequestParam(required = false) String status,
                                                    @AuthenticationPrincipal SessionUser user,
                                                    TenItemsCriteria criteria,
                                                    Model model) {
 
-
-        int count = orderItemService.getOrderItemCount("seller", user.getUserId());
+        int count = orderItemService.getOrderItemCountBySellerId(user.getUserId(),type,status,fromDate,toDate);
         PageMaker pageMaker = new PageMaker(count, orderDisplayPagingNum, criteria);
-        List<OrderItem> orderItemList = orderItemService.getOrderItemBySellerId(user.getUserId(), fromDate, toDate, type, deliveryStatus, orderStatus, criteria);
-
-        model.addAttribute("orderItemList",orderItemList);
+        List<OrderItem> orderItemList = orderItemService.getOrderItemBySellerId(user.getUserId(), null, null, null, null, null);
+        List<OrderItem> orderItemByCondition = orderItemService.getOrderItemBySellerId(user.getUserId(), fromDate, toDate, type, status, criteria);
+        model.addAttribute("orderItemList",orderItemByCondition);
         model.addAttribute("pageMaker",pageMaker);
 
-        // type이 order일시에는 환불관련 페이지로
-        if(type != null && type.equals("order")) {
-            model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.CANCEL,Orders.OrderStatus.REFUND,Orders.OrderStatus.CHANGE));
-            return "/order/seller/refund-list";
-        }
 
         int check = (int) orderItemList.stream().filter(orderItem -> orderItem.getStatus().equals(Orders.OrderStatus.ORDER)).count();
         int wait = (int) orderItemList.stream().filter(orderItem -> orderItem.getStatus().equals(Orders.OrderStatus.DELIVERY) && orderItem.getDelivery().getStatus().equals(Delivery.DeliveryStatus.WAIT)).count();
@@ -206,18 +205,47 @@ public class OrderController {
         int refund = (int) orderItemList.stream().filter(orderItem -> orderItem.getStatus().equals(Orders.OrderStatus.REFUND) && orderItem.getDelivery().getStatus().equals(Delivery.DeliveryStatus.CHANGE)).count();
 
 
-        Map<String,Integer> status = new HashMap<>();
-        status.put("check", check);
-        status.put("wait", wait);
-        status.put("delivery", delivery);
-        status.put("complete",complete);
-        status.put("change", change+refund);
+        Map<String,Integer> info = new HashMap<>();
+        info.put("check", check);
+        info.put("wait", wait);
+        info.put("delivery", delivery);
+        info.put("complete",complete);
+        info.put("change", change+refund);
 
-        model.addAttribute("status", status);
-        model.addAttribute("statusList", Delivery.DeliveryStatus.values());
+        model.addAttribute("info", info);
+        model.addAttribute("fromDate",fromDate);
+        model.addAttribute("toDate",toDate);
+        model.addAttribute("type",type);
+        model.addAttribute("status",status);
+        model.addAttribute("orderStatusList", Arrays.stream(Orders.OrderStatus.values()).filter(orderStatus -> !orderStatus.equals(Orders.OrderStatus.WAIT)).toArray());
+        model.addAttribute("deliveryStatusList", Delivery.DeliveryStatus.mapValues);
 
         return "/order/seller/list";
     }
+
+//    @GetMapping("/seller/refund")
+//    //Todo : 애매 개선해야함
+//    public String getRefundListBySellerId(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+//                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+//                                         @RequestParam(required = false) String type,
+//                                         @RequestParam(required = false) Delivery.DeliveryStatus deliveryStatus,
+//                                         @RequestParam(required = false) Orders.OrderStatus orderStatus,
+//                                         @AuthenticationPrincipal SessionUser user,
+//                                         TenItemsCriteria criteria,
+//                                         Model model) {
+//
+//
+//        int count = orderItemService.getOrderItemCountByBuyerId("seller", user.getUserId());
+//        PageMaker pageMaker = new PageMaker(count, orderDisplayPagingNum, criteria);
+//        List<OrderItem> orderItemList = orderItemService.getOrderItemBySellerId(user.getUserId(), fromDate, toDate, type, deliveryStatus, orderStatus, criteria);
+//
+//        model.addAttribute("orderItemList",orderItemList);
+//        model.addAttribute("pageMaker",pageMaker);
+//
+//        model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.CANCEL,Orders.OrderStatus.REFUND,Orders.OrderStatus.CHANGE));
+//
+//        return "/order/seller/refund-list";
+//    }
 
 
     @GetMapping("/{id}/seller")

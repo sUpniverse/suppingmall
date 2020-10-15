@@ -32,7 +32,7 @@
                     <td>
                         <select class="form-control ml-4" id="status">
                             <option th:text="전체상태" value="" selected></option>
-                            <option th:each="status : ${statusList}" th:text="${status.title}" th:value="${status}"></option>
+                            <option th:each="orderStatus : ${orderStatusList}" th:text="${orderStatus.title}" th:value="${orderStatus}"></option>
                         </select>
                     </td>
                     <td>

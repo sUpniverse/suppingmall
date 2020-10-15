@@ -96,8 +96,8 @@
         </div>
     </form>
 </div>
-<footer th:include="fragments/footer :: footer" />
 </body>
+<footer th:replace="fragments/footer :: footer" />
 <script th:inline="javascript">
     $(document).on('click','#cancelOrder',() => {
         var formObj = $("form[role='form']");

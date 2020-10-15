@@ -80,8 +80,8 @@
             </div>
         </form>
     </div>
-<footer class="cusFooter" th:include="fragments/footer :: footer" />
 </body>
+<footer th:replace="fragments/footer :: footer" />
 <script>
     $(document).ready(function() {
         var header = [[${_csrf.headerName}]];

@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.order;
 
+import com.supshop.suppingmall.delivery.Delivery;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -35,11 +36,20 @@ public class Orders {
         private String code;
 
 
-        public static OrderStatus getCode(String code) {
+        public static OrderStatus getStatusByCode(String code) {
             return Arrays.stream(Orders.OrderStatus.values())
                     .filter(v -> v.getCode().equals(code))
                     .findAny()
                     .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + code + "]"));
+        }
+
+        public static String getCodeByEnumString(String value) {
+            String code = null;
+            return Arrays.stream(OrderStatus.values())
+                    .filter(orderStatus -> orderStatus.toString().equals(value))
+                    .findFirst()
+                    .map(OrderStatus::getCode)
+                    .orElse(null);
         }
 
     }

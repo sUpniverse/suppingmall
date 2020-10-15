@@ -35,8 +35,25 @@ public class OrderItemService {
     private static final int hour = 23;
     private static final int minute = 59;
 
-    public int getOrderItemCount(String type, Long id) {
-        return orderItemMapper.findCount(type, id);
+    public int getOrderItemCount(String type, String searchValue,  LocalDate fromDate, LocalDate toDate) {
+        LocalDateTime formDateTime = getFormDateTime(fromDate);
+        LocalDateTime toDateTime = getToDateTime(toDate);
+        String code = getCode(type, searchValue);
+        return orderItemMapper.findCount(type,code,formDateTime,toDateTime);
+    }
+
+
+    public int getOrderItemCountByBuyerId(Long id,String type, String searchValue, LocalDate fromDate, LocalDate toDate) {
+        LocalDateTime formDateTime = getFormDateTime(fromDate);
+        LocalDateTime toDateTime = getToDateTime(toDate);
+        String code = getCode(type, searchValue);
+        return orderItemMapper.findCountByBuyerId(id,type,code,formDateTime,toDateTime);
+    }
+    public int getOrderItemCountBySellerId(Long id,String type, String searchValue, LocalDate fromDate, LocalDate toDate) {
+        LocalDateTime formDateTime = getFormDateTime(fromDate);
+        LocalDateTime toDateTime = getToDateTime(toDate);
+        String code = getCode(type, searchValue);
+        return orderItemMapper.findCountBySellerId(id,type,code,formDateTime,toDateTime);
     }
 
     public OrderItem getOrderItem(Long orderItemId) {
@@ -72,15 +89,15 @@ public class OrderItemService {
      * @param fromDate
      * @param toDate
      * @param type
-     * @param status
+     * @param orderStatus
      * @return List<OrderItem>, 구매자가 구매한 주문 목록
      */
-    public List<OrderItem> getOrderItemByBuyerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Orders.OrderStatus status) {
-        LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
-        LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
-        //code : orderStatus Value
-        String code = Optional.ofNullable(status).map(Orders.OrderStatus::getCode).orElse(null);
-        List<OrderItem> orderItemList = orderItemMapper.findByBuyerId(userId, formDateTime, toDateTime, type,  code);
+    public List<OrderItem> getOrderItemByBuyerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Orders.OrderStatus orderStatus, TenItemsCriteria criteria) {
+        LocalDateTime formDateTime = getFormDateTime(fromDate);
+        LocalDateTime toDateTime = getToDateTime(toDate);
+        //code : orderStatus code
+        String code = Optional.ofNullable(orderStatus).map(Orders.OrderStatus::getCode).orElse(null);
+        List<OrderItem> orderItemList = orderItemMapper.findByBuyerId(userId, formDateTime, toDateTime, type,  code, criteria);
         return orderItemList;
     }
 
@@ -90,22 +107,17 @@ public class OrderItemService {
      * @param fromDate
      * @param toDate
      * @param type
-     * @param deliveryStatus
-     * @param orderStatus
+     * @param searchValue
      * @param criteria
      * @return List<OrderItem>, 판매자에게 요청된 주문 목록
      */
-    public List<OrderItem> getOrderItemBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, Delivery.DeliveryStatus deliveryStatus, Orders.OrderStatus orderStatus, TenItemsCriteria criteria) {
-        LocalDateTime formDateTime = Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
-        LocalDateTime toDateTime = Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
+    public List<OrderItem> getOrderItemBySellerId(Long userId, LocalDate fromDate, LocalDate toDate, String type, String searchValue, TenItemsCriteria criteria) {
+        LocalDateTime formDateTime = getFormDateTime(fromDate);
+        LocalDateTime toDateTime = getToDateTime(toDate);
 
         //code : orderStatus Value
-        String code = "";
-        if(type != null && "delivery".equals(type)) {
-            code = Optional.ofNullable(deliveryStatus).map(Delivery.DeliveryStatus::getCode).orElse(null);
-        } else if(type != null && "order".equals(type)) {
-            code = Optional.ofNullable(orderStatus).map(Orders.OrderStatus::getCode).orElse(null);
-        }
+        String code = getCode(type, searchValue);
+
         List<OrderItem> orderItemList = orderItemMapper.findBySellerId(userId, formDateTime, toDateTime, type,  code, criteria);
         return orderItemList;
     }
@@ -209,5 +221,41 @@ public class OrderItemService {
         return orderId;
     }
     */
+
+    /**
+     * type이 delivery일 경우 deliveryStatus를 이용함
+     * type이 order 경우 orderStatus를 이용함
+     * @param type
+     * @param searchValue
+     * @return
+     */
+    public String getCode(String type, String searchValue) {
+        String code = "";
+        if(type != null && "delivery".equals(type)) {
+            code = Delivery.DeliveryStatus.getCodeByEnumString(searchValue);
+        } else if(type != null && "order".equals(type)) {
+            code = Orders.OrderStatus.getCodeByEnumString(searchValue);
+        }
+        return code;
+    }
+
+    /**
+     * 기준일 00:00분
+     * @param fromDate
+     * @return
+     */
+    private LocalDateTime getFormDateTime(LocalDate fromDate) {
+        return Optional.ofNullable(fromDate).map(LocalDate::atStartOfDay).orElse(null);
+    }
+
+    /**
+     * 기준일 23:59분
+     * @param toDate
+     * @return
+     */
+    private LocalDateTime getToDateTime(LocalDate toDate) {
+        return Optional.ofNullable(toDate).map(localDate -> toDate.atTime(hour, minute)).orElse(null);
+    }
+
 
 }

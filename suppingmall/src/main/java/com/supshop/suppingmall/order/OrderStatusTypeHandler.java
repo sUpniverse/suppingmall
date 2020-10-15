@@ -22,18 +22,18 @@ public class OrderStatusTypeHandler extends EnumTypeHandler<Orders.OrderStatus> 
     @Override
     public Orders.OrderStatus getNullableResult(ResultSet rs, String columnName) throws SQLException {
         String result = rs.getString(columnName);
-        return Orders.OrderStatus.getCode(result);
+        return Orders.OrderStatus.getStatusByCode(result);
     }
 
     @Override
     public Orders.OrderStatus getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         String result = rs.getString(columnIndex);
-        return Orders.OrderStatus.getCode(result);
+        return Orders.OrderStatus.getStatusByCode(result);
     }
 
     @Override
     public Orders.OrderStatus getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         String result = cs.getString(columnIndex);
-        return Orders.OrderStatus.getCode(result);
+        return Orders.OrderStatus.getStatusByCode(result);
     }
 }

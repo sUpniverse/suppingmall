@@ -91,12 +91,12 @@
     <select id="findAll" resultMap="QnA">
         SELECT Q.qna_id AS "QnAId", Q.title AS "QnATitle",Q.created_date AS "QnACreatedDate",
         Q.user_id AS "UserId",Q.email AS "UserEmail", Q.nickname AS "UserNickName",
-        Q.product_id AS "ProductId", Q.name AS "ProductName",
+        Q.product_id AS "ProductId", Q.name AS "ProductName", Q.seller_id AS "ProductSellerId",
         R.qna_id AS "ReplyId", R.title AS "ReplyTitle", R.created_date AS "ReplyCreatedDate"
         FROM
         (
         SELECT Q.qna_id, Q.title, Q.created_date , Q.user_id,Q.reply_id, U.email, U.nickname,
-        P.product_id, P.name
+        P.product_id, P.name, P.seller_id
         FROM QnA AS Q
         LEFT OUTER JOIN User AS U on (Q.user_id = U.user_id)
         LEFT OUTER JOIN Product AS P on (Q.product_id = P.product_id)
@@ -113,12 +113,12 @@
     <select id="findByProductId" resultMap="QnA">
         SELECT Q.qna_id AS "QnAId", Q.title AS "QnATitle",Q.created_date AS "QnACreatedDate",
         Q.user_id AS "UserId",Q.email AS "UserEmail", Q.nickname AS "UserNickName",
-        Q.product_id AS "ProductId", Q.name AS "ProductName",
+        Q.product_id AS "ProductId", Q.name AS "ProductName", Q.seller_id AS "ProductSellerId",
         R.qna_id AS "ReplyId", R.title AS "ReplyTitle", R.created_date AS "ReplyCreatedDate"
         FROM
         (
         SELECT Q.qna_id, Q.title, Q.created_date , Q.user_id,Q.reply_id, U.email, U.nickname,
-        P.product_id, P.name
+        P.product_id, P.name, P.seller_id
         FROM QnA AS Q
         LEFT OUTER JOIN User AS U on (Q.user_id = U.user_id)
         LEFT OUTER JOIN Product AS P on (Q.product_id = P.product_id)
@@ -134,12 +134,12 @@
     <select id="findByUserId" resultMap="QnA">
         SELECT Q.qna_id AS "QnAId", Q.title AS "QnATitle",Q.created_date AS "QnACreatedDate",
         Q.user_id AS "UserId",Q.email AS "UserEmail", Q.nickname AS "UserNickName",
-        Q.product_id AS "ProductId", Q.name AS "ProductName",
+        Q.product_id AS "ProductId", Q.name AS "ProductName", Q.seller_id AS "ProductSellerId",
         R.qna_id AS "ReplyId", R.title AS "ReplyTitle", R.created_date AS "ReplyCreatedDate"
         FROM
         (
         SELECT Q.qna_id, Q.title, Q.created_date , Q.user_id,Q.reply_id, U.email, U.nickname,
-        P.product_id, P.name
+        P.product_id, P.name, P.seller_id
         FROM QnA AS Q
         LEFT OUTER JOIN User AS U on (Q.user_id = U.user_id)
         LEFT OUTER JOIN Product AS P on (Q.product_id = P.product_id)

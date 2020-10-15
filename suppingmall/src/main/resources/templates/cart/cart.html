@@ -102,8 +102,8 @@
         <button class="btn btn-success" id="order" type="button">주문하기</button>
     </div>
 </div>
-<footer th:include="fragments/footer :: footer" />
 </body>
+<footer th:replace="fragments/footer :: footer" />
 <script th:inline="javascript">
 
     $(document).ready(() => {
