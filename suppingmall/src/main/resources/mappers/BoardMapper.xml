@@ -56,7 +56,9 @@
     </sql>
 
     <sql id="paging">
-        limit #{criteria.pageStart}, #{criteria.perPageNum}
+        <if test='criteria != null'>
+            limit #{criteria.pageStart}, #{criteria.perPageNum}
+        </if>
     </sql>
 
     <select id="findCount" resultType="int">

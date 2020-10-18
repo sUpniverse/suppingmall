@@ -2,7 +2,7 @@ package com.supshop.suppingmall.order;
 
 import com.supshop.suppingmall.delivery.Delivery;
 import com.supshop.suppingmall.delivery.DeliveryService;
-import com.supshop.suppingmall.exception.AlreadyCanceledException;
+import com.supshop.suppingmall.error.exception.AlreadyCanceledException;
 import com.supshop.suppingmall.mapper.OrderItemMapper;
 import com.supshop.suppingmall.page.TenItemsCriteria;
 import com.supshop.suppingmall.payModule.ModuleController;

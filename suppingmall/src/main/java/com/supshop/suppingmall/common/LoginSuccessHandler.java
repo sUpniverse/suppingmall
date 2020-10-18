@@ -31,7 +31,15 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         getPreviousUrl(httpServletRequest, httpServletResponse, authentication);
     }
 
-    private void getPreviousUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    /**
+     * 로그인이 필요한 요청을 받아 로그인 페이지에서
+     * 로그인을 한 후 요청했던 페이지로 다시 돌아감
+     * session에 prev페이지를 넣어놓아서 그걸 읽어서 redirect 해줌
+     * @param request
+     * @param response
+     * @param authentication
+     */
+    private void getPreviousUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         SavedRequest savedRequest = requestCache.getRequest(request, response);
         String prevPage = (String) request.getSession().getAttribute(prevPageContext);
         String url = defaultUrl;

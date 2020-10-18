@@ -10,6 +10,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -25,23 +28,174 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Transactional
 public class UserControllerTest {
 
     @Autowired MockMvc mockMvc;
     @Autowired UserFactory userFactory;
     @Autowired ModelMapper modelMapper;
     @Autowired UserService userService;
-    private MockHttpSession session;
+    @Autowired PasswordEncoder passwordEncoder;
 
     @Test
-    public void getUserById() throws Exception {
+    public void getSignUpForm_성공_비로그인_유저() throws Exception {
         //given
-        Long id = 1l;
+
+
+        //when
+        mockMvc.perform(get("/users/signup"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/user/signup"))
+                .andDo(print());
+
+        //then
+
+    }
+
+    @Test
+    @WithMockUser()
+    public void getSignUpForm_실패_로그인_유저() throws Exception {
+        //given
+
+
+        //when
+        mockMvc.perform(get("/users/signup"))
+                .andExpect(status().isForbidden())
+                .andExpect(forwardedUrl("/users/loginform"))
+                .andDo(print());
+
+        //then
+
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void getLoginForm_비로그인() throws Exception {
+        //given
+
+
+        //when
+        mockMvc.perform(get("/users/loginform"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/user/login"))
+                .andDo(print());
+
+
+        //then
+
+    }
+
+    @Test
+    @WithUserDetails(value = "user", userDetailsServiceBeanName = "userDetailsService")
+    public void getLoginForm_로그인유저() throws Exception {
+        //given
+
+
+        //when
+        mockMvc.perform(get("/users/loginform"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"))
+                .andDo(print());
+
+
+        //then
+
+    }
+
+    @Test
+    @WithUserDetails(value = "admin", userDetailsServiceBeanName = "userDetailsService")
+    public void getAllUser_성공_운영자() throws Exception {
+        //given
+        User admin = userFactory.createAdmin("admin");
+
+        //when
+        mockMvc.perform(get(("/users")))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/user/admin/list"))
+                .andDo(print());
+
+        //then
+
+    }
+
+    @Test
+    @WithUserDetails(value = "user", userDetailsServiceBeanName = "userDetailsService")
+    public void getAllUser_실패_운영자_아닌_회원() throws Exception {
+        //given
+        User admin = userFactory.createUser("user");
+
+        //when
+        mockMvc.perform(get(("/users")))
+                .andExpect(status().isForbidden())
+                .andExpect(forwardedUrl("/users/loginform"))
+                .andDo(print());
+
+        //then
+
+    }
+
+    @Test
+    public void login_성공() throws Exception {
+        //given
+        User user = userFactory.buildUser("user");
+        String password = user.getPassword();
+        userService.createUser(user);
+        //when
+        mockMvc.perform(post("/users/login")
+                .with(csrf())
+                .param("username", user.getEmail())
+                .param("password", password))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"))
+                .andDo(print());
+
+        //then
+
+    }
+
+    @Test
+    public void login_실패_아이디_혹은_패스워드오류() throws Exception {
+        //given
+        User user = userFactory.createUser("user");
+
+        //when
+        mockMvc.perform(post("/users/login")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/users/loginform?error"))
+                .andDo(print());
+
+        //then
+
+    }
+
+    @Test
+    @WithUserDetails(value = "user", userDetailsServiceBeanName = "userDetailsService")
+    public void getUserById_성공() throws Exception {
+        //given
+        User user = userFactory.createUser("user");
+
+        //when
+        mockMvc.perform(get("/users/{id}",user.getUserId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/user/main"))
+                .andDo(print())
+        ;
+        //then
+
+    }
+
+    @Test
+    @WithUserDetails(value = "user", userDetailsServiceBeanName = "userDetailsService")
+    public void getUserById_실패_주인이아닌_요청() throws Exception {
+        //given
+        User user = userFactory.createUser("user");
+        Long id = 0l;
 
         //when
         mockMvc.perform(get("/users/{id}",id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("userId").value(id))
+                .andExpect(view().name("/error/400"))
                 .andDo(print())
         ;
         //then
@@ -49,36 +203,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void getUserByEmail() throws Exception {
-        //given
-        String email = "kms22345@naver.com";
-
-        //when
-        mockMvc.perform(get("/users/emails/{email}",email))
-                .andExpect(status().isOk())
-                .andExpect(content().string("false"))
-                .andDo(print())
-        ;
-        //then
-    }
-
-    @Test
-    public void getUserByEmailNotFound() throws Exception {
-        //given
-        String email = "kms22345@google.com";
-
-        //when
-        mockMvc.perform(get("/users/emails/{email}",email))
-                .andExpect(status().isOk())
-                .andExpect(content().string("true"))
-                .andDo(print())
-        ;
-        //then
-    }
-
-    @Test
-    @Transactional
-    public void UserValidation() throws Exception {
+    public void createUser_Validation_성공() throws Exception {
         //given
         String username = "test@gmail.com";
         String userpassword = "kms9109111!";
@@ -108,7 +233,8 @@ public class UserControllerTest {
                                     .param("phoneNumber",user.getPhoneNumber())
                                     .param("role",user.getRole().toString())
                                     .param("type",user.getType().toString())
-                                    )
+
+                .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/users/loginform"))
                 .andDo(print());
@@ -118,11 +244,10 @@ public class UserControllerTest {
     }
 
     @Test
-    @Transactional
-    public void UserValidationWrongEmail() throws Exception {
+    public void createUser_Validation_실패_잘못된_이메일형식() throws Exception {
         //given
         String username = "test@gmai";
-        String userpassword = "kms9109111!";
+        String userpassword = "k12345!";
         User user = User.builder()
                 .email(username)
                 .password(userpassword)
@@ -149,8 +274,11 @@ public class UserControllerTest {
                 .param("phoneNumber",user.getPhoneNumber())
                 .param("role",user.getRole().toString())
                 .param("type",user.getType().toString())
+                .with(csrf())
+                .header("Referer", "/users/signup")
         )
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/users/signup?error"))
                 .andDo(print());
 
         //then
@@ -158,11 +286,10 @@ public class UserControllerTest {
     }
 
     @Test
-    @Transactional
-    public void UserValidationWrongPassword() throws Exception {
+    public void createUserValidation_실패_잘못된_패스워드() throws Exception {
         //given
         String username = "test@gmail.com";
-        String userpassword = "kms910911"; //특수 문자가 없는 경우
+        String userpassword = "k12345"; //특수 문자가 없는 경우
         User user = User.builder()
                 .email(username)
                 .password(userpassword)
@@ -189,8 +316,11 @@ public class UserControllerTest {
                 .param("phoneNumber",user.getPhoneNumber())
                 .param("role",user.getRole().toString())
                 .param("type",user.getType().toString())
+                .header("Referer", "/users/signup")
+                .with(csrf())
         )
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/users/signup?error"))
                 .andDo(print());
 
         //then
@@ -198,11 +328,10 @@ public class UserControllerTest {
     }
 
     @Test
-    @Transactional
-    public void UserValidationWrongPhone() throws Exception {
+    public void createUserValidation_실패_잘못된_전화번호() throws Exception {
         //given
         String username = "test@gmail.com";
-        String userpassword = "kms910911"; //특수 문자가 없는 경우
+        String userpassword = "kss12345!"; //특수 문자가 없는 경우
         User user = User.builder()
                 .email(username)
                 .password(userpassword)
@@ -229,27 +358,86 @@ public class UserControllerTest {
                 .param("phoneNumber",user.getPhoneNumber())
                 .param("role",user.getRole().toString())
                 .param("type",user.getType().toString())
+                .header("Referer", "/users/signup")
+                .with(csrf())
         )
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/users/signup?error"))
                 .andDo(print());
 
         //then
 
     }
 
-    private void addUserInSession(User user) {
-        SessionUser needUser = modelMapper.map(user, SessionUser.class);
-        session = new MockHttpSession();
-        session.setAttribute("user",needUser);
+    @Test
+    @WithUserDetails(value = "user", userDetailsServiceBeanName = "userDetailsService")
+    public void getUpdateForm_성공_로그인_유저() throws Exception {
+        //given
+        User user = userFactory.createUser("user");
+
+        //when
+        mockMvc.perform(get("/users/{id}/updateform",user.getUserId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/user/updateForm"))
+                .andDo(print());
+
+        //then
+
+    }
+
+    @Test
+    @WithUserDetails(value = "admin", userDetailsServiceBeanName = "userDetailsService")
+    public void getUpdateForm_성공_로그인_운영자() throws Exception {
+        //given
+        User admin = userFactory.createAdmin("admin");
+        User user = userFactory.createUser("user");
+
+        //when
+        mockMvc.perform(get("/users/{id}/updateform",user.getUserId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/user/admin/adminUpdateForm"))
+                .andDo(print());
+
+        //then
+
+    }
+
+    @Test
+    public void getUpdateForm_실패_비로그인_유저() throws Exception {
+        //given
+
+
+        //when
+        mockMvc.perform(get("/users/{id}/updateform",1))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/users/loginform"))
+                .andDo(print());
+
+        //then
+
+    }
+
+    @Test
+    @WithUserDetails(value = "user", userDetailsServiceBeanName = "userDetailsService")
+    public void getUpdateForm_실패_로그인_다른유저() throws Exception {
+        //given
+        userFactory.createUser("user");
+
+        //when
+        mockMvc.perform(get("/users/{id}/updateform",1))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/error/400"))
+                .andDo(print());
+
+        //then
 
     }
 
 
+
     @Test
-    @Transactional
     public void pathchUserWithOutDelYn() throws Exception {
         //given
-        addUserInSession(userFactory.createUser("test"));
         ObjectMapper objectMapper = new ObjectMapper();
         Long userId = 1l;
         String username = "kmsup2@gmail.com";
@@ -269,7 +457,6 @@ public class UserControllerTest {
         mockMvc.perform(patch("/users/{id}",userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user))
-                .session(session)
         )
                 .andExpect(status().isOk())
                 .andDo(print());
@@ -278,7 +465,6 @@ public class UserControllerTest {
     }
 
     @Test
-    @Transactional
     @WithUserDetails(value = "tester", userDetailsServiceBeanName = "userDetailsService")
     public void signOut() throws Exception {
         //given

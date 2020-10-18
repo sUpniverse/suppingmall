@@ -1,8 +1,10 @@
 package com.supshop.suppingmall.user;
 
 import com.supshop.suppingmall.common.TokenGenerator;
+import com.supshop.suppingmall.error.exception.DuplicateException;
 import com.supshop.suppingmall.event.EventType;
 import com.supshop.suppingmall.mapper.UserMapper;
+import com.supshop.suppingmall.page.Criteria;
 import com.supshop.suppingmall.page.ThirtyItemsCriteria;
 import com.supshop.suppingmall.event.UserEvent;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +31,15 @@ public class UserService implements UserDetailsService {
     private final ModelMapper modelMapper;
     private final ApplicationEventPublisher eventPublisher;
 
-    public List<User> getAllUser(ThirtyItemsCriteria thirtyItemsCriteria, String type, String searchValue) {
-        return userMapper.selectAllUser(thirtyItemsCriteria,type,searchValue);
+    public List<User> getAllUser(Criteria criteria, String type, String searchValue) {
+        return userMapper.findAll(criteria,type,searchValue);
     }
 
+    /**
+     * 판매자 지원한 유저의 목록을 반환
+     * @param thirtyItemsCriteria
+     * @return 판매자 지원자 목록
+     */
     public List<User> getApplySellerUsers(ThirtyItemsCriteria thirtyItemsCriteria) {
         return userMapper.findApplySeller(thirtyItemsCriteria);
     }
@@ -43,31 +50,68 @@ public class UserService implements UserDetailsService {
     }
 
     public User getUser(Long id) {
-        return userMapper.selectUser(id);
+        return userMapper.findOne(id);
     }
 
-    //UserConfirmation의 정보를 같이 가져옴
+    /**
+     * UserConfirmation의 정보를 포함하여 User정보 가져온다.
+     * @param email
+     * @return
+     */
     public Optional<User> getUserWithConfirmationByEmail(String email) {
         return userMapper.findUserConfirmationById(email);
     }
 
+    /**
+     * 회원가입
+     * 이미 존재하는 회원이 있는지 확인 후 (by Email),
+     * 존재하지 않으면, 회원가입을 하고 확인요청 이메일을 발송한다.
+     * 이메일 발송은 비동기로 진행된다.
+     * @param user
+     * @return createdUser
+     */
     @Transactional
-    public User createUser(User user) throws RuntimeException {
+    public User createUser(User user) {
+
+        if(isUserAlreadyExistByEmail(user.getEmail())) {
+           throw new DuplicateException();
+        }
+        //passowrodEncoder를 통한 입력된 비밀번호 암호화
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setEmailConfirmYn("N");
+
+        int insert = userMapper.insertUser(user);
+
+        // 회원정보 삽입에 상공하면 이메일 전송
+        if(insert == 1) {
+            sendConfirmationEmail(user);
+        }
+
+        return user;
+
+    }
+
+    /**
+     * OAuth 유저 회원가입
+     * 이미 존재하는 회원이 있는지 확인 후 (by Email)
+     * 존재하면, 이미 가입했던 이력의 유저를 반환
+     * 존재하지 않으면, 회원 가입을 한다.
+     * 이미 OAuth를 통해 이메일에 대한 검증은 됐다고 생각하므로,
+     * 따로 이메일 발송을 통한 검증은 진행하지 않는다.
+     * @param user
+     * @return createdUser
+     */
+    @Transactional
+    public User createUserByOAuth(User user) {
 
         User existUser;
         try {
             existUser = getUserByEmail(user.getEmail());
         } catch (UsernameNotFoundException e){
-            if(user.getType().equals(User.LoginType.LOCAL)) {
-                user.setPassword(passwordEncoder.encode(user.getPassword()));
-            }
-
+            user.setEmailConfirmYn("Y");
             userMapper.insertUser(user);
-            sendConfirmationEmail(user);
-
             return user;
         }
-
         return existUser;
     }
 
@@ -118,6 +162,12 @@ public class UserService implements UserDetailsService {
         eventPublisher.publishEvent(new UserEvent(EventType.CREATED, LocalDateTime.now(),user));
     }
 
+    /**
+     * 유저 회원 가입 후, 실제 존재하는 메일인지 확인하기 위해 이메일을 발송한다
+     * @Async 어노테이션을 이용해 비동기적으로 처리 되며,
+     * 토큰을 생성하여 eventPublisher로 메일 전송 이벤트를 publish 한다.
+     * @param user
+     */
     @Async
     void sendConfirmationEmail(User user) {
         String token = TokenGenerator.issueToken();

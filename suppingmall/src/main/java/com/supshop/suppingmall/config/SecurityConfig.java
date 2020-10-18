@@ -27,7 +27,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final LoginSuccessHandler   loginSuccessHandler;
+    private final LoginSuccessHandler loginSuccessHandler;
 
 
     private static final String resourcesPath = "/resources/**";
@@ -95,20 +95,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .userInfoEndpoint()
                     .userService(customOAuth2UserService)
         ;
-        setmvcMatchers(http);
+        setMvcMatchers(http);
     }
 
-    private void setmvcMatchers(HttpSecurity http) throws Exception {
+    private void setMvcMatchers(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
                 .mvcMatchers(HttpMethod.GET,"/users/signup/**").anonymous()
                 .mvcMatchers(HttpMethod.GET,"/users/findAccountForm").anonymous()
                 .mvcMatchers(HttpMethod.POST,"/users/findAccount").anonymous()
                 .mvcMatchers(HttpMethod.POST,"/users").permitAll()
+                .mvcMatchers(HttpMethod.GET,"/users").hasAnyRole(MASTER,ADMIN)
                 .mvcMatchers(HttpMethod.GET,"/users/{id}").authenticated()
                 .mvcMatchers(HttpMethod.PUT,"/users/{id}").authenticated()
                 .mvcMatchers(HttpMethod.DELETE,"/users/{id}").authenticated()
                 .mvcMatchers(HttpMethod.PATCH,"/users/{id}").hasAnyRole(MASTER,ADMIN)
+                .mvcMatchers(HttpMethod.GET,"/users/{id}/updateform").authenticated()
                 .mvcMatchers(HttpMethod.GET,"/users/seller/applyForm").hasAnyRole(USER)
                 .mvcMatchers(HttpMethod.POST,"/users/seller/{id}/apply").hasAnyRole(USER)
                 .mvcMatchers(HttpMethod.GET,"/users/seller/applicant").hasAnyRole(MASTER,ADMIN)
@@ -120,7 +122,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.PATCH,"/users/seller/{id}").hasAnyRole(MASTER,ADMIN)
                 .mvcMatchers(HttpMethod.GET,"/users/seller").hasAnyRole(MASTER,ADMIN,SELLER)
                 .mvcMatchers(HttpMethod.GET,"/users/confirm").authenticated()
-                .mvcMatchers(HttpMethod.GET,"/users").hasAnyRole(MASTER,ADMIN)
                 .mvcMatchers(HttpMethod.GET,"/boards").permitAll()
                 .mvcMatchers(HttpMethod.POST,"/boards").authenticated()
                 .mvcMatchers(HttpMethod.GET,"/boards/main").authenticated()

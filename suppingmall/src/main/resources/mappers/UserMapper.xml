@@ -36,19 +36,6 @@
         </association>
     </resultMap>
 
-    <select id="selectAllUser" resultMap="User">
-        SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
-        U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.zipcode AS "UserZipCode",
-        U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
-        U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.store_private_number AS "StorePrivateNumber", U.store_name AS "StoreName",
-        U.store_phone_number AS "StorePhoneNumber", U.store_address AS "StoreAddress", U.store_address_detail AS "StoreAddressDetail",
-        U.store_zipcode AS "StoreZipCode", U.store_apply_yes_or_no AS "StoreApplyYn"
-        FROM User AS U
-        <include refid="conditionalSearch"></include>
-        ORDER BY U.user_id asc
-        limit #{thirtyItemsCriteria.pageStart}, #{thirtyItemsCriteria.perPageNum}
-    </select>
-
     <sql id="conditionalSearch">
         <trim prefix="WHERE" prefixOverrides="AND|OR">
             <if test="type != null and searchValue != null">
@@ -88,12 +75,30 @@
 
     <select id="selectUserCount" resultType="int">
         SELECT count(*)
-        From USER
-        WHERE user_id > 0
+        From USER AS U
         <include refid="conditionalSearch"></include>
     </select>
 
-    <select id="selectUser" resultMap="User">
+    <sql id="paging">
+        <if test='criteria != null'>
+            limit #{criteria.pageStart}, #{criteria.perPageNum}
+        </if>
+    </sql>
+
+    <select id="findAll" resultMap="User">
+        SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
+        U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.zipcode AS "UserZipCode",
+        U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
+        U.role AS "UserRole", U.delete_yes_or_no AS "UserDelYn", U.store_private_number AS "StorePrivateNumber", U.store_name AS "StoreName",
+        U.store_phone_number AS "StorePhoneNumber", U.store_address AS "StoreAddress", U.store_address_detail AS "StoreAddressDetail",
+        U.store_zipcode AS "StoreZipCode", U.store_apply_yes_or_no AS "StoreApplyYn", U.store_registered_date AS "StoreRegisteredDate", U.store_updated_date AS "StoreUpdatedDate"
+        FROM User AS U
+        <include refid="conditionalSearch"></include>
+        ORDER BY U.user_id asc
+        <include refid="paging"></include>
+    </select>
+
+    <select id="findOne" resultMap="User">
         SELECT U.user_id AS "UserId", U.email AS "UserEmail", U.password AS "UserPassword", U.type AS "UserType",
         U.name AS "UserName", U.nickname AS "UserNickName",U.address AS "UserAddress",U.address_detail AS "UserAddressDetail", U.zipcode AS "UserZipCode",
         U.phone_number AS "UserPhoneNumber", U.created_date AS "UserCreatedDate", U.updated_date AS "UserUpdatedData",
@@ -125,7 +130,7 @@
         FROM User AS U
         WHERE U.store_apply_yes_or_no = 'Y'
         ORDER BY U.updated_date asc
-        limit #{pageStart}, #{perPageNum}
+        <include refid="paging"></include>
     </select>
 
     <insert id="insertUser" parameterType="com.supshop.suppingmall.user.User" useGeneratedKeys="true" keyProperty="userId">
@@ -158,7 +163,7 @@
         now(),
         now(),
         'N',
-        'N',
+        #{emailConfirmYn},
         #{role, typeHandler=com.supshop.suppingmall.user.RoleTypeHandler},
         #{type, typeHandler=com.supshop.suppingmall.user.LoginTypeHandler},
         'N'
@@ -175,6 +180,9 @@
         address_detail = #{user.addressDetail},
         zipcode = #{user.zipCode},
         phone_number = #{user.phoneNumber},
+        role = #{user.role, typeHandler=com.supshop.suppingmall.user.RoleTypeHandler},
+        type = #{user.type, typeHandler=com.supshop.suppingmall.user.LoginTypeHandler},
+        delete_yes_or_no = #{user.delYn},
         updated_date = now()
         WHERE user_id = #{id};
     </update>
@@ -248,6 +256,7 @@
         FROM User AS U
         <include refid="conditionalSearchStore"></include>
         ORDER BY U.user_id asc
+        <include refid="paging"></include>
     </select>
 
     <insert id="saveConfirmation" parameterType="com.supshop.suppingmall.user.UserConfirmation" useGeneratedKeys="true" keyProperty="confirmId">

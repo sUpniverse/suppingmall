@@ -25,46 +25,4 @@ public class UserUtils {
         return sessionUser != null && sessionUser.getRole().equals(Role.USER);
     }
 
-
-    // 삭제 예정
-
-    public static boolean isSameUser(Long id, HttpSession session) {
-        if(isSessionNull(session)) {
-            return false;
-        }
-        SessionUser user = getSessionUser(session);
-        if(user.getUserId().equals(id)) {
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean isSessionNull(HttpSession session) {
-        SessionUser user = (SessionUser) session.getAttribute("user");
-        if(user == null) {
-            return true;
-        }
-        return false;
-    }
-
-    public static SessionUser getSessionUser(HttpSession session) {
-        return (SessionUser) session.getAttribute("user");
-    }
-
-    public static boolean isAdmin(HttpSession session) {
-        if(isSessionNull(session)) {
-            return false;
-        }
-        SessionUser sessionUser = getSessionUser(session);
-        if (sessionUser.getRole().equals(Role.MASTER) || sessionUser.getRole().equals(Role.ADMIN)) {
-            return true;
-        }
-        return false;
-    }
-
-    public boolean isLoginUser(SessionUser sessionUser) {
-        if(sessionUser != null) return true;
-        return false;
-    }
-
 }

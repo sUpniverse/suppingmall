@@ -38,7 +38,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private SessionUser save(OAuthAttribute authAttribute) {
         User user = authAttribute.setUserInformation();
-        user = userService.createUser(user);
+        user = userService.createUserByOAuth(user);
         SessionUser sessionUser = modelMapper.map(user, SessionUser.class);
         sessionUser.setAttributes(authAttribute.getAttributes());
         sessionUser.setNameAttributeKey(authAttribute.getNameAttributeKey());

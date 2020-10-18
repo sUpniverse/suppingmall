@@ -1,4 +1,4 @@
-package com.supshop.suppingmall.exception;
+package com.supshop.suppingmall.error.exception;
 
 public class AlreadyCanceledException extends RuntimeException{
 

@@ -33,8 +33,7 @@ public class CategoryControllerTest {
         //given
 
         //when
-        mockMvc.perform(get("/category/list")
-                            .with(user(userFactory.createAdminToSession("kevin"))))
+        mockMvc.perform(get("/category/list"))
                 .andExpect(status().isOk())
                 .andDo(print())
         ;

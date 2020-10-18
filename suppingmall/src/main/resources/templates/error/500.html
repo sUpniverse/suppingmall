@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: header" />
+<head th:include="fragments/header :: header-product" />
+<body>
+<header th:insert="fragments/navigation-main :: main-nav" />
+<div class="error-content text-center mt-3" style="background-image: url(assets/images/backgrounds/error-bg.jpg)">
+
+        <h1 class="error-title">Error 500</h1><!-- End .error-title -->
+        <p>잘못된 요청입니다.</p>
+        <p>Page not found :)</p>
+        <a href="/" class="btn btn-outline-primary-2 btn-minwidth-lg">
+            <span>메인으로</span>
+            <i class="icon-long-arrow-right"></i>
+        </a>
+</div><!-- End .container -->
+</body>
+<footer th:replace="fragments/footer :: footer" />
+<script th:src="@{/assets/js/jquery.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/js/jquery.hoverIntent.min.js}"></script>
+<script th:src="@{/assets/js/jquery.waypoints.min.js}"></script>
+<script th:src="@{/assets/js/superfish.min.js}"></script>
+<script th:src="@{/assets/js/owl.carousel.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap-input-spinner.js}"></script>
+<script th:src="@{/assets/js/jquery.plugin.min.js}"></script>
+<script th:src="@{/assets/js/jquery.countdown.min.js}"></script>
+<!-- Main JS File -->
+<script th:src="@{/assets/js/main.js}"></script>
+<script th:src="@{/assets/js/demos/demo-4.js}"></script>
+</html>
