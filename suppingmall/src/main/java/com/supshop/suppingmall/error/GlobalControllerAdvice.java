@@ -1,9 +1,12 @@
 package com.supshop.suppingmall.error;
 
+import com.supshop.suppingmall.error.exception.order.InvalidConfirmationTokenException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,7 +22,6 @@ import java.sql.SQLException;
  */
 
 @Slf4j
-@Order(GlobalRestControllerAdvice.ORDER+1)
 @ControllerAdvice
 public class GlobalControllerAdvice {
 
@@ -28,17 +30,59 @@ public class GlobalControllerAdvice {
      * URL not found 에러 공통 처리 (404)
      */
     @ExceptionHandler(NoHandlerFoundException.class)
-    protected String NoHandlerFoundException(NoHandlerFoundException e) {
+    protected Object handleNoHandlerFoundException(NoHandlerFoundException e,HttpServletRequest request) {
         log.debug(e.getLocalizedMessage());
+        if(isJson(request)){
+            return ResponseEntity.notFound().build();
+        }
         return "/error/404";
+    }
+
+    private boolean isJson(HttpServletRequest request) {
+        String contentType = request.getContentType();
+
+        if(contentType != null && (contentType.equals(MediaType.APPLICATION_JSON)
+                || contentType.equals(MediaType.APPLICATION_JSON_VALUE)
+                || contentType.equals(MediaType.APPLICATION_JSON_UTF8)
+                || contentType.equals(MediaType.APPLICATION_JSON_UTF8_VALUE)))
+            return true;
+
+        return false;
     }
 
     /**
      * 잘못된 요청 정보로 에러가 났을 경우 (400)
      */
     @ExceptionHandler(IllegalArgumentException.class)
-    public String handleIllegalArgumentException(IllegalArgumentException e) {
+    public Object handleIllegalArgumentException(IllegalArgumentException e,HttpServletRequest request) {
         log.debug(e.getLocalizedMessage());
+        if(isJson(request)){
+            return ResponseEntity.badRequest().build();
+        }
+        return "/error/400";
+    }
+
+    /**
+     * 잘못된 토큰 정보 요청 (400)
+     */
+    @ExceptionHandler(InvalidConfirmationTokenException.class)
+    public Object handleInvalidConfirmationTokenException(InvalidConfirmationTokenException e,HttpServletRequest request) {
+        log.debug(e.getLocalizedMessage());
+        if(isJson(request)){
+            return ResponseEntity.badRequest().build();
+        }
+        return "/error/400";
+    }
+
+    /**
+     * DB의 제약조건 에러 (400)
+     */
+    @ExceptionHandler(DataAccessException.class)
+    protected Object handleDataAccessException(DataAccessException e, HttpServletRequest request) {
+        log.debug(e.getLocalizedMessage());
+        if(isJson(request)) {
+            return ResponseEntity.badRequest().build();
+        }
         return "/error/400";
     }
 
@@ -46,13 +90,33 @@ public class GlobalControllerAdvice {
     /**
      * @Validate 으로 검증 error 발생시 발생 => 다시 요청 페이지 +error로 전달
      */
-    @ExceptionHandler(BindException.class)
-    protected String handleBindException(BindException e,
-                                                     HttpServletRequest request,
-                                                     RedirectAttributes redirectAttributes) {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    protected Object handleMethodArgumentNotValidException(MethodArgumentNotValidException e,
+                                                           HttpServletRequest request,
+                                                           RedirectAttributes redirectAttributes) {
         log.debug(e.getLocalizedMessage());
         String referer = request.getHeader("Referer");
 //        redirectAttributes.addAttribute("errorMsg", e.getMessage());
+        if(isJson(request)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return "redirect:"+referer+"?error";
+    }
+
+    /**
+     * @ModelAttribute binding error 발생시 발생 => 다시 요청 페이지 +error로 전달
+     */
+    @ExceptionHandler(BindException.class)
+    protected Object handleBindException(BindException e,
+                                         HttpServletRequest request,
+                                         RedirectAttributes redirectAttributes) {
+        log.debug(e.getLocalizedMessage());
+        String referer = request.getHeader("Referer");
+//        redirectAttributes.addAttribute("errorMsg", e.getMessage());
+        if(isJson(request)) {
+            return ResponseEntity.badRequest().build();
+        }
 
         return "redirect:"+referer+"?error";
     }
@@ -62,8 +126,11 @@ public class GlobalControllerAdvice {
      * DB Connection Error (500)
      */
     @ExceptionHandler(SQLException.class)
-    protected String  handleDataIntegrityViolationException(SQLException e) {
+    protected Object  handleDataIntegrityViolationException(SQLException e,HttpServletRequest request) {
         log.error(e.getLocalizedMessage());
+        if(isJson(request)){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
         return "/error/500";
     }
 
@@ -72,8 +139,11 @@ public class GlobalControllerAdvice {
      * 그외 Error 발생 시 (500)
      */
     @ExceptionHandler(Exception.class)
-    protected String handleException(Exception e) {
+    protected Object handleException(Exception e,HttpServletRequest request) {
         log.debug(e.getLocalizedMessage());
+        if(isJson(request)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
         return "/error/500";
     }
 

@@ -1,9 +1,9 @@
 package com.supshop.suppingmall.user;
 
 import com.supshop.suppingmall.common.UserUtils;
-import com.supshop.suppingmall.error.exception.order.InvalidConfirmationToken;
-import com.supshop.suppingmall.page.ThirtyItemsCriteria;
+import com.supshop.suppingmall.error.exception.order.InvalidConfirmationTokenException;
 import com.supshop.suppingmall.page.PageMaker;
+import com.supshop.suppingmall.page.ThirtyItemsCriteria;
 import com.supshop.suppingmall.user.Form.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.Errors;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -113,14 +114,13 @@ public class UserController {
     @PostMapping("")
     public String createUser(@Valid SignUpForm signUpForm) {
 
-
         User createdUser = modelMapper.map(signUpForm, User.class);
         userService.createUser(createdUser);
 
         return redirectLoginUrl;
     }
 
-    @GetMapping("/{id}/updateform")
+    @GetMapping("/{id}/form")
     public String getUpdateForm(@PathVariable Long id,
                                 Model model,
                                 @AuthenticationPrincipal SessionUser sessionUser) {
@@ -140,30 +140,11 @@ public class UserController {
         return "/user/updateForm";
     }
 
-    @GetMapping("/{id}/passwordform")
-    public String getPasswordForm(@PathVariable Long id,
-                                  Model model,
-                                  @AuthenticationPrincipal SessionUser sessionUser) {
-
-        if(!UserUtils.isOwner(id,sessionUser)) {
-            throw new IllegalArgumentException("유효하지 않는 유저입니다.");
-        }
-
-        User user = userService.getUser(id);
-        model.addAttribute("user",user);
-        return "/user/passwordForm";
-    }
-
     @PutMapping("/{id}")
     @ResponseBody
     public ResponseEntity updateUser(@PathVariable Long id,
                                      @RequestBody @Valid UpdateUserForm form,
-                                     @AuthenticationPrincipal SessionUser sessionUser,
-                                     Errors errors) {
-
-        if(errors.hasErrors()) {
-
-        }
+                                     @AuthenticationPrincipal SessionUser sessionUser) {
 
         if(!(UserUtils.isOwner(id, sessionUser))) {
             throw new IllegalArgumentException("유효하지 않는 유저입니다.");
@@ -176,14 +157,38 @@ public class UserController {
             throw new IllegalArgumentException("유효하지 않은 패스워드");
         }
 
-        User user = modelMapper.map(form, User.class);
-        try {
-            userService.updateUser(id, user);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body("회원변경 실패");
-        }
+        modelMapper.map(form, originUser);
+        userService.updateUser(id, originUser);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<String> partialUpdateUser(@RequestBody(required = false) @Valid SessionUser sessionUser,
+                                                    @PathVariable Long id) {
+
+//        if(isAdmin(sessionUser)) {
+//            User user = modelMapper.map(userVO, User.class);
+//            userService.patchUser(id,user);
+//            return ResponseEntity.ok().build();
+//        }
+        User user = modelMapper.map(sessionUser, User.class);
+        userService.patchUser(id,user);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/password")
+    public String getPasswordForm(@PathVariable Long id,
+                                  Model model,
+                                  @AuthenticationPrincipal SessionUser sessionUser) {
+
+        if(!UserUtils.isOwner(id,sessionUser)) {
+            throw new IllegalArgumentException("유효하지 않는 유저입니다.");
+        }
+
+        User user = userService.getUser(id);
+        model.addAttribute("user",user);
+        return "/user/passwordForm";
     }
 
     @PutMapping("/{id}/password")
@@ -210,21 +215,6 @@ public class UserController {
     }
 
 
-    @PatchMapping("/{id}")
-    @ResponseBody
-    public ResponseEntity<String> partialUpdateUser(@RequestBody(required = false) @Valid SessionUser sessionUser,
-                                                    @PathVariable Long id) {
-
-//        if(isAdmin(sessionUser)) {
-//            User user = modelMapper.map(userVO, User.class);
-//            userService.patchUser(id,user);
-//            return ResponseEntity.ok().build();
-//        }
-        User user = modelMapper.map(sessionUser, User.class);
-        userService.patchUser(id,user);
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/{id}/signout")
     public String getSignOutForm(@PathVariable Long id, Model model, @AuthenticationPrincipal SessionUser sessionUser) {
 
@@ -235,6 +225,67 @@ public class UserController {
         User user = userService.getUser(id);
         model.addAttribute("user",user);
         return "/user/signout";
+    }
+
+
+    @GetMapping("/confirm")
+    public String confirmUser(@RequestParam String token,
+                              @AuthenticationPrincipal SessionUser sessionUser) {
+
+        User user = userService.getUserWithConfirmationByEmail(sessionUser.getEmail()).get();
+
+        if(user.getEmailConfirmYn().equals("Y")) {
+            throw new IllegalArgumentException("이미 인증 된 유저입니다");
+        }
+
+        if(!user.getUserConfirmation().getConfirmToken().equals(token)) {
+            throw new InvalidConfirmationTokenException("유효하지 않는 토큰입니다.");
+        }
+        user.setEmailConfirmYn("Y");
+        userService.patchUser(user.getUserId(), user);
+
+        return "/user/confirm/success";
+    }
+
+    @PostMapping("/confirm/resend")
+    @ResponseBody
+    public ResponseEntity resendConfirmEmail(@AuthenticationPrincipal SessionUser sessionUser) {
+        User user = userService.getUserWithConfirmationByEmail(sessionUser.getEmail()).get();
+
+        if(user.getEmailConfirmYn().equals("Y")) {
+            throw new IllegalArgumentException("이미 인증 된 유저입니다");
+        }
+
+        userService.resendConfirmationEmail(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/account")
+    public String getFindAccountForm() {
+
+        return "/user/findAccountForm";
+    }
+
+    @PostMapping("/account")
+    @ResponseBody
+    public ResponseEntity findAccount(@RequestBody FindAccountForm findAccountForm) {
+        User user;
+
+        try {
+            user = userService.getUserByEmail(findAccountForm.getEmail());
+            if(!user.getName().equals(findAccountForm.getUserName()))
+                throw new UsernameNotFoundException("유저의 이름이 존재하지 않습니다.");
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.noContent().build();
+        }
+
+        try {
+            userService.sendChangePasswordEmail(user);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
@@ -261,73 +312,5 @@ public class UserController {
         httpSession.invalidate();
         return ResponseEntity.ok().build();
     }
-
-
-    @GetMapping("/confirm")
-    public String confirmUser(@RequestParam String token,
-                              @AuthenticationPrincipal SessionUser sessionUser) {
-
-        User user = userService.getUserWithConfirmationByEmail(sessionUser.getEmail()).get();
-
-        if(user.getEmailConfirmYn().equals("Y")) {
-            throw new IllegalArgumentException("유효하지 않은 유저입니다");
-        }
-
-        if(!user.getUserConfirmation().getConfirmToken().equals(token)) {
-            throw new InvalidConfirmationToken("유효하지 않는 토큰입니다.");
-        }
-        user.setEmailConfirmYn("Y");
-        userService.patchUser(user.getUserId(), user);
-
-        return "/user/confirm/success";
-    }
-
-    @PostMapping("/confirm/resend")
-    @ResponseBody
-    public ResponseEntity resendConfirmEmail(@AuthenticationPrincipal SessionUser sessionUser) {
-        String fail = "가입되지 않은 이메일입니다.";
-        User user;
-        try {
-            user = userService.getUserWithConfirmationByEmail(sessionUser.getEmail()).orElseThrow(() -> new UsernameNotFoundException(fail));
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.noContent().build();
-        }
-        userService.resendConfirmationEmail(user);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/findAccountForm")
-    public String getFindAccountForm(@AuthenticationPrincipal SessionUser sessionUser) {
-        if(sessionUser != null)
-            return redirectMainUrl;
-
-        return "/user/findAccountForm";
-    }
-
-    @PostMapping("/findAccount")
-    @ResponseBody
-    public ResponseEntity findAccount(@AuthenticationPrincipal SessionUser sessionUser,@RequestBody FindAccountForm findAccountForm) {
-        if(sessionUser != null)
-            return ResponseEntity.badRequest().build();
-
-        User user;
-
-        try {
-            user = userService.getUserByEmail(findAccountForm.getEmail());
-            if(!user.getName().equals(findAccountForm.getUserName()))
-                throw new UsernameNotFoundException("유저의 이름이 존재하지 않습니다.");
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.noContent().build();
-        }
-
-        try {
-            userService.sendChangePasswordEmail(user);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        return ResponseEntity.ok().build();
-    }
-
 
 }

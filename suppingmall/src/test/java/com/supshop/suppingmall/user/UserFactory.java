@@ -124,6 +124,11 @@ public class UserFactory {
     }
 
 
+    /**
+     * UserDetails를 상속한 SessionUser를 생성하기 위한 userDetailsService
+     * 테스트시, @WithSessionUser 사용시 해당 빈을 사용하여 유저를 생성함
+     * @return user
+     */
     @Bean(value = "userDetailsService")
     @Profile("test")
     public UserDetailsService userDetailsService() {
