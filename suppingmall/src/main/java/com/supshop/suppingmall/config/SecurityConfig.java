@@ -1,5 +1,6 @@
 package com.supshop.suppingmall.config;
 
+import com.supshop.suppingmall.common.CustomDeniedHandler;
 import com.supshop.suppingmall.common.LoginSuccessHandler;
 import com.supshop.suppingmall.user.CustomOAuth2UserService;
 import com.supshop.suppingmall.user.UserService;
@@ -28,6 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final PasswordEncoder passwordEncoder;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final LoginSuccessHandler loginSuccessHandler;
+    private final CustomDeniedHandler customDeniedHandler;
 
 
     private static final String resourcesPath = "/resources/**";
@@ -88,7 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .invalidateHttpSession(true).deleteCookies("JSESSIONID")
         .and()
             .exceptionHandling()
-                .accessDeniedPage(loginForm)
+                .accessDeniedHandler(customDeniedHandler)
         .and()
             .oauth2Login()
                 .successHandler(loginSuccessHandler)
@@ -117,14 +119,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.PUT,"/users/{id}/password").authenticated()
                 .mvcMatchers(HttpMethod.GET,"/users/{id}/signout").authenticated()
                 .mvcMatchers(HttpMethod.POST,"/users/{id}/signout").authenticated()
-                .mvcMatchers(HttpMethod.GET,"/users/seller/applyForm").hasAnyRole(USER)
-                .mvcMatchers(HttpMethod.POST,"/users/seller/{id}/apply").hasAnyRole(USER)
+                .mvcMatchers(HttpMethod.GET,"/users/seller/main").hasAnyRole(SELLER)
+                .mvcMatchers(HttpMethod.GET,"/users/seller/apply").hasAnyRole(USER)
+                .mvcMatchers(HttpMethod.POST,"/users/seller/apply").hasAnyRole(USER)
                 .mvcMatchers(HttpMethod.GET,"/users/seller/applicant").hasAnyRole(MASTER,ADMIN)
                 .mvcMatchers(HttpMethod.PATCH,"/users/seller/{id}/apply").hasAnyRole(MASTER,ADMIN)
-                .mvcMatchers(HttpMethod.GET,"/users/seller/{id}/transfer").hasAnyRole(SELLER)
-                .mvcMatchers(HttpMethod.PATCH,"/users/seller/{id}/transfer").hasAnyRole(SELLER)
-                .mvcMatchers(HttpMethod.GET,"/users/seller/main").hasAnyRole(SELLER)
-                .mvcMatchers(HttpMethod.GET,"/users/seller/{id}").hasAnyRole(MASTER,ADMIN,SELLER)
+                .mvcMatchers(HttpMethod.GET,"/users/seller/transfer").hasAnyRole(SELLER)
+                .mvcMatchers(HttpMethod.POST,"/users/seller/transfer").hasAnyRole(SELLER)
+//                .mvcMatchers(HttpMethod.GET,"/users/seller/{id}").hasAnyRole(MASTER,ADMIN,SELLER)
+                .mvcMatchers(HttpMethod.GET,"/users/seller/{id}/updateform").hasAnyRole(SELLER)
                 .mvcMatchers(HttpMethod.PATCH,"/users/seller/{id}").hasAnyRole(MASTER,ADMIN)
                 .mvcMatchers(HttpMethod.GET,"/users/seller").hasAnyRole(MASTER,ADMIN,SELLER)
                 .mvcMatchers(HttpMethod.GET,"/boards").permitAll()

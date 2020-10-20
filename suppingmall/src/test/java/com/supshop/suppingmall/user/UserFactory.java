@@ -39,7 +39,7 @@ public class UserFactory {
 
         User admin = buildUser(name);
         admin.setRole(Role.ADMIN);
-        userMapper.insertUser(admin);
+        userService.createUser(admin);
 
         return admin;
     }
@@ -47,21 +47,27 @@ public class UserFactory {
     public User createSeller(String name) {
 
         User seller = buildUser("seller");
+        String email = name+"@email.com";
 
-        StoreVO store = StoreVO.builder()
-                .storeName("섭프라이즈스토어")
-                .storePrivateNumber("000-000-000")
-                .storeAddress("서울시 중구 신당동 432")
-                .storeAddressDetail("서프라이즈빌딩 502호")
-                .storeZipCode("347532")
-                .storeApplyYn("N")
-                .build();
+        Optional<User> userByEmail = userMapper.findUserByEmail(email);
+        if(userByEmail.isPresent()) {
+            User user = userByEmail.get();
+            user.setCreatedDate(null);
+            return user;
+        }
 
+        StoreVO store = bulidStore();
+
+        seller.setRole(Role.SELLER);
         seller.setStoreVO(store);
 
-        userService.patchUser(seller.getUserId(), seller);
+
+        userService.createUser(seller);
+
         return seller;
     }
+
+
 
     public User createApplicant(String name) {
         name = "applicant";
@@ -72,14 +78,7 @@ public class UserFactory {
             user.setCreatedDate(null);
             return user;
         }
-        StoreVO store = StoreVO.builder()
-                .storeName("섭프라이즈스토어")
-                .storePrivateNumber("000-000-000")
-                .storeAddress("서울시 중구 신당동 432")
-                .storeAddressDetail("서프라이즈빌딩 502호")
-                .storeZipCode("347532")
-                .storeApplyYn("N")
-                .build();
+        StoreVO store = bulidStore();
 
         User user = buildUser(name);
         user.setStoreVO(store);
@@ -120,6 +119,17 @@ public class UserFactory {
                 .role(Role.getCodeString(Role.USER.getCode()))
                 .type(User.LoginType.getCodeString(User.LoginType.LOCAL.getCode()))
                 .storeVO(storeVO)
+                .build();
+    }
+
+    private StoreVO bulidStore() {
+        return StoreVO.builder()
+                .storeName("섭프라이즈스토어")
+                .storePrivateNumber("000-000-000")
+                .storeAddress("서울시 중구 신당동 432")
+                .storeAddressDetail("서프라이즈빌딩 502호")
+                .storeZipCode("347532")
+                .storeApplyYn("N")
                 .build();
     }
 

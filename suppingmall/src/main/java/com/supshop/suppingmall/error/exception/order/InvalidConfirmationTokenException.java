@@ -1,6 +1,8 @@
 package com.supshop.suppingmall.error.exception.order;
 
-public class InvalidConfirmationTokenException extends RuntimeException {
+import com.supshop.suppingmall.error.exception.BusinessException;
+
+public class InvalidConfirmationTokenException extends BusinessException {
 
     public InvalidConfirmationTokenException() {
         super();

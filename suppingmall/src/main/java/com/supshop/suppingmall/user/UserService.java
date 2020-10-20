@@ -37,11 +37,11 @@ public class UserService implements UserDetailsService {
 
     /**
      * 판매자 지원한 유저의 목록을 반환
-     * @param thirtyItemsCriteria
+     * @param criteria
      * @return 판매자 지원자 목록
      */
-    public List<User> getApplySellerUsers(ThirtyItemsCriteria thirtyItemsCriteria) {
-        return userMapper.findApplySeller(thirtyItemsCriteria);
+    public List<User> getApplySellerUsers(Criteria criteria, String type, String searchValue) {
+        return userMapper.findApplySeller(criteria,type,searchValue);
     }
 
 
@@ -213,5 +213,18 @@ public class UserService implements UserDetailsService {
             return Boolean.FALSE;
         }
         return Boolean.TRUE;
+    }
+
+    /**
+     * 해당 판매 지원자에게 판매자 권한 부여 및 Apply여부를 다시 N으로 변경
+     * @param id
+     */
+    public void grantSeller(Long id) {
+        User user = getUser(id);
+        StoreVO storeVO = user.getStoreVO();
+        storeVO.setStoreApplyYn("N");
+        user.setStoreVO(storeVO);
+        user.setRole(Role.SELLER);
+        this.patchUser(user.getUserId(), user);
     }
 }

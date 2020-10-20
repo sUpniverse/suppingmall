@@ -18,7 +18,7 @@ public interface UserMapper {
 
     Optional<User> findUserByEmail(String email);
 
-    List<User> findApplySeller(Criteria criteria);
+    List<User> findApplySeller(Criteria criteria, String type, String searchValue);
 
     List<User> selectAllStore(Criteria criteria, String type, String searchValue);
 
