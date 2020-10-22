@@ -1,11 +1,9 @@
 package com.supshop.suppingmall.board;
 
-import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryService;
 import com.supshop.suppingmall.image.ImageService;
 import com.supshop.suppingmall.mapper.BoardMapper;
 import com.supshop.suppingmall.page.Criteria;
-import com.supshop.suppingmall.page.ThirtyItemsCriteria;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,6 @@ import java.util.stream.Collectors;
 public class BoardService {
 
     private final BoardMapper boardMapper;
-    private final CategoryService categoryService;
     private final ImageService imageService;
 
     private static final String boardName = "board";
@@ -108,6 +105,8 @@ public class BoardService {
         boardMapper.delete(id);
     }
 
-
-
+    @Transactional
+    public void blindBoard(Long id) {
+        boardMapper.blind(id);
+    }
 }

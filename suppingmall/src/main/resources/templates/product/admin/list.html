@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <div th:include="fragments/header :: header" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dashboard.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}" />
+    <style>
+        ul{
+            list-style:none;
+            padding: unset;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="fragments/navigation-fix :: navigation-fix" />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 d-none d-md-block bg-light sidebar" th:if="${#strings.equals(#authentication.principal.role,'ADMIN') || #strings.equals(#authentication.principal.role,'MASTER')}">
+            <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
+        </div>
+        <div class="col-md-6 ml-sm-auto col-lg-10 p-5">
+            <div>
+                <div>
+                    <h2>판매상품 관리</h2>
+                    <a class="btn btn-outline-danger text-right" href="/products/form">물품등록</a>
+                </div>
+                <hr>
+                <table class="table table-default">
+                    <tr>
+                        <td class="table-secondary">
+                            검색분류
+                        </td>
+                        <td class="form-inline">
+                            <select class="form-control form-control-sm" id="type">
+                                <option th:text="상품명" selected></option>
+                            </select>
+                            <input class="form-control form-control-sm ml-3" id="searchValue" type="text">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="table-secondary">
+                            상품등록일
+                        </td>
+                        <td class="form-inline">
+                            <input type="date" id="fromDate" class="form-control form-control-sm">
+                            <span class="mx-sm-3">~</span>
+                            <input type="date" id="toDate" class="form-control form-control-sm">
+                        </td>
+                    </tr>
+                </table>
+                <div class="text-center">
+                    <a class="btn btn-primary" href="javascript:searchProduct()">검색</a>
+                </div>
+            </div>
+            <div class="mt-5">
+                <h3>판매목록</h3>
+                <span th:text="@{'등록된 상품 개수 : ' + ${count}}"></span>
+                <table class="table table-default mt-3 text-small">
+                    <thead class="table-secondary">
+                    <tr>
+                        <th>품번</th>
+                        <th>카테고리</th>
+                        <th>상품명</th>
+                        <th>옵션명</th>
+                        <th>판매자</th>
+                        <th>재고</th>
+                        <th>배송비</th>
+                        <th>등록일</th>
+                        <th>상태</th>
+                        <th>상태변경</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="product : ${products}" class="border-bottom">
+                        <td th:text="${product?.productId}"></td>
+                        <td th:text="${product?.category.name}"></td>
+                        <td>
+                            <a th:href="@{'/products/'+${product.productId}}" style="color: #333333" th:text="${product?.name}"></a>
+                        </td>
+                        <td>
+                            <div th:each="option : ${product?.options}">
+                                <span th:text="${option?.optionName}"></span>
+                            </div>
+                        </td>
+                        <td>
+                            <span th:text="${product.getSeller().getStoreVO().getStoreName()}"></span>
+                        </td>
+                        <td>
+                            <div th:each="option : ${product?.options}">
+                                <span th:text="${option?.quantity}"></span>
+                            </div>
+                        </td>
+                        <td th:text="${product?.deliveryPrice}"></td>
+                        <td th:text="${#temporals.format(product?.registeredDate,'yyyy-MM-dd')}"></td>
+                        <td><div th:id="${product.productId}+'_status'" th:text="${product?.status.title}"></div></td>
+                        <td>
+                            <div th:id="${product.productId}+'_statusButton'">
+                                <div th:if="${product.status.equals(product.status.WAIT) or product.status.equals(product.status.STOP)}">
+                                    <span><a class="btn btn-info btn-sm" href="#" th:href="'javascript:updateStatus('+${product.productId}+',\''+${product.status.SALE}+'\')'" th:text="${product.status.SALE.title}"></a></span>
+                                </div>
+                                <div th:class="mt-1" th:if="${product.status.equals(product.status.SALE)}">
+                                    <span><a class="btn btn-warning btn-sm" href="#" th:href="'javascript:updateStatus('+${product.productId}+',\''+${product.status.STOP}+'\')'" th:text="${product.status.STOP.title}"></a></span>
+                                </div>
+                                <div th:class="mt-1" th:unless="${product.status.equals(product.status.END)}">
+                                    <span><a class="btn btn-danger btn-sm" href="#" th:href="'javascript:updateStatus('+${product.productId}+',\''+${product.status.END}+'\')'" th:text="${product.status.END.title}"></a></span>
+                                </div>
+                                <div th:class="mt-1" th:if="${product.status.equals(product.status.END)}">
+                                    <span><a class="btn btn-danger btn-sm" href="#" th:href="'javascript:updateStatus('+${product.productId}+',\''+${product.status.DELETED}+'\')'" th:text="${product.status.DELETED.title}"></a></span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="container d-flex justify-content-center mb-3 text-small">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination mx-auto">
+                        <li class="page-item">
+                            <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/products/admin?page='+${pageMaker.startPage - 1}}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:classappend="${pageMaker.criteria.page} == ${idx} ? active">
+                            <a class="page-link" th:href="@{'/products/admin?page='+${idx}}" th:text="${idx}"></a>
+                        </li>
+                        <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">
+                            <a class="page-link" th:href="@{'/products/admin?page='+${pageMaker.endPage + 1}}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<footer th:include="fragments/footer :: footer" />
+</body>
+<script th:inline="javascript">
+
+
+
+    function searchProduct() {
+        var type = document.getElementById('type').value;
+        var searchValue = document.getElementById('searchValue').value;
+        var fromDate = document.getElementById('fromDate').value;
+        var toDate = document.getElementById('toDate').value;
+        $(location).attr('href','/product/seller?fromDate=' + fromDate + '&toDate=' + toDate + '&type='+type+'&searchValue='+searchValue);
+    }
+
+    var header = [[${_csrf.headerName}]];
+    var token = [[${_csrf.token}]];
+
+    function updateStatus(id,status) {
+        console.log("눌림");
+
+        $.ajax({
+            type: 'PATCH',
+            url: "/products/"+id+"/status/"+status,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Content-type","application/json");
+                xhr.setRequestHeader(header,token);
+            },
+            success: () => {
+                changeButton(id,status);
+            },
+            error: (response, error) => {
+                alert("Q&A수정에 실패했습니다.")
+            }
+        });
+    }
+
+    function changeButton(id,status) {
+        if(status === "STOP") {
+            document.getElementById(id+"_status").innerText = '판매중지';
+            document.getElementById(id+'_statusButton').innerHTML = '<div class="mt-1"><span><a class="btn btn-info btn-sm" href="javascript:updateStatus('+id+',\'SALE\')">판매중</a></span></div>' +
+                                                                    '<div class="mt-1"><span><a class="btn btn-danger btn-sm"  href="javascript:updateStatus('+id+',\'END\')">판매종료</a></span></div>'
+        } else if(status === "END") {
+            document.getElementById(id+"_status").innerText = '판매종료';
+            document.getElementById(id+'_statusButton').innerHTML = '<div class="mt-1"><span><a class="btn btn-danger btn-sm" href="javascript:updateStatus('+id+',\'DELETED\')">삭제</a></span></div>'
+        } else if(status === "SALE") {
+            document.getElementById(id+"_status").innerText = '판매중';
+            document.getElementById(id+'_statusButton').innerHTML = '<div class="mt-1"><span><a class="btn btn-warning btn-sm" href="javascript:updateStatus('+id+',\'STOP\')">판매중지</a></span></div>' +
+                                                                    '<div class="mt-1"><span><a class="btn btn-danger btn-sm" href="javascript:updateStatus('+id+',\'END\')">판매종료</a></span></div>'
+        } else if(status === "DELETED") {
+            document.getElementById(id+"_status").innerText = '물품삭제';
+            document.getElementById(id+'_statusButton').innerHTML = ''
+        }
+    }
+</script>
+</html>

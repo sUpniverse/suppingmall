@@ -83,6 +83,22 @@ public class OrderItemService {
         orderItemMapper.update(orderItem);
     }
 
+
+
+
+    public List<OrderItem> getOrderItems(LocalDate fromDate, LocalDate toDate, String type, String searchValue, TenItemsCriteria criteria) {
+        LocalDateTime formDateTime = getFormDateTime(fromDate);
+        LocalDateTime toDateTime = getToDateTime(toDate);
+
+        //code : orderStatus Value
+        String code = getCode(type, searchValue);
+
+        List<OrderItem> orderItemList = orderItemMapper.findAll(formDateTime, toDateTime, type,  code, criteria);
+        return orderItemList;
+    }
+
+
+
     /**
      * 구매자의 관점에서 주문을 조회
      * @param userId

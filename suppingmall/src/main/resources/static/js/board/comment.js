@@ -127,6 +127,9 @@ $(document).ready(function (){
                     '    </div>';
 
                 $("#comments").append(comment);
+                document.getElementById('comment-text').value = "";
+                var commentCount = document.getElementById('commentCount');
+                commentCount.value = commentCount.value + 1;
             },
             error: () => {
                 alert('댓글 생성오류');

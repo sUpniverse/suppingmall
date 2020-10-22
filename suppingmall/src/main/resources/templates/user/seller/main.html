@@ -70,11 +70,11 @@
         var userId = [[${#authentication.principal.userId}]];
 
         $(document).on('click','#update',() => {
-            window.location.replace('/users/seller/'+userId+'/updateForm');
+            window.location.replace('/users/seller/'+userId+'/updateform');
         })
 
         $(document).on('click','#transfer',() => {
-            window.location.replace('/users/seller/'+userId+'/transfer');
+            window.location.replace('/users/seller/transfer');
         })
 
     });

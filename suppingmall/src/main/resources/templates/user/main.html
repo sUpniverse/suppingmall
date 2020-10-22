@@ -67,7 +67,7 @@
             </div>
         </div>
         <div class="col-md-2">
-            여기도 광고?
+
         </div>
     </div>
 </div>
@@ -79,11 +79,11 @@
         var userId = [[${user.userId}]]
 
         $(document).on('click','#update',() => {
-            window.location.replace('/users/'+userId+'/updateform');
+            window.location.replace('/users/'+userId+'/form');
         })
 
         $(document).on('click','#passwordUpdate',() => {
-            window.location.replace('/users/'+userId+'/passwordform');
+            window.location.replace('/users/'+userId+'/password');
         })
 
         $(document).on('click','#signOut',() => {

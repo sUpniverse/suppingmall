@@ -30,6 +30,9 @@ public interface ProductMapper {
     // 판매순별로 물품조회
     List<Product> findAllOrderByOrdersQuantity();
 
+    // 판매순별로 물품조회
+    List<Product> findByRecommend();
+
     Product findOne(Long id);
     Product findOne(Long id, String category, String name, Product.ProductStatus status);
 

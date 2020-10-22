@@ -8,13 +8,14 @@ import com.supshop.suppingmall.comment.Comment;
 import com.supshop.suppingmall.comment.CommentService;
 import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.page.Criteria;
+import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.page.TenItemsCriteria;
 import com.supshop.suppingmall.page.ThirtyItemsCriteria;
-import com.supshop.suppingmall.page.PageMaker;
 import com.supshop.suppingmall.user.SessionUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -141,13 +142,17 @@ public class BoardController {
 
     @PostMapping("/{id}")
     public String deleteBoard(@PathVariable Long id, @AuthenticationPrincipal SessionUser sessionUser) {
-        log.debug("'deleteBoard'가 실행됨");
-
         Board board = boardService.getBoard(id);
         if(!UserUtils.isOwner(board.getCreator().getUserId(), sessionUser)) {
-            return "redirect:/boards";
+            throw new AccessDeniedException("권한이 없는 유저입니다.");
         }
         boardService.deleteBoard(id);
+        return "redirect:/boards";
+    }
+
+    @PostMapping("/{id}/blind")
+    public String blindBoard(@PathVariable Long id) {
+        boardService.blindBoard(id);
         return "redirect:/boards";
     }
 

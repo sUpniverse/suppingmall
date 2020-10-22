@@ -6,7 +6,7 @@
 </head>
 <body>
     <nav th:replace="fragments/navigation :: navigation" />
-    <div class="container-fluid my-5">
+    <div class="container-fluid p-5">
         <h3>회원관리</h3>
         <table class="table table-default text-small">
             <thead>
@@ -36,7 +36,7 @@
                 <td th:text="${user.addressDetail}" />
                 <td th:text="${user.zipCode}" />
                 <td th:text="${user.phoneNumber}" />
-                <td th:text="${user.createdDate}" />
+                <td th:text="${#temporals.format(user.createdDate,'yyyy-MM-dd')}" />
                 <td th:text="${user.role.title}" />
                 <td th:text="${user.delYn}" />
                 <td>
@@ -149,7 +149,7 @@
     });
 
     function getUpdateUserFom(userId) {
-        window.open("/users/"+userId+"/updateForm","_blank","width=500,height=600,left=500,top=100,menubar=no,toolbar=no,location=no");
+        window.open("/users/"+userId+"/form","_blank","width=500,height=600,left=500,top=100,menubar=no,toolbar=no,location=no");
     }
 </script>
 </html>

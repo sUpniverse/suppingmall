@@ -117,20 +117,25 @@ public class OrderController {
     @GetMapping("")
     public String getOrders(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
-                            @RequestParam(required = false) Orders.OrderStatus orderStatus,
-                            @AuthenticationPrincipal SessionUser user,
+                            @RequestParam(required = false) String type,
+                            @RequestParam(required = false) String status,
                             TenItemsCriteria criteria,
                             Model model) {
 
 
-        int count = orderService.findCount("seller", user.getUserId());
+        int count = orderItemService.getOrderItemCount(type,status,fromDate,toDate);
         PageMaker pageMaker = new PageMaker(count, orderDisplayPagingNum, criteria);
-        List<Orders> orders = orderService.getOrderList(fromDate,toDate,orderStatus,null);
-
-        model.addAttribute("orders",orders);
+        List<OrderItem> orderItemByCondition = orderItemService.getOrderItems(fromDate, toDate, type, status, criteria);
+        model.addAttribute("orderItemList",orderItemByCondition);
         model.addAttribute("pageMaker",pageMaker);
 
-        model.addAttribute("statusList", Arrays.asList(Orders.OrderStatus.ORDER,Orders.OrderStatus.DELIVERY,Orders.OrderStatus.COMPLETE,Orders.OrderStatus.CANCEL,Orders.OrderStatus.REFUND,Orders.OrderStatus.CHANGE));
+        model.addAttribute("fromDate",fromDate);
+        model.addAttribute("toDate",toDate);
+        model.addAttribute("type",type);
+        model.addAttribute("status",status);
+        model.addAttribute("orderStatusList", Arrays.stream(Orders.OrderStatus.values()).filter(orderStatus -> !orderStatus.equals(Orders.OrderStatus.WAIT)).toArray());
+        model.addAttribute("deliveryStatusList", Delivery.DeliveryStatus.mapValues);
+
         return "/order/admin/list";
     }
 
@@ -182,12 +187,12 @@ public class OrderController {
 
     @GetMapping("/seller/main")
     public String getOrderListBySellerId(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-                                                   @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
-                                                   @RequestParam(required = false) String type,
-                                                   @RequestParam(required = false) String status,
-                                                   @AuthenticationPrincipal SessionUser user,
-                                                   TenItemsCriteria criteria,
-                                                   Model model) {
+                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+                                         @RequestParam(required = false) String type,
+                                         @RequestParam(required = false) String status,
+                                         @AuthenticationPrincipal SessionUser user,
+                                         TenItemsCriteria criteria,
+                                         Model model) {
 
         int count = orderItemService.getOrderItemCountBySellerId(user.getUserId(),type,status,fromDate,toDate);
         PageMaker pageMaker = new PageMaker(count, orderDisplayPagingNum, criteria);

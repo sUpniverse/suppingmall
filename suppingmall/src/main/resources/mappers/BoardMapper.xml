@@ -229,6 +229,13 @@
         WHERE board_id = #{id};
     </delete>
 
+    <update id="blind" parameterType="com.supshop.suppingmall.board.Board">
+        UPDATE Board
+        SET
+        blind = 'Y'
+        WHERE board_id = #{id};
+    </update>
+
     <update id="updateBoardHit" parameterType="com.supshop.suppingmall.board.Board">
         UPDATE board
         SET

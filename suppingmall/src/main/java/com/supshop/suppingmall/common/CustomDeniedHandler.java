@@ -24,6 +24,7 @@ public class CustomDeniedHandler implements AccessDeniedHandler {
         response.setStatus(403);
         if(isJsonRequest(request)) {
             response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+            return;
         }
         request.getRequestDispatcher("/error/403").forward(request, response);
     }

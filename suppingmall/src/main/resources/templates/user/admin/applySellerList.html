@@ -4,9 +4,11 @@
     <div th:include="fragments/header :: header" />
     <link rel="stylesheet" type="text/css" th:href="@{/css/table.css}" />
 </head>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<meta name="_csrf" th:content="${_csrf.token}"/>
 <body>
     <nav th:replace="fragments/navigation :: navigation" />
-    <div class="container-fluid my-5">
+    <div class="container-fluid p-5">
         <h3 class="mb-5">회원관리</h3>
         <table class="table table-default text-small">
             <thead>
@@ -51,7 +53,9 @@
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
-                <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:if="${pageMaker.criteria.page.equals(idx) ? 'class = active': ''}"><a class="page-link" th:href="@{'/users/seller/apply?page='+${idx}}" th:text="${idx}"></a></li>
+                <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:classappend="${pageMaker.criteria.page.equals(idx) ? 'class = active': ''}">
+                    <a class="page-link" th:href="@{'/users/seller/apply?page='+${idx}}" th:text="${idx}" th:if="${idx} > 0"></a>
+                </li>
                 <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">
                     <a class="page-link" th:href="@{'/users/seller/apply?page='+${pageMaker.endPage + 1}}" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
@@ -84,8 +88,6 @@
 <footer th:replace="fragments/footer :: footer" />
 <script>
     $(document).ready(function() {
-        var header = [[${_csrf.headerName}]];
-        var token = [[${_csrf.token}]];
 
         $(document).on("click","#acceptButton",function(e,xhr,options) {
             var userId = e.target.parentElement.parentElement.firstElementChild.textContent;
@@ -100,10 +102,10 @@
                     xhr.setRequestHeader(header,token);
                 },
                 success: () => {
-                    e.target().remove();
+                    e.target.remove();
                 },
                 error: () => {
-
+                    alert("권한 부여 실패");
                 }
             });
 

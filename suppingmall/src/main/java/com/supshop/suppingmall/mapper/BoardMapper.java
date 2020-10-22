@@ -29,4 +29,5 @@ public interface BoardMapper {
 
     void updateBoardHit(Long id);
 
+    void blind(Long id);
 }

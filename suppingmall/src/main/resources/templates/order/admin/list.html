@@ -16,90 +16,99 @@
 <div th:replace="fragments/navigation-fix :: navigation-fix" />
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-2 d-none d-md-block bg-light sidebar" th:if="${#strings.equals(#authentication.principal.role,'SELLER')}">
-             <nav th:replace="user/user-left-bar :: user-left-bar" />
-        </div>
         <div class="col-md-2 d-none d-md-block bg-light sidebar" th:if="${#strings.equals(#authentication.principal.role,'ADMIN') || #strings.equals(#authentication.principal.role,'MASTER')}">
             <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
         </div>
-        <div class="col-md-6 ml-sm-auto col-lg-8 p-5 container">
-            <table class="d-flex p-3 my-3 bg-light rounded shadow-sm mt-5 border">
-                <tr>
-                    <td>
-                        <div class="row row-cols-3 ml-3">
-                            <input type="date" id="fromDate" class="form-control col">
-                            <span class="col">~</span>
-                            <input type="date" id="toDate" class="form-control col">
-                        </div>
-                    </td>
-                    <td>
-                        <select class="form-control ml-4" id="status">
-                            <option th:text="전체상태" value="" selected></option>
-                            <option th:each="status : ${statusList}" th:text="${status.title}" th:value="${status}"></option>
-                        </select>
-                    </td>
-                    <td>
-                        <a class="btn btn-success ml-5" href="javascript:search()">조회</a>
-                    </td>
-                </tr>
-            </table>
-            <ul class="mt-5">
-                <li th:each="order : ${orders}" class="row border-bottom mt-4 pb-4">
-                    <div class="col row">
-                        <a th:href="@{'/orders/'+${order.orderId}+'/seller'}">
-                            <img th:src="${order.orderItems[0].product.thumbnail}" style="width: 90px; height: 90px">
-                        </a>
-                        <div class="ml-3">
-                            <a th:href="@{'/orders/'+${order.orderId}+'/seller'}" style="text-decoration: none;">
-                                <span th:text="${order.orderItems[0].product.name}" class="text-dark" style="font-size: 16px"></span>
-                                <ul class="container row">
-                                    <li>
-                                        <span th:text="@{${#numbers.formatInteger(order.getAmountPrice(),3,'COMMA')}+'원'}" class="text-dark" style="font-size: 13px;"></span>
-                                    </li>
-                                    <li>
-                                        <span th:text="${#temporals.format(order.orderDate,'yyyy-MM-dd HH:mm')}" class="text-muted" style="font-size: 13px; display: inline-block; padding-left: 11px"></span>
-                                    </li>
-                                </ul>
-                                <div>
-                                    <span th:if="${not #strings.equals(order.status.title,'DELIVERY')}" th:text="${order.status.title}" class="text-dark" style="font-size: 16px"></span>
-                                    <span th:if="${#strings.equals(order.status.title,'DELIVERY')}" th:text="${order.delivery.status.title}" class="text-dark" style="font-size: 16px"></span>
-                                </div>
+        <div class="col-md-6 ml-sm-auto col-lg-8 p-5">
+            <div>
+                <table class="d-flex p-3 my-3 bg-light rounded shadow-sm mt-5 border">
+                    <tr>
+                        <td>
+                            <div class="row row-cols-3 ml-3">
+                                <input type="date" id="fromDate" class="form-control col">
+                                <span class="col">~</span>
+                                <input type="date" id="toDate" class="form-control col">
+                            </div>
+                        </td>
+                        <td>
+                            <select class="form-control ml-4" id="orderStatus">
+                                <option th:text="전체상태" value="" selected></option>
+                                <option th:each="orderStatus : ${orderStatusList}" th:text="${orderStatus.title}" th:value="${orderStatus}"></option>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-control ml-4" id="deliveryStatus">
+                                <option th:text="전체상태" value="" selected></option>
+                            </select>
+                        </td>
+                        <td>
+                            <a class="btn btn-success ml-5" href="javascript:search()">조회</a>
+                        </td>
+                    </tr>
+                </table>
+                <ul class="mt-5">
+                    <li th:each="orderItem : ${orderItemList}" class="row border-bottom m-4 pb-4">
+                        <div class="col row">
+                            <a th:href="@{'/orders/'+${orderItem.orders.orderId}}">
+                                <img th:src="${orderItem.product.thumbnail}" style="width: 90px; height: 90px">
                             </a>
+                            <div class="ml-3">
+                                <a th:href="@{'/orders/'+${orderItem.orders.orderId}}" style="text-decoration: none;">
+                                    <span th:text="${orderItem.product.name}" class="text-dark" style="font-size: 16px"></span>
+                                    <ul class="container row">
+                                        <li>
+                                            <span th:text="@{${#numbers.formatInteger(orderItem.price,3,'COMMA')}+'원'}" class="text-dark" style="font-size: 13px;"></span>
+                                        </li>
+                                        <li>
+                                            <span th:text="${#temporals.format(orderItem.orderedDate,'yyyy-MM-dd HH:mm')}" class="text-muted" style="font-size: 13px; display: inline-block; padding-left: 11px"></span>
+                                        </li>
+                                    </ul>
+                                    <div>
+                                        <span th:if="${not #strings.equals(orderItem.status,'DELIVERY')}" th:text="${orderItem.status.title}" class="text-dark" style="font-size: 16px"></span>
+                                        <span th:if="${#strings.equals(orderItem.status,'DELIVERY')}" th:text="${orderItem.delivery.status.title}" class="text-dark" style="font-size: 16px"></span>
+                                    </div>
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-auto text-center align-items-center">
-                        <span th:text="${order.buyer.name}"></span>
-                        <br>
-                        <span class="text-muted" th:text="@{'('+${order.buyer.phoneNumber}+')'}" style="font-size: 14px"></span>
-                    </div>
-                    <div class="col col-lg-2  d-flex align-items-center text-center">
-                        <div th:if="${#strings.equals(order.delivery?.status,'DELIVERY')}">
-                            <span th:text="${order.delivery.vendor.title}"></span>
-                            <span th:text="@{'('+${order.delivery.trackingNumber}+')'}"></span>
+                        <div class="col-md-auto text-center align-items-center">
+                            <span th:text="${orderItem.buyer.name}"></span>
+                            <br>
+                            <span class="text-muted" th:text="@{'('+${orderItem.buyer.phoneNumber}+')'}" style="font-size: 14px"></span>
                         </div>
-                        <a class="form-control" href="#" th:href="'javascript:getDeliveryForm('+${order.delivery.deliveryId}+')'" th:if="${#strings.equals(order.delivery.status,'WAIT')}">송장등록</a>
-                    </div>
-                </li>
-            </ul>
-<!--            <div class="container d-flex justify-content-center mb-3 text-small">-->
-<!--                <nav aria-label="Page navigation example">-->
-<!--                    <ul class="pagination mx-auto">-->
-<!--                        <li class="page-item">-->
-<!--                            <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/orders?page='+${pageMaker.startPage - 1}}" aria-label="Previous">-->
-<!--                                <span aria-hidden="true">&laquo;</span>-->
-<!--                            </a>-->
-<!--                        </li>-->
-<!--                        <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:classappend="${pageMaker.criteria.page} == ${idx} ? active">-->
-<!--                            <a class="page-link" th:href="@{'/orders?page='+${idx}}" th:text="${idx}"></a>-->
-<!--                        </li>-->
-<!--                        <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">-->
-<!--                            <a class="page-link" th:href="@{'/orders?page='+${pageMaker.endPage + 1}}" aria-label="Next">-->
-<!--                                <span aria-hidden="true">&raquo;</span>-->
-<!--                            </a>-->
-<!--                        </li>-->
-<!--                    </ul>-->
-<!--                </nav>-->
-<!--            </div>-->
+                        <div class="col col-lg-2 align-items-center text-center">
+                            <div th:if="${#strings.equals(orderItem.status,'DELIVERY') and #strings.equals(orderItem.delivery?.status,'DELIVERY')}">
+                                <span th:text="${orderItem.delivery.vendor.title}"></span>
+                                <span th:text="@{'('+${orderItem.delivery.trackingNumber}+')'}"></span>
+                            </div>
+                            <div th:if="${#strings.equals(orderItem.status,'ORDER')}">
+                                <a class="form-control" href="#" th:onclick="'checkTheOrder('+${orderItem.orderItemId}+'); return false;'" th:id="${orderItem.orderItemId}">주문확인</a>
+                            </div>
+                            <div th:if="${#strings.equals(orderItem.status,'DELIVERY') and #strings.equals(orderItem.delivery.status,'WAIT')}">
+                                <a class="form-control" href="#" th:onclick="'getDeliveryForm('+${orderItem.delivery.deliveryId}+'); return false;'">송장등록</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="container d-flex justify-content-center mb-3 text-small">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination mx-auto">
+                            <li class="page-item">
+                                <a class="page-link" th:if="${pageMaker.prev}" th:href="@{'/orders?page='+${pageMaker.startPage - 1}+'&fromData='+${fromDate != null ? fromDate :''}+'&toDate='+${toDate != null ? toDate:''}+'&type='+${type != null ? type:''}+'&status='+${status != null ? status:''}}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item" th:each="idx : ${#numbers.sequence(pageMaker.startPage,pageMaker.endPage)}" th:classappend="${pageMaker.criteria.page} == ${idx} ? active">
+                                <a class="page-link" th:href="@{'/orders?page='+${idx}+'&fromData='+${fromDate != null ? fromDate :''}+'&toDate='+${toDate != null ? toDate:''}+'&type='+${type != null ? type:''}+'&status='+${status != null ? status:''}} " th:text="${idx}"></a>
+                            </li>
+                            <li class="page-item" th:if="${pageMaker.next && pageMaker.endPage > 0}">
+                                <a class="page-link" th:href="@{'/orders?page='+${pageMaker.endPage + 1}+'&fromData='+${fromDate != null ? fromDate :''}+'&toDate='+${toDate != null ? toDate:''}+'&type='+${type != null ? type:''}+'&status='+${status != null ? status:''}}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
         </div>
         <div class="col-md-2">
 
@@ -108,17 +117,83 @@
 </div>
 </body>
 <footer th:replace="fragments/footer :: footer" />
-<script>
+<script th:inline="javascript">
+
+    $(document).ready(function (){
+        var deliveryStatusList = [[${deliveryStatusList}]];
+        $(document).on('change','#orderStatus',function (){
+            let value = document.getElementById('orderStatus').value;
+            if(value === 'DELIVERY') {
+                setDeliveryOption(deliveryStatusList);
+            } else {
+                let deliverySelect = document.getElementById('deliveryStatus');
+                while (deliverySelect.childNodes.length > 2) {
+                    deliverySelect.removeChild(deliverySelect.lastChild);
+                }
+            }
+        });
+
+    });
+
+    function setDeliveryOption(status) {
+        for(var key in status){
+            var option = document.createElement('option');
+            option.text = status[key];
+            option.value = key;
+            document.getElementById('deliveryStatus').appendChild(option);
+        }
+    }
 
     function search() {
         var fromDate = document.getElementById('fromDate').value;
         var toDate = document.getElementById('toDate').value;
-        var status = document.getElementById('status').value;
-        console.log(status);
-        $(location).attr('href','/orders?fromDate=' + fromDate + '&toDate=' + toDate +'&status=' + status);
+        var status;
+        var type;
+        var orderStatus = document.getElementById('orderStatus').value;
+
+        if(orderStatus === 'DELIVERY') {
+            type = "delivery"
+            status = document.getElementById('deliveryStatus').value;
+        } else if(orderStatus !== ''){
+            type = "order"
+            status = orderStatus;
+        } else {
+            type = '';
+            status = '';
+        }
+
+        $(location).attr('href','/orders?fromDate=' + fromDate + '&toDate=' + toDate +'&type='+type+'&status='+status);
     }
+
+    function checkTheOrder(orderItemId){
+
+        var header = [[${_csrf.headerName}]];
+        var token = [[${_csrf.token}]];
+
+
+        $.ajax({
+            type: 'POST',
+            url: '/orders/'+orderItemId+'/seller/status/check',
+            dataType: 'text',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Content-type","application/json");
+                xhr.setRequestHeader(header,token);
+            },
+            success: () => {
+                alert("주문확인 완료, 배송을 준비해 주세요");
+                window.location.reload();
+            },
+            error: (response, error) => {
+                alert("주문확인에 실패 했습니다. 다시 시도해주세요")
+            }
+        });
+
+        return;
+    }
+
     function getDeliveryForm(deliveryId) {
         window.open("/delivery/"+deliveryId+"/form","_blank","width=500,height=600,left=500,top=100,menubar=no,toolbar=no,location=no");
     }
+
 </script>
 </html>

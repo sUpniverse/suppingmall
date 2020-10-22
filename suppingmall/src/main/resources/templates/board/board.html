@@ -58,6 +58,7 @@
                     <div class="box-footer text-center py-3">
                         <button sec:authorize="isAuthenticated()"  th:if="${board.creator.userId.equals(#authentication.principal.userId)}" type="submit" class="btn btn-warning">수정</button>
                         <button sec:authorize="isAuthenticated()"     th:if="${board.creator.userId.equals(#authentication.principal.userId)}" type="submit" class="btn btn-danger">삭제</button>
+                        <button sec:authorize="isAuthenticated()"  type="submit" class="btn btn-secondary">블라인드</button>
                         <button type="submit" class="btn btn-primary">목록</button>
                     </div>
                 </div>
@@ -65,7 +66,7 @@
 
                 <!-- Comments List -->
                 <div class="mt-5">
-                    <div class="border-bottom border-gray pb-2 mb-3" th:text="@{'댓글 ['+${board.comments.size()}+']'}"></div>
+                    <div class="border-bottom border-gray pb-2 mb-3" id="commentCount" th:text="@{'댓글 ['+${board.comments.size()}+']'}"></div>
                     <div id="comments">
                         <!-- Single Comment -->
                         <div class="media pb-3" th:each="comment : ${board.comments}" th:data-no="${comment.commentId}">
@@ -148,10 +149,16 @@
             formObj.submit();
         });
 
+        $(document).on("click",".btn-secondary",function() {
+            formObj.attr("action","/boards/"+boardId)+"/blind";
+            formObj.submit();
+        });
+
         $(document).on("click",".btn-primary",function() {
             formObj.attr("action",'/boards?page='+pageNum+'&&categoryId='+categoryId+'&&type='+type+'&&searchValue='+searchValue);
             self.location ='/boards?page='+pageNum+'&&categoryId='+categoryId+'&&type='+type+'&&searchValue='+searchValue;
         });
+
     });
 </script>
 <script type="text/javascript" th:inline="javascript" th:src="@{/js/board/comment.js}"></script>

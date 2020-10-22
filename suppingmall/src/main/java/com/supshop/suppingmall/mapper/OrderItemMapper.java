@@ -18,7 +18,7 @@ public interface OrderItemMapper {
 
     OrderItem findOne(Long orderId);
 
-    List<OrderItem> findAll(LocalDateTime fromDate, LocalDateTime toDate, String searchValue, TenItemsCriteria criteria);
+    List<OrderItem> findAll(LocalDateTime fromDate, LocalDateTime toDate, String type, String searchValue, TenItemsCriteria criteria);
 
     List<OrderItem> findByBuyerId(Long userId, LocalDateTime fromDate, LocalDateTime toDate, String type, String searchValue, TenItemsCriteria criteria);
 

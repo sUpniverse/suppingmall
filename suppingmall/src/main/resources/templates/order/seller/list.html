@@ -16,9 +16,6 @@
 <div th:replace="fragments/navigation-fix :: navigation-fix" />
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-2 d-none d-md-block bg-light sidebar" th:if="${#strings.equals(#authentication.principal.role,'SELLER')}">
-             <nav th:replace="user/user-left-bar :: user-left-bar" />
-        </div>
         <div class="col-md-2 d-none d-md-block bg-light sidebar" th:if="${#strings.equals(#authentication.principal.role,'ADMIN') || #strings.equals(#authentication.principal.role,'MASTER')}">
             <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
         </div>

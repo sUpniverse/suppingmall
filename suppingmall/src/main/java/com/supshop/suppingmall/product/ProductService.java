@@ -27,6 +27,12 @@ public class ProductService {
     private static final int latestProductCount = 5;
     private static final int recommandProductCount = 8;
 
+    public int getProductsCount() {
+        return getProductsCount(null, null, null, null);
+    }
+    public int getProductsCount(Long categoryId,Long sellerId, String name, Product.ProductStatus status) {
+        return productMapper.findSaleProductCount(categoryId,sellerId,name,status);
+    }
 
     // 물품 + 물품상세정보 + 물품 옵션
     public List<Product> getProducts() {
@@ -58,16 +64,16 @@ public class ProductService {
     }
 
 
-    public int getProductsCount() {
-        return getProductsCount(null, null, null, null);
-    }
-    public int getProductsCount(Long categoryId,Long sellerId, String name, Product.ProductStatus status) {
-        return productMapper.findSaleProductCount(categoryId,sellerId,name,status);
-    }
+
 
     // 판매량이 가장 높은 순으로 검색
     public List<Product> getProductsOrderByOrdersQuantity() {
         return productMapper.findAllOrderByOrdersQuantity();
+    }
+
+    // 추천 물품
+    public List<Product> getRecommendProducts() {
+        return productMapper.findByRecommend();
     }
 
 

@@ -76,6 +76,7 @@ public class ProductController {
         model.addAttribute("productList",productService.getOnSaleProductsOnMenu(null, name, criteria));
         model.addAttribute("productPageMaker",new PageMaker(productsCount, productPagingCount, criteria));
         model.addAttribute("categories",categoryService.getCategoryToGrandChildren(productCategoryId));
+        model.addAttribute("recommends",productService.getRecommendProducts());
 
 
         return "/product/list";
@@ -118,11 +119,13 @@ public class ProductController {
         Category category = categoryService.getCategoryByEnName(categoryName);
         int productsCount = productService.getProductsCount(category.getId(), null, null, Product.ProductStatus.SALE);
 
+
+
         model.addAttribute("count",productsCount);
         model.addAttribute("productList",productService.getOnSaleProductsOnMenu(category.getId(), null, criteria));
         model.addAttribute("categoryId",category.getId());
         model.addAttribute("productPageMaker",new PageMaker(productsCount, productPagingCount, criteria));
-
+        model.addAttribute("recommends",productService.getRecommendProducts());
 
         return "/product/list";
     }
@@ -162,22 +165,30 @@ public class ProductController {
         return "/product/product";
     }
 
+    @GetMapping("/admin")
+    public String getProductsByAdmin(ThirtyItemsCriteria criteria,
+                                     Model model) {
+
+        int count = productService.getProductsCount();
+        List<Product> products = productService.getProducts(criteria);
+
+        PageMaker pageMaker = new PageMaker(count,productPagingCount,criteria);
+
+        model.addAttribute("count",count);
+        model.addAttribute("products",products);
+        model.addAttribute("pageMaker",pageMaker);
+
+        return "/product/admin/list";
+    }
+
 
     @GetMapping("/seller")
     public String getProductsBySeller(@AuthenticationPrincipal SessionUser user,
                                       ThirtyItemsCriteria criteria,
                                       Model model) {
 
-        int count = 0;
-        List<Product> products = null;
-        if(UserUtils.isSeller(user)){
-            count = productService.getProductsCount(null, user.getUserId(),null,null);
-            products = productService.getProductsBySeller(user.getUserId(),criteria);
-
-        } else if(UserUtils.isAdmin(user)) {
-            count = productService.getProductsCount();
-            products = productService.getProducts(criteria);
-        }
+        int count = count = productService.getProductsCount(null, user.getUserId(),null,null);
+        List<Product> products = products = productService.getProductsBySeller(user.getUserId(),criteria);
 
         PageMaker pageMaker = new PageMaker(count,productPagingCount,criteria);
 
@@ -386,6 +397,25 @@ public class ProductController {
         model.addAttribute("pageMaker",pageMaker);
 
         return "/product/seller/qna-list";
+    }
+
+    @GetMapping("/qna/admin")
+    public String getQnaList(@RequestParam(required = false) String type,
+                             @RequestParam(required = false) String searchValue,
+                             TenItemsCriteria criteria,
+                             Model model) {
+
+
+        List<QnA> qnaList = qnaService.getQnAList(criteria, type, searchValue);
+        int qnaCount = qnaService.getQnACount(type, searchValue);
+        PageMaker pageMaker = new PageMaker(qnaCount, 10, criteria);
+
+        model.addAttribute("type",type);
+        model.addAttribute("searchValue",searchValue);
+        model.addAttribute("qnaList",qnaList);
+        model.addAttribute("pageMaker",pageMaker);
+
+        return "/product/admin/qna-list";
     }
 
 

@@ -219,6 +219,7 @@ public class UserService implements UserDetailsService {
      * 해당 판매 지원자에게 판매자 권한 부여 및 Apply여부를 다시 N으로 변경
      * @param id
      */
+    @Transactional
     public void grantSeller(Long id) {
         User user = getUser(id);
         StoreVO storeVO = user.getStoreVO();

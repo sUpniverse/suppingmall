@@ -20,9 +20,6 @@
         <div class="col-md-2 d-none d-md-block bg-light sidebar" th:if="${#strings.equals(#authentication.principal.role,'SELLER')}">
             <nav th:replace="user/user-left-bar :: user-left-bar" />
         </div>
-        <div class="col-md-2 d-none d-md-block bg-light sidebar" th:if="${#strings.equals(#authentication.principal.role,'ADMIN') || #strings.equals(#authentication.principal.role,'MASTER')}">
-            <nav th:replace="user/admin/admin-left-bar :: admin-left-bar" />
-        </div>
         <div class="col-md-6 ml-sm-auto col-lg-10 p-5">
             <div>
                 <div>
@@ -36,11 +33,10 @@
                             검색분류
                         </td>
                         <td class="form-inline">
-                            <select class="form-control form-control-sm">
-                                <option th:text="카테고리" selected></option>
+                            <select class="form-control form-control-sm" id="type">
                                 <option th:text="상품명" selected></option>
                             </select>
-                            <input class="form-control form-control-sm ml-3" type="text">
+                            <input class="form-control form-control-sm ml-3" id="searchValue" type="text">
                         </td>
                     </tr>
                     <tr>
@@ -55,7 +51,7 @@
                     </tr>
                 </table>
                 <div class="text-center">
-                    <button class="btn btn-primary">검색</button>
+                    <a class="btn btn-primary" href="javascript:searchProduct()">검색</a>
                 </div>
             </div>
             <div class="mt-5">
@@ -145,17 +141,15 @@
 </body>
 <script th:inline="javascript">
 
-    $(document).ready(function () {
 
 
-        function search() {
-            var fromDate = document.getElementById('fromDate').value;
-            var toDate = document.getElementById('toDate').value;
-            var status = document.getElementById('status').value;
-            $(location).attr('href','/orders/main?fromDate=' + fromDate + '&toDate=' + toDate + '&type=order&status=' + status);
-        }
-
-    });
+    function searchProduct() {
+        var type = document.getElementById('type').value;
+        var searchValue = document.getElementById('searchValue').value;
+        var fromDate = document.getElementById('fromDate').value;
+        var toDate = document.getElementById('toDate').value;
+        $(location).attr('href','/product/seller?fromDate=' + fromDate + '&toDate=' + toDate + '&type='+type+'&searchValue='+searchValue);
+    }
 
     var header = [[${_csrf.headerName}]];
     var token = [[${_csrf.token}]];
@@ -171,7 +165,7 @@
                 xhr.setRequestHeader(header,token);
             },
             success: () => {
-                chagneButton(id,status);
+                changeButton(id,status);
             },
             error: (response, error) => {
                 alert("Q&A수정에 실패했습니다.")
@@ -179,7 +173,7 @@
         });
     }
 
-    function chagneButton(id,status) {
+    function changeButton(id,status) {
         if(status === "STOP") {
             document.getElementById(id+"_status").innerText = '판매중지';
             document.getElementById(id+'_statusButton').innerHTML = '<div class="mt-1"><span><a class="btn btn-info btn-sm" href="javascript:updateStatus('+id+',\'SALE\')">판매중</a></span></div>' +

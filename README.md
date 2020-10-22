@@ -1,6 +1,6 @@
 # SuppingMall (섭핑몰)
 
-IT 커뮤니티 + IT 쇼핑몰을 결합한, IT기기를 좋아하는 SUP의 소망을 담은 SuppingMall 입니다.
+IT 커뮤니티 + IT 쇼핑몰을 및 IT기기를 좋아하는 SUP의 IT기기를 Surf 하다라는 뜻을 담은 SuppingMall 입니다.
 
 IT기기에 대한 관심을 가지고 있는 커뮤니티 유저들과 그 커뮤니티 사이트에 쇼핑몰을 함께 담아
 

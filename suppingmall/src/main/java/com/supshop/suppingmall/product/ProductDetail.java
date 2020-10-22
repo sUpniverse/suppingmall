@@ -22,7 +22,8 @@ public class ProductDetail {
     @Pattern(regexp = phoneReg)
     private String asNumber;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate manuplatedDate;
+    private LocalDate manufacturedDate;
+
 
     private String manufacturer;
     private String origin;
@@ -32,5 +33,6 @@ public class ProductDetail {
     private String spec4;
     private String spec5;
     private String spec6;
+    private String recommend;
 
 }

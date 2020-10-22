@@ -137,6 +137,66 @@
         </div>
     </div>
 </div>
-
 </body>
+<script type="text/javascript" th:inline="javascript">
+
+    $(document).on("click",'.replyButton',function (event){
+        let button = event.target;
+        var qnaId = button.parentNode.parentElement.getAttribute('data-rno');
+        var replyTitle = button.parentNode.parentElement.getElementsByClassName('replyTitle')[0].value;
+
+        createReply(qnaId,replyTitle);
+    });
+
+    function createReply(qnaId,replyTitle){
+        let sellerId = [[${qnaList.get(0).product.seller.userId}]];
+
+        var header = [[${_csrf.headerName}]];
+        var token = [[${_csrf.token}]];
+
+        var reply = {
+            "userId" : sellerId,
+            "title" : replyTitle
+        }
+
+        $.ajax({
+            url: "/products/qna/"+qnaId+"/reply",
+            type: 'POST',
+            contentType: 'application/json',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Content-type","application/json");
+                xhr.setRequestHeader(header,token);
+            },
+            data : JSON.stringify(reply),
+            success: ()=> {
+                alert("답변 작성완료");
+                setReply(replyTitle,qnaId);
+            },
+            error: ()=> {
+                alert("답변 작성실패");
+            }
+        });
+
+    }
+
+    function setReply(title,qnaId) {
+
+        var str = "";
+
+        str +=
+            '             <div class="cell replyYn text-center">\n' +
+            '                  <svg width="3em" height="3em" viewBox="0 0 16 16" class="bi bi-info-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">\n' +
+            '                       <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>\n' +
+            '                       <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>\n' +
+            '                       <circle cx="8" cy="4.5" r="1"/>\n' +
+            '                   </svg>\n' +
+            '              </div>\n' +
+            '              <div class="cell qnaTitle">'+title+'</div>\n' +
+            '              <div class="cell creator">판매자</div>\n' +
+            '             <div class="cell createdDate">'+new Date()+'</div>';
+
+        document.getElementById('qna-'+qnaId).children[1].innerHTML = str;
+
+    }
+</script>
 </html>
