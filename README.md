@@ -32,9 +32,9 @@ IT기기에 대한 관심을 가지고 있는 커뮤니티 유저들과 그 커�
 
 ## 프로젝트 구성
 
-- [요구사항](https://github.com/sUpniverse/suppingmall/wiki/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD)
-- [설계](https://github.com/sUpniverse/suppingmall/wiki/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD)
-- 구현
+- [요구사항](https://github.com/sUpniverse/suppingmall/wiki/요구사항)
+- [설계](https://github.com/sUpniverse/suppingmall/wiki/설계)
+- [구현](https://github.com/sUpniverse/suppingmall/wiki/구현)
 - 테스트
 - 자세한 내용은 [위키](https://github.com/sUpniverse/suppingmall/wiki)를 통해 확인하실 수 있습니다.
 
