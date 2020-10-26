@@ -30,7 +30,7 @@ public class CategoryServiceTest {
         List<Category> originCategories = categoryService.getCategories();
 
         //when
-        Long categoryId = categoryService.saveCategory(category);
+        Long categoryId = categoryService.createCategory(category);
         Category newCategory = categoryService.getCategory(categoryId);
         List<Category> categories = categoryService.getCategories();
 

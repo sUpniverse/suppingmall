@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.io.FileNotFoundException;
+
 @Component
 @ActiveProfiles("test")
 public class ReviewFactory {
@@ -16,7 +18,7 @@ public class ReviewFactory {
     @Autowired private ProductFactory productFactory;
     @Autowired private ReviewService reviewService;
 
-    public Review buildReview(String userName) {
+    public Review buildReview(String userName) throws FileNotFoundException {
         User user = userFactory.createUser("user");
         User seller = userFactory.createSeller("seller");
         Product product = productFactory.createProduct("맥북", seller);
@@ -29,7 +31,7 @@ public class ReviewFactory {
         return review;
     }
 
-    public Review createReview(String userName){
+    public Review createReview(String userName) throws FileNotFoundException {
         User user = userFactory.createUser(userName);
         User seller = userFactory.createSeller("seller");
         Product product = productFactory.createProduct("맥북", seller);

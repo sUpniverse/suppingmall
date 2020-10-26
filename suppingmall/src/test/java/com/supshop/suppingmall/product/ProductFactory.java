@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +71,7 @@ public class ProductFactory {
         return product;
     }
 
-    public Product createProduct(String productName,User seller) {
+    public Product createProduct(String productName,User seller) throws FileNotFoundException {
 
         Product product = buildProduct(productName, seller);
         productService.createProduct(product, null);
@@ -78,7 +79,7 @@ public class ProductFactory {
         return product;
     }
 
-    public QnA createQna() {
+    public QnA createQna() throws FileNotFoundException {
 
         User kevin = userFactory.createUser("kevin");
         User seller = userFactory.createSeller("seller");

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class OrderFactory {
     @Autowired private ProductFactory productFactory;
 
 
-    private Product setUpTest(String productName) {
+    private Product setUpTest(String productName) throws FileNotFoundException {
         User seller = userFactory.createSeller("seller");
         seller.setCreatedDate(null);
 
@@ -41,7 +42,7 @@ public class OrderFactory {
 
 
     // 임시주문을 위한 form을 return, 구매할 물품들의 정보와 갯수 가격등을 포함함 , 물품 페이지에서 단일 물품을 구매할 때
-    public List<TempOrderForm> buildTempOrderForm(User user){
+    public List<TempOrderForm> buildTempOrderForm(User user) throws FileNotFoundException {
         List<TempOrderForm> tempOrderFormList = new ArrayList<>();
 
         Product product = setUpTest("notebook");
@@ -71,7 +72,7 @@ public class OrderFactory {
     }
 
     // 임시주문을 위한 form을 return, 구매할 물품들의 정보와 갯수 가격등을 포함함 , 물품 페이지에서 다중 물품을 구매할 때
-    public TempOrderForm buildTempOrderFormWithMoreThanTwoProduct(User user){
+    public TempOrderForm buildTempOrderFormWithMoreThanTwoProduct(User user) throws FileNotFoundException {
         Product product = setUpTest("notebook");
         Product product2 = setUpTest("tablet");
 
@@ -107,7 +108,7 @@ public class OrderFactory {
 
 
     //임시주문을 가져와 배송정보와 결제정보등을 담은 form 상태 반환함
-    public OrderForm buildOrderForm() {
+    public OrderForm buildOrderForm() throws FileNotFoundException {
 
         // 임시상품정보
         User user = userFactory.createUser("tester");
@@ -129,7 +130,7 @@ public class OrderFactory {
     }
 
     //임시주문을 가져와 배송정보와 결제정보등을 담은 form 상태 반환함
-    public Orders createTempOrder() {
+    public Orders createTempOrder() throws FileNotFoundException {
 
         // 임시상품정보
         User user = userFactory.createUser("tester");

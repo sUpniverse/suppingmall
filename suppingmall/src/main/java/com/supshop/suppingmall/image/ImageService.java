@@ -65,9 +65,9 @@ public class ImageService {
 
     // 받은 url을 통해 그림을 Storage에 저장 /{board or product}/{boardId}/fileName
     @Transactional
-    public boolean saveInStorage(Set<String> pathUrls, String path, Long Id, String directory){
+    public boolean saveInStorage(Set<String> urls, String path, Long Id, String directory){
         try {
-            for(String url : pathUrls) {
+            for(String url : urls) {
                 String fileName = url.replace(path, "");
                 storage.create(BlobInfo.newBuilder(storageBucketName,directory+File.separator+Id+File.separator+fileName)
                         .build(),

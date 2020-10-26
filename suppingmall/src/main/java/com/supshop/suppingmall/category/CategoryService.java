@@ -43,7 +43,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public Long saveCategory(Category category) {
+    public Long createCategory(Category category) {
         categoryMapper.save(category);
         return category.getId();
     }

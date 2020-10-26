@@ -49,7 +49,7 @@ public class CategoryControllerTest {
         Category category = categoryFactory.createCategory("청소기");
 
         //when
-        Long categoryId = categoryService.saveCategory(category);
+        Long categoryId = categoryService.createCategory(category);
         Category newCategory = categoryService.getCategory(categoryId);
 
         //then

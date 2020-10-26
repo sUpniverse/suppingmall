@@ -21,7 +21,7 @@ public class CategoryFactory {
                                     .enName(categoryName)
                                     .memo("좋아요!!"+categoryName)
                                     .build();
-        categoryService.saveCategory(category);
+        categoryService.createCategory(category);
         return category;
     }
 }

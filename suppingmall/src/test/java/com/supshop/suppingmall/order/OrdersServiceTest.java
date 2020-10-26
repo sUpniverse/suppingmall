@@ -17,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,7 +59,7 @@ public class OrdersServiceTest {
 
     //임시 주문 생성 테스트
     @Test
-    public void createTempOrder(){
+    public void createTempOrder() throws FileNotFoundException {
         //given
         int size = orderService.getOrderList(null, null, null, null).size();
         User tester = userFactory.createUser("tester");

@@ -43,7 +43,7 @@ public class CategoryController {
     @PostMapping("")
     @ResponseBody
     public ResponseEntity createCategory(@RequestBody Category category) {
-        Long categoryId = categoryService.saveCategory(category);
+        Long categoryId = categoryService.createCategory(category);
         URI uri = linkTo(CategoryController.class).slash(categoryId).toUri();
         return ResponseEntity.created(uri).build();
     }

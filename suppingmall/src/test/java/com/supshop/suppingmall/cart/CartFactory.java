@@ -9,6 +9,7 @@ import com.supshop.suppingmall.user.UserFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class CartFactory {
         return cartItemList;
     }
 
-    public CartForm buildCartForm(){
+    public CartForm buildCartForm() throws FileNotFoundException {
         User buyer = userFactory.createUser("buyer");
         User seller = userFactory.createSeller("seller");
         Product product = productFactory.createProduct("macbookPro",seller);
@@ -49,7 +50,7 @@ public class CartFactory {
         return cartForm;
     }
 
-    public Cart createCart(){
+    public Cart createCart() throws FileNotFoundException {
         CartForm cartForm = buildCartForm();
         Cart cart = cartService.save(cartForm);
         return cart;
