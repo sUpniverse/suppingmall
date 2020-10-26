@@ -27,15 +27,15 @@
                 <div class="col-12">
                     <ol class="breadcrumb mb-0 font-size-xs">
                         <li class="breadcrumb-item">
-                            <a th:href="'/products/category/'+${product.category.parent.parent.id}" th:text="${product?.category.parent.parent.name}">
+                            <a href="#" th:text="${product?.category.parent.parent.name}">
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a th:href="'/products/category/'+${product.category.parent.id}" th:text="${product?.category.parent.name}">
+                            <a href="#" th:text="${product?.category.parent.name}">
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a th:href="'/products/category/'+${product.category.id}" th:text="${product?.category.name}">
+                            <a th:href="'/products/category/'+${product.category.enName}" th:text="${product?.category.name}">
                             </a>
                         </li>
                     </ol>

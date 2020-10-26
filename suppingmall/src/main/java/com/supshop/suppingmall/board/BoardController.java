@@ -6,6 +6,7 @@ import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryService;
 import com.supshop.suppingmall.comment.Comment;
 import com.supshop.suppingmall.comment.CommentService;
+import com.supshop.suppingmall.common.Search;
 import com.supshop.suppingmall.common.UserUtils;
 import com.supshop.suppingmall.page.Criteria;
 import com.supshop.suppingmall.page.PageMaker;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 @Slf4j
@@ -48,24 +50,22 @@ public class BoardController {
     @GetMapping("")
     public String getAllBoard(Model model,
                               ThirtyItemsCriteria thirtyItemsCriteria,
-                              @RequestParam(required = false, defaultValue = "farm") String categoryName,
-                              @RequestParam(required = false) String type,
-                              @RequestParam(required = false) String searchValue) {
+                              Search search,
+                              @RequestParam(required = false, defaultValue = "farm") String categoryName){
 
         log.debug("'getAllBoard'가 실행됨");
         Category category = categoryService.getCategoryByEnName(categoryName);
 
-        Long categoryId = category.getId();
-        int boardCount = boardService.getBoardCountByCategoryId(categoryId, type, searchValue);
-        List<Board> boards = boardService.getBoardsByCategoryId(thirtyItemsCriteria, categoryId, type, searchValue);
+        int boardCount = boardService.getBoardCountByCategoryId(category.getId(), search);
+        List<Board> boards = boardService.getBoardsByCategoryId(thirtyItemsCriteria, category.getId(), search);
         PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum, thirtyItemsCriteria);
 
         model.addAttribute("boardList",boards);
         model.addAttribute("boardPageMaker", pageMaker);
 
         model.addAttribute("category", category);
-        model.addAttribute("type", type);
-        model.addAttribute("searchValue", searchValue);
+        model.addAttribute("type", search.getType());
+        model.addAttribute("searchValue", search.getSearchValue());
         model.addAttribute("pageNum", thirtyItemsCriteria.getPage());
 
         return "/board/list";
@@ -76,8 +76,7 @@ public class BoardController {
                            ThirtyItemsCriteria thirtyItemsCriteria,
                            Model model,
                            @RequestParam(required = false) Long categoryId,
-                           @RequestParam(required = false) @ModelAttribute String type,
-                           @RequestParam(required = false) @ModelAttribute String searchValue) {
+                           Search search) {
         log.debug("'getBoard'가 실행됨");
 
         Board board = boardService.getBoard(id);
@@ -86,11 +85,11 @@ public class BoardController {
         }
         if(categoryId == null) categoryId = board.getCategory().getId();
 
-        List<Board> boards = boardService.getBoardsByCategoryId(thirtyItemsCriteria, board.getCategory().getId(), type, searchValue);
-        int boardCount = boardService.getBoardCountByCategoryId(categoryId, type, searchValue);
+        List<Board> boards = boardService.getBoardsByCategoryId(thirtyItemsCriteria, board.getCategory().getId(), search);
+        int boardCount = boardService.getBoardCountByCategoryId(categoryId, search);
         PageMaker pageMaker = new PageMaker(boardCount,boardDisplayPagingNum, thirtyItemsCriteria);
 
-        int commentCount = commentService.getCommentCountByBoardId(id,null,null);
+        int commentCount = commentService.getCommentCountByBoardId(id,null);
         Criteria criteria = new TenItemsCriteria();
         PageMaker commentPageMaker = new PageMaker(commentCount,boardDisplayPagingNum,criteria);
 
@@ -106,7 +105,7 @@ public class BoardController {
     }
 
     @PostMapping("")
-    public String createBoard(BoardCreateForm createForm, @AuthenticationPrincipal SessionUser sessionUser) {
+    public String createBoard(BoardCreateForm createForm, @AuthenticationPrincipal SessionUser sessionUser) throws FileNotFoundException {
         log.debug("'createBoard'가 실행됨");
 
         if(!UserUtils.isOwner(createForm.getCreator().getUserId(), sessionUser)) return "redirect:/boards";
@@ -158,8 +157,7 @@ public class BoardController {
 
     @GetMapping("/main")
     public String getMyBoard(@RequestParam(required = false) String category,
-                             @RequestParam(required = false) String type,
-                             @RequestParam(required = false) String searchValue,
+                             Search search,
                              TenItemsCriteria criteria,
                              @AuthenticationPrincipal SessionUser sessionUser,
                              Model model){
@@ -169,14 +167,14 @@ public class BoardController {
             category = "boards";
 
         if("boards".equals(category)) {
-            int boardCount = boardService.getBoardCountByUserId(sessionUser.getUserId(), type, searchValue);
-            List<Board> boardList = boardService.getBoardByUserId(criteria, sessionUser.getUserId(), type, searchValue);
+            int boardCount = boardService.getBoardCountByUserId(sessionUser.getUserId(), search);
+            List<Board> boardList = boardService.getBoardByUserId(criteria, sessionUser.getUserId(), search);
             pageMaker = new PageMaker(boardCount,boardDisplayPagingNum, criteria);
 
             model.addAttribute("boardList",boardList);
         } else if("comments".equals(category)){
-            int commentCount = commentService.getCommentCountByUserId(sessionUser.getUserId(), type, searchValue);
-            List<Comment> commentList = commentService.getCommentsByUserId(sessionUser.getUserId(), criteria, type, searchValue);
+            int commentCount = commentService.getCommentCountByUserId(sessionUser.getUserId(), search);
+            List<Comment> commentList = commentService.getCommentsByUserId(sessionUser.getUserId(), criteria, search);
             pageMaker = new PageMaker(commentCount, boardDisplayPagingNum, criteria);
 
             model.addAttribute("commentList",commentList);
@@ -185,8 +183,8 @@ public class BoardController {
         }
 
         model.addAttribute("category",category);
-        model.addAttribute("type",type);
-        model.addAttribute("searchValue",searchValue);
+        model.addAttribute("type",search.getType());
+        model.addAttribute("searchValue",search.getSearchValue());
         model.addAttribute("pageMaker", pageMaker);
         model.addAttribute("pageNum", criteria.getPage());
 

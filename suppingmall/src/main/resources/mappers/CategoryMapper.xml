@@ -16,6 +16,7 @@
             <association property="parent" javaType="com.supshop.suppingmall.category.Category">
                 <id property="id" column="GrandParentCategoryId" />
                 <result property="name" column="GrandParentCategoryName" />
+                <result property="enName" column="GrandParentCategoryEnName" />
                 <result property="memo" column="GrandParentCategoryMemo" />
             </association>
         </association>
@@ -27,6 +28,7 @@
             <collection property="child" ofType="com.supshop.suppingmall.category.Category">
                 <id property="id" column="GrandChildrenCategoryId" />
                 <result property="name" column="GrandChildrenCategoryName" />
+                <result property="enName" column="GrandChildrenCategoryEnName" />
                 <result property="memo" column="GrandChildrenCategoryMemo" />
             </collection>
         </collection>
@@ -41,9 +43,9 @@
     </resultMap>
 
     <select id="findAll" resultMap="Category">
-        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName",  C.memo AS "CategoryMemo",
-        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName",
-        GCH.category_id AS "GrandChildrenCategoryId", GCH.name AS "GrandChildrenCategoryName"
+        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName", C.en_name AS "CategoryEnName",  C.memo AS "CategoryMemo",
+        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName", CH.en_name AS "ChildCategoryEnName",
+        GCH.category_id AS "GrandChildrenCategoryId", GCH.name AS "GrandChildrenCategoryName", GCH.en_name AS "GrandChildCategoryEnName"
         FROM category AS C
         LEFT OUTER JOIN category AS CH on (C.category_id = CH.parent_id)
         LEFT OUTER JOIN category AS GCH on (CH.category_id = GCH.parent_id)
@@ -51,8 +53,8 @@
     </select>
 
     <select id="findAllByTop" resultMap="Category">
-        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName", C.memo AS "CategoryMemo",
-        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName",
+        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName", C.en_name AS "CategoryEnName", C.memo AS "CategoryMemo",
+        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName", CH.en_name AS "ChildCategoryEnName",
         GCH.category_id AS "GrandChildrenCategoryId", GCH.name AS "GrandChildrenCategoryName"
         FROM category AS C
         LEFT OUTER JOIN category AS CH on (C.category_id = CH.parent_id)
@@ -62,9 +64,9 @@
     </select>
 
     <select id="findGrandParentByGrandChildren" resultMap="Category">
-        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName", C.memo AS "CategoryMemo",
-        PC.category_id AS "ParentCategoryId", PC.name AS "ParentCategoryName", PC.memo AS "ParentCategoryMemo",
-        GPC.category_id AS "GrandParentCategoryId", GPC.name AS "GrandParentCategoryName", GPC.memo AS "GrandParentCategoryMemo"
+        SELECT C.category_id AS "CategoryId", C.name AS "CategoryName", C.en_name AS "CategoryEnName", C.memo AS "CategoryMemo",
+        PC.category_id AS "ParentCategoryId", PC.name AS "ParentCategoryName", PC.en_name AS "ParentCategoryEnName", PC.memo AS "ParentCategoryMemo",
+        GPC.category_id AS "GrandParentCategoryId", GPC.name AS "GrandParentCategoryName", GPC.en_name AS "GrandParentCategoryEnName", GPC.memo AS "GrandParentCategoryMemo"
         FROM category AS C
         LEFT OUTER JOIN category AS PC on (C.parent_id = PC.category_id)
         LEFT OUTER JOIN category AS GPC on (PC.parent_id = GPC.category_id)
@@ -82,7 +84,7 @@
     <select id="findOneToGrandChildren" resultMap="Category">
         SELECT C.category_id AS "CategoryId", C.name AS "CategoryName",  C.memo AS "CategoryMemo", C.en_name AS "CategoryEnName",
         CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName", CH.en_name AS "ChildCategoryEnName",
-        GCH.category_id AS "GrandChildrenCategoryId", GCH.name AS "GrandChildrenCategoryName"
+        GCH.category_id AS "GrandChildrenCategoryId", GCH.name AS "GrandChildrenCategoryName", GCH.en_name AS "GrandChildCategoryEnName"
         FROM category AS C
         LEFT OUTER JOIN category AS CH on (C.category_id = CH.parent_id)
         LEFT OUTER JOIN category AS GCH on (CH.category_id = GCH.parent_id)
@@ -91,7 +93,7 @@
 
     <select id="findOneByEnName" resultMap="Category">
         SELECT C.category_id AS "CategoryId", C.name AS "CategoryName",  C.memo AS "CategoryMemo", C.en_name AS "CategoryEnName",
-        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName"
+        CH.category_id AS "ChildCategoryId", CH.name AS "ChildCategoryName", CH.en_name AS "ChildCategoryEnName"
         FROM category AS C
         LEFT OUTER JOIN category AS CH on (C.category_id = CH.parent_id)
         WHERE C.en_name = #{enName}

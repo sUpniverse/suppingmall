@@ -24,6 +24,7 @@ public class Board {
     private Category category;
     private int hit;
     private String delYn;
+    private String blindYn;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 

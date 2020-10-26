@@ -4,8 +4,10 @@ import com.supshop.suppingmall.board.Board;
 import com.supshop.suppingmall.board.BoardService;
 import com.supshop.suppingmall.category.Category;
 import com.supshop.suppingmall.category.CategoryService;
+import com.supshop.suppingmall.common.Search;
 import com.supshop.suppingmall.page.Criteria;
 import com.supshop.suppingmall.page.EightItemsCriteria;
+import com.supshop.suppingmall.product.ProductSearch;
 import com.supshop.suppingmall.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -27,25 +29,25 @@ public class MainController {
     @RequestMapping("")
     public String mainPage(Model model){
 
-        Criteria productCriteria = new EightItemsCriteria();
-        model.addAttribute("latestComputerList",productService.getOnSaleProductsByParentCategoryOnMenu(4l,productCriteria));
-        model.addAttribute("latestMobileList",productService.getOnSaleProductsByParentCategoryOnMenu(5l,productCriteria));
+        Criteria criteria = new EightItemsCriteria();
+        model.addAttribute("latestComputerList",productService.getOnSaleProductsByParentCategoryOnMenu(4l,null,criteria));
+        model.addAttribute("latestMobileList",productService.getOnSaleProductsByParentCategoryOnMenu(5l,null,criteria));
 
 
 
         Category it = categoryService.getCategoryByEnName("it-news");
-        List<Board> newBoards = boardService.getBoardsByCategoryId(productCriteria, it.getId(), null, null);
+        List<Board> newBoards = boardService.getBoardsByCategoryId(criteria, it.getId(), null);
         Category now = categoryService.getCategoryByEnName("now-how");
-        List<Board> nowhowBoards = boardService.getBoardsByCategoryId(productCriteria, now.getId(), null, null);
+        List<Board> nowhowBoards = boardService.getBoardsByCategoryId(criteria, now.getId(), null);
 
         Category apple = categoryService.getCategoryByEnName("appleFarm");
-        List<Board> appleBoards = boardService.getBoardsByCategoryId(productCriteria, apple.getId(), null, null);
+        List<Board> appleBoards = boardService.getBoardsByCategoryId(criteria, apple.getId(), null);
         Category samsung = categoryService.getCategoryByEnName("samsungFarm");
-        List<Board> samsungBoards = boardService.getBoardsByCategoryId(productCriteria, samsung.getId(), null, null);
+        List<Board> samsungBoards = boardService.getBoardsByCategoryId(criteria, samsung.getId(), null);
         Category lg = categoryService.getCategoryByEnName("lgFarm");
-        List<Board> lgBoards = boardService.getBoardsByCategoryId(productCriteria, lg.getId(), null, null);
+        List<Board> lgBoards = boardService.getBoardsByCategoryId(criteria, lg.getId(), null);
         Category foreign = categoryService.getCategoryByEnName("foreignFarm");
-        List<Board> foreignBoards = boardService.getBoardsByCategoryId(productCriteria, foreign.getId(), null, null);
+        List<Board> foreignBoards = boardService.getBoardsByCategoryId(criteria, foreign.getId(), null);
 
         model.addAttribute("newBoards",newBoards);
         model.addAttribute("nowhowBoards",nowhowBoards);

@@ -31,7 +31,7 @@ public class CommentController {
                                      @RequestParam(required = false) int page){
         Map<String,Object> map = new HashMap<>();
 
-        int commentCount = commentService.getCommentCountByBoardId(boardId,null,null);
+        int commentCount = commentService.getCommentCountByBoardId(boardId,null);
 
         Criteria criteria = new TenItemsCriteria();
         criteria.setPage(page);
@@ -40,7 +40,7 @@ public class CommentController {
 
         map.put("pageMaker", pageMaker);
 
-        List<Comment> list = commentService.getCommentsByBoardId(boardId, criteria,null,null);
+        List<Comment> list = commentService.getCommentsByBoardId(boardId, criteria,null);
         map.put("list", list);
 
         return ResponseEntity.ok(map);

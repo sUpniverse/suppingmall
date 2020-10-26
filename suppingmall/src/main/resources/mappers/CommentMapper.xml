@@ -41,13 +41,13 @@
 
 
     <sql id="conditionalSearch">
-        <if test="type != null and searchValue != null">
-            <if test='type.equals("contents")'>
-                <bind name="searchValue" value="'%'+searchValue+'%'"/>
-                AND C.contents LIKE #{searchValue}
+        <if test="search.type != null and search.searchValue != null">
+            <if test='search.type.equals("search.contents")'>
+                <bind name="search.searchValue" value="'%'+search.searchValue+'%'"/>
+                AND C.contents LIKE #{search.searchValue}
             </if>
-            <if test='type.equals("creator")'>
-                AND U.nickname = #{searchValue}
+            <if test='search.type.equals("search.creator")'>
+                AND U.nickname = #{search.searchValue}
             </if>
         </if>
     </sql>

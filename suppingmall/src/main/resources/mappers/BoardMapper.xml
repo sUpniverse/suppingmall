@@ -9,6 +9,7 @@
         <result property="contents" column="BoardContents" />
         <result property="hit" column="BoardHit" />
         <result property="delYn" column="BoardDelYn" />
+        <result property="blindYn" column="BoardBlindYn" />
         <result property="createdDate" column="BoardCreatedDate" />
         <result property="updatedDate" column="BoardUpdatedDate" />
         <association property="creator" javaType="com.supshop.suppingmall.user.User">
@@ -40,17 +41,17 @@
     </resultMap>
 
     <sql id="conditionalSearch">
-        <if test="type != null and searchValue != null">
-            <if test='type.equals("title")'>
-                <bind name="searchValue" value="'%'+searchValue+'%'"/>
-                AND B.title LIKE #{searchValue}
+        <if test="search != null and search.type != null and search.searchValue != null">
+            <if test='search.type.equals("title")'>
+                <bind name="search.searchValue" value="'%'+search.searchValue+'%'"/>
+                AND B.title LIKE #{search.searchValue}
             </if>
-            <if test='type.equals("contents")'>
-                <bind name="searchValue" value="'%'+searchValue+'%'"/>
-                AND B.contents LIKE #{searchValue}
+            <if test='search.type.equals("contents")'>
+                <bind name="search.searchValue" value="'%'+search.searchValue+'%'"/>
+                AND B.contents LIKE #{search.searchValue}
             </if>
-            <if test='type.equals("creator")'>
-                AND U.nickname = #{searchValue}
+            <if test='search.type.equals("creator")'>
+                AND U.nickname = #{search.searchValue}
             </if>
         </if>
     </sql>
@@ -201,6 +202,8 @@
         user_id,
         hit,
         category_id,
+        delete_yes_or_no,
+        blind_yes_or_no,
         created_date,
         updated_date
         )
@@ -210,6 +213,8 @@
         #{creator.userId},
         0,
         #{category.id},
+        'N',
+        'N',
         now(),
         now()
         )
@@ -232,7 +237,7 @@
     <update id="blind" parameterType="com.supshop.suppingmall.board.Board">
         UPDATE Board
         SET
-        blind = 'Y'
+        blind_yes_or_no = 'Y'
         WHERE board_id = #{id};
     </update>
 

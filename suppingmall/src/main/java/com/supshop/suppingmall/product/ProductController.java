@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
@@ -66,14 +67,14 @@ public class ProductController {
     //조건을 통한 모든 물품 조회
     @GetMapping("")
     public String getAllProduct(Model model,
-                                @RequestParam(required = false) String name,
+                                ProductSearch search,
                                 EightItemsCriteria criteria) {
 
 
-        int productsCount = productService.getProductsCount(null, null, name, Product.ProductStatus.SALE);
+        int productsCount = productService.getProductsCount(null, null, search, Product.ProductStatus.SALE,criteria);
 
         model.addAttribute("count",productsCount);
-        model.addAttribute("productList",productService.getOnSaleProductsOnMenu(null, name, criteria));
+        model.addAttribute("productList",productService.getOnSaleProductsOnMenu(null, search,criteria));
         model.addAttribute("productPageMaker",new PageMaker(productsCount, productPagingCount, criteria));
         model.addAttribute("categories",categoryService.getCategoryToGrandChildren(productCategoryId));
         model.addAttribute("recommends",productService.getRecommendProducts());
@@ -85,8 +86,9 @@ public class ProductController {
     //판매상태의 모든 물품들
     @GetMapping("/main")
     public String getAllOnSaleProduct(Model model,
-                                       @AuthenticationPrincipal SessionUser user,
-                                       @RequestParam(required = false)String name) {
+                                      ProductSearch search,
+                                      EightItemsCriteria criteria,
+                                      @AuthenticationPrincipal SessionUser user) {
 
         List<Cart> cart = null;
         if(user != null) cart = cartService.getCartByBuyerId(user.getUserId());
@@ -98,12 +100,11 @@ public class ProductController {
         model.addAttribute("clothing",categoryService.getCategoryToGrandChildren(clothingCategoryId));
 
         //물품 목록
-        Criteria criteria = new EightItemsCriteria();
         // 상위 카테고리를 이용해 물품 목록 불러오기
-        model.addAttribute("latestComputerList",productService.getOnSaleProductsByParentCategoryOnMenu(4l,criteria));
-        model.addAttribute("latestMobileList",productService.getOnSaleProductsByParentCategoryOnMenu(5l,criteria));
+        model.addAttribute("latestComputerList",productService.getOnSaleProductsByParentCategoryOnMenu(4l,search,criteria));
+        model.addAttribute("latestMobileList",productService.getOnSaleProductsByParentCategoryOnMenu(5l,search,criteria));
         // 전체 물품 목록 가져오기
-        model.addAttribute("productList",productService.getOnSaleProductsOnMenu(null, null, criteria));
+        model.addAttribute("productList",productService.getOnSaleProductsOnMenu(null, search,criteria));
 
 
         return "/product/main";
@@ -112,17 +113,17 @@ public class ProductController {
     //카테고리별 물품 조회
     @GetMapping("/category/{categoryName}")
     public String getProductOnSaleInCategory(Model model,
-                                       @PathVariable String categoryName,
-                                       EightItemsCriteria criteria) {
+                                             ProductSearch search,
+                                             EightItemsCriteria criteria) {
 
 
-        Category category = categoryService.getCategoryByEnName(categoryName);
-        int productsCount = productService.getProductsCount(category.getId(), null, null, Product.ProductStatus.SALE);
+        Category category = categoryService.getCategoryByEnName(search.getCategoryName());
+        int productsCount = productService.getProductsCount(category.getId(), null, search, Product.ProductStatus.SALE,criteria);
 
 
 
         model.addAttribute("count",productsCount);
-        model.addAttribute("productList",productService.getOnSaleProductsOnMenu(category.getId(), null, criteria));
+        model.addAttribute("productList",productService.getOnSaleProductsOnMenu(category.getId(), search,criteria));
         model.addAttribute("categoryId",category.getId());
         model.addAttribute("productPageMaker",new PageMaker(productsCount, productPagingCount, criteria));
         model.addAttribute("recommends",productService.getRecommendProducts());
@@ -166,11 +167,12 @@ public class ProductController {
     }
 
     @GetMapping("/admin")
-    public String getProductsByAdmin(ThirtyItemsCriteria criteria,
+    public String getProductsByAdmin(ProductSearch search,
+                                     ThirtyItemsCriteria criteria,
                                      Model model) {
 
-        int count = productService.getProductsCount();
-        List<Product> products = productService.getProducts(criteria);
+        int count = productService.getProductsCount(criteria);
+        List<Product> products = productService.getProducts(search,criteria);
 
         PageMaker pageMaker = new PageMaker(count,productPagingCount,criteria);
 
@@ -184,11 +186,11 @@ public class ProductController {
 
     @GetMapping("/seller")
     public String getProductsBySeller(@AuthenticationPrincipal SessionUser user,
+                                      ProductSearch search,
                                       ThirtyItemsCriteria criteria,
                                       Model model) {
-
-        int count = count = productService.getProductsCount(null, user.getUserId(),null,null);
-        List<Product> products = products = productService.getProductsBySeller(user.getUserId(),criteria);
+        int count = count = productService.getProductsCount(null, user.getUserId(),search,null,criteria);
+        List<Product> products = products = productService.getProductsBySeller(user.getUserId(),search,criteria);
 
         PageMaker pageMaker = new PageMaker(count,productPagingCount,criteria);
 
@@ -203,7 +205,7 @@ public class ProductController {
     @PostMapping("")
     public String createProduct(@Valid ProductForm productForm,
                                 MultipartFile[] thumnails,
-                                @AuthenticationPrincipal SessionUser sessionUser) {
+                                @AuthenticationPrincipal SessionUser sessionUser) throws FileNotFoundException {
         Product product = modelMapper.map(productForm, Product.class);
         String thumnail = null;
         if(thumnails.length > 0) {

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,35 +28,35 @@ public class ProductService {
     private static final int latestProductCount = 5;
     private static final int recommandProductCount = 8;
 
-    public int getProductsCount() {
-        return getProductsCount(null, null, null, null);
+    public int getProductsCount(Criteria criteria) {
+        return getProductsCount(null, null, null, null,criteria);
     }
-    public int getProductsCount(Long categoryId,Long sellerId, String name, Product.ProductStatus status) {
-        return productMapper.findSaleProductCount(categoryId,sellerId,name,status);
+    public int getProductsCount(Long categoryId,Long sellerId, ProductSearch search, Product.ProductStatus status,Criteria criteria) {
+        return productMapper.findSaleProductCount(categoryId,sellerId,search,status,criteria);
     }
 
     // 물품 + 물품상세정보 + 물품 옵션
     public List<Product> getProducts() {
-        return getProducts(null);
+        return getProducts(null,null);
     }
-    public List<Product> getProducts(Criteria productCriteria) {
-        return productMapper.findAll(null,null,null,null,productCriteria);
+    public List<Product> getProducts(ProductSearch search,Criteria criteria) {
+        return productMapper.findAll(null,null, search,null,criteria);
     }
 
     // 전체 리스트 에서 오직 물품 정보만을 보여줄 때
-    public List<Product> getOnSaleProductsOnMenu(Long categoryId, String name, Criteria criteria) {
-        return productMapper.findAllPart(null,categoryId,name,Product.ProductStatus.SALE,criteria);
+    public List<Product> getOnSaleProductsOnMenu(Long categoryId, ProductSearch search, Criteria criteria) {
+        return productMapper.findAllPart(null,categoryId,search,Product.ProductStatus.SALE,criteria);
     }
 
     // 전체 리스트 에서 상위 카테고리로 조회하며 물품 가져올 때
-    public List<Product> getOnSaleProductsByParentCategoryOnMenu(Long parentId, Criteria criteria) {
-        return productMapper.findAllPartByParentCategory(parentId, criteria);
+    public List<Product> getOnSaleProductsByParentCategoryOnMenu(Long parentId, ProductSearch search,Criteria criteria) {
+        return productMapper.findAllPartByParentCategory(parentId, search,criteria);
     }
 
 
     // 물품 + 물품상세정보 + 물품 옵션 by 판매자 (판매자의 판매물품 정보 전체)
-    public List<Product> getProductsBySeller(Long sellerId, Criteria productCriteria) {
-        return productMapper.findAll(sellerId,null,null,null,productCriteria);
+    public List<Product> getProductsBySeller(Long sellerId, ProductSearch search,Criteria criteria) {
+        return productMapper.findAll(sellerId,null,search,null,criteria);
     }
 
 
@@ -78,7 +79,7 @@ public class ProductService {
 
 
     @Transactional
-    public void createProduct(Product product, Set<String> urls) {
+    public void createProduct(Product product, Set<String> urls) throws FileNotFoundException {
         int result = productMapper.insertProduct(product);
         Long productId = product.getProductId();
         List<ProductOption> options = product.getOptions();
@@ -98,16 +99,16 @@ public class ProductService {
             if(urls == null) urls = new HashSet<>();
             urls.add(product.getThumbnail());   // 썸네일 이미지도 포함
             String originUrl = setProductImageUrl(product, urls);
-            boolean saveInStorage = imageService.saveInStorage(urls, originUrl, product.getProductId(), productName);
-            if(!saveInStorage) {
+            boolean isSave = imageService.saveInStorage(urls, originUrl, product.getProductId(), productName);
+            if(!isSave) {
                 // Todo : 파일 저장 실패 exception && 시간초과 (지금은 단지 3번 실패 후 exception)
                 int count  = 0;
-                while (!saveInStorage && count < 3){
-                    saveInStorage = imageService.saveInStorage(urls, originUrl, product.getProductId(), productName);
+                while (!isSave && count < 3){
+                    isSave = imageService.saveInStorage(urls, originUrl, product.getProductId(), productName);
                     count++;
                 }
 
-                if(!saveInStorage) throw new RuntimeException();
+                if(!isSave) throw new FileNotFoundException();
             }
             productMapper.updateProduct(productId,product);
         }
