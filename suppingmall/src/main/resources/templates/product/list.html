@@ -204,7 +204,7 @@
                 </div><!-- End .toolbox -->
 
                 <div class="products mb-3">
-                    <div class="row">
+                    <div class="row product-list">
                         <div class="col-6 col-md-4 col-xl-3" th:each="product : ${productList}">
                             <div class="product">
                                 <figure class="product-media">
@@ -222,7 +222,7 @@
                                     </div><!-- End .product-price -->
                                     <div class="ratings-container">
                                         <div class="ratings">
-                                            <div class="ratings-val" th:style="'width:'+${product.getRating() * 20}+'%;'"></div><!-- End .ratings-val -->
+                                            <div class="ratings-val" th:style="'width:'+${product.rating * 20}+'%;'"></div><!-- End .ratings-val -->
                                         </div><!-- End .ratings -->
                                         <span class="ratings-text" th:text="${'( '+product.reviewList.size()+' 개 리뷰 )'}"></span>
                                     </div><!-- End .rating-container -->
@@ -240,7 +240,7 @@
                             </a>
                         </li>
                         <li class="page-item" th:each="idx : ${#numbers.sequence(productPageMaker.startPage,productPageMaker.endPage)}" th:classappend="${productPageMaker.criteria.page} == ${idx} ? active" aria-current="page">
-                            <a class="page-link" th:href="@{'/products?page='+${idx}}" th:text="${idx}" th:if="${idx > 0}"></a>
+                            <a class="page-link" th:href="@{${idx}}" th:text="${idx}" th:if="${idx} > 0"></a>
                         </li>
                         <li class="page-item" th:if="${productPageMaker.next && productPageMaker.endPage > 0}">
                             <a class="page-link page-link-next" href="#" aria-label="Next">
@@ -260,28 +260,28 @@
                             <div class="filter-item">
                                 <div class="custom-control custom-radio">
                                     <input type="radio" class="custom-control-input" id="price-1" name="filter-price">
-                                    <label class="custom-control-label" for="price-1">10만원 이하</label>
+                                    <label class="custom-control-label" for="price-1">5만원 이하</label>
                                 </div><!-- End .custom-checkbox -->
                             </div><!-- End .filter-item -->
 
                             <div class="filter-item">
                                 <div class="custom-control custom-radio">
                                     <input type="radio" class="custom-control-input" id="price-2" name="filter-price">
-                                    <label class="custom-control-label" for="price-2">30만원 이하</label>
+                                    <label class="custom-control-label" for="price-2">5만원 ~ 30만원</label>
                                 </div><!-- End .custom-checkbox -->
                             </div><!-- End .filter-item -->
 
                             <div class="filter-item">
                                 <div class="custom-control custom-radio">
                                     <input type="radio" class="custom-control-input" id="price-3" name="filter-price">
-                                    <label class="custom-control-label" for="price-3">50만원 이하</label>
+                                    <label class="custom-control-label" for="price-3">30만원 ~ 50만원</label>
                                 </div><!-- End .custom-checkbox -->
                             </div><!-- End .filter-item -->
 
                             <div class="filter-item">
                                 <div class="custom-control custom-radio">
                                     <input type="radio" class="custom-control-input" id="price-4" name="filter-price">
-                                    <label class="custom-control-label" for="price-4">100만원 미만</label>
+                                    <label class="custom-control-label" for="price-4">50만원 ~ 100만원</label>
                                 </div><!-- End .custom-checkbox -->
                             </div><!-- End .filter-item -->
 
@@ -301,7 +301,7 @@
                             <div class="filter-items">
                                 <div class="filter-item">
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="cus-rating-1">
+                                        <input type="checkbox" class="custom-control-input" id="cus-rating-1" name="filter-rating">
                                         <label class="custom-control-label" for="cus-rating-1">
                                                             <span class="ratings-container">
                                                                 <span class="ratings">
@@ -315,7 +315,7 @@
 
                                 <div class="filter-item">
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="cus-rating-2">
+                                        <input type="checkbox" class="custom-control-input" id="cus-rating-2" name="filter-rating">
                                         <label class="custom-control-label" for="cus-rating-2">
                                                             <span class="ratings-container">
                                                                 <span class="ratings">
@@ -329,7 +329,7 @@
 
                                 <div class="filter-item">
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="cus-rating-3">
+                                        <input type="checkbox" class="custom-control-input" id="cus-rating-3" name="filter-rating">
                                         <label class="custom-control-label" for="cus-rating-3">
                                                             <span class="ratings-container">
                                                                 <span class="ratings">
@@ -343,7 +343,7 @@
 
                                 <div class="filter-item">
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="cus-rating-4">
+                                        <input type="checkbox" class="custom-control-input" id="cus-rating-4" name="filter-rating">
                                         <label class="custom-control-label" for="cus-rating-4">
                                                             <span class="ratings-container">
                                                                 <span class="ratings">
@@ -357,7 +357,7 @@
 
                                 <div class="filter-item">
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="cus-rating-5">
+                                        <input type="checkbox" class="custom-control-input" id="cus-rating-5" name="filter-rating">
                                         <label class="custom-control-label" for="cus-rating-5">
                                                             <span class="ratings-container">
                                                                 <span class="ratings">
@@ -388,4 +388,162 @@
     </div><!-- End .container -->
 </div>
 </body>
+<script th:inline="javascript">
+
+    var originMaxPrice = [[${search?.maxPrice}]];
+    var originMinPrice = [[${search?.minPrice}]];
+    var originPage = [[${productPageMaker.criteria?.page}]];
+    var originPage = [[${productPageMaker.criteria?.page}]];
+    var search = [[${search}]];
+    var originSortedBy = '';
+
+    var radioIndex = -1;
+
+    $(document).on('click','input:checkbox', function (e){
+        var name = e.target.name;
+        ratingEventHandler(e.target.id);
+    });
+
+    $(document).on('click','input:radio', function (e){
+        var name = e.target.name;
+        if(radioIndex === e.target.id) {
+            radioIndex = -1;
+            document.getElementById(e.target.id).checked = false;
+            priceEventHandler('price-6');
+        } else {
+            radioIndex = e.target.id
+            priceEventHandler(e.target.id);
+        }
+    });
+
+    function priceEventHandler(id) {
+        var num = id.charAt(id.length-1);
+        switch (num){
+            case '1':
+                originMaxPrice = 50000;
+                originMinPrice = '';
+                break;
+            case '2':
+                originMaxPrice = 300000;
+                originMinPrice = 50000;
+                break;
+            case '3':
+                originMaxPrice = 500000;
+                originMinPrice = 300000;
+                break;
+            case '4':
+                originMaxPrice = 1000000;
+                originMinPrice = 500000;
+                break;
+            case '5':
+                originMaxPrice = '';
+                originMinPrice = 1000000;
+                break;
+            default:
+                originMaxPrice = '';
+                originMinPrice = '';
+        }
+
+        requestSearch()
+    }
+
+
+
+    function ratingEventHandler(id) {
+
+    }
+
+
+    function requestSearch(){
+        var url = '/products?';
+        var query= '';
+
+        console.log(search);
+        if(search.categoryName !== null) {
+            query += 'categoryName=' + search.categoryName + '&&';
+        }
+        if(search.name !== null) {
+            query += 'name=' + search.name + '&&';
+        }
+        if(originMinPrice > 0)
+            query += 'minPrice='+ originMinPrice +'&&';
+        if(originMaxPrice > 0)
+            query += 'maxPrice=' + originMaxPrice +'&&';
+        if(originPage > 0)
+            query += 'page=' + originPage + '&&';
+
+        console.log(query)
+        $.ajax({
+            url: url+query,
+            type: 'GET',
+            contentType: 'application/json',
+            success: (list) => {
+                setProduct(list.productList);
+                setPageList(list.productPageMaker);
+            }
+        });
+    }
+
+    function setProduct(productList){
+        var list = new Array()
+        productList.forEach(product =>{
+            var one =   '<div class="col-6 col-md-4 col-xl-3">\n' +
+                        '       <div class="product">\n' +
+                        '          <figure class="product-media">\n' +
+                        '               <a href="/products/+${product.productId}"}>\n' +
+                        '                   <img src="'+product.thumbnail+'" alt="Product image" class="product-image">\n' +
+                        '               </a>\n' +
+                        '           </figure><!-- End .product-media -->\n' +
+                        '           <div class="product-body">\n' +
+                        '                <div class="product-cat">\n' +
+                        '                     <a href="/products/category/'+product.category.id+'">'+product.category.name+'</a>\n' +
+                        '                </div><!-- End .product-cat -->\n' +
+                        '                <h3 class="product-title">' +
+                        '                    <a href="/products/'+product.productId+'">'+product.name+'</a></h3><!-- End .product-title -->\n' +
+                        '            <div class="product-price">'+product.price+'</div><!-- End .product-price -->\n' +
+                        '                 <div class="ratings-container">\n' +
+                        '                      <div class="ratings">\n' +
+                        '                           <div class="ratings-val" style="width:'+product.rating * 20+'%;"></div><!-- End .ratings-val -->\n' +
+                        '                      </div><!-- End .ratings -->\n' +
+                        '                      <span class="ratings-text">'+product.reviewList.length+'개 리뷰</span>\n' +
+                        '                  </div><!-- End .rating-container -->\n' +
+                        '             </div><!-- End .product-body -->\n' +
+                        '         </div><!-- End .product -->\n' +
+                        '</div>';
+            list.push(one);
+        });
+
+        $('.product-list').empty();
+        $('.product-list').append(list);
+
+    }
+
+    function setPageList(pageMaker) {
+        var str = "";
+
+        if(pageMaker.prev){
+            str += '<li class="page-item"><a class="page-link"  href="'+(pageMaker.startPage - 1)+'" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>'
+        }
+
+        for(var i = pageMaker.startPage; i <= pageMaker.endPage; i++) {
+            var strClass = pageMaker.criteria.page === i? 'class=active' : '';
+            str += '<li class="page-item '+strClass+'"><a class="page-link" href="'+i+'">'+i+'</a></li>'
+        }
+
+
+        if(pageMaker.next){
+            str += '<li class="page-item"><a class="page-link"  href="'+(pageMaker.endPage - 1)+'" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>'
+        }
+
+        $('.pagination').html(str);
+    }
+
+    $(".pagination").on("click","li a", function (event){
+        event.preventDefault();
+        var page = event.target.getAttribute('href');
+        originPage = page;
+        requestSearch();
+    });
+
+</script>
 </html>

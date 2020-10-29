@@ -38,6 +38,7 @@ public class Product {
     private User seller;
     private ProductStatus status;
     private LocalDateTime registeredDate;
+    private double rating;
 
 
     @Getter
@@ -63,8 +64,10 @@ public class Product {
         }
     }
 
-    public double getRating() {
-        if(reviewList == null) return 0;
-        return reviewList.stream().collect(Collectors.averagingInt(Review::getRating));
+    public void setRating() {
+        if(reviewList == null)
+            this.rating =  0;
+        else
+            this.rating = reviewList.stream().collect(Collectors.averagingInt(Review::getRating));
     }
 }

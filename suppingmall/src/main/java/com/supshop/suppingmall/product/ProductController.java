@@ -64,15 +64,44 @@ public class ProductController {
         return "/product/seller/form";
     }
 
-    //조건을 통한 모든 물품 조회
     @GetMapping("")
-    public String getAllProduct(Model model,
+    @ResponseBody
+    public ResponseEntity getAllProduct(ProductSearch search,
+                                        EightItemsCriteria criteria) {
+
+        Category category = null;
+        int productsCount = 0;
+        List<Product> productList = null;
+        if(search.getCategoryName() != null) {
+            category = categoryService.getCategoryByEnName(search.getCategoryName());
+            productsCount = productService.getProductsCount(category.getId(), null, search, Product.ProductStatus.SALE,criteria);
+            productList = productService.getOnSaleProductsOnMenu(category.getId(), search, criteria);
+        } else {
+            productsCount = productService.getProductsCount(null, null, search, Product.ProductStatus.SALE,criteria);
+            productList = productService.getOnSaleProductsOnMenu(null, search, criteria);
+        }
+
+        Map<String,Object> map = new HashMap();
+
+        map.put("search",search);
+        map.put("count",productsCount);
+        map.put("productList",productList);
+        map.put("productPageMaker",new PageMaker(productsCount, productPagingCount, criteria));
+        map.put("categories",categoryService.getCategoryToGrandChildren(productCategoryId));
+        map.put("recommends",productService.getRecommendProducts());
+
+
+        return ResponseEntity.ok(map);
+    }
+
+    //조건을 통한 물품 조회
+    @GetMapping("/search")
+    public String searchProduct(Model model,
                                 ProductSearch search,
                                 EightItemsCriteria criteria) {
-
-
         int productsCount = productService.getProductsCount(null, null, search, Product.ProductStatus.SALE,criteria);
 
+        model.addAttribute("search",search);
         model.addAttribute("count",productsCount);
         model.addAttribute("productList",productService.getOnSaleProductsOnMenu(null, search,criteria));
         model.addAttribute("productPageMaker",new PageMaker(productsCount, productPagingCount, criteria));
@@ -118,10 +147,15 @@ public class ProductController {
 
 
         Category category = categoryService.getCategoryByEnName(search.getCategoryName());
+        search.setCategoryName(category.getEnName());
+
+        if(category == null)
+            return "redirect:/products/main";
+
         int productsCount = productService.getProductsCount(category.getId(), null, search, Product.ProductStatus.SALE,criteria);
 
 
-
+        model.addAttribute("search",search);
         model.addAttribute("count",productsCount);
         model.addAttribute("productList",productService.getOnSaleProductsOnMenu(category.getId(), search,criteria));
         model.addAttribute("categoryId",category.getId());

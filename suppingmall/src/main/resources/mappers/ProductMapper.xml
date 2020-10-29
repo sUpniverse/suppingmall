@@ -72,6 +72,28 @@
                     <bind name="search.name" value="'%'+search.name+'%'"/>
                     AND P.name LIKE #{search.name}
                 </if>
+                <if test='search.minPrice gt 0 and search.maxPrice == 0'>
+                    <![CDATA[
+                    AND P.price >= #{search.minPrice}
+                    ]]>
+                </if>
+                <if test='search.minPrice == 0 and search.maxPrice gt 0'>
+                    <![CDATA[
+                    AND P.price <= #{search.maxPrice}
+                    ]]>
+                </if>
+                <if test="search.minPrice gt 0 and search.maxPrice gt 0">
+                    <if test='search.minPrice lte search.maxPrice'>
+                        <![CDATA[
+                        AND P.price >= #{search.minPrice} AND P.price <= #{search.maxPrice}
+                        ]]>
+                    </if>
+                    <if test='search.minPrice gte search.maxPrice'>
+                        <![CDATA[
+                        AND P.price >= #{search.minPrice}
+                        ]]>
+                    </if>
+                </if>
             </if>
             <if test='status != null'>
                 AND P.status = #{status, typeHandler=com.supshop.suppingmall.product.ProductStatusTypeHandler}
@@ -335,7 +357,7 @@
         thumbnail = #{product.thumbnail},
         rating = #{product.rating},
         contents = #{product.contents}
-        where
+        WHERE
         product_id = #{productId};
     </update>
 
