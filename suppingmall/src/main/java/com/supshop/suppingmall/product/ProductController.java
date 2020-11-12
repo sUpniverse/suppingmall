@@ -96,9 +96,9 @@ public class ProductController {
 
     //조건을 통한 물품 조회
     @GetMapping("/search")
-    public String searchProduct(Model model,
-                                ProductSearch search,
-                                EightItemsCriteria criteria) {
+    public String searchProduct(ProductSearch search,
+                                EightItemsCriteria criteria,
+                                Model model) {
         int productsCount = productService.getProductsCount(null, null, search, Product.ProductStatus.SALE,criteria);
 
         model.addAttribute("search",search);
@@ -107,7 +107,6 @@ public class ProductController {
         model.addAttribute("productPageMaker",new PageMaker(productsCount, productPagingCount, criteria));
         model.addAttribute("categories",categoryService.getCategoryToGrandChildren(productCategoryId));
         model.addAttribute("recommends",productService.getRecommendProducts());
-
 
         return "/product/list";
     }

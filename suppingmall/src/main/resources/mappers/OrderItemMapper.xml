@@ -8,6 +8,7 @@
         <result property="count" column="OrderItemCount" />
         <result property="price" column="OrderItemPrice" />
         <result property="status" column="OrderItemStatus" typeHandler="com.supshop.suppingmall.order.OrderStatusTypeHandler" />
+        <result property="reviewYn" column="OrderItemReviewYn" />
         <association property="orders" javaType="com.supshop.suppingmall.order.Orders">
             <id property="orderId" column="OrderId" />
             <result property="orderDate" column="OrderDate"/>
@@ -115,7 +116,7 @@
     </select>
 
     <select id="findAll" resultMap="OrderItem">
-        SELECT OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice", OI.status AS "OrderItemStatus", O.order_id AS "OrderId", O.order_date AS "OrderDate",
+        SELECT OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice", OI.status AS "OrderItemStatus", OI.review_yes_or_no AS "OrderItemReviewYn", O.order_id AS "OrderId", O.order_date AS "OrderDate",
         B.user_id AS "BuyerId", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber",
         S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
         S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
@@ -139,7 +140,7 @@
 
 
     <select id="findOne" resultMap="OrderItem">
-        SELECT OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice", OI.status AS "OrderItemStatus", O.order_id AS "OrderId", O.order_date AS "OrderDate",
+        SELECT OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice", OI.status AS "OrderItemStatus", OI.review_yes_or_no AS "OrderItemReviewYn", O.order_id AS "OrderId", O.order_date AS "OrderDate",
         B.user_id AS "BuyerId", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber",
         S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
         S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
@@ -160,7 +161,7 @@
     </select>
 
     <select id="findByBuyerId" resultMap="OrderItem">
-        SELECT OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice", OI.status AS "OrderItemStatus", O.order_id AS "OrderId", O.order_date AS "OrderDate",
+        SELECT OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice", OI.status AS "OrderItemStatus", OI.review_yes_or_no AS "OrderItemReviewYn", O.order_id AS "OrderId", O.order_date AS "OrderDate",
         B.user_id AS "BuyerId", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber",
         S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
         S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
@@ -184,7 +185,7 @@
     </select>
 
     <select id="findBySellerId" resultMap="OrderItem">
-        SELECT OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice", OI.status AS "OrderItemStatus", O.order_id AS "OrderId", O.order_date AS "OrderDate",
+        SELECT OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice", OI.status AS "OrderItemStatus", OI.review_yes_or_no AS "OrderItemReviewYn", O.order_id AS "OrderId", O.order_date AS "OrderDate",
         B.user_id AS "BuyerId", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber",
         S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
         S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",
@@ -208,7 +209,7 @@
     </select>
 
     <select id="findOneBySellerId" resultMap="OrderItem">
-        SELECT OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice", OI.status AS "OrderItemStatus", O.order_id AS "OrderId", O.order_date AS "OrderDate",
+        SELECT OI.orderItem_id AS "OrderItemId", OI.count AS "OrderItemCount", OI.price AS "OrderItemPrice", OI.status AS "OrderItemStatus", OI.review_yes_or_no AS "OrderItemReviewYn", O.order_id AS "OrderId", O.order_date AS "OrderDate",
         B.user_id AS "BuyerId", B.name AS "BuyerName", B.phone_number AS "BuyerPhoneNumber",
         S.user_id AS "SellerId", S.store_name AS "StoreName", S.store_zipcode AS "StoreZipCode",
         S.store_address AS "StoreAddress", S.store_address_detail AS "StoreAddressDetail", S.store_phone_number AS "StorePhoneNumber",

@@ -25,9 +25,6 @@ public class ProductService {
     private static final String productImageUrl = "/images/product/";
     private static final String productName = "product";
 
-    private static final int latestProductCount = 5;
-    private static final int recommandProductCount = 8;
-
     public int getProductsCount(Criteria criteria) {
         return getProductsCount(null, null, null, null,criteria);
     }

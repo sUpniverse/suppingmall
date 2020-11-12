@@ -40,7 +40,6 @@ public class Product {
     private LocalDateTime registeredDate;
     private double rating;
 
-
     @Getter
     @AllArgsConstructor
     public enum  ProductStatus {
@@ -69,5 +68,10 @@ public class Product {
             this.rating =  0;
         else
             this.rating = reviewList.stream().collect(Collectors.averagingInt(Review::getRating));
+    }
+
+    public double getRating() {
+        setRating();
+        return rating;
     }
 }

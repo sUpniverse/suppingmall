@@ -86,25 +86,15 @@
         WHERE R.review_id = #{reviewId}
     </select>
 
-    <insert id="save" parameterType="com.supshop.suppingmall.review.Review" useGeneratedKeys="true" keyProperty="reviewId">
-        INSERT INTO Review (
-        title,
-        contents,
-        user_id,
-        product_id,
-        orderitem_id,
-        rating,
-        created_date
-        )
-        VALUES (
-        #{title},
-        #{contents},
-        #{creator.userId},
-        #{product.productId},
-        #{orderItem.orderItemId},
-        #{rating},
-        now()
-        )
+    <insert id="save" parameterType="com.supshop.suppingmall.review.Review" useGeneratedKeys="true" keyProperty="reviewId" statementType="CALLABLE">
+            {call CALCULATE_PRODUCT_RATING(
+                            #{contents, mode = IN, jdbcType = VARCHAR},
+                            #{creator.userId, mode = IN, jdbcType = NUMERIC},
+                            #{product.productId, mode = IN, jdbcType = NUMERIC},
+                            #{orderItem.orderItemId, mode = IN, jdbcType = NUMERIC},
+                            #{rating, mode = IN, jdbcType = INTEGER}
+                            )
+            }
     </insert>
 
     <update id="update" parameterType="com.supshop.suppingmall.review.Review">

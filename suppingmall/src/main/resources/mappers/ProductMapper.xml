@@ -94,6 +94,11 @@
                         ]]>
                     </if>
                 </if>
+                <if test='search.rating == 0 and search.rating gt 0'>
+                    <![CDATA[
+                    AND P.rating <= #{search.rating}
+                    ]]>
+                </if>
             </if>
             <if test='status != null'>
                 AND P.status = #{status, typeHandler=com.supshop.suppingmall.product.ProductStatusTypeHandler}
