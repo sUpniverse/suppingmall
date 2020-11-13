@@ -39,6 +39,7 @@ public class Product {
     private ProductStatus status;
     private LocalDateTime registeredDate;
     private double rating;
+    private int reviewCount;
 
     @Getter
     @AllArgsConstructor

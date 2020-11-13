@@ -224,7 +224,7 @@
                                         <div class="ratings">
                                             <div class="ratings-val" th:style="'width:'+${product.rating * 20}+'%;'"></div><!-- End .ratings-val -->
                                         </div><!-- End .ratings -->
-                                        <span class="ratings-text" th:text="${'( '+product.reviewList.size()+' 개 리뷰 )'}"></span>
+                                        <span class="ratings-text" th:text="${'( '+product.reviewCount+' 개 리뷰 )'}"></span>
                                     </div><!-- End .rating-container -->
                                 </div><!-- End .product-body -->
                             </div><!-- End .product -->
