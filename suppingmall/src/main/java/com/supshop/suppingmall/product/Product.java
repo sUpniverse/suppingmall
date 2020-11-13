@@ -63,15 +63,15 @@ public class Product {
         }
     }
 
-    public void setRating() {
-        if(reviewList == null)
-            this.rating =  0;
-        else
-            this.rating = reviewList.stream().collect(Collectors.averagingInt(Review::getRating));
-    }
-
-    public double getRating() {
-        setRating();
-        return rating;
-    }
+//    public void setRating() {
+//        if(reviewList == null)
+//            this.rating =  0;
+//        else
+//            this.rating = reviewList.stream().collect(Collectors.averagingInt(Review::getRating));
+//    }
+//
+//    public double getRating() {
+//        setRating();
+//        return rating;
+//    }
 }
