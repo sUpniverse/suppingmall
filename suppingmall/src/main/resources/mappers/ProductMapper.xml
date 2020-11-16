@@ -96,9 +96,9 @@
                         ]]>
                     </if>
                 </if>
-                <if test='search.rating == 0 and search.rating gt 0'>
+                <if test='search.rating gte 1'>
                     <![CDATA[
-                    AND P.rating <= #{search.rating}
+                    AND P.rating >= #{search.rating}
                     ]]>
                 </if>
             </if>
