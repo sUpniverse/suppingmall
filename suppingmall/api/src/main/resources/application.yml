@@ -4,6 +4,10 @@ spring:
 server:
   port: 8080
 
+springdoc:
+  api-docs.path: /api/v1/openapi
+  swagger-ui.path: /api/v1/swagger
+
 management:
   endpoints:
     web:
