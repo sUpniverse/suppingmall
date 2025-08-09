@@ -35,6 +35,14 @@
       <version>2.8.9</version>
     </dependency>
 
+    <!-- lombok -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.38</version>
+      <scope>provided</scope>
+    </dependency>
+
     <!-- actuator -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -56,6 +64,32 @@
         <configuration>
           <mainClass>com.supshop.suppingmall.api.SuppingmallApiApplication</mainClass>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <release>${java.version}</release> <!-- 23 -->
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>1.18.38</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+        <!-- (선택) 테스트 컴파일에도 확실히 적용하고 싶으면 executions 추가 -->
+        <executions>
+          <execution>
+            <id>default-compile</id>
+            <goals><goal>compile</goal></goals>
+          </execution>
+          <execution>
+            <id>default-testCompile</id>
+            <goals><goal>testCompile</goal></goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

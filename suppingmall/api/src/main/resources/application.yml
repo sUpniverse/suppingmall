@@ -4,6 +4,14 @@ spring:
 server:
   port: 8080
 
+app:
+  cors:
+    allowed-origins: "http://localhost:3000,http://127.0.0.1:3000"   # 프론트 도메인 생기면 교체
+
+logging:
+  level:
+    org.springdoc: DEBUG
+
 springdoc:
   api-docs.path: /api/v1/openapi
   swagger-ui.path: /api/v1/swagger
