@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: suppingmall-api
+server:
+  port: 8080
