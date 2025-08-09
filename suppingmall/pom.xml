@@ -2,20 +2,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.7.RELEASE</version>
-        <relativePath/> <!-- lookup parent from repository -->
-    </parent>
     <groupId>com.supshop</groupId>
     <artifactId>suppingmall</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+      <module>core</module>
+      <module>api</module>
+      <module>infra</module>
+    </modules>
     <name>suppingmall</name>
     <description>Suppingmall</description>
 
     <properties>
-        <java.version>11</java.version>
+      <java.version>23</java.version>
+      <spring.boot.version>3.1.0</spring.boot.version>
     </properties>
 
     <dependencies>
@@ -54,7 +55,8 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
-            <scope>true</scope>
+            <optional>true</optional>
+            <scope>runtime</scope>
         </dependency>
 
         <dependency>
@@ -96,6 +98,7 @@
         <dependency>
             <groupId>org.thymeleaf.extras</groupId>
             <artifactId>thymeleaf-extras-springsecurity5</artifactId>
+            <version>3.1.1.RELEASE</version>
         </dependency>
 
         <dependency>
@@ -119,22 +122,44 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <version>5.2.1.RELEASE</version>
-            <scope>test</scope>
-        </dependency>
 
     </dependencies>
 
+    <dependencyManagement>
+      <dependencies>
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-dependencies</artifactId>
+          <version>${spring.boot.version}</version>
+          <type>pom</type>
+          <scope>import</scope>
+        </dependency>
+      </dependencies>
+    </dependencyManagement>
+
     <build>
+      <pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.11.0</version>
+            <configuration>
+              <release>${java.version}</release>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <version>${spring.boot.version}</version>
+            <executions>
+              <execution>
+                <goals><goal>repackage</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
+      </pluginManagement>
     </build>
 
 </project>
